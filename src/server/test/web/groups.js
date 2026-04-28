@@ -12,6 +12,7 @@ const Point = require('../../models/Point');
 const User = require('../../models/User');
 const Unit = require('../../models/Unit');
 const gpsPoint = new Point(90, 45);
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('groups API', () => {
 	let groupA;
@@ -59,7 +60,7 @@ mocha.describe('groups API', () => {
 	mocha.describe('retrieval', () => {
 		mocha.it('returns the list of existing groups', async () => {
 			const res = await chai.request(app).get('/api/groups/idname');
-			expect(res).to.have.status(200);
+			expect(res).to.have.status(HTTP_CODES.OK);
 			expect(res).to.be.json;
 			expect(res.body).to.be.a('array').with.a.lengthOf(3);
 			// This route only returns the id and name. Since we have other properties, we need to remove them
@@ -70,7 +71,7 @@ mocha.describe('groups API', () => {
 		});
 		mocha.it('returns the immediate children of a group', async () => {
 			const res = await chai.request(app).get(`/api/groups/children/${groupA.id}`);
-			expect(res).to.have.status(200);
+			expect(res).to.have.status(HTTP_CODES.OK);
 			expect(res).to.be.json;
 			expect(res.body).to.have.property('meters');
 			expect(res.body).to.have.property('groups');
@@ -79,14 +80,14 @@ mocha.describe('groups API', () => {
 		});
 		mocha.it('returns the deep child meters of a group', async () => {
 			const res = await chai.request(app).get(`/api/groups/deep/meters/${groupA.id}`);
-			expect(res).to.have.status(200);
+			expect(res).to.have.status(HTTP_CODES.OK);
 			expect(res).to.be.json;
 			expect(res.body).to.have.a.property('deepMeters');
 			expect(res.body.deepMeters).to.include.members([meterA.id, meterB.id, meterC.id]);
 		});
 		mocha.it('returns the deep child groups of a group', async () => {
 			const res = await chai.request(app).get(`/api/groups/deep/groups/${groupA.id}`);
-			expect(res).to.have.status(200);
+			expect(res).to.have.status(HTTP_CODES.OK);
 			expect(res).to.be.json;
 			expect(res.body).to.have.a.property('deepGroups');
 			expect(res.body.deepGroups).to.include.members([groupB.id, groupC.id]);
@@ -105,18 +106,18 @@ mocha.describe('groups API', () => {
 		mocha.describe('create endpoint', () => {
 			mocha.it('rejects all requests without a token with 403', async () => {
 				const res = await chai.request(app).post('/api/groups/create').type('json').send({});
-				expect(res).to.have.status(403);
+				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 			});
 			mocha.it('rejects all requests with an invalid token with 401', async () => {
 				const res = await chai.request(app).post('/api/groups/create').set('token', token + 'nope').type('json').send({});
-				expect(res).to.have.status(401);
+				expect(res).to.have.status(HTTP_CODES.UNAUTHORIZED);
 			});
 			mocha.describe('properly process roles:', () => {
 				for (const role of Object.keys(User.role)) {
 					const isAdmin = User.role[role] === User.role.ADMIN;
 					const message = `should ${isAdmin ? 'accept' : 'reject'} requests from ${role}`;
 					// Response status code should be 403 if improper role, but 400 if proper role, but improper user input.
-					const expectedResponseStatus = isAdmin ? 400 : 403;
+					const expectedResponseStatus = isAdmin ? HTTP_CODES.BAD_REQUEST : HTTP_CODES.FORBIDDEN;
 					mocha.it(message, async () => {
 						let currentToken;
 						let res;
@@ -147,11 +148,11 @@ mocha.describe('groups API', () => {
 					childGroups: [groupB.id],
 					childMeters: [meterA.id]
 				});
-				expect(res).to.have.status(200);
+				expect(res).to.have.status(HTTP_CODES.OK);
 
 				// Get the results of the API call.
 				const res2 = await chai.request(app).get('/api/groups').set('token', token);
-				expect(res2).to.have.status(200);
+				expect(res2).to.have.status(HTTP_CODES.OK);
 				expect(res2).to.be.json;
 				expect(res2.body).to.have.lengthOf(4);
 
@@ -165,18 +166,18 @@ mocha.describe('groups API', () => {
 		mocha.describe('edit endpoint', () => {
 			mocha.it('rejects all requests without a token with 403', async () => {
 				const res = await chai.request(app).put('/api/groups/edit').type('json').send({});
-				expect(res).to.have.status(403);
+				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 			});
 			mocha.it('rejects all requests with an invalid token with 401', async () => {
 				const res = await chai.request(app).put('/api/groups/edit').set('token', token + 'nope').type('json').send({});
-				expect(res).to.have.status(401);
+				expect(res).to.have.status(HTTP_CODES.UNAUTHORIZED);
 			});
 			mocha.describe('properly process roles', () => {
 				for (const role of Object.keys(User.role)) {
 					const isAdmin = User.role[role] === User.role.ADMIN;
 					const message = `should ${isAdmin ? 'accept' : 'reject'} requests from ${role}`;
 					// Response status code should be 403 if improper role, but 400 if proper role, but improper user input.
-					const expectedResponseStatus = isAdmin ? 400 : 403;
+					const expectedResponseStatus = isAdmin ? HTTP_CODES.BAD_REQUEST : HTTP_CODES.FORBIDDEN;
 					mocha.it(message, async () => {
 						let currentToken;
 						let res;
@@ -213,10 +214,10 @@ mocha.describe('groups API', () => {
 					childGroups: [],
 					childMeters: [meterC.id, meterD.id]
 				});
-				expect(res).to.have.status(200);
+				expect(res).to.have.status(HTTP_CODES.OK);
 
 				res = await chai.request(app).get(`/api/groups/children/${groupC.id}`);
-				expect(res).to.have.status(200);
+				expect(res).to.have.status(HTTP_CODES.OK);
 				expect(res).to.be.json;
 				expect(res.body).to.have.property('meters');
 				expect(res.body).to.have.property('groups');
@@ -234,10 +235,10 @@ mocha.describe('groups API', () => {
 					childGroups: [groupD.id],
 					childMeters: [meterC.id]
 				});
-				expect(res).to.have.status(200);
+				expect(res).to.have.status(HTTP_CODES.OK);
 
 				res = await chai.request(app).get(`/api/groups/children/${groupC.id}`);
-				expect(res).to.have.status(200);
+				expect(res).to.have.status(HTTP_CODES.OK);
 				expect(res).to.be.json;
 				expect(res.body).to.have.property('meters');
 				expect(res.body).to.have.property('groups');

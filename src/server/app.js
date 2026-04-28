@@ -32,6 +32,7 @@ const conversionArray = require('./routes/conversionArray');
 const units = require('./routes/units');
 const conversions = require('./routes/conversions');
 const ciks = require('./routes/ciks');
+const { HTTP_CODES } = require('./util/httpCodes');
 
 // Detect test environment and use higher rate limits during tests.
 // Rate limiting is critical for security in production but interferes with automated testing.
@@ -153,6 +154,12 @@ const router = express.Router();
 // Accept all other endpoint requests which will be handled by the client router
 router.get('*', (req, res) => {
 	fs.readFile(path.resolve(__dirname, '..', 'client', 'index.html'), (err, html) => {
+		if (err) {
+			log.error('Failed to read index.html for client router; logging caught err object.', err);
+			return res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).
+				send('Internal Server Error. Details are in the OED logs that are available to your site admin(s).');
+		}
+
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
 		res.send(htmlPlusData);
@@ -162,7 +169,26 @@ router.get('*', (req, res) => {
 app.use(router);
 
 app.use((req, res) => {
-	res.status(404).send('<h1>404 Not Found</h1>');
+	res.status(HTTP_CODES.NOT_FOUND).send('<h1>404 Not Found</h1>');
+});
+
+// Global error handler, errors will still be logged internally but keep client response generic
+app.use((err, req, res, next) => {
+	// Malformed JSON needs to return bad request for tests to pass
+	// err instanceof SyntaxError: body-parser throws SyntaxError when JSON cannot be parsed
+	// err.status === 400: confirms this parse failure maps to HTTP 400 Bad Request
+	// 'body' in err: indicates the error came from request body parsing and not an unrelated SyntaxError
+	if (err instanceof SyntaxError && err.status === HTTP_CODES.BAD_REQUEST && 'body' in err) {
+		return res.status(HTTP_CODES.BAD_REQUEST).send('Bad Request');
+	}
+
+	log.error('Unhandled request error caught by global error handler; logging forwarded err object.', err);
+	// If response headers are already sent, Express cannot safely change the response
+	// Forward to the default Express handler to finish error
+	if (res.headersSent) {
+		return next(err);
+	}
+	res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server Error' });
 });
 
 module.exports = app;

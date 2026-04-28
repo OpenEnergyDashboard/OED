@@ -10,6 +10,7 @@ const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { isTokenAuthorized, isUserAuthorized } = require('../util/userRoles');
 const { getConnection } = require('../db');
+const { HTTP_CODES } = require('../util/httpCodes');
 const escapeHtml = require('escape-html');
 const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH }
 	= require('../util/validationConstants');
@@ -18,7 +19,7 @@ const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN
  * Middleware function to require authentication on protected routes.
  * Verifies the request's token, ensures the user exists, and checks that
  * the token has not been invalidated.
- * This middleware is currently used within this file.
+ * This middleware was created to only be used within this file.
  */
 const authMiddleware = (req, res, next) => {
 	const token = req.headers.token || req.body.token || req.query.token;
@@ -28,24 +29,18 @@ const authMiddleware = (req, res, next) => {
 	};
 
 	if (!validate(token, validParams).valid) {
-		res.status(403).json({ success: false, message: 'No token provided or JSON was invalid.' });
+		res.status(HTTP_CODES.FORBIDDEN).json({ success: false, message: 'No token provided or JSON was invalid.' });
 	} else if (token) {
 		verifyActiveTokenAndGetUser(token)
 			.then(({ decoded }) => {
 				req.decoded = decoded;
 				next();
 			})
-			.catch(error => {
-				if (error.code === 'TOKEN_INVALIDATED') {
-					res.status(401).json({ success: false, message: 'Token invalidated.' });
-				} else if (error.message === 'No data returned from the query.') {
-					res.status(401).json({ success: false, message: 'User does not exist in database.' });
-				} else {
-					res.status(401).json({ success: false, message: 'Failed to authenticate token.' });
-				}
+			.catch(() => {
+				res.status(HTTP_CODES.UNAUTHORIZED).json({ success: false, message: 'Failed to authenticate token.' });
 			});
 	} else {
-		res.status(403).send({ success: false, message: 'No token provided.' });
+		res.status(HTTP_CODES.FORBIDDEN).send({ success: false, message: 'No token provided.' });
 	}
 };
 
@@ -74,7 +69,7 @@ function credentialsRequestValidationMiddleware(req, res, next) {
 		}
 	};
 	if (!validate(req.body, validParams).valid) {
-		res.status(400).send('Invalid JSON. \n');
+		res.status(HTTP_CODES.BAD_REQUEST).send('Invalid JSON. \n');
 	} else {
 		next();
 	}
@@ -121,31 +116,31 @@ async function verifyActiveTokenAndGetUser(token) {
 		});
 	});
 
-		// jwt.verify confirms the token signature is valid, but it does not guarantee
-    	// the referenced user still exists in the database. The user may have been
-    	// deleted after the token was issued, so OED must still verify the user record.
-    	const conn = getConnection();
-    	const user = await User.getByID(decoded.data, conn);
+	// jwt.verify confirms the token signature is valid, but it does not guarantee
+	// the referenced user still exists in the database. The user may have been
+	// deleted after the token was issued, so OED must still verify the user record.
+	const conn = getConnection();
+	const user = await User.getByID(decoded.data, conn);
 
-    	// Compare timestamps at millisecond precision to avoid edge cases caused by
-    	// JWT iat being stored in seconds while the database timestamp is more precise.
-    	const tokenIssuedAtMs = decoded.iat * 1000;
-    	let invalidBeforeMs = 0;
+	// Compare timestamps at millisecond precision to avoid edge cases caused by
+	// JWT iat being stored in seconds while the database timestamp is more precise.
+	const tokenIssuedAtMs = decoded.iat * 1000;
+	let invalidBeforeMs = 0;
 
-    	if (user.tokenInvalidBefore) {
-    		const parsedDate = new Date(user.tokenInvalidBefore);
-    		if (!isNaN(parsedDate.getTime())) {
-    			invalidBeforeMs = parsedDate.getTime();
-    		} else {
-    			log.error(`Invalid tokenInvalidBefore value for user ${user.id}`);
-    		}
-    	}
+	if (user.tokenInvalidBefore) {
+		const parsedDate = new Date(user.tokenInvalidBefore);
+		if (!isNaN(parsedDate.getTime())) {
+			invalidBeforeMs = parsedDate.getTime();
+		} else {
+			log.error(`Invalid tokenInvalidBefore value for user ${user.id}`);
+		}
+	}
 
-    	if (tokenIssuedAtMs <= invalidBeforeMs) {
-    		const error = new Error('Token invalidated');
-    		error.code = 'TOKEN_INVALIDATED';
-    		throw error;
-    	}
+	if (tokenIssuedAtMs <= invalidBeforeMs) {
+		const error = new Error('Token invalidated');
+		error.code = 'TOKEN_INVALIDATED';
+		throw error;
+	}
 
 	return { decoded, user };
 }
@@ -163,11 +158,11 @@ function roleTokenAuthMiddleware(role, action) {
 				next();
 			} else {
 				log.warn(`Got request to '${action}' with invalid credentials. ${role.toUpperCase()} role is required to '${action}'.`);
-				res.status(403)
+				res.status(HTTP_CODES.FORBIDDEN)
 					.json({ message: `Invalid credentials supplied. Only ${role.toUpperCase()} can ${action}.` });
 			}
-		})
-	}
+		});
+	};
 }
 
 /**
@@ -207,25 +202,25 @@ function obviusUsernameAndPasswordAuthMiddleware(action) {
 					} else {
 						const message = `Got request to '${action}' with invalid authorization level. Obvius role is at least required to '${action}'.`;
 						log.warn(message);
-						res.status(401).send(message);
+						res.status(HTTP_CODES.UNAUTHORIZED).send(message);
 						return;
 					}
 				} else {
 					const message = `Got request to '${action} with invalid credentials.`;
 					log.warn(message);
-					res.status(400).send(message);
+					res.status(HTTP_CODES.BAD_REQUEST).send(message);
 					return;
 				}
 			} catch (error) {
 				if (error.message === 'No data returned from the query.') {
-					res.status(400).send(`No user corresponding to the username: ${escapeHtml(req.body.username)} was found. Please make a request with a valid username.`);
+					res.status(HTTP_CODES.BAD_REQUEST).send(`No user corresponding to the username: ${escapeHtml(req.body.username)} was found. Please make a request with a valid username.`);
 				} else {
 					log.error('Internal Server Error for Obvius request.', error);
-					res.status(500).send('Internal OED Server Error for Obvius request.');
+					res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send('Internal OED Server Error for Obvius request.');
 				}
 			}
 		});
-	}
+	};
 }
 
 /**

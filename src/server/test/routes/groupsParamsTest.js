@@ -6,7 +6,7 @@
 
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 const {
 	testInvalidField,
 	validateNoExtraFields,
@@ -20,8 +20,8 @@ const {
 
 /** Non-numeric path values reused across group_id route tests. */
 const INVALID_GROUP_ID_PATH_VALUES = ['abc', '12abc', 'group123', 'null', ''];
-/** Some group routes still return HTTP_CODE.OK for malformed group_id until path validation is strict; test encodes current behavior. */
-const GROUP_ID_MALFORMED_EXPECTED_STATUSES = [HTTP_CODE.OK, HTTP_CODE.BAD_REQUEST];
+/** Some group routes still return HTTP_CODES.OK for malformed group_id until path validation is strict; test encodes current behavior. */
+const GROUP_ID_MALFORMED_EXPECTED_STATUSES = [HTTP_CODES.OK, HTTP_CODES.BAD_REQUEST];
 
 async function expectMalformedGroupIdRejectedOrOk(baseEndpoint) {
 	await validateNumericIdInPath({
@@ -44,7 +44,7 @@ mocha.describe('Groups Parameter Validation', () => {
 			await validateNumericIdInPath({
 				baseEndpoint: BASE_ENDPOINT,
 				invalidValues: ['1'.repeat(25)],
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 		});
 
@@ -52,7 +52,7 @@ mocha.describe('Groups Parameter Validation', () => {
 			await validateNumericIdInPath({
 				baseEndpoint: BASE_ENDPOINT,
 				invalidValues: [encodeURIComponent("1' OR '1'='1")],
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 		});
 
@@ -76,7 +76,7 @@ mocha.describe('Groups Parameter Validation', () => {
 			await validateNumericIdInPath({
 				baseEndpoint: BASE_ENDPOINT,
 				invalidValues: pathTraversalAttempts,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 		});
 	});
@@ -92,7 +92,7 @@ mocha.describe('Groups Parameter Validation', () => {
 			await validateNumericIdInPath({
 				baseEndpoint: BASE_ENDPOINT,
 				invalidValues: ['9'.repeat(50)],
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 		});
 	});
@@ -119,7 +119,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				.send(baseGroupData);
 
 			// Should require admin authentication (rate limiting may also trigger)
-			expect([HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]).to.include(res.status);
+			expect([HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]).to.include(res.status);
 		});
 
 		mocha.it('should validate required fields', async () => {
@@ -134,7 +134,7 @@ mocha.describe('Groups Parameter Validation', () => {
 					.send(payloadMissingField);
 
 				// Should fail due to missing required field (validation catches before auth)
-				expect([HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]).to.include(res.status);
+				expect([HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]).to.include(res.status);
 			}
 		});
 
@@ -145,7 +145,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: 'x'.repeat(STRING_SHORT_MAX_LENGTH + 1),
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test note field length  
@@ -154,7 +154,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: 'x'.repeat(STRING_GENERAL_MAX_LENGTH + 1),
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test areaUnit field length
@@ -163,7 +163,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: 'x'.repeat(51),
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 		});
 
@@ -174,7 +174,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: { latitude: 91, longitude: 0 },
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test invalid longitude (outside -180 to 180)  
@@ -183,7 +183,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: { latitude: 0, longitude: 181 },
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test missing required GPS fields
@@ -192,7 +192,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: { latitude: 45 },
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test non-numeric GPS values
@@ -201,7 +201,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: { latitude: 'north', longitude: 'west' },
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 		});
 
@@ -213,7 +213,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: oversizedChildGroups,
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test oversized childMeters array
@@ -223,7 +223,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: oversizedChildMeters,
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test invalid childGroup IDs (non-integer)
@@ -232,7 +232,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: ['abc', 'def'],
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test invalid childGroup IDs (negative)
@@ -241,7 +241,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: [-1, 0],
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test duplicate values in childGroups (uniqueItems: true)
@@ -250,7 +250,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: [1, 2, 2, 3],
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 		});
 
@@ -261,7 +261,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: -1,
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test invalid defaultGraphicUnit (minimum: 1)
@@ -270,7 +270,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: 0,
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 
 			// Test invalid ID (minimum: 1)
@@ -279,7 +279,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: 0,
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseGroupData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -292,7 +292,7 @@ mocha.describe('Groups Parameter Validation', () => {
 					invalidValue: invalidValue,
 					endpoint: CREATE_ENDPOINT,
 					basePayload: baseGroupData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -308,7 +308,7 @@ mocha.describe('Groups Parameter Validation', () => {
 					executeCommand: 'rm -rf /',
 					extraProperty: 'should be rejected'
 				},
-				expectedStatus: [HTTP_CODE.FORBIDDEN, HTTP_CODE.TOO_MANY_REQUESTS]
+				expectedStatus: [HTTP_CODES.FORBIDDEN, HTTP_CODES.TOO_MANY_REQUESTS]
 			});
 		});
 
@@ -330,7 +330,7 @@ mocha.describe('Groups Parameter Validation', () => {
 						invalidValue: maliciousInput,
 						endpoint: CREATE_ENDPOINT,
 						basePayload: baseGroupData,
-						expectedStatus: HTTP_CODE.FORBIDDEN
+						expectedStatus: HTTP_CODES.FORBIDDEN
 					});
 				}
 			}
@@ -351,7 +351,7 @@ mocha.describe('Groups Parameter Validation', () => {
 					.send(payloadWithNull);
 
 				// Should pass validation but fail auth
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 
@@ -364,7 +364,7 @@ mocha.describe('Groups Parameter Validation', () => {
 					invalidValue: invalidUnit,
 					endpoint: CREATE_ENDPOINT,
 					basePayload: baseGroupData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -392,7 +392,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				.send(baseGroupData);
 
 			// Should require admin authentication
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate required id field for edit', async () => {
@@ -404,7 +404,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				.send(payloadMissingId);
 
 			// Should fail validation (id is required for edit)
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should reject parameter injection on edit', async () => {
@@ -420,7 +420,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				.send(payloadWithExtra);
 
 			// Should fail due to additionalProperties: false
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate all fields with same constraints as create', async () => {
@@ -432,7 +432,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				endpoint: EDIT_ENDPOINT,
 				basePayload: baseGroupData,
 				// TODO: Should be 403 for auth or 400 for validation
-				expectedStatus: HTTP_CODE.NOT_FOUND
+				expectedStatus: HTTP_CODES.NOT_FOUND
 			});
 
 			// TODO: Same routing issue - PUT endpoint behavior needs review
@@ -442,7 +442,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				endpoint: EDIT_ENDPOINT,
 				basePayload: baseGroupData,
 				// TODO: Should be 403 for auth or 400 for validation
-				expectedStatus: HTTP_CODE.NOT_FOUND
+				expectedStatus: HTTP_CODES.NOT_FOUND
 			});
 		});
 	});
@@ -460,7 +460,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				.send(baseDeleteData);
 
 			// Should require admin authentication
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate required id field', async () => {
@@ -469,7 +469,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				.send({});
 
 			// Should fail validation (id is required)
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate id constraints', async () => {
@@ -479,7 +479,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: -1,
 				endpoint: DELETE_ENDPOINT,
 				basePayload: baseDeleteData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 
 			// Test zero ID
@@ -488,7 +488,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: 0,
 				endpoint: DELETE_ENDPOINT,
 				basePayload: baseDeleteData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 
 			// Test non-integer ID
@@ -497,7 +497,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				invalidValue: 'not_a_number',
 				endpoint: DELETE_ENDPOINT,
 				basePayload: baseDeleteData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -514,7 +514,7 @@ mocha.describe('Groups Parameter Validation', () => {
 				.send(payloadWithExtra);
 
 			// Should fail due to additionalProperties: false
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 	});
 
@@ -540,7 +540,7 @@ mocha.describe('Groups Parameter Validation', () => {
 
 			// All should fail with 403 (auth required)
 			results.forEach(res => {
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			});
 		});
 
@@ -553,17 +553,17 @@ mocha.describe('Groups Parameter Validation', () => {
 				// Test non-object payload
 				const res1 = await chai.request(app)[method](endpoint)
 					.send('not an object');
-				expect(res1.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res1.status).to.equal(HTTP_CODES.FORBIDDEN);
 
 				// Test array payload
 				const res2 = await chai.request(app)[method](endpoint)
 					.send(['array', 'payload']);
-				expect(res2.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res2.status).to.equal(HTTP_CODES.FORBIDDEN);
 
 				// Test null payload
 				const res3 = await chai.request(app)[method](endpoint)
 					.send(null);
-				expect(res3.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res3.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 	});

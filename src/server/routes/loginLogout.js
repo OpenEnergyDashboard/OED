@@ -12,6 +12,7 @@ const { log } = require('../log');
 const { getConnection } = require('../db');
 const { credentialsRequestValidationMiddleware, verifyActiveTokenAndGetUser } = require('./authenticator');
 const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } = require('../util/validationConstants');
+const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
 
@@ -40,7 +41,7 @@ router.post('/login', credentialsRequestValidationMiddleware, async (req, res) =
 	};
 
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
@@ -60,10 +61,10 @@ router.post('/login', credentialsRequestValidationMiddleware, async (req, res) =
 			}
 		} catch (err) {
 			if (err.message === 'Unauthorized password' || err.message === 'No data returned from the query.') {
-				res.status(401).send({ text: 'Not authorized' });
+				res.status(HTTP_CODES.UNAUTHORIZED).send({ text: 'Not authorized' });
 			} else {
 				log.error(`Unable to check user password for ${req.body.username}`, err);
-				res.status(500).send({ text: 'Internal Server Error' });
+				res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send({ text: 'Internal Server Error' });
 			}
 		}
 	}
@@ -93,7 +94,7 @@ router.post('/logout', async (req, res) => {
 	};
 
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		return;
 	}
 
@@ -105,15 +106,15 @@ router.post('/logout', async (req, res) => {
 		const { user } = await verifyActiveTokenAndGetUser(req.body.token);
 		const conn = getConnection();
 		await User.invalidateTokensBeforeNow(user.id, conn);
-		res.json({ success: true, message: 'Logout successful.' });
+		res.status(HTTP_CODES.OK).json({ success: true, message: 'Logout successful.' });
 	} catch (error) {
 		if (error.code === 'TOKEN_INVALIDATED') {
-			res.json({ success: true, message: 'Logout successful.' });
+			res.status(HTTP_CODES.OK).json({ success: true, message: 'Logout successful.' });
 		} else if (error.message === 'No data returned from the query.') {
-			res.status(401).json({ success: false, message: 'Logout failed.' });
+			res.status(HTTP_CODES.UNAUTHORIZED).json({ success: false, message: 'Logout failed.' });
 		} else {
 			log.error('Logout failed while invalidating user tokens.', error);
-			res.status(500).json({ success: false, message: 'Logout failed.' });
+			res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Logout failed.' });
 		}
 	}
 });

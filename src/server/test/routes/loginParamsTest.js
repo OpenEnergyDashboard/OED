@@ -7,7 +7,7 @@
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
 const { validateString, testInvalidField, validateNoExtraFields } = require('../util/validationHelpers');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 const {
 	PASSWORD_MAX_LENGTH,
 	PASSWORD_MIN_LENGTH,
@@ -31,7 +31,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: undefined,
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: [HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED]
+				expectedStatus: [HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED]
 			});
 
 			await testInvalidField({
@@ -39,7 +39,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: 'x'.repeat(USERNAME_MIN_LENGTH - 1),
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: [HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED]
+				expectedStatus: [HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED]
 			});
 
 			await testInvalidField({
@@ -47,7 +47,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: 'x'.repeat(USERNAME_MAX_LENGTH + 1),
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: [HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED]
+				expectedStatus: [HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED]
 			});
 		});
 
@@ -58,7 +58,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: "'; DROP TABLE users; --",
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 
 			// Test XSS attempt - login will return 401 for invalid credentials
@@ -67,7 +67,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: '<script>alert("xss")</script>',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 
 			// Test LDAP injection attempt
@@ -76,7 +76,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: 'admin)(&(password=*))',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 		});
 
@@ -87,7 +87,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: 'user@' + 'x'.repeat(250) + '.com',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 
 			// Test empty username
@@ -96,7 +96,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: '',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 
 			// Test null bytes - TODO: Currently returns 500 (likely database rejection of null bytes)
@@ -108,7 +108,7 @@ mocha.describe('Login Parameter Validation', () => {
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
 				// TODO: Verify this is correct expected behavior
-				expectedStatus: HTTP_CODE.INTERNAL_SERVER_ERROR
+				expectedStatus: HTTP_CODES.INTERNAL_SERVER_ERROR
 			});
 		});
 	});
@@ -132,7 +132,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: 'x'.repeat(1001),
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 
 			// Test null bytes - login will return 401 for invalid credentials
@@ -141,7 +141,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: 'password\x00injection',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 
 			// Test Unicode normalization attacks
@@ -150,7 +150,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: 'pa\u0073\u0073word', // Unicode 's'
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 		});
 
@@ -161,7 +161,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: 'short',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 
 			// Test empty password
@@ -170,7 +170,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: '',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 
 			// Test whitespace-only password
@@ -179,7 +179,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: '        ',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 		});
 	});
@@ -194,7 +194,7 @@ mocha.describe('Login Parameter Validation', () => {
 					admin: true,
 					role: 'ADMIN'
 				},
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 		});
 
@@ -203,19 +203,19 @@ mocha.describe('Login Parameter Validation', () => {
 			const res1 = await chai.request(app)
 				.post(LOGIN_ENDPOINT)
 				.send('not an object');
-			expect(res1).to.have.status(HTTP_CODE.BAD_REQUEST);
+			expect(res1).to.have.status(HTTP_CODES.BAD_REQUEST);
 
 			// Test array payload
 			const res2 = await chai.request(app)
 				.post(LOGIN_ENDPOINT)
 				.send(['username', 'password']);
-			expect(res2).to.have.status(HTTP_CODE.BAD_REQUEST);
+			expect(res2).to.have.status(HTTP_CODES.BAD_REQUEST);
 
 			// Test null payload
 			const res3 = await chai.request(app)
 				.post(LOGIN_ENDPOINT)
 				.send(null);
-			expect(res3).to.have.status(HTTP_CODE.BAD_REQUEST);
+			expect(res3).to.have.status(HTTP_CODES.BAD_REQUEST);
 		});
 	});
 
@@ -235,7 +235,7 @@ mocha.describe('Login Parameter Validation', () => {
 			const end = Date.now();
 
 			// Should return 401 for invalid credentials, not reveal user existence
-			expect(res).to.have.status(HTTP_CODE.UNAUTHORIZED);
+			expect(res).to.have.status(HTTP_CODES.UNAUTHORIZED);
 			expect(res.body).to.have.property('text', 'Not authorized');
 
 			// Response should take reasonable time (not too fast revealing user doesn't exist)
@@ -260,7 +260,7 @@ mocha.describe('Login Parameter Validation', () => {
 
 			// All should fail consistently
 			results.forEach(res => {
-				expect(res).to.have.status(HTTP_CODE.UNAUTHORIZED);
+				expect(res).to.have.status(HTTP_CODES.UNAUTHORIZED);
 				expect(res.body).to.have.property('text', 'Not authorized');
 			});
 		});
@@ -270,19 +270,19 @@ mocha.describe('Login Parameter Validation', () => {
 			const res1 = await chai.request(app)
 				.post(LOGIN_ENDPOINT)
 				.send({ password: 'somepassword123' });
-			expect(res1).to.have.status(HTTP_CODE.BAD_REQUEST);
+			expect(res1).to.have.status(HTTP_CODES.BAD_REQUEST);
 
 			// Missing password
 			const res2 = await chai.request(app)
 				.post(LOGIN_ENDPOINT)
 				.send({ username: 'user@example.com' });
-			expect(res2).to.have.status(HTTP_CODE.BAD_REQUEST);
+			expect(res2).to.have.status(HTTP_CODES.BAD_REQUEST);
 
 			// Missing both
 			const res3 = await chai.request(app)
 				.post(LOGIN_ENDPOINT)
 				.send({});
-			expect(res3).to.have.status(HTTP_CODE.BAD_REQUEST);
+			expect(res3).to.have.status(HTTP_CODES.BAD_REQUEST);
 		});
 	});
 
@@ -293,7 +293,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: 12345,
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 
 			await testInvalidField({
@@ -301,7 +301,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: true,
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 
 			await testInvalidField({
@@ -309,7 +309,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: { email: 'user@example.com' },
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 		});
 
@@ -319,7 +319,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: 12345678,
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 
 			await testInvalidField({
@@ -327,7 +327,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: true,
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 
 			await testInvalidField({
@@ -335,7 +335,7 @@ mocha.describe('Login Parameter Validation', () => {
 				invalidValue: ['p', 'a', 's', 's', 'w', 'o', 'r', 'd'],
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 		});
 	});

@@ -7,7 +7,7 @@
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
 const { validateString, testInvalidField, validateNoExtraFields } = require('../util/validationHelpers');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH }
 	= require('../../util/validationConstants');
 
@@ -62,7 +62,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 					maliciousField: 'injection attempt',
 					anotherField: 'should be rejected'
 				},
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 		});
 
@@ -73,7 +73,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				invalidValue: "'; DROP TABLE users; --",
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 
 			// Test XSS attempt - login will return 401 for invalid credentials
@@ -82,7 +82,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				invalidValue: '<script>alert("xss")</script>',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 
 			// Test command injection attempt
@@ -91,7 +91,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				invalidValue: '$(rm -rf /)',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 
 			await testInvalidField({
@@ -99,7 +99,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				invalidValue: '| cat /etc/passwd',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 		});
 
@@ -110,7 +110,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				invalidValue: 'x'.repeat(PASSWORD_MAX_LENGTH + 1),
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.BAD_REQUEST
+				expectedStatus: HTTP_CODES.BAD_REQUEST
 			});
 
 			// Test null bytes - login will return 401 for invalid credentials
@@ -119,7 +119,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				invalidValue: 'password\x00injection',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 
 			// Test command injection attempt
@@ -128,7 +128,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				invalidValue: '$(rm -rf /)',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 
 			await testInvalidField({
@@ -136,7 +136,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				invalidValue: '`shutdown -h now`',
 				endpoint: LOGIN_ENDPOINT,
 				basePayload: baseCredentials,
-				expectedStatus: HTTP_CODE.UNAUTHORIZED
+				expectedStatus: HTTP_CODES.UNAUTHORIZED
 			});
 		});
 	});
@@ -153,7 +153,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get(PROTECTED_ENDPOINT)
 				.set('token', hugeToken);
-			expect(res).to.have.status(HTTP_CODE.FORBIDDEN);
+			expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should reject non-string tokens in headers', async () => {
@@ -161,7 +161,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				.get(PROTECTED_ENDPOINT)
 				.set('token', 12345);
 
-			expect(res).to.have.status(HTTP_CODE.UNAUTHORIZED);
+			expect(res).to.have.status(HTTP_CODES.UNAUTHORIZED);
 		});
 
 		mocha.it('should reject non-string tokens in body', async () => {
@@ -169,7 +169,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				.post(PROTECTED_ENDPOINT)
 				.send({ token: 12345 });
 
-			expect(res).to.have.status(HTTP_CODE.NOT_FOUND);
+			expect(res).to.have.status(HTTP_CODES.NOT_FOUND);
 		});
 
 		mocha.it('should reject non-string tokens in query', async () => {
@@ -177,7 +177,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				.get(PROTECTED_ENDPOINT)
 				.query({ token: 12345 });
 
-			expect(res).to.have.status(HTTP_CODE.UNAUTHORIZED);
+			expect(res).to.have.status(HTTP_CODES.UNAUTHORIZED);
 		});
 
 		mocha.it('should handle extremely long bearer tokens', async () => {
@@ -187,7 +187,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				.get(PROTECTED_ENDPOINT)
 				.set('token', hugeToken);
 
-			expect(res).to.have.status(HTTP_CODE.FORBIDDEN);
+			expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should reject malformed JWT tokens', async () => {
@@ -206,7 +206,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 					.set('token', token);
 
 				// Should either be 403 (invalid format) or 401 (invalid signature)
-				expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			}
 		});
 	});
@@ -230,7 +230,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 
 			// All should fail with 400 or 401 (invalid credentials)
 			results.forEach(res => {
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED]).to.include(res.status);
 			});
 		});
 
@@ -249,7 +249,7 @@ mocha.describe('Authenticator Parameter Validation', () => {
 				.send(nonExistentUser);
 
 			// Response should not reveal whether user exists or not
-			expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED]).to.include(res1.status);
+			expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED]).to.include(res1.status);
 		});
 	});
 });

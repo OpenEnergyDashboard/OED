@@ -18,21 +18,7 @@ const DELTA = 0.0000001;
 const METER_ID = 100;
 const GROUP_ID = 200;
 // Some common HTTP status response codes
-const HTTP_CODE = {
-	OK: 200,
-	FOUND: 302,
-	NOT_MODIFIED: 304,
-	BAD_REQUEST: 400,
-	UNAUTHORIZED: 401,
-	FORBIDDEN: 403,
-	NOT_FOUND: 404,
-	METHOD_NOT_ALLOWED: 405,
-	NOT_ACCEPTABLE: 406,
-	UNPROCESSABLE_ENTITY: 422,
-	TOO_MANY_REQUESTS: 429,
-	INTERNAL_SERVER_ERROR: 500,
-	SERVICE_UNAVAILABLE: 503
-};
+const { HTTP_CODES } = require('./httpCodes');
 
 /**
  * Initialize test database, call the functions to insert data into the database,
@@ -71,7 +57,7 @@ async function parseExpectedCsv(fileName) {
  */
 function expectReadingToEqualExpected(res, expected, id = METER_ID) {
 	expect(res).to.be.json;
-	expect(res).to.have.status(HTTP_CODE.OK);
+	expect(res).to.have.status(HTTP_CODES.OK);
 	// Did the response have the correct number of readings.
 	expect(res.body).to.have.property(`${id}`).to.have.lengthOf(expected.length);
 	// Loop over each reading
@@ -90,27 +76,27 @@ function expectReadingToEqualExpected(res, expected, id = METER_ID) {
  * @param {array} expected the returned array from parseExpectedCsv
  */
 function expectRangeToEqualExpected(res, expected, id = METER_ID) {
-    expect(res).to.be.json;
-    expect(res).to.have.status(HTTP_CODE.OK);
-    // Did the response have the correct number of readings.
-    expect(res.body).to.have.property(`${id}`).to.have.lengthOf(expected.length);
-    // Loop over each reading
-    for (let i = 0; i < expected.length; i++) {
-        // The parsing of the expected CSV file returns a string which will be null if no min/max
-        if (expected[i][0] === 'null' || expected[i][1] === 'null') {
-            // This is a case where raw/meter readings are being returned so min/max is null.
-            // Both expected values should always be null if one is so require one to be null to be safe.
-            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.equal(null);
-            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.equal(null);
-        } else {
-            // Check that the reading's min/max is within the expected tolerance (DELTA).
-            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.be.closeTo(Number(expected[i][0]), DELTA);
-            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.be.closeTo(Number(expected[i][1]), DELTA);
-        }
-        // Reading has correct start/end date and time.
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][2]));
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][3]));
-    }
+	expect(res).to.be.json;
+	expect(res).to.have.status(HTTP_CODES.OK);
+	// Did the response have the correct number of readings.
+	expect(res.body).to.have.property(`${id}`).to.have.lengthOf(expected.length);
+	// Loop over each reading
+	for (let i = 0; i < expected.length; i++) {
+		// The parsing of the expected CSV file returns a string which will be null if no min/max
+		if (expected[i][0] === 'null' || expected[i][1] === 'null') {
+			// This is a case where raw/meter readings are being returned so min/max is null.
+			// Both expected values should always be null if one is so require one to be null to be safe.
+			expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.equal(null);
+			expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.equal(null);
+		} else {
+			// Check that the reading's min/max is within the expected tolerance (DELTA).
+			expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.be.closeTo(Number(expected[i][0]), DELTA);
+			expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.be.closeTo(Number(expected[i][1]), DELTA);
+		}
+		// Reading has correct start/end date and time.
+		expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][2]));
+		expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][3]));
+	}
 }
 
 /**
@@ -120,7 +106,7 @@ function expectRangeToEqualExpected(res, expected, id = METER_ID) {
  */
 function expectCompareToEqualExpected(res, expected, id = METER_ID) {
 	expect(res).to.be.json;
-	expect(res).to.have.status(HTTP_CODE.OK);
+	expect(res).to.have.status(HTTP_CODES.OK);
 	// Did the response have the correct meter
 	expect(res.body).to.have.property(`${id}`);
 	// Check that the reading's values (previous value and current value) is within the expected tolerance (DELTA).
@@ -140,7 +126,7 @@ function expectThreeDReadingToEqualExpected(res, expected, timePerReading, noDat
 	// Number of days expected to be returned. Special of only 1 value if 3D cannot return data so special value.
 	let days = noData ? 1 : expected.length / readingsPerDay;
 	expect(res).to.be.json;
-	expect(res).to.have.status(HTTP_CODE.OK);
+	expect(res).to.have.status(HTTP_CODES.OK);
 	// Did the response have the correct type of properties.
 	expect(res.body).to.have.property('xData');
 	expect(res.body).to.have.property('yData');
@@ -305,7 +291,6 @@ module.exports = {
 	DELTA,
 	METER_ID,
 	GROUP_ID,
-	HTTP_CODE,
 	unitDatakWh,
 	conversionDatakWh,
 	meterDatakWh,
