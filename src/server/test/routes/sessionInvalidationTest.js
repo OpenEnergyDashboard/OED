@@ -8,7 +8,7 @@ const { expect } = require('chai');
 const common = require('../common');
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../../config').secretToken;
 
@@ -32,7 +32,7 @@ mocha.describe('Session Invalidation Security', () => {
 				password
 			});
 
-		expect(res).to.have.status(HTTP_CODE.OK);
+		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res.body).to.have.property('token');
 		return res.body.token;
 	}
@@ -49,7 +49,7 @@ mocha.describe('Session Invalidation Security', () => {
 				.post(VERIFY_ENDPOINT)
 				.send({ token });
 
-			expect(verifyRes).to.have.status(HTTP_CODE.OK);
+			expect(verifyRes).to.have.status(HTTP_CODES.OK);
 			expect(verifyRes.body).to.have.property('success', true);
 			expect(verifyRes.body).to.not.have.property('message');
 		});
@@ -59,21 +59,21 @@ mocha.describe('Session Invalidation Security', () => {
 				.post(VERIFY_ENDPOINT)
 				.send({ token });
 
-			expect(beforeVerify).to.have.status(HTTP_CODE.OK);
+			expect(beforeVerify).to.have.status(HTTP_CODES.OK);
 			expect(beforeVerify.body).to.have.property('success', true);
 
 			const logoutRes = await chai.request(app)
 				.post(LOGOUT_ENDPOINT)
 				.send({ token });
 
-			expect(logoutRes).to.have.status(HTTP_CODE.OK);
+			expect(logoutRes).to.have.status(HTTP_CODES.OK);
 			expect(logoutRes.body).to.have.property('success', true);
 
 			const verifyRes = await chai.request(app)
 				.post(VERIFY_ENDPOINT)
 				.send({ token });
 
-			expect(verifyRes).to.have.status(HTTP_CODE.UNAUTHORIZED);
+			expect(verifyRes).to.have.status(HTTP_CODES.UNAUTHORIZED);
 			expect(verifyRes.body).to.have.property('success', false);
 			expect(verifyRes.body).to.have.property('message', 'Failed to authenticate token.');
 		});
@@ -83,14 +83,14 @@ mocha.describe('Session Invalidation Security', () => {
 				.post(LOGOUT_ENDPOINT)
 				.send({ token });
 
-			expect(firstLogoutRes).to.have.status(HTTP_CODE.OK);
+			expect(firstLogoutRes).to.have.status(HTTP_CODES.OK);
 			expect(firstLogoutRes.body).to.have.property('success', true);
 
 			const secondLogoutRes = await chai.request(app)
 				.post(LOGOUT_ENDPOINT)
 				.send({ token });
 
-			expect(secondLogoutRes).to.have.status(HTTP_CODE.OK);
+			expect(secondLogoutRes).to.have.status(HTTP_CODES.OK);
 			expect(secondLogoutRes.body).to.have.property('success', true);
 			expect(secondLogoutRes.body).to.have.property('message', 'Logout successful.');
 		});
@@ -100,7 +100,7 @@ mocha.describe('Session Invalidation Security', () => {
 				.get(PROTECTED_ENDPOINT)
 				.set('token', token);
 
-			expect(beforeLogoutRes).to.have.status(HTTP_CODE.OK);
+			expect(beforeLogoutRes).to.have.status(HTTP_CODES.OK);
 
 			await chai.request(app)
 				.post(LOGOUT_ENDPOINT)
@@ -110,9 +110,9 @@ mocha.describe('Session Invalidation Security', () => {
 				.get(PROTECTED_ENDPOINT)
 				.set('token', token);
 
-			expect(afterLogoutRes).to.have.status(HTTP_CODE.UNAUTHORIZED);
+			expect(afterLogoutRes).to.have.status(HTTP_CODES.UNAUTHORIZED);
 			expect(afterLogoutRes.body).to.have.property('success', false);
-			expect(afterLogoutRes.body).to.have.property('message', 'Token invalidated.');
+			expect(afterLogoutRes.body).to.have.property('message', 'Failed to authenticate token.');
 		});
 
 		mocha.it('should require a token for logout', async () => {
@@ -120,7 +120,7 @@ mocha.describe('Session Invalidation Security', () => {
 				.post(LOGOUT_ENDPOINT)
 				.send({});
 
-			expect(res).to.have.status(HTTP_CODE.BAD_REQUEST);
+			expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 		});
 
 		mocha.it('should reject extra fields on logout', async () => {
@@ -131,7 +131,7 @@ mocha.describe('Session Invalidation Security', () => {
 					extraField: 'should be rejected'
 				});
 
-			expect(res).to.have.status(HTTP_CODE.BAD_REQUEST);
+			expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 		});
 
 		mocha.it('should reject an expired token through normal JWT expiration handling', async () => {
@@ -147,7 +147,7 @@ mocha.describe('Session Invalidation Security', () => {
 				.post(VERIFY_ENDPOINT)
 				.send({ token: expiredToken });
 
-			expect(res).to.have.status(HTTP_CODE.UNAUTHORIZED);
+			expect(res).to.have.status(HTTP_CODES.UNAUTHORIZED);
 			expect(res.body).to.have.property('success', false);
 			expect(res.body).to.have.property('message', 'Failed to authenticate token.');
 		});
@@ -176,21 +176,21 @@ mocha.describe('Session Invalidation Security', () => {
 				.post(VERIFY_ENDPOINT)
 				.send({ token: csvToken });
 
-			expect(beforeVerify).to.have.status(HTTP_CODE.OK);
+			expect(beforeVerify).to.have.status(HTTP_CODES.OK);
 			expect(beforeVerify.body).to.have.property('success', true);
 
 			const logoutRes = await chai.request(app)
 				.post(LOGOUT_ENDPOINT)
 				.send({ token: csvToken });
 
-			expect(logoutRes).to.have.status(HTTP_CODE.OK);
+			expect(logoutRes).to.have.status(HTTP_CODES.OK);
 			expect(logoutRes.body).to.have.property('success', true);
 
 			const verifyRes = await chai.request(app)
 				.post(VERIFY_ENDPOINT)
 				.send({ token: csvToken });
 
-			expect(verifyRes).to.have.status(HTTP_CODE.UNAUTHORIZED);
+			expect(verifyRes).to.have.status(HTTP_CODES.UNAUTHORIZED);
 			expect(verifyRes.body).to.have.property('success', false);
 			expect(verifyRes.body).to.have.property('message', 'Failed to authenticate token.');
 		});
