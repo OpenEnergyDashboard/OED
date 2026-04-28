@@ -71,13 +71,12 @@ const testUser = new User(undefined, 'test@example.invalid', bcrypt.hashSync('pa
 testUser.password = 'password';
 
 async function recreateDB() {
-	conn = testDB.getConnection();
+	const conn = testDB.getConnection();
 	// This should drop all database objects, as long as they were all created by the current database user
 	// They should be, since they were all created during a previous test.
 	await conn.none('DROP OWNED BY current_user;');
 	await createSchema(conn);
 	await testUser.insert(conn);
-    await testUser2.insert(conn);
 }
 
 mocha.before(() => {
@@ -97,7 +96,7 @@ module.exports = {
 	mocha,
 	expect,
 	app,
-	testUser,,
+	testUser,
 	recreateDB,
 	testDB
 };
