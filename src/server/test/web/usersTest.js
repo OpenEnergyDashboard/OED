@@ -8,7 +8,6 @@
 const { chai, mocha, expect, app, testDB, testUser, recreateDB } = require('../common');
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
-const { log } = require('console');
 const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Users API', () => {
@@ -71,7 +70,6 @@ mocha.describe('Users API', () => {
 			const res1 = await chai.request(app).post('/api/users/edit').set('token', token).send({
 				user: { id: retrievedTestUser.id, username: retrievedTestUser.username, role: retrievedTestUser.role, note: 'test note' }
 			});
-			expect(res1).to.have.status(200);
 			expect(res1).to.have.status(HTTP_CODES.OK);
 
 			const res2 = await chai.request(app).post('/api/users/edit').set('token', token).send({
