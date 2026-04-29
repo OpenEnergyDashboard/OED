@@ -67,6 +67,13 @@ async function uploadMeters(req, res, filepath, conn) {
 				meter[6] = switchGPS(gpsInput);
 			}
 
+			// verify the area input
+			const areaInput = meter[9];
+			const areaInputCheck = isValidArea(areaInput, i);
+			if (!areaInputCheck.value) {
+				throw new CSVPipelineError(areaInputCheck.areaMsg, undefined, 500);
+			}
+
 			const timeSortValue = meter[17];
 			const timeSortCheck = isValidTimeSort(timeSortValue, i);
 			if (!timeSortCheck.value) {
@@ -294,6 +301,32 @@ function switchGPS(gpsString) {
 	const array = gpsString.split(',');
 	// return String(array[1] + "," + array[0]);
 	return (array[1] + ',' + array[0]);
+}
+
+/**
+ * Checks if the area provided is a number and if it is larger than zero.
+ * @param {number | string} areaInput - The provided area for the meter
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+function isValidArea(areaInput, rowIndex) {
+	let msg = '';
+
+	const val = Number(areaInput);
+
+	// check for non-number input, which is not allowed
+	if (Number.isNaN(val)) {
+		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" is not a number.`;
+		return { areaMsg: msg, value: false };
+	}
+
+	// must be a number and must be non-negative
+	if (val < 0) {
+		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" cannot be less than zero.`;
+		return { areaMsg: msg, value: false };
+	}
+
+	return { areaMsg: '', value: true };
 }
 
 /**
