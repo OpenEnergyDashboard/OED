@@ -67,6 +67,13 @@ async function uploadMeters(req, res, filepath, conn) {
 				meter[6] = switchGPS(gpsInput);
 			}
 
+			// Verify area unit provided
+			const areaUnitString = meter[25];
+			const areaUnitCheck = isValidAreaUnit(areaUnitString, i);
+			if (!areaUnitCheck.value) {
+				throw new CSVPipelineError(areaUnitCheck.areaUnitMsg, undefined, 500);
+			}
+
 			// Process unit.
 			const unitName = meter[23];
 			const unitId = await getUnitId(unitName, Unit.unitType.METER, conn);
@@ -233,6 +240,24 @@ function switchGPS(gpsString) {
 	const array = gpsString.split(',');
 	// return String(array[1] + "," + array[0]);
 	return (array[1] + ',' + array[0]);
+}
+
+/**
+ * Checks if the unit of measurement for area is valid
+ * @param {string} areaUnit - the unit of measurement for area
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag
+ */
+function isValidAreaUnit(areaUnit, rowIndex) {
+	let msg = '';
+	const validTypes = Object.values(Unit.areaUnitType);
+	// must be one of the enum values 
+	if (validTypes.includes(areaUnit)) {
+		return { areaUnitMsg: '', value: true };
+	} else {
+		msg = `Unrecognizable area unit in row ${rowIndex + 1}: "${areaUnit}" is not a valid unit.`;
+		return { areaUnitMsg: msg, value: false };
+	}
 }
 
 /**
