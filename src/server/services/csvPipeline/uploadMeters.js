@@ -87,6 +87,14 @@ async function uploadMeters(req, res, filepath, conn) {
 				throw new CSVPipelineError(maxErrorCheck.maxErrorMsg, undefined, 500);
 			}
 
+			// Verify meter type
+			const meterTypeString = meter[4];
+			const meterTypeCheck = isValidMeterType(meterTypeString, i);
+			if (!meterTypeCheck.value) {
+				throw new CSVPipelineError(meterTypeCheck.meterTypeMsg, undefined, 500);
+			}
+
+
 			// Process unit.
 			const unitName = meter[23];
 			const unitId = await getUnitId(unitName, Unit.unitType.METER, conn);
@@ -321,6 +329,23 @@ function isValidTimeSort(timeSortValue, rowIndex) {
 	} else {
 		msg = `Unrecognized time sort value in row ${rowIndex + 1}: "${timeSortValue}" is not a valid value. Time sort must be either increasing or decreasing.`;
 		return { timeSortMsg: msg, value: false };
+	}
+}
+
+/**
+ * Checks if the meter type provided is one of the options allowed when creating a meter.
+ * @param {string} meterTypeString - The string for the meter type
+ * @param {number} rowIndex - The current row index for error reporting.
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag.
+ */
+function isValidMeterType(meterTypeString, rowIndex) {
+	let msg = '';
+	const validTypes = Object.values(Meter.type);
+	if (validTypes.includes(meterTypeString)) {
+		return { meterTypeMsg: '', value: true };
+	} else {
+		msg = `Invalid meter type in row ${rowIndex + 1}: "${meterTypeString}" is not valid. Valid types are: ${Object.values(Meter.type).join(', ')}.`;
+		return { meterTypeMsg: msg, value: false };
 	}
 }
 
