@@ -74,6 +74,13 @@ async function uploadMeters(req, res, filepath, conn) {
 				throw new CSVPipelineError(areaUnitCheck.areaUnitMsg, undefined, 500);
 			}
 
+			//checks to make sure max error value is a number between 0 and 75 if it is provided.
+			const maxErrorInput = meter[31];
+			const maxErrorCheck = validateMaxError(maxErrorInput, i);
+			if (!maxErrorCheck.value) {
+				throw new CSVPipelineError(maxErrorCheck.maxErrorMsg, undefined, 500);
+			}
+
 			// Process unit.
 			const unitName = meter[23];
 			const unitId = await getUnitId(unitName, Unit.unitType.METER, conn);
@@ -228,6 +235,39 @@ function validateMinMaxValues(minValue, maxValue, rowIndex) {
 		return { minMaxErrorMsg: msg, value: false };
 	}
 	return { minMaxErrorMsg: '', value: true };
+}
+
+/**
+ * Validates the max error value for a given meter row. Range should be between 0 and 75 if it is provided
+ * Allows for empty value which is treated as valid. Also allows for floating point values
+ * @param {number | string} maxErrorValue - The raw max error value extracted from the CSV row
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+function validateMaxError(maxErrorValue, rowIndex) {
+	let msg = '';
+
+	//check existence
+	if (maxErrorValue === undefined || maxErrorValue === null || maxErrorValue === '') {
+		return { maxErrorMsg: '', value: true };
+	}
+
+	//Strict type check
+	if (typeof maxErrorValue !== 'number' && Number.isNaN(Number(maxErrorValue))) {
+		msg = `Invalid Max Error in row ${rowIndex + 1}: "${maxErrorValue}" is not a number.`;
+		return { maxErrorMsg: msg, value: false };
+	}
+
+	//Conversion
+	const val = Number(maxErrorValue);
+
+	//Now that we know its a number, check if it is in the valid range
+	if (val < 0 || val > 75) {
+		msg = `Invalid Max Error in row ${rowIndex + 1}: "${maxErrorValue}" Max error must be between 0 and 75.`;
+		return { maxErrorMsg: msg, value: false };
+	}
+
+	return { maxErrorMsg: '', value: true };
 }
 
 /**
