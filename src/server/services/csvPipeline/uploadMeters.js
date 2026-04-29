@@ -101,6 +101,13 @@ async function uploadMeters(req, res, filepath, conn) {
 				throw new CSVPipelineError(areaUnitCheck.areaUnitMsg, undefined, 500);
 			}
 
+			//Verify the relationship between areaUnit & areaValue
+			//When areaUnit is none areaValue must be zero
+			const areaCheck = validateArea(areaInput, areaUnitString, i);
+			if (!areaCheck.value) {
+				throw new CSVPipelineError(areaCheck.areaMsg, undefined, 500);
+			}
+
 			//checks to make sure max error value is a number between 0 and 75 if it is provided.
 			const maxErrorInput = meter[31];
 			const maxErrorCheck = validateMaxError(maxErrorInput, i);
@@ -303,6 +310,52 @@ function validateMaxError(maxErrorValue, rowIndex) {
 	}
 
 	return { maxErrorMsg: '', value: true };
+}
+
+/**
+ * Validates the area value and its relationship with the area unit
+ * Ensures the value is a valid number, non-negative, and correctly corresponds to the 'none' unit
+ * @param {number | string} areaValue - The raw area value extracted from the CSV row
+ * @param {string} areaUnitString - The raw area unit extracted from the CSV row
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+function validateArea(areaValue, areaUnitString, rowIndex) {
+	let msg = '';
+
+	// Check existence
+	if (areaValue === undefined || areaValue === '' || areaValue === null) {
+		return { areaMsg: '', value: true };
+	}
+
+	//Validate its a number
+	if (typeof areaValue !== 'number' && Number.isNaN(Number(areaValue))) {
+		msg = `Invalid area value in row ${rowIndex + 1}: "${areaValue}" is not a number.`;
+		return { areaMsg: msg, value: false };
+	}
+
+	//Convert now that we know it is valid
+	const val = Number(areaValue);
+
+	//Without this Infinity could be passed as Valid but that would not make sense.
+	if (!Number.isFinite(val)) {
+		msg = `Invalid area value in row ${rowIndex + 1}: "${areaValue}" is not a finite number.`;
+		return { areaMsg: msg, value: false };
+	}
+
+	//Check it is not negative
+	if (val < 0) {
+		msg = `Invalid area value in row ${rowIndex + 1}: "${areaValue}" must be a positive number.`;
+		return { areaMsg: msg, value: false };
+	}
+
+	// If unit is 'none', area value cannot be specified (areaValue must be zero)
+	if (areaUnitString === Unit.areaUnitType.NONE && val !== 0) {
+		msg = `Invalid area value in row ${rowIndex + 1}: "${areaValue}". When Area Unit is 'none', Area Value must be exactly 0.`;
+		return { areaMsg: msg, value: false };
+	}
+
+	return { areaMsg: '', value: true };
 }
 
 /**
