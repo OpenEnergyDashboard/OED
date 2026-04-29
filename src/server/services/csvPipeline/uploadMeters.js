@@ -42,6 +42,15 @@ async function uploadMeters(req, res, filepath, conn) {
 	try {
 		for (let i = 0; i < meters.length; i++) {
 			let meter = meters[i];
+
+			// Validate min and max values
+			const minValue = meter[27];
+			const maxValue = meter[28];
+			const minMaxCheck = validateMinMaxValues(minValue, maxValue, i);
+			if (!minMaxCheck.value) {
+				throw new CSVPipelineError(minMaxCheck.minMaxErrorMsg, undefined, 500);
+			}
+
 			// First verify GPS is okay
 			// This assumes that the sixth column is the GPS as order is assumed for now in a GPS file.
 			const gpsInput = meter[6];
@@ -152,6 +161,66 @@ function isValidGPSInput(input) {
 		}
 	}
 	return { validGps, message };
+}
+
+/**
+ * Validates the min and max reasonable limits
+ * Ensures both are valid numeric values (allowing floating points and Infinity)
+ * and verifies that the minimum value does not exceed the maximum value
+ * @param {string | number} minValue - inclusive minimum acceptable reading value
+ * @param {string | number} maxValue - inclusive maximum acceptable reading value 
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+
+function validateMinMaxValues(minValue, maxValue, rowIndex) {
+	let msg = ''
+
+	//Quick exit if both are empty
+	if ((minValue === undefined || minValue === '' || minValue === null) && (maxValue === undefined || maxValue === '' || maxValue === null)) {
+		return { minMaxErrorMsg: '', value: true };
+	}
+
+	//1.Test if minValue is a Valid number
+	if (minValue !== undefined && minValue !== '' && minValue !== null) {
+		if (typeof minValue !== 'number' && Number.isNaN(Number(minValue))) {
+			msg = `Invalid Min in row ${rowIndex + 1}: "${minValue}" is not a number.`;
+			return { minMaxErrorMsg: msg, value: false };
+		}
+
+	}
+	//2.Check if maxValue is a Valid Number
+	if (maxValue !== undefined && maxValue !== '' && maxValue !== null) {
+		if (typeof maxValue !== 'number' && Number.isNaN(Number(maxValue))) {
+			msg = `Invalid Max in row ${rowIndex + 1}: "${maxValue}" is not a number.`;
+			return { minMaxErrorMsg: msg, value: false };
+		}
+	}
+
+	//3.Convert to a number now that we know they are valid
+	let minNum;
+
+	//if its not empty convert it to a number otherwise fall back to DB defaults
+	if (minValue !== undefined && minValue !== '' && minValue !== null) {
+		minNum = Number(minValue);
+	} else {
+		minNum = Number.MIN_SAFE_INTEGER;
+	}
+
+	let maxNum;
+
+	//if its not empty convert it to a number otherwise fall back to DB defaults
+	if (maxValue !== undefined && maxValue !== '' && maxValue !== null) {
+		maxNum = Number(maxValue);
+	} else {
+		maxNum = Number.MAX_SAFE_INTEGER;
+	}
+	//4.Test if min > max
+	if (minNum > maxNum) {
+		msg = `Invalid Min/Max Values in row ${rowIndex + 1}: Min ("${minValue}") is greater than Max ("${maxValue}").`;
+		return { minMaxErrorMsg: msg, value: false };
+	}
+	return { minMaxErrorMsg: '', value: true };
 }
 
 /**
