@@ -58,8 +58,8 @@ class HolidayInstance {
 	 * @returns {Promise.<HolidayInstance>}
 	 */
 	static async getById(id, conn) {
-		const rows = await conn.any(sqlFile('holidayInstance/get_by_id.sql'), { id: id });
-		return rows.map(row => new HolidayInstance(row.id, row.name, row.holiday_id, row.day_pattern_id, row.note));
+		const row = await conn.one(sqlFile('holidayInstance/get_by_id.sql'), { id: id });
+		return new HolidayInstance(row.id, row.name, row.holiday_id, row.day_pattern_id, row.note);
 	}
 
     /**
@@ -82,7 +82,8 @@ class HolidayInstance {
 		if (holidayInstance.id !== undefined) {
 			throw new Error('Attempted to insert a holidayInstance that already has an ID');
 		}
-		return await conn.none(sqlFile('holidayInstance/insert_new_holiday_instance.sql'), holidayInstance);
+		const resp = await conn.one(sqlFile('holidayInstance/insert_new_holiday_instance.sql'), holidayInstance);
+		this.id = resp.id;
 	}
 
     /**

@@ -47,7 +47,7 @@ class Holiday{
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('holiday/get_all.sql'));
-		return rows.map(row => new Holiday(row.id, row.name, row.startDate, row.location, row.note));
+		return rows.map(row => new Holiday(row.id, row.name, row.start_date, row.location, row.note));
 	}
 
     /**
@@ -58,7 +58,7 @@ class Holiday{
 	 */
 	static async getById(id, conn) {
 		const row = await conn.one(sqlFile('holiday/get_by_id.sql'), { id: id });
-		return new Holiday(row.id, row.name, row.startDate, row.location, row.note);
+		return new Holiday(row.id, row.name, row.start_date, row.location, row.note);
 	}
     
     /**
@@ -69,7 +69,7 @@ class Holiday{
 	 */
 	static async getByLocation(location, conn) {
 		const rows = await conn.any(sqlFile('holiday/get_by_location.sql'), { location: location });
-		return rows.map(row => new Holiday(row.id, row.name, row.startDate, row.location, row.note));
+		return rows.map(row => new Holiday(row.id, row.name, row.start_date, row.location, row.note));
 	}
 
     /**
@@ -82,7 +82,8 @@ class Holiday{
 		if (holiday.id !== undefined) {
 			throw new Error('Attempted to insert a holiday that already has an ID');
 		}
-		return await conn.none(sqlFile('holiday/insert_new_holiday.sql'), holiday);
+		const resp = await conn.one(sqlFile('holiday/insert_new_holiday.sql'), holiday);
+		this.id = resp.id;
 	}
 
     /**

@@ -54,7 +54,11 @@ class HolidayInstanceGroup {
 	 */
 	async insert(conn) {
 		const holidayInstanceGroup = this;
-		return await conn.none(sqlFile('holidayInstanceGroup/insert_new_holiday_instance_group.sql'), holidayInstanceGroup);
+		if (holidayInstanceGroup.id !== undefined) {
+			throw new Error('Attempted to insert a holidayInstanceGroup that already has an ID');
+		}
+		const resp = await conn.one(sqlFile('holidayInstanceGroup/insert_new_holiday_instance_group.sql'), holidayInstanceGroup);
+		this.id = resp.id;
 	}
 
     /**
