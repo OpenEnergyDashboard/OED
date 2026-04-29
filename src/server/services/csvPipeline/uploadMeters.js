@@ -74,6 +74,13 @@ async function uploadMeters(req, res, filepath, conn) {
 				throw new CSVPipelineError(areaInputCheck.areaMsg, undefined, 500);
 			}
 
+			// verify the Gap input is greater than zero
+			const gapInput = meter[14];
+			const gapReadingCheck = validateGap(gapInput, i);
+			if (!gapReadingCheck.value) {
+				throw new CSVPipelineError(gapReadingCheck.gapMsg, undefined, 500);
+			}
+
 			// verify the Variation input
 			const variationInput = meter[15];
 			const variationCheck = validateVariation(variationInput, i);
@@ -405,6 +412,44 @@ async function getUnitId(unitName, expectedUnitType, conn) {
 	// Return null if the unit doesn't exist or its type is different from expectation.
 	if (!unit || unit.typeOfUnit !== expectedUnitType) return null;
 	return unit.id;
+}
+
+/**
+ * Validates the Gap Reading to ensure it is a number greater than zero
+ * @param {string | number} gapValue - the allowed time variation in seconds that a gap may occur between two readings, default 0
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+function validateGap(gapValue, rowIndex) {
+	let msg = ''
+
+	//DB defaults to zero if empty
+	if (gapValue === '' || gapValue === undefined || gapValue === null) {
+		return { gapMsg: '', value: true };
+	}
+
+	//Check if it is a number
+	if (typeof gapValue !== 'number' && Number.isNaN(Number(gapValue))) {
+		msg = `Invalid Gap Reading in row ${rowIndex + 1}: "${gapValue}" is not a number.`;
+		return { gapMsg: msg, value: false };
+	}
+
+	//Convert now that we know it is a number
+	const gapNum = Number(gapValue);
+
+	if (!Number.isFinite(gapNum)) {
+		msg = `Invalid Gap Reading in row ${rowIndex + 1}: "${gapValue}" cannot be an infinite number.`;
+		return { gapMsg: msg, value: false };
+	}
+
+	//Check if it is negative
+	if (gapNum < 0) {
+		msg = `Invalid Gap Reading in row ${rowIndex + 1}: "${gapValue}" cannot be negative.`;
+		return { gapMsg: msg, value: false };
+	}
+
+	return { gapMsg: '', value: true };
+
 }
 
 /**
