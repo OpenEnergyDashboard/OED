@@ -74,6 +74,13 @@ async function uploadMeters(req, res, filepath, conn) {
 				throw new CSVPipelineError(areaInputCheck.areaMsg, undefined, 500);
 			}
 
+			// verify the Variation input
+			const variationInput = meter[15];
+			const variationCheck = validateVariation(variationInput, i);
+			if (!variationCheck.value) {
+				throw new CSVPipelineError(variationCheck.variationMsg, undefined, 500);
+			}
+
 			const timeSortValue = meter[17];
 			const timeSortCheck = isValidTimeSort(timeSortValue, i);
 			if (!timeSortCheck.value) {
@@ -398,6 +405,44 @@ async function getUnitId(unitName, expectedUnitType, conn) {
 	// Return null if the unit doesn't exist or its type is different from expectation.
 	if (!unit || unit.typeOfUnit !== expectedUnitType) return null;
 	return unit.id;
+}
+
+/**
+ * Valdates the Reading Variation to ensure it is a positive number
+ * @param {string | number} variationValue - The raw variation value extracted from the meter array,
+ * representing the allowed time variation in seconds
+ * @param {number} rowIndex - The current row index for error reporting.
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+function validateVariation(variationValue, rowIndex) {
+	let msg = '';
+
+	//DB defaults to zero if empty, columns allow null
+	if (variationValue === '' || variationValue === undefined || variationValue === null) {
+		return { variationMsg: '', value: true };
+	}
+
+	//Validate it is a number
+	if (typeof variationValue !== 'number' && Number.isNaN(Number(variationValue))) {
+		msg = `Invalid Reading Variation in row ${rowIndex + 1}: "${variationValue}" is not a number.`;
+		return { variationMsg: msg, value: false };
+	}
+
+	//convert now that we know it is a valid number
+	const variationNum = Number(variationValue);
+
+	if (!Number.isFinite(variationNum)) {
+		msg = `Invalid Reading Variation in row ${rowIndex + 1}: "${variationValue}" cannot be an infinite number.`;
+		return { variationMsg: msg, value: false };
+	}
+
+	//Check that it is not negative
+	if (variationNum < 0) {
+		msg = `Invalid Reading Variation in row ${rowIndex + 1}: "${variationValue}" cannot be negative.`;
+		return { variationMsg: msg, value: false };
+	}
+
+	return { variationMsg: '', value: true };
 }
 
 module.exports = uploadMeters;
