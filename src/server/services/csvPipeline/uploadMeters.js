@@ -67,6 +67,12 @@ async function uploadMeters(req, res, filepath, conn) {
 				meter[6] = switchGPS(gpsInput);
 			}
 
+			const timeSortValue = meter[17];
+			const timeSortCheck = isValidTimeSort(timeSortValue, i);
+			if (!timeSortCheck.value) {
+				throw new CSVPipelineError(timeSortCheck.timeSortMsg, undefined, 500);
+			}
+
 			// Verify area unit provided
 			const areaUnitString = meter[25];
 			const areaUnitCheck = isValidAreaUnit(areaUnitString, i);
@@ -297,6 +303,24 @@ function isValidAreaUnit(areaUnit, rowIndex) {
 	} else {
 		msg = `Unrecognizable area unit in row ${rowIndex + 1}: "${areaUnit}" is not a valid unit.`;
 		return { areaUnitMsg: msg, value: false };
+	}
+}
+
+/**
+ * Checks if the time sort value provided is accurate (should be increasing or decreasing)
+ * @param {string} timeSortValue - The provided time sort
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag
+ */
+function isValidTimeSort(timeSortValue, rowIndex) {
+	let msg = '';
+	const validTimes = Object.values(MeterTimeSortTypesJS);
+	// must be one of the enum values
+	if (validTimes.includes(timeSortValue)) {
+		return { timeSortMsg: '', value: true };
+	} else {
+		msg = `Unrecognized time sort value in row ${rowIndex + 1}: "${timeSortValue}" is not a valid value. Time sort must be either increasing or decreasing.`;
+		return { timeSortMsg: msg, value: false };
 	}
 }
 
