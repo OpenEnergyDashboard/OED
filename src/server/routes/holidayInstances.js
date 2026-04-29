@@ -12,6 +12,11 @@ const { adminAuthMiddleware } = require('./authenticator');
 
 const router = express.Router();
 
+/**
+ * Formats a holiday instance for response
+ * @param {Object} item - The holiday instance to format
+ * @returns {Object} The formatted holiday instance
+ */
 function formatHolidayInstanceForResponse(item) {
 	return {
 		id: item.id,
@@ -22,6 +27,11 @@ function formatHolidayInstanceForResponse(item) {
 	};
 }
 
+/**
+ * Formats a holiday instance with details for response
+ * @param {Object} item - The holiday instance to format
+ * @returns {Object} The formatted holiday instance with details
+ */
 function formatHolidayInstanceDetailsForResponse(item) {
 	return {
 		id: item.id,
@@ -37,7 +47,7 @@ function formatHolidayInstanceDetailsForResponse(item) {
 }
 
 /**
- * GET all holiday instances.
+ * Route for getting all holiday instances ordered by name
  */
 router.get('/', adminAuthMiddleware('get all holiday instances'), async (req, res) => {
 	const conn = getConnection();
@@ -51,7 +61,7 @@ router.get('/', adminAuthMiddleware('get all holiday instances'), async (req, re
 });
 
 /**
- * GET holiday instances including joined holiday and day pattern details.
+ * Route for getting all holiday instances with joined holiday and day pattern details
  */
 router.get('/withDetails', adminAuthMiddleware('get holiday instances with details'), async (req, res) => {
 	const conn = getConnection();
@@ -65,7 +75,10 @@ router.get('/withDetails', adminAuthMiddleware('get holiday instances with detai
 });
 
 /**
- * GET holiday instances for a given holiday id.
+ * Route for getting holiday instances for a given holiday id
+ *
+ * Route params:
+ * - holidayId: numeric holiday id
  */
 router.get('/holiday/:holidayId', adminAuthMiddleware('get holiday instances by holiday id'), async (req, res) => {
 	const validParams = {
@@ -98,7 +111,10 @@ router.get('/holiday/:holidayId', adminAuthMiddleware('get holiday instances by 
 });
 
 /**
- * GET holiday instance by id.
+ * Route for getting one holiday instance by id
+ *
+ * Route params:
+ * - holidayInstanceId: numeric holiday instance id
  */
 router.get('/:holidayInstanceId', adminAuthMiddleware('get holiday instance by id'), async (req, res) => {
 	const validParams = {
@@ -131,11 +147,7 @@ router.get('/:holidayInstanceId', adminAuthMiddleware('get holiday instance by i
 });
 
 /**
- * POST add holiday instance.
- * @param {string} name The name for the holiday instance.
- * @param {integer} holidayId The parent holiday id.
- * @param {integer} dayPatternId The day pattern id used on this holiday instance.
- * @param {string} note Notes for the holiday instance.
+ * Route for adding a new holiday instance
  */
 router.post('/addHolidayInstance', adminAuthMiddleware('add holiday instance'), async (req, res) => {
 	const validHolidayInstance = {
@@ -190,12 +202,10 @@ router.post('/addHolidayInstance', adminAuthMiddleware('add holiday instance'), 
 });
 
 /**
- * POST edit holiday instance.
- * @param {integer} id The id for the holiday instance.
- * @param {string} name The new name for the holiday instance.
- * @param {integer} holidayId The new parent holiday id.
- * @param {integer} dayPatternId The new day pattern id.
- * @param {string} note The new notes for the holiday instance.
+ * Route for editing an existing holiday instance
+ *
+ * Request body:
+ * - id: numeric holiday instance id
  */
 router.post('/edit', adminAuthMiddleware('edit holiday instance'), async (req, res) => {
 	const validHolidayInstance = {
@@ -254,8 +264,10 @@ router.post('/edit', adminAuthMiddleware('edit holiday instance'), async (req, r
 });
 
 /**
- * POST delete holiday instance.
- * @param {integer} id The id for the holiday instance to be deleted.
+ * Route for deleting a holiday instance by id
+ *
+ * Request body:
+ * - id: numeric holiday instance id
  */
 router.post('/delete', adminAuthMiddleware('delete holiday instance'), async (req, res) => {
 	const validHolidayInstance = {

@@ -23,7 +23,9 @@ function formatHolidayForResponse(item) {
 }
 
 /**
- * GET all holidays.
+ * Route for getting all holidays.
+ *
+ * Error response: 500 when the database query fails.
  */
 router.get('/', adminAuthMiddleware('get all holidays'), async (req, res) => {
 	const conn = getConnection();
@@ -37,7 +39,10 @@ router.get('/', adminAuthMiddleware('get all holidays'), async (req, res) => {
 });
 
 /**
- * GET holiday by id.
+ * Route for getting one holiday by id.
+ *
+ * Route params:
+ * - holidayId: numeric holiday id.
  */
 router.get('/:holidayId', adminAuthMiddleware('get holiday by id'), async (req, res) => {
 	const validParams = {
@@ -70,11 +75,7 @@ router.get('/:holidayId', adminAuthMiddleware('get holiday by id'), async (req, 
 });
 
 /**
- * POST add holiday.
- * @param {string} name The name for the holiday.
- * @param {string} startDate The calendar date of the holiday.
- * @param {string} location Location associated with the holiday.
- * @param {string} note Notes for the holiday.
+ * Route for adding a new holiday.
  */
 router.post('/addHoliday', adminAuthMiddleware('add holiday'), async (req, res) => {
 	const validHoliday = {
@@ -129,12 +130,7 @@ router.post('/addHoliday', adminAuthMiddleware('add holiday'), async (req, res) 
 });
 
 /**
- * POST edit holiday.
- * @param {integer} id The id for the holiday.
- * @param {string} name The new name for the holiday.
- * @param {string} startDate The new start date for the holiday.
- * @param {string} location The new location for the holiday.
- * @param {string} note The new notes for the holiday.
+ * Route for editing an existing holiday.
  */
 router.post('/edit', adminAuthMiddleware('edit holiday'), async (req, res) => {
 	const validHoliday = {
@@ -193,8 +189,7 @@ router.post('/edit', adminAuthMiddleware('edit holiday'), async (req, res) => {
 });
 
 /**
- * POST delete holiday.
- * @param {integer} id The id for the holiday to be deleted.
+ * Route for deleting a holiday by id.
  */
 router.post('/delete', adminAuthMiddleware('delete holiday'), async (req, res) => {
 	const validHoliday = {
