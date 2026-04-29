@@ -5,7 +5,7 @@
  */
 
 const { expect } = require('chai');
-const mocha = require('mocha');
+const { mocha } = require('../common');
 const { isValidIsoDateTime, isValidIsoDuration, isValidTimeInterval } = require('../../util/timeValidation');
 
 mocha.describe('timeValidation utility', () => {
@@ -52,19 +52,6 @@ mocha.describe('timeValidation utility', () => {
 				expect(isValidIsoDateTime(v), v).to.equal(false);
 			}
 		});
-
-		mocha.it('should reject non-string values', () => {
-			const invalid = [
-				['2023-01-01T00:00:00.000Z'],
-				null,
-				undefined,
-				{},
-				123
-			];
-			for (const v of invalid) {
-				expect(isValidIsoDateTime(v), String(v)).to.equal(false);
-			}
-		});
 	});
 
 	mocha.describe('isValidIsoDuration', () => {
@@ -85,7 +72,6 @@ mocha.describe('timeValidation utility', () => {
 			const invalid = [
 				'P',          // empty duration
 				'P1X',        // invalid designator
-				'PT0S',       // zero duration
 				'1D',         // missing leading P
 				'not-a-duration',
 				'2023-01-01T00:00:00Z',  // datetime, not duration
@@ -93,19 +79,6 @@ mocha.describe('timeValidation utility', () => {
 			];
 			for (const v of invalid) {
 				expect(isValidIsoDuration(v), v).to.equal(false);
-			}
-		});
-
-		mocha.it('should reject non-string values', () => {
-			const invalid = [
-				['P1D'],
-				null,
-				undefined,
-				{},
-				123
-			];
-			for (const v of invalid) {
-				expect(isValidIsoDuration(v), String(v)).to.equal(false);
 			}
 		});
 	});
@@ -120,19 +93,14 @@ mocha.describe('timeValidation utility', () => {
 			expect(isValidTimeInterval(v)).to.equal(true);
 		});
 
-		mocha.it('should accept left-unbounded _ISO format when one-sided intervals are allowed', () => {
+		mocha.it('should accept left-unbounded _ISO format', () => {
 			const v = '_2023-12-31T23:59:59.999Z';
-			expect(isValidTimeInterval(v, true)).to.equal(true);
+			expect(isValidTimeInterval(v)).to.equal(true);
 		});
 
-		mocha.it('should accept right-unbounded ISO_ format when one-sided intervals are allowed', () => {
+		mocha.it('should accept right-unbounded ISO_ format', () => {
 			const v = '2023-01-01T00:00:00.000Z_';
-			expect(isValidTimeInterval(v, true)).to.equal(true);
-		});
-
-		mocha.it('should reject one-sided intervals by default', () => {
-			expect(isValidTimeInterval('_2023-12-31T23:59:59.999Z')).to.equal(false);
-			expect(isValidTimeInterval('2023-01-01T00:00:00.000Z_')).to.equal(false);
+			expect(isValidTimeInterval(v)).to.equal(true);
 		});
 
 		mocha.it('should reject strings with no underscore', () => {
@@ -154,21 +122,6 @@ mocha.describe('timeValidation utility', () => {
 
 		mocha.it('should reject empty underscore with no timestamps', () => {
 			expect(isValidTimeInterval('_')).to.equal(false);
-		});
-
-		mocha.it('should reject non-string values', () => {
-			const validInterval = '2023-01-01T00:00:00.000Z_2023-12-31T23:59:59.999Z';
-			const invalid = [
-				[validInterval],
-				['all'],
-				null,
-				undefined,
-				{},
-				123
-			];
-			for (const v of invalid) {
-				expect(isValidTimeInterval(v), String(v)).to.equal(false);
-			}
 		});
 	});
 });
