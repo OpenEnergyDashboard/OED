@@ -19,6 +19,7 @@ const { failure, success } = require('./response');
 const { updateNonNullExpression } = require('typescript');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
+const { isValidIsoDateTime } = require('../util/timeValidation');
 
 const router = express.Router();
 
@@ -216,6 +217,7 @@ function validateMeterParams(params) {
 			area: { type: 'number', minimum: 0 },
 			cumulative: { type: 'boolean' },
 			cumulativeReset: { type: 'boolean' },
+			// Time-of-day strings (HH:MM:SS); do not use moment so only length-limited here.
 			cumulativeResetStart: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 			cumulativeResetEnd: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 			readingGap: { type: 'number' },
@@ -244,6 +246,7 @@ function validateMeterParams(params) {
 				maxLength: 50,
 				enum: Object.values(Unit.areaUnitType)
 			},
+			// PostgreSQL interval string (e.g. "00:15:00"); does not use moment so only length-limited here.
 			readingFrequency: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 			minVal: { type: 'number' },
 			maxVal: { type: 'number' },
@@ -267,6 +270,14 @@ router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 	if (!response.valid) {
 		log.warn(`Got request to edit a meter with invalid meter data, errors: ${response.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, 'validation failed with ' + response.errors.toString());
+	} else if (
+		(req.body.startTimestamp && !isValidIsoDateTime(req.body.startTimestamp)) ||
+		(req.body.endTimestamp && !isValidIsoDateTime(req.body.endTimestamp)) ||
+		(req.body.previousEnd && !isValidIsoDateTime(req.body.previousEnd)) ||
+		(req.body.minDate && !isValidIsoDateTime(req.body.minDate)) ||
+		(req.body.maxDate && !isValidIsoDateTime(req.body.maxDate))
+	) {
+		failure(res, HTTP_CODES.BAD_REQUEST, 'invalid date/time format');
 	} else {
 		const conn = getConnection();
 		try {
@@ -331,6 +342,14 @@ router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 	if (!response.valid) {
 		log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, 'validation failed with ' + response.errors.toString());
+	} else if (
+		(req.body.startTimestamp && !isValidIsoDateTime(req.body.startTimestamp)) ||
+		(req.body.endTimestamp && !isValidIsoDateTime(req.body.endTimestamp)) ||
+		(req.body.previousEnd && !isValidIsoDateTime(req.body.previousEnd)) ||
+		(req.body.minDate && !isValidIsoDateTime(req.body.minDate)) ||
+		(req.body.maxDate && !isValidIsoDateTime(req.body.maxDate))
+	) {
+		failure(res, HTTP_CODES.BAD_REQUEST, 'invalid date/time format');
 	} else {
 		const conn = getConnection();
 		try {

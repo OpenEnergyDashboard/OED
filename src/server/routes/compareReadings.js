@@ -11,16 +11,7 @@ const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { STRING_GENERAL_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
-
-const ISO_DURATION_REGEX = /^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$/;
-
-function isValidIsoDateTime(value) {
-	return moment.parseZone(value, moment.ISO_8601, true).isValid();
-}
-
-function isValidIsoDuration(value) {
-	return ISO_DURATION_REGEX.test(value);
-}
+const { isValidIsoDateTime, isValidIsoDuration } = require('../util/timeValidation');
 
 function validateMeterCompareReadingsParams(params) {
 	const validParams = {
