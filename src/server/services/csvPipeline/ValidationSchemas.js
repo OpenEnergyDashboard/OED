@@ -40,15 +40,18 @@ class BooleanParam extends EnumParam {
 
 class StringParam extends Param {
 	/**
-	 * 
 	 * @param {string} paramName - The name of the parameter.
-	 * @param {string} pattern - Regular expression pattern to be used in validation. This can be undefined to avoid checking.
+	 * @param {string} pattern - Regular expression pattern for validation. Can be undefined to skip pattern check.
 	 * @param {string} description - The description of what the parameter needs to be.
+	 * @param {number} [maxLength] - Optional maximum string length to guard against oversized inputs.
 	 */
-	constructor(paramName, pattern, description) {
+	constructor(paramName, pattern, description, maxLength) {
 		super(paramName, description);
 		this.pattern = pattern;
 		this.type = 'string';
+		if (maxLength !== undefined) {
+			this.maxLength = maxLength;
+		}
 	}
 }
 

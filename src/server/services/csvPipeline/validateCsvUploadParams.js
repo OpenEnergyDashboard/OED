@@ -7,6 +7,7 @@ const { CSVPipelineError } = require('./CustomErrors');
 const { Param, EnumParam, BooleanParam, StringParam } = require('./ValidationSchemas');
 const failure = require('./failure');
 const validate = require('jsonschema').validate;
+const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH } = require('../../util/validationConstants');
 
 // This is only used for meter page inputs but put here so next one above that related to.
 /**
@@ -117,13 +118,15 @@ const VALIDATION = {
 			...COMMON_PROPERTIES,
 			cumulative: new EnumParam('cumulative', BooleanCheckArray),
 			cumulativeReset: new EnumParam('cumulativeReset', BooleanCheckArray),
-			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined),
-			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined),
+			// Time-of-day strings (HH:MM:SS); do not use moment so only length-limited here
+			cumulativeResetStart: new StringParam('cumulativeResetStart', undefined, undefined, STRING_SHORT_MAX_LENGTH),
+			cumulativeResetEnd: new StringParam('cumulativeResetEnd', undefined, undefined, STRING_SHORT_MAX_LENGTH),
 			duplications: new StringParam('duplications', '^\\d+$|^(?![\s\S])', 'duplications must be an integer or empty.'),
 			endOnly: new EnumParam('endOnly', BooleanCheckArray),
 			honorDst: new EnumParam('honorDst', BooleanCheckArray),
-			lengthGap: new StringParam('lengthGap', undefined, undefined),
-			lengthVariation: new StringParam('lengthVariation', undefined, undefined),
+			// Numeric duration values passed to the pipeline; do not use moment so only length-limited here
+			lengthGap: new StringParam('lengthGap', undefined, undefined, STRING_GENERAL_MAX_LENGTH),
+			lengthVariation: new StringParam('lengthVariation', undefined, undefined, STRING_GENERAL_MAX_LENGTH),
 			refreshReadings: new EnumParam('refreshReadings', BooleanCheckArray),
 			relaxedParsing: new EnumParam('relaxedParsing', BooleanCheckArray),
 			timeSort: new EnumParam('timeSort', [MeterTimeSortTypesJS.increasing, MeterTimeSortTypesJS.decreasing]),
