@@ -7,9 +7,10 @@
 const { expect } = require('chai');
 const { mocha } = require('../common');
 const { success, failure } = require('../../routes/response');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Response Utility Functions', () => {
+	const internalErrorMsg = 'Internal Server Error. Details are in the OED logs that are available to your site admin(s).';
 
 	// Mock Express response object
 	function createMockResponse() {
@@ -34,7 +35,7 @@ mocha.describe('Response Utility Functions', () => {
 
 			success(mockRes);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.OK);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.OK);
 		});
 
 		mocha.it('should send empty comment by default', () => {
@@ -51,7 +52,7 @@ mocha.describe('Response Utility Functions', () => {
 
 			success(mockRes, comment);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.OK);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.OK);
 			expect(mockRes.sentData).to.equal(comment);
 		});
 
@@ -69,7 +70,7 @@ mocha.describe('Response Utility Functions', () => {
 
 			success(mockRes, '');
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.OK);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.OK);
 			expect(mockRes.sentData).to.equal('');
 		});
 
@@ -78,7 +79,7 @@ mocha.describe('Response Utility Functions', () => {
 
 			success(mockRes, null);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.OK);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.OK);
 			expect(mockRes.sentData).to.equal(null);
 		});
 
@@ -87,7 +88,7 @@ mocha.describe('Response Utility Functions', () => {
 
 			success(mockRes, undefined);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.OK);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.OK);
 			// success() defaults undefined to ''
 			expect(mockRes.sentData).to.equal('');
 		});
@@ -99,7 +100,7 @@ mocha.describe('Response Utility Functions', () => {
 
 			failure(mockRes);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.INTERNAL_SERVER_ERROR);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		});
 
 		mocha.it('should send empty comment by default', () => {
@@ -107,37 +108,38 @@ mocha.describe('Response Utility Functions', () => {
 
 			failure(mockRes);
 
-			expect(mockRes.sentData).to.equal('');
+			expect(mockRes.sentData).to.equal(internalErrorMsg);
 		});
 
 		mocha.it('should use provided status code', () => {
 			const mockRes = createMockResponse();
 
-			failure(mockRes, HTTP_CODE.NOT_FOUND);
+			failure(mockRes, HTTP_CODES.NOT_FOUND);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.NOT_FOUND);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.NOT_FOUND);
 		});
 
 		mocha.it('should send provided comment', () => {
 			const mockRes = createMockResponse();
 			const comment = 'Operation failed';
 
-			failure(mockRes, HTTP_CODE.BAD_REQUEST, comment);
+			failure(mockRes, HTTP_CODES.BAD_REQUEST, comment);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.BAD_REQUEST);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.BAD_REQUEST);
 			expect(mockRes.sentData).to.equal(comment);
 		});
 
 		mocha.it('should handle various HTTP error codes', () => {
 			const mockRes = createMockResponse();
-			const errorCodes = [HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN, HTTP_CODE.NOT_FOUND, HTTP_CODE.UNPROCESSABLE_ENTITY, HTTP_CODE.INTERNAL_SERVER_ERROR, HTTP_CODE.SERVICE_UNAVAILABLE];
+			const errorCodes = [HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN, HTTP_CODES.NOT_FOUND, HTTP_CODES.UNPROCESSABLE_ENTITY, HTTP_CODES.INTERNAL_SERVER_ERROR, HTTP_CODES.SERVICE_UNAVAILABLE];
 
 			errorCodes.forEach(code => {
 				const freshMockRes = createMockResponse();
 				failure(freshMockRes, code, `Error ${code}`);
 
 				expect(freshMockRes.statusCode).to.equal(code);
-				expect(freshMockRes.sentData).to.equal(`Error ${code}`);
+				const expectedData = code >= 500 ? internalErrorMsg : `Error ${code}`;
+				expect(freshMockRes.sentData).to.equal(expectedData);
 			});
 		});
 
@@ -213,14 +215,14 @@ mocha.describe('Response Utility Functions', () => {
 
 			// Test success with only res parameter
 			success(mockRes);
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.OK);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.OK);
 			expect(mockRes.sentData).to.equal('');
 
 			// Test failure with only res parameter
 			const mockRes2 = createMockResponse();
 			failure(mockRes2);
-			expect(mockRes2.statusCode).to.equal(HTTP_CODE.INTERNAL_SERVER_ERROR);
-			expect(mockRes2.sentData).to.equal('');
+			expect(mockRes2.statusCode).to.equal(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			expect(mockRes2.sentData).to.equal(internalErrorMsg);
 		});
 	});
 
@@ -231,7 +233,7 @@ mocha.describe('Response Utility Functions', () => {
 
 			success(mockRes, longComment);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.OK);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.OK);
 			expect(mockRes.sentData).to.equal(longComment);
 		});
 
@@ -241,7 +243,7 @@ mocha.describe('Response Utility Functions', () => {
 
 			success(mockRes, specialComment);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.OK);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.OK);
 			expect(mockRes.sentData).to.equal(specialComment);
 		});
 
@@ -249,9 +251,9 @@ mocha.describe('Response Utility Functions', () => {
 			const mockRes = createMockResponse();
 			const unicodeComment = '🚀👨‍💻🔐💾📱';
 
-			failure(mockRes, HTTP_CODE.BAD_REQUEST, unicodeComment);
+			failure(mockRes, HTTP_CODES.BAD_REQUEST, unicodeComment);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.BAD_REQUEST);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.BAD_REQUEST);
 			expect(mockRes.sentData).to.equal(unicodeComment);
 		});
 
@@ -259,10 +261,10 @@ mocha.describe('Response Utility Functions', () => {
 			const mockRes = createMockResponse();
 			const jsonComment = '{"error": "Something went wrong"}';
 
-			failure(mockRes, HTTP_CODE.INTERNAL_SERVER_ERROR, jsonComment);
+			failure(mockRes, HTTP_CODES.INTERNAL_SERVER_ERROR, jsonComment);
 
-			expect(mockRes.statusCode).to.equal(HTTP_CODE.INTERNAL_SERVER_ERROR);
-			expect(mockRes.sentData).to.equal(jsonComment);
+			expect(mockRes.statusCode).to.equal(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			expect(mockRes.sentData).to.equal(internalErrorMsg);
 		});
 	});
 
@@ -283,14 +285,14 @@ mocha.describe('Response Utility Functions', () => {
 
 			success(mockRes, 'test');
 
-			expect(callLog).to.deep.equal([`status(${HTTP_CODE.OK})`, 'send(test)']);
+			expect(callLog).to.deep.equal([`status(${HTTP_CODES.OK})`, 'send(test)']);
 		});
 
 		mocha.it('should work with real Express patterns', () => {
 			// Test that functions return the response object for chaining
 			const mockRes = createMockResponse();
 
-			const result1 = mockRes.status(HTTP_CODE.OK);
+			const result1 = mockRes.status(HTTP_CODES.OK);
 			expect(result1).to.equal(mockRes);
 
 			const result2 = mockRes.send('test');

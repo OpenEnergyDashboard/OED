@@ -10,6 +10,7 @@ const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const validate = require('jsonschema').validate;
 const { success, failure } = require('./response');
+const { HTTP_CODES } = require('../util/httpCodes');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH } = require('../util/validationConstants');
 const router = express.Router();
 
@@ -41,7 +42,7 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 		res.json(rows.map(formatUnitForResponse));
 	} catch (err) {
 		log.error(`Error fetching units: ${err}`, err);
-		res.sendStatus(500);
+		res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 	}
 });
 
@@ -107,7 +108,7 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -127,7 +128,7 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 			success(res, 'Successfully edited unit');
 		} catch (err) {
 			log.error(`Failed to update unit: ${err}`, err);
-			failure(res, 500, 'Unable to update unit');
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, 'Unable to update unit');
 		}
 	}
 });
@@ -198,7 +199,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 	const validationResult = validate(req.body, validUnit);
 	if (!validationResult.valid) {
 		log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
-		failure(res, 400, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -223,7 +224,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 			success(res, 'Unit created successfully');
 		} catch (err) {
 			log.error(`Error while inserting new unit: ${err}`, err);
-			failure(res, 500, `Error while inserting new unit: ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while inserting new unit: ${err}`);
 		}
 	}
 });
@@ -244,7 +245,7 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 	if (!validatorResult.valid) {
 		const errorMsg = `Got request to delete a unit with invalid data, error(s):  ${validatorResult.errors}`;
 		log.warn(errorMsg);
-		failure(res, 400, errorMsg);
+		failure(res, HTTP_CODES.BAD_REQUEST, errorMsg);
 	} else {
 		const conn = getConnection();
 		const unitId = req.body.id;
@@ -256,7 +257,7 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 		} catch (err) {
 			const errorMsg = `Error while deleting unit with error(s): ${err}`;
 			log.error(errorMsg);
-			failure(res, 500, errorMsg);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, errorMsg);
 		}
 	}
 });

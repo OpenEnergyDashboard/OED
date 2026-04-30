@@ -7,7 +7,7 @@
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
 const { testInvalidField } = require('../util/validationHelpers');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 const { PASSWORD_MAX_LENGTH, TOKEN_MAX_LENGTH, STRING_GENERAL_MAX_LENGTH } = require('../../util/validationConstants');
 
 mocha.describe('Users Parameter Validation', () => {
@@ -21,7 +21,7 @@ mocha.describe('Users Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get(TOKEN_ENDPOINT)
 				.set('token', hugeToken);
-			expect(res).to.have.status(HTTP_CODE.FORBIDDEN);
+			expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should reject non-string tokens', async () => {
@@ -29,12 +29,12 @@ mocha.describe('Users Parameter Validation', () => {
 			const res1 = await chai.request(app)
 				.get(TOKEN_ENDPOINT)
 				.set('token', 12345);
-			expect(res1).to.have.status(HTTP_CODE.UNAUTHORIZED); // JWT verification failure
+			expect(res1).to.have.status(HTTP_CODES.UNAUTHORIZED); // JWT verification failure
 
 			// Test missing token
 			const res2 = await chai.request(app)
 				.get(TOKEN_ENDPOINT);
-			expect(res2).to.have.status(HTTP_CODE.FORBIDDEN);
+			expect(res2).to.have.status(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should handle malformed tokens', async () => {
@@ -52,7 +52,7 @@ mocha.describe('Users Parameter Validation', () => {
 					.set('token', token);
 
 				// Should either be 403 (validation) or 401 (JWT verification)
-				expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			}
 		});
 	});
@@ -69,7 +69,7 @@ mocha.describe('Users Parameter Validation', () => {
 					.get(`/api/users/${invalidId}`);
 
 				// Should return 403 for auth error (admin required) or 400 for validation
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			}
 		});
 
@@ -78,7 +78,7 @@ mocha.describe('Users Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get(`/api/users/${longId}`);
 
-			expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+			expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 		});
 
 		mocha.it('should handle SQL injection in user ID', async () => {
@@ -86,7 +86,7 @@ mocha.describe('Users Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get(`/api/users/${sqlInjection}`);
 
-			expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+			expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 		});
 	});
 
@@ -109,7 +109,7 @@ mocha.describe('Users Parameter Validation', () => {
 				invalidValue: 'x'.repeat(255),
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseUserData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -121,7 +121,7 @@ mocha.describe('Users Parameter Validation', () => {
 				invalidValue: 'x'.repeat(PASSWORD_MAX_LENGTH + 1),
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseUserData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -133,7 +133,7 @@ mocha.describe('Users Parameter Validation', () => {
 				invalidValue: 'x'.repeat(STRING_GENERAL_MAX_LENGTH + 1),
 				endpoint: CREATE_ENDPOINT,
 				basePayload: baseUserData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -146,7 +146,7 @@ mocha.describe('Users Parameter Validation', () => {
 					invalidValue: invalidRole,
 					endpoint: CREATE_ENDPOINT,
 					basePayload: baseUserData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -162,7 +162,7 @@ mocha.describe('Users Parameter Validation', () => {
 			const res = await chai.request(app)
 				.post(CREATE_ENDPOINT)
 				.send(payloadWithExtra);
-			expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+			expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 		});
 
 		mocha.it('should handle malicious username inputs', async () => {
@@ -179,7 +179,7 @@ mocha.describe('Users Parameter Validation', () => {
 					invalidValue: maliciousInput,
 					endpoint: CREATE_ENDPOINT,
 					basePayload: baseUserData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -194,7 +194,7 @@ mocha.describe('Users Parameter Validation', () => {
 				const res = await chai.request(app)
 					.post(CREATE_ENDPOINT)
 					.send(payloadMissingField);
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			}
 		});
 	});
@@ -218,13 +218,13 @@ mocha.describe('Users Parameter Validation', () => {
 			const res1 = await chai.request(app)
 				.post(EDIT_ENDPOINT)
 				.send({});
-			expect(res1.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res1.status).to.equal(HTTP_CODES.FORBIDDEN);
 
 			// Test invalid user object type - admin auth returns 403
 			const res2 = await chai.request(app)
 				.post(EDIT_ENDPOINT)
 				.send({ user: 'not an object' });
-			expect(res2.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res2.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate user ID field', async () => {
@@ -234,7 +234,7 @@ mocha.describe('Users Parameter Validation', () => {
 				invalidValue: -1,
 				endpoint: EDIT_ENDPOINT,
 				basePayload: { user: { ...baseEditData.user } },
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -252,7 +252,7 @@ mocha.describe('Users Parameter Validation', () => {
 				invalidValue: 'x'.repeat(255),
 				endpoint: EDIT_ENDPOINT,
 				basePayload: testPayload,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -263,7 +263,7 @@ mocha.describe('Users Parameter Validation', () => {
 				invalidValue: 'x'.repeat(PASSWORD_MAX_LENGTH + 1),
 				endpoint: EDIT_ENDPOINT,
 				basePayload: { user: { ...baseEditData.user } },
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 
 			// Test password can be omitted (optional field)
@@ -277,7 +277,7 @@ mocha.describe('Users Parameter Validation', () => {
 			const res = await chai.request(app)
 				.post(EDIT_ENDPOINT)
 				.send(payloadWithoutPassword);
-			expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+			expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 		});
 
 		mocha.it('should validate note field in edit', async () => {
@@ -294,7 +294,7 @@ mocha.describe('Users Parameter Validation', () => {
 				invalidValue: 'x'.repeat(STRING_GENERAL_MAX_LENGTH + 1),
 				endpoint: EDIT_ENDPOINT,
 				basePayload: testPayload,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -311,7 +311,7 @@ mocha.describe('Users Parameter Validation', () => {
 			const res = await chai.request(app)
 				.post(EDIT_ENDPOINT)
 				.send(payloadWithExtra);
-			expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+			expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 		});
 
 		mocha.it('should handle nested parameter injection', async () => {
@@ -324,7 +324,7 @@ mocha.describe('Users Parameter Validation', () => {
 			const res = await chai.request(app)
 				.post(EDIT_ENDPOINT)
 				.send(payloadWithExtraFields);
-			expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+			expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 		});
 	});
 
@@ -342,7 +342,7 @@ mocha.describe('Users Parameter Validation', () => {
 				invalidValue: 'x'.repeat(255),
 				endpoint: DELETE_ENDPOINT,
 				basePayload: baseDeleteData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -357,7 +357,7 @@ mocha.describe('Users Parameter Validation', () => {
 			const res = await chai.request(app)
 				.post(DELETE_ENDPOINT)
 				.send(payloadWithExtra);
-			expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+			expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 		});
 
 		mocha.it('should handle malicious username inputs', async () => {
@@ -374,7 +374,7 @@ mocha.describe('Users Parameter Validation', () => {
 					invalidValue: maliciousInput,
 					endpoint: DELETE_ENDPOINT,
 					basePayload: baseDeleteData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -395,7 +395,7 @@ mocha.describe('Users Parameter Validation', () => {
 					invalidValue: invalidUsername,
 					endpoint: DELETE_ENDPOINT,
 					basePayload: baseDeleteData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -422,7 +422,7 @@ mocha.describe('Users Parameter Validation', () => {
 
 			// All should fail with 403 (admin auth required)
 			results.forEach(res => {
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			});
 		});
 
@@ -438,19 +438,19 @@ mocha.describe('Users Parameter Validation', () => {
 				const res1 = await chai.request(app)
 					.post(endpoint)
 					.send('not an object');
-				expect(res1.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res1.status).to.equal(HTTP_CODES.FORBIDDEN);
 
 				// Test array payload - admin auth returns 403
 				const res2 = await chai.request(app)
 					.post(endpoint)
 					.send(['array', 'payload']);
-				expect(res2.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res2.status).to.equal(HTTP_CODES.FORBIDDEN);
 
 				// Test null payload - admin auth returns 403
 				const res3 = await chai.request(app)
 					.post(endpoint)
 					.send(null);
-				expect(res3.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res3.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 	});

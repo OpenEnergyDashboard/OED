@@ -9,6 +9,7 @@ const { chai, mocha, expect, app, testDB, testUser, recreateDB } = require('../c
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const { log } = require('console');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Users API', () => {
 	mocha.describe('Admin role', () => {
@@ -30,7 +31,7 @@ mocha.describe('Users API', () => {
 			const csv = new User(undefined, 'csv@example.com', password, User.role.CSV);
 			await csv.insert(conn);
 			const res = await chai.request(app).get('/api/users').set('token', token);
-			expect(res).to.have.status(200);
+			expect(res).to.have.status(HTTP_CODES.OK);
 			expect(res.body).to.have.lengthOf(2);
 		});
 		mocha.it('successfully creates a user', async () => {
@@ -44,7 +45,7 @@ mocha.describe('Users API', () => {
 			const conn = testDB.getConnection();
 			const user = { username: 'a@ex.com', password: 'abcdefgh', role: User.role.CSV, note: 'test note' };
 			const res = await chai.request(app).post('/api/users/create').set('token', token).send(user);
-			expect(res).to.have.status(200);
+			expect(res).to.have.status(HTTP_CODES.OK);
 			const dbUser = await User.getByUsername(user.username, conn);
 			expect(dbUser.role).to.equal(user.role);
 		});
@@ -52,7 +53,7 @@ mocha.describe('Users API', () => {
 			const conn = testDB.getConnection();
 			const user = { username: 'a@ex.com', password: 'abcdefg' };
 			const res = await chai.request(app).post('/api/users/create').set('token', token).send(user);
-			expect(res).to.have.status(400);
+			expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 			const users = await User.getAll(conn);
 			expect(users).to.have.lengthOf(1);
 		});
@@ -70,17 +71,17 @@ mocha.describe('Users API', () => {
 			const res1 = await chai.request(app).post('/api/users/edit').set('token', token).send({
 				user: { id: retrievedTestUser.id, username: retrievedTestUser.username, role: retrievedTestUser.role, note: 'test note' }
 			});
-			expect(res1).to.have.status(200);
-			
+			expect(res1).to.have.status(HTTP_CODES.OK);
+
 			const res2 = await chai.request(app).post('/api/users/edit').set('token', token).send({
 				user: { id: csvUser.id, username: csv.username, role: User.role.OBVIUS, note: 'test note' }
 			});
-			expect(res2).to.have.status(200);
+			expect(res2).to.have.status(HTTP_CODES.OK);
 
 			const res3 = await chai.request(app).post('/api/users/edit').set('token', token).send({
 				user: { id: obviusUser.id, username: obvius.username, role: User.role.CSV, note: 'test note' }
 			});
-			expect(res3).to.have.status(200);
+			expect(res3).to.have.status(HTTP_CODES.OK);
 
 			const modifiedCsv = await User.getByUsername(csv.username, conn);
 			expect(modifiedCsv.role).to.equal(User.role.OBVIUS);
@@ -95,7 +96,7 @@ mocha.describe('Users API', () => {
 			const dbUser = await User.getByUsername(csv.username, conn);
 			expect(dbUser.username).to.equal(csv.username);
 			const res = await chai.request(app).post('/api/users/delete').set('token', token).send({ username: csv.username });
-			expect(res).to.have.status(200);
+			expect(res).to.have.status(HTTP_CODES.OK);
 			expect((await User.getAll(conn)).filter(user => user === csv.username)).to.have.length(0);
 		});
 	});
@@ -120,24 +121,24 @@ mocha.describe('Users API', () => {
 				});
 				mocha.it('should reject request to retrieve users', async () => {
 					const res = await chai.request(app).get('/api/users').set('token', token);
-					expect(res).to.have.status(403);
+					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 				mocha.it(`should reject requests from ${role} to create users`, async () => {
 					// create
 					const res = await chai.request(app).post('/api/users/create').set('token', token);
-					expect(res).to.have.status(403);
+					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 
 				mocha.it(`should reject requests from ${role} to edit users`, async () => {
 					// edit
 					let res = await chai.request(app).post('/api/users/edit').set('token', token);
-					expect(res).to.have.status(403);
+					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 
 				mocha.it(`should reject requests from ${role} to delete users`, async () => {
 					// delete
 					const res = await chai.request(app).post('/api/users/delete').set('token', token);
-					expect(res).to.have.status(403);
+					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 			}
 		}

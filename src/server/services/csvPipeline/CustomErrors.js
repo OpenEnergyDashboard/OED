@@ -8,8 +8,11 @@
  * also used in the pipeline. It stores the status code of the failure response
  * as well as the log and response messages.
  */
+
+const { HTTP_CODES } = require('../../util/httpCodes');
+
 class CSVPipelineError extends Error {
-	constructor(responseMessage, logMessage = responseMessage, statusCode=400) {
+	constructor(responseMessage, logMessage = responseMessage, statusCode = HTTP_CODES.BAD_REQUEST) {
 		super(responseMessage);
 		// Ensure the name of this error is the same as the class name
 		this.name = this.constructor.name;
