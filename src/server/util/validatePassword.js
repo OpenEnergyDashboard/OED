@@ -1,6 +1,12 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 const zxcvbn = require('zxcvbn');
 
-//Temproarly list, until we decide a better approach like a specific file
+//Temporary list, until we decide a better approach like a specific file
 const COMMON_PASSWORDS = new Set([
   'password',
   '12345678',
