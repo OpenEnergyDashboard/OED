@@ -26,6 +26,7 @@ const loadLogfileToReadings = require('../services/obvius/loadLogfileToReadings'
 const middleware = require('../middleware');
 const obvius = require('../util').obvius;
 const { obviusUsernameAndPasswordAuthMiddleware } = require('./authenticator');
+const { HTTP_CODES } = require('../util/httpCodes');
 const { getConnection } = require('../db');
 const escapeHtml = require('escape-html');
 const { PASSWORD_MAX_LENGTH } = require('../util/validationConstants');
@@ -58,7 +59,7 @@ function failure(req, res, reason = '') {
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	log.error(`Obvius protocol request from ${ip} failed due to ${reason}`);
 
-	res.status(406) // 406 Not Acceptable error, as required by Obvius
+	res.status(HTTP_CODES.NOT_ACCEPTABLE) // 406 Not Acceptable error, as required by Obvius
 		.send(`<pre>\n${reason}\n</pre>\n`);
 }
 
@@ -72,7 +73,7 @@ function failure(req, res, reason = '') {
  */
 function success(req, res, comment = '') {
 	comment = escapeHtml(comment); // escape html to sanitize html
-	res.status(200) // 200 OK
+	res.status(HTTP_CODES.OK) // 200 OK
 		.send(`<pre>\nSUCCESS\n${comment}</pre>\n`);
 }
 

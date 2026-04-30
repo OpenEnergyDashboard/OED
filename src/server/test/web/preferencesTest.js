@@ -8,6 +8,7 @@
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('preferences API', () => {
 	mocha.describe('modification api', () => {
@@ -15,7 +16,7 @@ mocha.describe('preferences API', () => {
 			mocha.it('should accept requests from Admin role', async () => {
 				let res = await chai.request(app).post('/api/login')
 					.send({ username: testUser.username, password: testUser.password });
-				expect(res).to.have.status(200);
+				expect(res).to.have.status(HTTP_CODES.OK);
 				const token = res.body.token;
 				const preferences = {
 					displayTitle: 'title',
@@ -29,7 +30,7 @@ mocha.describe('preferences API', () => {
 					defaultMeterReadingFrequency: '1:13:17'
 				}
 				res = await chai.request(app).post('/api/preferences').set('token', token).send({ preferences });
-				expect(res).to.have.status(200);
+				expect(res).to.have.status(HTTP_CODES.OK);
 			});
 
 			mocha.describe('Non-Admin roles: ', () => {
@@ -52,7 +53,7 @@ mocha.describe('preferences API', () => {
 						});
 						mocha.it(`should reject requests from ${role}`, async () => {
 							let res = await chai.request(app).post('/api/preferences').set('token', token);
-							expect(res).to.have.status(403);
+							expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 						});
 					}
 				}
