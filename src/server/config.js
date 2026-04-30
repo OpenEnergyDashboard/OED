@@ -5,17 +5,21 @@
 const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
+const loadInfisicalSecrets = require('./util/loadInfisicalSecrets');
 // Try to load the .env file
 
 const envPath = path.join(__dirname, '..', '..', '.env');
 try {
 	fs.accessSync(envPath);
-	dotenv.config({ path: envPath });
+	dotenv.config({ path: envPath, override: true });
 } catch (err) {
 	// TODO: Check if valid env variables are actually loaded despite the lack of a file, only log if they are not
 	// console.log("Couldn't load a .env file");
 }
 
+// Optional Infisical password vault support. If PASSWORD_VAULT is enabled, override the
+// database password environment variables from Infisical secrets
+loadInfisicalSecrets();
 
 const config = {};
 
