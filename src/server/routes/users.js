@@ -12,6 +12,7 @@ const { getConnection } = require('../db');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
 const { STRING_GENERAL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
+const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
 
@@ -36,27 +37,27 @@ router.get('/token', optionalAuthMiddleware, async (req, res) => {
 		maxLength: TOKEN_MAX_LENGTH
 	};
 	if (!validate(token, validParams).valid) {
-		res.status(403).json({ message: 'No token provided or JSON was invalid.' });
+		res.status(HTTP_CODES.FORBIDDEN).json({ message: 'No token provided or JSON was invalid.' });
 	} else if (token) {
 		jwt.verify(token, secretToken, async (err, decoded) => {
 			if (err) {
-				res.status(401).json({ message: 'Failed to authenticate token.' });
+				res.status(HTTP_CODES.UNAUTHORIZED).json({ message: 'Failed to authenticate token.' });
 			} else {
 				try {
 					const conn = getConnection();
 					const userProfile = await User.getByID(decoded.data, conn);
-					res.status(200).json(
+					res.status(HTTP_CODES.OK).json(
 						{
 							username: userProfile.username,
 							role: userProfile.role
 						});
 				} catch (error) {
-					res.status(401).json({ message: 'User does not exist in database.' });
+					res.status(HTTP_CODES.UNAUTHORIZED).json({ message: 'User does not exist in database.' });
 				}
 			}
 		});
 	} else {
-		res.status(403).send({ message: 'No token provided.' });
+		res.status(HTTP_CODES.FORBIDDEN).send({ message: 'No token provided.' });
 	}
 });
 
@@ -75,7 +76,7 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 		}
 	};
 	if (!validate(req.params, validParams).valid) {
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
@@ -83,7 +84,7 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 			res.json(rows);
 		} catch (err) {
 			log.error(`Error while performing GET specific user by id query: ${err}`, err);
-			res.sendStatus(500);
+			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });
@@ -116,7 +117,7 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 		}
 	};
 	if (!validate(req.body, validParams).valid) {
-		res.status(400).json({ message: 'Invalid params' });
+		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
 	} else {
 		try {
 			const { username, password, role, note } = req.body;
@@ -124,16 +125,17 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 			// Check if user already exists
 			const currentUser = await User.getByUsername(username, conn);
 			if (currentUser !== null) {
-				res.status(400).send({ message: `user ${username} already exists so cannot create` });
+				res.status(HTTP_CODES.BAD_REQUEST).send({ message: `user ${username} already exists so cannot create` });
 			} else {
 				const hashedPassword = await bcrypt.hash(password, 10);
 				const user = new User(undefined, username, hashedPassword, role, note);
 				await user.insert(conn);
-				res.sendStatus(200);
+				res.sendStatus(HTTP_CODES.OK);
 			}
 		} catch (error) {
+			// Log the error internally and return a generic response
 			log.error(`Error while performing POST request to create user: ${error}`, error);
-			res.status(500).send({ message: 'Internal Server Error', error: error });
+			res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send({ message: 'Internal Server Error' });
 		}
 	}
 });
@@ -180,7 +182,7 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 	};
 
 	if (!validate(req.body, validParams).valid) {
-		res.status(400).json({ message: 'Invalid params' });
+		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
 	} else {
 		try {
 			const conn = getConnection();
@@ -193,7 +195,7 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 				if (numberOfAdmins < 2) {
 					const errorMessage = 'There must be at least one admin remaining to avoid lockout!';
 					log.error(errorMessage);
-					return res.status(400).json({
+					return res.status(HTTP_CODES.BAD_REQUEST).json({
 						message: errorMessage,
 					});
 				}
@@ -216,14 +218,12 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 			}
 
 			await Promise.all(userUpdates);
-			return res.sendStatus(200);
+			return res.sendStatus(HTTP_CODES.OK);
 
 		} catch (error) {
+			// Log internally and send a generic error response.
 			log.error('Error while performing edit user request.', error);
-			res.status(500).json({
-				message: 'Error while performing edit user request.',
-				error: error.message
-			});
+			res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server Error' });
 		}
 	}
 });
@@ -243,7 +243,7 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 		}
 	};
 	if (!validate(req.body, validParams).valid) {
-		res.status(400).json({ message: 'Invalid params!' });
+		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params!' });
 	} else {
 		try {
 			const conn = getConnection();
@@ -251,14 +251,14 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 			const id = req.decoded.data;
 			const user = await User.getByID(id, conn);
 			if (user.username === username) {// Admins cannot delete themselves
-				res.sendStatus(400);
+				res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			} else {
 				await User.deleteUser(username, conn);
-				res.sendStatus(200);
+				res.sendStatus(HTTP_CODES.OK);
 			}
 		} catch (error) {
 			log.error('Error while performing delete user request', error);
-			res.sendStatus(500);
+			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });

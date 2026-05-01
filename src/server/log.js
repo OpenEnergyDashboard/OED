@@ -192,6 +192,7 @@ defaultLogger.logToDb = true;
 defaultLogger.logToConsole = true;
 defaultLogger.level = LogLevel.DEBUG;
 
+
 /**
  * @type {{log: Logger, LogLevel: LogLevel}}
  */

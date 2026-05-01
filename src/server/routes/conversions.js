@@ -7,6 +7,7 @@ const { log } = require('../log');
 const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
 const { success, failure } = require('./response');
+const { HTTP_CODES } = require('../util/httpCodes');
 const validate = require('jsonschema').validate;
 
 const { simulateDeleteConversion } = require('../services/conversionSimulation');
@@ -78,7 +79,7 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 		return;
 	} else {
 		const conn = getConnection();
@@ -88,7 +89,7 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 			await updatedConversion.update(conn);
 		} catch (err) {
 			log.error(`Error while editing conversion with error(s): ${err}`);
-			failure(res, 500, `Error while editing conversion with error(s): ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while editing conversion with error(s): ${err}`);
 		}
 		success(res);
 	}
@@ -136,7 +137,7 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.error(`Got request to insert conversion with invalid conversion data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to insert conversion with invalid conversion data. Error(s): ${validatorResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to insert conversion with invalid conversion data. Error(s): ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -151,10 +152,10 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
 				);
 				await newConversion.insert(t);
 			});
-			res.sendStatus(200);
+			res.sendStatus(HTTP_CODES.OK);
 		} catch (err) {
 			log.error(`Error while inserting new conversion with error(s): ${err}`);
-			failure(res, 500, `Error while inserting new conversion with errors(s): ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while inserting new conversion with errors(s): ${err}`);
 		}
 	}
 });
@@ -195,7 +196,7 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.error(`Got request to delete conversions with invalid conversion data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
 	} else {
 		const { sourceId, destinationId, meterIds = [], groupIds = [] } = req.body;
 		const conn = getConnection();
@@ -215,7 +216,7 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 			success(res, 'Successfully deleted conversion and updated meters/groups');
 		} catch (err) {
 			log.error(`Error while deleting conversion and updating meters/groups: ${err}`);
-			failure(res, 500, `Error while deleting conversion and updating meters/groups: ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while deleting conversion and updating meters/groups: ${err}`);
 		}
 	}
 });
@@ -232,7 +233,7 @@ router.post('/simulate-delete', adminAuthMiddleware('simulate deleting conversio
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to simulate deletion of conversions with invalid conversion data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
 	} else {
 		try {
 			const conn = getConnection();
@@ -240,7 +241,7 @@ router.post('/simulate-delete', adminAuthMiddleware('simulate deleting conversio
 			return res.json(result);
 		} catch (err) {
 			log.error(`Error while simulating deletion of conversion with error(s): ${err}`);
-			failure(res, 500, `Error while simulating deletion of conversion with errors(s): ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while simulating deletion of conversion with errors(s): ${err}`);
 		}
 	}
 });
