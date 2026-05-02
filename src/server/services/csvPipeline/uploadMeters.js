@@ -88,6 +88,13 @@ async function uploadMeters(req, res, filepath, conn) {
 				throw new CSVPipelineError(variationCheck.variationMsg, undefined, 500);
 			}
 
+			// validate reading duplication
+			const duplicateValue = meter[16];
+			const duplicateCheck = isDuplicate(duplicateValue, i);
+			if (!duplicateCheck.value) {
+				throw new CSVPipelineError(duplicateCheck.duplicateMsg, undefined, 500);
+			}
+
 			const timeSortValue = meter[17];
 			const timeSortCheck = isValidTimeSort(timeSortValue, i);
 			if (!timeSortCheck.value) {
@@ -465,6 +472,38 @@ async function getUnitId(unitName, expectedUnitType, conn) {
 	// Return null if the unit doesn't exist or its type is different from expectation.
 	if (!unit || unit.typeOfUnit !== expectedUnitType) return null;
 	return unit.id;
+}
+
+/**
+ * Checks if the number of times each reading is given lies within the range 1 to 9 inclusive
+ * @param {number} duplicateValue - The number of times each reading is repeated in the meter data
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag
+ */
+function isDuplicate(duplicateValue, rowIndex) {
+	let msg = '';
+
+	//DB defaults to 1
+	if (duplicateValue === undefined) {
+		return { duplicateMsg: '', value: true };
+	}
+
+	if (duplicateValue === null || duplicateValue === '') {
+		msg = `Invalid duplicate value in row ${rowIndex + 1}: "${duplicateValue}" is not a valid integer.`;
+		return { duplicateMsg: msg, value: false };
+	}
+
+	//Validate it is a number
+	if (typeof duplicateValue !== 'number' && Number.isNaN(Number(duplicateValue))) {
+		msg = `Invalid duplicate value in row ${rowIndex + 1}: "${duplicateValue}" is not a number.`;
+		return { duplicateMsg: msg, value: false };
+	}
+
+	if (duplicateValue < 1 || duplicateValue > 9) {
+		msg = `Invalid duplicate value in row ${rowIndex + 1}: "${duplicateValue}" must be between 1-9.`;
+		return { duplicateMsg: msg, value: false };
+	}
+	return { duplicateMsg: '', value: true };
 }
 
 /**
