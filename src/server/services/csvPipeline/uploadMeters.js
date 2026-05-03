@@ -386,21 +386,33 @@ function switchGPS(gpsString) {
 function isValidArea(areaInput, rowIndex) {
 	let msg = '';
 
-	const val = Number(areaInput);
+	//Quick exit if empty
+	if (areaInput === undefined || areaInput === null || areaInput === '') {
+		msg = `Invalid area in row ${rowIndex + 1}: Value cannot be empty.`;
+		return { areaNumMsg: msg, value: false };
+	}
 
 	// check for non-number input, which is not allowed
-	if (Number.isNaN(val)) {
+	if (typeof areaInput !== 'number' && Number.isNaN(Number(areaInput))) {
 		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" is not a number.`;
-		return { areaMsg: msg, value: false };
+		return { areaNumMsg: msg, value: false };
 	}
 
-	// must be a number and must be non-negative
-	if (val < 0) {
-		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" cannot be less than zero.`;
-		return { areaMsg: msg, value: false };
+	const areaNum = Number(areaInput);
+
+	//Check for Infinity or -Infinity inputs
+	if (!Number.isFinite(areaNum)) {
+		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" must be a finite number.`;
+		return { areaNumMsg: msg, value: false };
 	}
 
-	return { areaMsg: '', value: true };
+	//Check for positive
+	if (areaNum < 0) {
+		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" cannot be negative.`;
+		return { areaNumMsg: msg, value: false }
+	}
+
+	return { areaNumMsg: msg, value: true };
 }
 
 /**
