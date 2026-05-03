@@ -66,7 +66,7 @@ async function uploadMeters(req, res, filepath, conn) {
 				const { validGps, message } = isValidGPSInput(gpsInput);
 				if (!validGps) {
 					let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid with error of "${message}"`;
-					throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+					throw new CSVPipelineError(msg, undefined, 500);
 				}
 				// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
 				// DB is longitude, latitude.
@@ -154,7 +154,7 @@ async function uploadMeters(req, res, filepath, conn) {
 			const unitId = await getUnitId(unitName, Unit.unitType.METER, conn);
 			if (!unitId) {
 				const msg = `For meter ${meter[0]} the unit of ${unitName} is invalid`;
-				throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+				throw new CSVPipelineError(msg, undefined, 500);
 			}
 			// Replace the unit's name by its id.
 			meter[23] = unitId;
@@ -164,7 +164,7 @@ async function uploadMeters(req, res, filepath, conn) {
 			const defaultGraphicUnitId = await getUnitId(defaultGraphicUnitName, Unit.unitType.UNIT, conn);
 			if (!defaultGraphicUnitId) {
 				const msg = `For meter ${meter[0]} the default graphic unit of ${defaultGraphicUnitName} is invalid`;
-				throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+				throw new CSVPipelineError(msg, undefined, 500);
 			}
 			// Replace the default graphic unit's name by its id.
 			meter[24] = defaultGraphicUnitId;
@@ -183,14 +183,14 @@ async function uploadMeters(req, res, filepath, conn) {
 					}
 				} else if (meters.length !== 1) {
 					// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
-					throw new CSVPipelineError(`Meter identifier provided (\"${identifierOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+					throw new CSVPipelineError(`Meter identifier provided (\"${identifierOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
 				}
 				let currentMeter;
 				currentMeter = await Meter.getByIdentifier(identifierOfMeter, conn)
 					.catch(error => {
 						// Did not find the meter.
 						let msg = `Meter identifier of \"${identifierOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
-						throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+						throw new CSVPipelineError(msg, undefined, 500);
 					});
 				currentMeter.merge(...meter);
 				await currentMeter.update(conn);
@@ -200,13 +200,13 @@ async function uploadMeters(req, res, filepath, conn) {
 					.catch(error => {
 						// Probably duplicate meter.
 						throw new CSVPipelineError(
-							`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+							`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, 500);
 					}
 					);
 			}
 		}
 	} catch (error) {
-		throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+		throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`, undefined, 500);
 	}
 }
 
