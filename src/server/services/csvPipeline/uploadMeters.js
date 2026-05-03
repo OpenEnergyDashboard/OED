@@ -101,6 +101,15 @@ async function uploadMeters(req, res, filepath, conn) {
 				throw new CSVPipelineError(timeSortCheck.timeSortMsg, undefined, 500);
 			}
 
+
+			// validate minDate & maxDate
+			const minDate = meter[29];
+			const maxDate = meter[30];
+			const dateCheck = validateDateRange(minDate, maxDate, i);
+			if (!dateCheck.value) {
+				throw new CSVPipelineError(dateCheck.dateMsg, undefined, 500);
+			}
+
 			const timezone = meter[5];
 			const timeZoneCheck = isValidTimeZone(timezone, i);
 			if (!timeZoneCheck.value) {
@@ -323,6 +332,68 @@ function validateMaxError(maxErrorValue, rowIndex) {
 	}
 
 	return { maxErrorMsg: '', value: true };
+}
+
+/**
+ * Validates whether the minimum and maximum dates are valid
+ * Also validates that the minimum date comes before or is equal to the maximum date
+ * @param {String} minDate - The minimum date string
+ * @param {String} maxDate - The maximum date string
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} - An Object containing the error message (if any) and a boolean success flag
+ */
+function validateDateRange(minDate, maxDate, rowIndex) {
+	let msg = ''
+
+	const trimmedMin = typeof minDate === 'string' ? minDate.trim() : minDate;
+	const trimmedMax = typeof maxDate === 'string' ? maxDate.trim() : maxDate;
+
+	if (trimmedMin === undefined || trimmedMin === null || trimmedMin === '') {
+		msg = `Invalid min date in row ${rowIndex + 1}: Min date must be provided.`;
+		return { dateMsg: msg, value: false };
+	}
+
+	if (trimmedMax === undefined || trimmedMax === null || trimmedMax === '') {
+		msg = `Invalid max date in row ${rowIndex + 1}: Max date must be provided.`;
+		return { dateMsg: msg, value: false };
+	}
+
+	const acceptedFormats = [
+		'YYYY-MM-DD', 'YYYY-M-D',
+		'MM-DD-YYYY', 'M-D-YYYY',
+		'M-DD-YYYY', 'MM-D-YYYY',
+		'YYYY-M-DD', 'YYYY-MM-D',
+		'YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD H:m:s',
+		'MM-DD-YYYY HH:mm:ss', 'MM-DD-YYYY H:m:s',
+		'M-D-YYYY HH:mm:ss', 'M-D-YYYY H:m:s',
+		'M-DD-YYYY HH:mm:ss', 'M-DD-YYYY H:m:s',
+		'MM-D-YYYY HH:mm:ss', 'MM-D-YYYY H:m:s',
+		'YYYY-M-DD HH:mm:ss', 'YYYY-M-DD H:m:s',
+		'YYYY-MM-D HH:mm:ss', 'YYYY-MM-D HH:mm:ss',
+	];
+
+	//create moment objects directly
+	const minMoment = moment(trimmedMin, acceptedFormats, true);
+	const maxMoment = moment(trimmedMax, acceptedFormats, true);
+
+	//Check if they are valid dates
+	if (!minMoment.isValid()) {
+		msg = `Invalid min date in row ${rowIndex + 1}: "${minDate}".`
+		return { dateMsg: msg, value: false };
+	}
+
+	if (!maxMoment.isValid()) {
+		msg = `Invalid max date in row ${rowIndex + 1}: "${maxDate}".`
+		return { dateMsg: msg, value: false };
+	}
+
+	//Check if min is before or equal to max
+	if (!minMoment.isSameOrBefore(maxMoment)) {
+		msg = `Date range error in row ${rowIndex + 1}: Min date: ("${minDate}") must be before or equal to Max date: ("${maxDate}").`
+		return { dateMsg: msg, value: false };
+	}
+
+	return { dateMsg: '', value: true };
 }
 
 /**
