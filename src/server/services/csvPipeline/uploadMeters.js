@@ -101,6 +101,12 @@ async function uploadMeters(req, res, filepath, conn) {
 				throw new CSVPipelineError(timeSortCheck.timeSortMsg, undefined, 500);
 			}
 
+			const timezone = meter[5];
+			const timeZoneCheck = isValidTimeZone(timezone, i);
+			if (!timeZoneCheck.value) {
+				throw new CSVPipelineError(timeZoneCheck.timeZoneMsg, undefined, 500);
+			}
+
 			// Verify area unit provided
 			const areaUnitString = meter[25];
 			const areaUnitCheck = isValidAreaUnit(areaUnitString, i);
@@ -465,6 +471,24 @@ function isValidMeterType(meterTypeString, rowIndex) {
 	} else {
 		msg = `Invalid meter type in row ${rowIndex + 1}: "${meterTypeString}" is not valid. Valid types are: ${Object.values(Meter.type).join(', ')}.`;
 		return { meterTypeMsg: msg, value: false };
+	}
+}
+
+/**
+ * Checks the provided time zone and if it is a real time zone
+ * @param {string} zone - The provided time zone from the csv
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag
+ */
+function isValidTimeZone(zone, rowIndex) {
+	let msg = '';
+
+	const validZones = moment.tz.names();
+	if (validZones.includes(zone)) {
+		return { timeZoneMsg: msg, value: true };
+	} else {
+		msg = `Invalid time zone in row ${rowIndex + 1}: "${zone}" is not valid.`;
+		return { timeZoneMsg: msg, value: false };
 	}
 }
 
