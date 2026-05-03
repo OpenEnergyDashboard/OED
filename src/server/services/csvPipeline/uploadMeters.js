@@ -43,6 +43,12 @@ async function uploadMeters(req, res, filepath, conn) {
 		for (let i = 0; i < meters.length; i++) {
 			let meter = meters[i];
 
+			//validation for boolean values
+			const boolCheck = validateBooleanFields(meter, i);
+			if (!boolCheck.value) {
+				throw new CSVPipelineError(boolCheck.boolMsg, undefined, 500);
+			}
+
 			// Validate min and max values
 			const minValue = meter[27];
 			const maxValue = meter[28];
@@ -71,7 +77,7 @@ async function uploadMeters(req, res, filepath, conn) {
 			const areaInput = meter[9];
 			const areaInputCheck = isValidArea(areaInput, i);
 			if (!areaInputCheck.value) {
-				throw new CSVPipelineError(areaInputCheck.areaMsg, undefined, 500);
+				throw new CSVPipelineError(areaInputCheck.areaNumMsg, undefined, 500);
 			}
 
 			// verify the Gap input is greater than zero
@@ -100,7 +106,6 @@ async function uploadMeters(req, res, filepath, conn) {
 			if (!timeSortCheck.value) {
 				throw new CSVPipelineError(timeSortCheck.timeSortMsg, undefined, 500);
 			}
-
 
 			// validate minDate & maxDate
 			const minDate = meter[29];
@@ -143,7 +148,6 @@ async function uploadMeters(req, res, filepath, conn) {
 			if (!meterTypeCheck.value) {
 				throw new CSVPipelineError(meterTypeCheck.meterTypeMsg, undefined, 500);
 			}
-
 
 			// Process unit.
 			const unitName = meter[23];
@@ -579,6 +583,61 @@ async function getUnitId(unitName, expectedUnitType, conn) {
 	// Return null if the unit doesn't exist or its type is different from expectation.
 	if (!unit || unit.typeOfUnit !== expectedUnitType) return null;
 	return unit.id;
+}
+
+/**
+ * Validates all boolean-like fields for a given meter row.
+ * @param {Array} meter - A single row from the CSV file.
+ * @param {number} rowIndex - The current row index for error reporting.
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag
+ */
+function validateBooleanFields(meter, rowIndex) {
+	let msg = '';
+	// all inputs that involve a true or false all being validated together.
+	const booleanFields = {
+		2: 'enabled',
+		3: 'displayable',
+		10: 'cumulative',
+		11: 'reset',
+		18: 'end only',
+		32: 'disableChecks'
+	};
+
+	// this array has values which may be left empty
+	const booleanUndefinedAcceptable = [
+		'cumulative', 'reset', 'end only', 'disableChecks'
+	];
+
+	for (const [index, name] of Object.entries(booleanFields)) {
+		let value = meter[index];
+
+		// allows upper/lower case.
+		if (value === '' || value === undefined) {
+			if (booleanUndefinedAcceptable.includes(name)) {
+				// skip if the value is undefined
+				continue;
+			}
+			msg = `Invalid input for '${name}' in row ${rowIndex + 1}: Value cannot be empty.`;
+			return { boolMsg: msg, value: false };
+		}
+
+		let checkValue = value;
+		if (typeof checkValue === 'string') {
+			checkValue = checkValue.toLowerCase().trim();
+		}
+
+		const isValid = (
+			checkValue === 'true' || checkValue === 'false' ||
+			checkValue === true || checkValue === false ||
+			checkValue === 'yes' || checkValue === 'no'
+		);
+
+		if (!isValid) {
+			msg = `Invalid input for '${name}' in row ${rowIndex + 1}: "${value}". Expected 'true', 'false', 'yes', or 'no'.`;
+			return { boolMsg: msg, value: false };
+		}
+	}
+	return { boolMsg: '', value: true };
 }
 
 /**
