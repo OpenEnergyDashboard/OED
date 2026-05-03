@@ -2,30 +2,30 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const express = require('express');
-const { CSVPipelineError } = require('./CustomErrors');
-const Meter = require('../../models/Meter');
-const readCsv = require('../pipeline-in-progress/readCsv');
-const Unit = require('../../models/Unit');
-const { normalizeBoolean } = require('./validateCsvUploadParams');
-const { HTTP_CODES } = require('../../util/httpCodes');
+const express = require("express");
+const { CSVPipelineError } = require("./CustomErrors");
+const Meter = require("../../models/Meter");
+const readCsv = require("../pipeline-in-progress/readCsv");
+const Unit = require("../../models/Unit");
+const { normalizeBoolean } = require("./validateCsvUploadParams");
+const { HTTP_CODES } = require("../../util/httpCodes");
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
- * @param {express.Request} req 
- * @param {express.Response} res 
+ * @param {express.Request} req
+ * @param {express.Response} res
  * @param {filepath} filepath Path to meters csv file.
  * @param conn Connection to the database.
  */
 async function uploadMeters(req, res, filepath, conn) {
-	const temp = (await readCsv(filepath)).map(row => {
-		// The Canonical structure of each row in the Meters CSV file is the order of the fields 
+	const temp = (await readCsv(filepath)).map((row) => {
+		// The Canonical structure of each row in the Meters CSV file is the order of the fields
 		// declared in the Meter constructor. If no headerRow is provided (i.e. headerRow === false),
 		// then we assume that the uploaded CSV file follows this Canonical structure.
 
 		// For now, we do not use the header row to remap the ordering of the columns.
 		// To Do: Use header row to remap the indices to fit the Meter constructor
-		return row.map(val => val === '' ? undefined : val);
+		return row.map((val) => (val === "" ? undefined : val));
 	});
 
 	// If there is a header row, we remove and ignore it for now.
@@ -161,7 +161,11 @@ async function uploadMeters(req, res, filepath, conn) {
 
 			// Process default graphic unit.
 			const defaultGraphicUnitName = meter[24];
-			const defaultGraphicUnitId = await getUnitId(defaultGraphicUnitName, Unit.unitType.UNIT, conn);
+			const defaultGraphicUnitId = await getUnitId(
+				defaultGraphicUnitName,
+				Unit.unitType.UNIT,
+				conn,
+			);
 			if (!defaultGraphicUnitId) {
 				const msg = `For meter ${meter[0]} the default graphic unit of ${defaultGraphicUnitName} is invalid`;
 				throw new CSVPipelineError(msg, undefined, 500);
@@ -183,30 +187,41 @@ async function uploadMeters(req, res, filepath, conn) {
 					}
 				} else if (meters.length !== 1) {
 					// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
-					throw new CSVPipelineError(`Meter identifier provided (\"${identifierOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, 500);
+					throw new CSVPipelineError(
+						`Meter identifier provided (\"${identifierOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`,
+						undefined,
+						500,
+					);
 				}
 				let currentMeter;
-				currentMeter = await Meter.getByIdentifier(identifierOfMeter, conn)
-					.catch(error => {
-						// Did not find the meter.
-						let msg = `Meter identifier of \"${identifierOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
-						throw new CSVPipelineError(msg, undefined, 500);
-					});
+				currentMeter = await Meter.getByIdentifier(
+					identifierOfMeter,
+					conn,
+				).catch((error) => {
+					// Did not find the meter.
+					let msg = `Meter identifier of \"${identifierOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				});
 				currentMeter.merge(...meter);
 				await currentMeter.update(conn);
 			} else {
 				// Inserting the new meter
-				await new Meter(undefined, ...meter).insert(conn)
-					.catch(error => {
-						// Probably duplicate meter.
-						throw new CSVPipelineError(
-							`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, 500);
-					}
+				await new Meter(undefined, ...meter).insert(conn).catch((error) => {
+					// Probably duplicate meter.
+					throw new CSVPipelineError(
+						`Meter name of \"${meter[0]}\" got database error of: ${error.message}`,
+						undefined,
+						500,
 					);
+				});
 			}
 		}
 	} catch (error) {
-		throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`, undefined, 500);
+		throw new CSVPipelineError(
+			`Failed to upload meters due to internal OED Error: ${error.message}`,
+			undefined,
+			500,
+		);
 	}
 }
 
@@ -220,26 +235,32 @@ async function uploadMeters(req, res, filepath, conn) {
  * @returns true if string is GPS and false otherwise.
  */
 function isValidGPSInput(input) {
-	let message = '';
+	let message = "";
 	let validGps = true;
-	if (input.indexOf(',') === -1) { // if there is no comma
-		message = 'GPS Input is missing a comma';
+	if (input.indexOf(",") === -1) {
+		// if there is no comma
+		message = "GPS Input is missing a comma";
 		validGps = false;
-	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
-		message = 'GPS Input has too many commas';
+	} else if (input.indexOf(",") !== input.lastIndexOf(",")) {
+		// if there are multiple commas
+		message = "GPS Input has too many commas";
 		validGps = false;
 	}
 	if (validGps) {
 		// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
-		const array = input.split(',').map((value) => parseFloat(value));
+		const array = input.split(",").map((value) => parseFloat(value));
 		const latitudeIndex = 0;
 		const longitudeIndex = 1;
-		const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
-		const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
+		const latitudeConstraint =
+			array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
+		const longitudeConstraint =
+			array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
 		const result = latitudeConstraint && longitudeConstraint;
 		if (!result) {
 			validGps = false;
-			message = 'Invalid GPS coordinate, latitude must be an integer between -90 and 90, longitude must be an integer between -180 and 180. You input: ' + input;
+			message =
+				"Invalid GPS coordinate, latitude must be an integer between -90 and 90, longitude must be an integer between -180 and 180. You input: " +
+				input;
 		}
 	}
 	return { validGps, message };
@@ -250,30 +271,32 @@ function isValidGPSInput(input) {
  * Ensures both are valid numeric values (allowing floating points and Infinity)
  * and verifies that the minimum value does not exceed the maximum value
  * @param {string | number} minValue - inclusive minimum acceptable reading value
- * @param {string | number} maxValue - inclusive maximum acceptable reading value 
+ * @param {string | number} maxValue - inclusive maximum acceptable reading value
  * @param {number} rowIndex - The current row index for error reporting
  * @returns {Object} An object containing the error message (if any) and a boolean success flag
  */
 
 function validateMinMaxValues(minValue, maxValue, rowIndex) {
-	let msg = ''
+	let msg = "";
 
 	//Quick exit if both are empty
-	if ((minValue === undefined || minValue === '' || minValue === null) && (maxValue === undefined || maxValue === '' || maxValue === null)) {
-		return { minMaxErrorMsg: '', value: true };
+	if (
+		(minValue === undefined || minValue === "" || minValue === null) &&
+		(maxValue === undefined || maxValue === "" || maxValue === null)
+	) {
+		return { minMaxErrorMsg: "", value: true };
 	}
 
 	//1.Test if minValue is a Valid number
-	if (minValue !== undefined && minValue !== '' && minValue !== null) {
-		if (typeof minValue !== 'number' && Number.isNaN(Number(minValue))) {
+	if (minValue !== undefined && minValue !== "" && minValue !== null) {
+		if (typeof minValue !== "number" && Number.isNaN(Number(minValue))) {
 			msg = `Invalid Min in row ${rowIndex + 1}: "${minValue}" is not a number.`;
 			return { minMaxErrorMsg: msg, value: false };
 		}
-
 	}
 	//2.Check if maxValue is a Valid Number
-	if (maxValue !== undefined && maxValue !== '' && maxValue !== null) {
-		if (typeof maxValue !== 'number' && Number.isNaN(Number(maxValue))) {
+	if (maxValue !== undefined && maxValue !== "" && maxValue !== null) {
+		if (typeof maxValue !== "number" && Number.isNaN(Number(maxValue))) {
 			msg = `Invalid Max in row ${rowIndex + 1}: "${maxValue}" is not a number.`;
 			return { minMaxErrorMsg: msg, value: false };
 		}
@@ -283,7 +306,7 @@ function validateMinMaxValues(minValue, maxValue, rowIndex) {
 	let minNum;
 
 	//if its not empty convert it to a number otherwise fall back to DB defaults
-	if (minValue !== undefined && minValue !== '' && minValue !== null) {
+	if (minValue !== undefined && minValue !== "" && minValue !== null) {
 		minNum = Number(minValue);
 	} else {
 		minNum = Number.MIN_SAFE_INTEGER;
@@ -292,7 +315,7 @@ function validateMinMaxValues(minValue, maxValue, rowIndex) {
 	let maxNum;
 
 	//if its not empty convert it to a number otherwise fall back to DB defaults
-	if (maxValue !== undefined && maxValue !== '' && maxValue !== null) {
+	if (maxValue !== undefined && maxValue !== "" && maxValue !== null) {
 		maxNum = Number(maxValue);
 	} else {
 		maxNum = Number.MAX_SAFE_INTEGER;
@@ -302,7 +325,7 @@ function validateMinMaxValues(minValue, maxValue, rowIndex) {
 		msg = `Invalid Min/Max Values in row ${rowIndex + 1}: Min ("${minValue}") is greater than Max ("${maxValue}").`;
 		return { minMaxErrorMsg: msg, value: false };
 	}
-	return { minMaxErrorMsg: '', value: true };
+	return { minMaxErrorMsg: "", value: true };
 }
 
 /**
@@ -313,15 +336,22 @@ function validateMinMaxValues(minValue, maxValue, rowIndex) {
  * @returns {Object} An object containing the error message (if any) and a boolean success flag
  */
 function validateMaxError(maxErrorValue, rowIndex) {
-	let msg = '';
+	let msg = "";
 
 	//check existence
-	if (maxErrorValue === undefined || maxErrorValue === null || maxErrorValue === '') {
-		return { maxErrorMsg: '', value: true };
+	if (
+		maxErrorValue === undefined ||
+		maxErrorValue === null ||
+		maxErrorValue === ""
+	) {
+		return { maxErrorMsg: "", value: true };
 	}
 
 	//Strict type check
-	if (typeof maxErrorValue !== 'number' && Number.isNaN(Number(maxErrorValue))) {
+	if (
+		typeof maxErrorValue !== "number" &&
+		Number.isNaN(Number(maxErrorValue))
+	) {
 		msg = `Invalid Max Error in row ${rowIndex + 1}: "${maxErrorValue}" is not a number.`;
 		return { maxErrorMsg: msg, value: false };
 	}
@@ -335,7 +365,7 @@ function validateMaxError(maxErrorValue, rowIndex) {
 		return { maxErrorMsg: msg, value: false };
 	}
 
-	return { maxErrorMsg: '', value: true };
+	return { maxErrorMsg: "", value: true };
 }
 
 /**
@@ -347,33 +377,44 @@ function validateMaxError(maxErrorValue, rowIndex) {
  * @returns {Object} - An Object containing the error message (if any) and a boolean success flag
  */
 function validateDateRange(minDate, maxDate, rowIndex) {
-	let msg = ''
+	let msg = "";
 
-	const trimmedMin = typeof minDate === 'string' ? minDate.trim() : minDate;
-	const trimmedMax = typeof maxDate === 'string' ? maxDate.trim() : maxDate;
+	const trimmedMin = typeof minDate === "string" ? minDate.trim() : minDate;
+	const trimmedMax = typeof maxDate === "string" ? maxDate.trim() : maxDate;
 
-	if (trimmedMin === undefined || trimmedMin === null || trimmedMin === '') {
+	if (trimmedMin === undefined || trimmedMin === null || trimmedMin === "") {
 		msg = `Invalid min date in row ${rowIndex + 1}: Min date must be provided.`;
 		return { dateMsg: msg, value: false };
 	}
 
-	if (trimmedMax === undefined || trimmedMax === null || trimmedMax === '') {
+	if (trimmedMax === undefined || trimmedMax === null || trimmedMax === "") {
 		msg = `Invalid max date in row ${rowIndex + 1}: Max date must be provided.`;
 		return { dateMsg: msg, value: false };
 	}
 
 	const acceptedFormats = [
-		'YYYY-MM-DD', 'YYYY-M-D',
-		'MM-DD-YYYY', 'M-D-YYYY',
-		'M-DD-YYYY', 'MM-D-YYYY',
-		'YYYY-M-DD', 'YYYY-MM-D',
-		'YYYY-MM-DD HH:mm:ss', 'YYYY-MM-DD H:m:s',
-		'MM-DD-YYYY HH:mm:ss', 'MM-DD-YYYY H:m:s',
-		'M-D-YYYY HH:mm:ss', 'M-D-YYYY H:m:s',
-		'M-DD-YYYY HH:mm:ss', 'M-DD-YYYY H:m:s',
-		'MM-D-YYYY HH:mm:ss', 'MM-D-YYYY H:m:s',
-		'YYYY-M-DD HH:mm:ss', 'YYYY-M-DD H:m:s',
-		'YYYY-MM-D HH:mm:ss', 'YYYY-MM-D HH:mm:ss',
+		"YYYY-MM-DD",
+		"YYYY-M-D",
+		"MM-DD-YYYY",
+		"M-D-YYYY",
+		"M-DD-YYYY",
+		"MM-D-YYYY",
+		"YYYY-M-DD",
+		"YYYY-MM-D",
+		"YYYY-MM-DD HH:mm:ss",
+		"YYYY-MM-DD H:m:s",
+		"MM-DD-YYYY HH:mm:ss",
+		"MM-DD-YYYY H:m:s",
+		"M-D-YYYY HH:mm:ss",
+		"M-D-YYYY H:m:s",
+		"M-DD-YYYY HH:mm:ss",
+		"M-DD-YYYY H:m:s",
+		"MM-D-YYYY HH:mm:ss",
+		"MM-D-YYYY H:m:s",
+		"YYYY-M-DD HH:mm:ss",
+		"YYYY-M-DD H:m:s",
+		"YYYY-MM-D HH:mm:ss",
+		"YYYY-MM-D HH:mm:ss",
 	];
 
 	//create moment objects directly
@@ -382,22 +423,22 @@ function validateDateRange(minDate, maxDate, rowIndex) {
 
 	//Check if they are valid dates
 	if (!minMoment.isValid()) {
-		msg = `Invalid min date in row ${rowIndex + 1}: "${minDate}".`
+		msg = `Invalid min date in row ${rowIndex + 1}: "${minDate}".`;
 		return { dateMsg: msg, value: false };
 	}
 
 	if (!maxMoment.isValid()) {
-		msg = `Invalid max date in row ${rowIndex + 1}: "${maxDate}".`
+		msg = `Invalid max date in row ${rowIndex + 1}: "${maxDate}".`;
 		return { dateMsg: msg, value: false };
 	}
 
 	//Check if min is before or equal to max
 	if (!minMoment.isSameOrBefore(maxMoment)) {
-		msg = `Date range error in row ${rowIndex + 1}: Min date: ("${minDate}") must be before or equal to Max date: ("${maxDate}").`
+		msg = `Date range error in row ${rowIndex + 1}: Min date: ("${minDate}") must be before or equal to Max date: ("${maxDate}").`;
 		return { dateMsg: msg, value: false };
 	}
 
-	return { dateMsg: '', value: true };
+	return { dateMsg: "", value: true };
 }
 
 /**
@@ -409,15 +450,15 @@ function validateDateRange(minDate, maxDate, rowIndex) {
  * @returns {Object} An object containing the error message (if any) and a boolean success flag
  */
 function validateArea(areaValue, areaUnitString, rowIndex) {
-	let msg = '';
+	let msg = "";
 
 	// Check existence
-	if (areaValue === undefined || areaValue === '' || areaValue === null) {
-		return { areaMsg: '', value: true };
+	if (areaValue === undefined || areaValue === "" || areaValue === null) {
+		return { areaMsg: "", value: true };
 	}
 
 	//Validate its a number
-	if (typeof areaValue !== 'number' && Number.isNaN(Number(areaValue))) {
+	if (typeof areaValue !== "number" && Number.isNaN(Number(areaValue))) {
 		msg = `Invalid area value in row ${rowIndex + 1}: "${areaValue}" is not a number.`;
 		return { areaMsg: msg, value: false };
 	}
@@ -443,7 +484,7 @@ function validateArea(areaValue, areaUnitString, rowIndex) {
 		return { areaMsg: msg, value: false };
 	}
 
-	return { areaMsg: '', value: true };
+	return { areaMsg: "", value: true };
 }
 
 /**
@@ -453,9 +494,9 @@ function validateArea(areaValue, areaUnitString, rowIndex) {
  * @returns the new string with the updated GPS pair
  */
 function switchGPS(gpsString) {
-	const array = gpsString.split(',');
+	const array = gpsString.split(",");
 	// return String(array[1] + "," + array[0]);
-	return (array[1] + ',' + array[0]);
+	return array[1] + "," + array[0];
 }
 
 /**
@@ -465,16 +506,16 @@ function switchGPS(gpsString) {
  * @returns {Object} An object containing the error message (if any) and a boolean success flag
  */
 function isValidArea(areaInput, rowIndex) {
-	let msg = '';
+	let msg = "";
 
 	//Quick exit if empty
-	if (areaInput === undefined || areaInput === null || areaInput === '') {
+	if (areaInput === undefined || areaInput === null || areaInput === "") {
 		msg = `Invalid area in row ${rowIndex + 1}: Value cannot be empty.`;
 		return { areaNumMsg: msg, value: false };
 	}
 
 	// check for non-number input, which is not allowed
-	if (typeof areaInput !== 'number' && Number.isNaN(Number(areaInput))) {
+	if (typeof areaInput !== "number" && Number.isNaN(Number(areaInput))) {
 		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" is not a number.`;
 		return { areaNumMsg: msg, value: false };
 	}
@@ -490,7 +531,7 @@ function isValidArea(areaInput, rowIndex) {
 	//Check for positive
 	if (areaNum < 0) {
 		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" cannot be negative.`;
-		return { areaNumMsg: msg, value: false }
+		return { areaNumMsg: msg, value: false };
 	}
 
 	return { areaNumMsg: msg, value: true };
@@ -503,11 +544,11 @@ function isValidArea(areaInput, rowIndex) {
  * @returns {Object} - An object containing the error message (if any) and a boolean success flag
  */
 function isValidAreaUnit(areaUnit, rowIndex) {
-	let msg = '';
+	let msg = "";
 	const validTypes = Object.values(Unit.areaUnitType);
-	// must be one of the enum values 
+	// must be one of the enum values
 	if (validTypes.includes(areaUnit)) {
-		return { areaUnitMsg: '', value: true };
+		return { areaUnitMsg: "", value: true };
 	} else {
 		msg = `Unrecognizable area unit in row ${rowIndex + 1}: "${areaUnit}" is not a valid unit.`;
 		return { areaUnitMsg: msg, value: false };
@@ -521,11 +562,11 @@ function isValidAreaUnit(areaUnit, rowIndex) {
  * @returns {Object} - An object containing the error message (if any) and a boolean success flag
  */
 function isValidTimeSort(timeSortValue, rowIndex) {
-	let msg = '';
+	let msg = "";
 	const validTimes = Object.values(MeterTimeSortTypesJS);
 	// must be one of the enum values
 	if (validTimes.includes(timeSortValue)) {
-		return { timeSortMsg: '', value: true };
+		return { timeSortMsg: "", value: true };
 	} else {
 		msg = `Unrecognized time sort value in row ${rowIndex + 1}: "${timeSortValue}" is not a valid value. Time sort must be either increasing or decreasing.`;
 		return { timeSortMsg: msg, value: false };
@@ -539,12 +580,12 @@ function isValidTimeSort(timeSortValue, rowIndex) {
  * @returns {Object} - An object containing the error message (if any) and a boolean success flag.
  */
 function isValidMeterType(meterTypeString, rowIndex) {
-	let msg = '';
+	let msg = "";
 	const validTypes = Object.values(Meter.type);
 	if (validTypes.includes(meterTypeString)) {
-		return { meterTypeMsg: '', value: true };
+		return { meterTypeMsg: "", value: true };
 	} else {
-		msg = `Invalid meter type in row ${rowIndex + 1}: "${meterTypeString}" is not valid. Valid types are: ${Object.values(Meter.type).join(', ')}.`;
+		msg = `Invalid meter type in row ${rowIndex + 1}: "${meterTypeString}" is not valid. Valid types are: ${Object.values(Meter.type).join(", ")}.`;
 		return { meterTypeMsg: msg, value: false };
 	}
 }
@@ -556,7 +597,7 @@ function isValidMeterType(meterTypeString, rowIndex) {
  * @returns {Object} - An object containing the error message (if any) and a boolean success flag
  */
 function isValidTimeZone(zone, rowIndex) {
-	let msg = '';
+	let msg = "";
 
 	const validZones = moment.tz.names();
 	if (validZones.includes(zone)) {
@@ -573,7 +614,7 @@ function isValidTimeZone(zone, rowIndex) {
  * @param {string} unitName The given unit's name.
  * @param {Unit.unitType} expectedUnitType the expected unit's type.
  * @param {*} conn The connection to use.
- * @returns 
+ * @returns
  */
 async function getUnitId(unitName, expectedUnitType, conn) {
 	// Case no unit.
@@ -592,27 +633,30 @@ async function getUnitId(unitName, expectedUnitType, conn) {
  * @returns {Object} - An object containing the error message (if any) and a boolean success flag
  */
 function validateBooleanFields(meter, rowIndex) {
-	let msg = '';
+	let msg = "";
 	// all inputs that involve a true or false all being validated together.
 	const booleanFields = {
-		2: 'enabled',
-		3: 'displayable',
-		10: 'cumulative',
-		11: 'reset',
-		18: 'end only',
-		32: 'disableChecks'
+		2: "enabled",
+		3: "displayable",
+		10: "cumulative",
+		11: "reset",
+		18: "end only",
+		32: "disableChecks",
 	};
 
 	// this array has values which may be left empty
 	const booleanUndefinedAcceptable = [
-		'cumulative', 'reset', 'end only', 'disableChecks'
+		"cumulative",
+		"reset",
+		"end only",
+		"disableChecks",
 	];
 
 	for (const [index, name] of Object.entries(booleanFields)) {
 		let value = meter[index];
 
 		// allows upper/lower case.
-		if (value === '' || value === undefined) {
+		if (value === "" || value === undefined) {
 			if (booleanUndefinedAcceptable.includes(name)) {
 				// skip if the value is undefined
 				continue;
@@ -622,22 +666,24 @@ function validateBooleanFields(meter, rowIndex) {
 		}
 
 		let checkValue = value;
-		if (typeof checkValue === 'string') {
+		if (typeof checkValue === "string") {
 			checkValue = checkValue.toLowerCase().trim();
 		}
 
-		const isValid = (
-			checkValue === 'true' || checkValue === 'false' ||
-			checkValue === true || checkValue === false ||
-			checkValue === 'yes' || checkValue === 'no'
-		);
+		const isValid =
+			checkValue === "true" ||
+			checkValue === "false" ||
+			checkValue === true ||
+			checkValue === false ||
+			checkValue === "yes" ||
+			checkValue === "no";
 
 		if (!isValid) {
 			msg = `Invalid input for '${name}' in row ${rowIndex + 1}: "${value}". Expected 'true', 'false', 'yes', or 'no'.`;
 			return { boolMsg: msg, value: false };
 		}
 	}
-	return { boolMsg: '', value: true };
+	return { boolMsg: "", value: true };
 }
 
 /**
@@ -647,20 +693,23 @@ function validateBooleanFields(meter, rowIndex) {
  * @returns {Object} - An object containing the error message (if any) and a boolean success flag
  */
 function isDuplicate(duplicateValue, rowIndex) {
-	let msg = '';
+	let msg = "";
 
 	//DB defaults to 1
 	if (duplicateValue === undefined) {
-		return { duplicateMsg: '', value: true };
+		return { duplicateMsg: "", value: true };
 	}
 
-	if (duplicateValue === null || duplicateValue === '') {
+	if (duplicateValue === null || duplicateValue === "") {
 		msg = `Invalid duplicate value in row ${rowIndex + 1}: "${duplicateValue}" is not a valid integer.`;
 		return { duplicateMsg: msg, value: false };
 	}
 
 	//Validate it is a number
-	if (typeof duplicateValue !== 'number' && Number.isNaN(Number(duplicateValue))) {
+	if (
+		typeof duplicateValue !== "number" &&
+		Number.isNaN(Number(duplicateValue))
+	) {
 		msg = `Invalid duplicate value in row ${rowIndex + 1}: "${duplicateValue}" is not a number.`;
 		return { duplicateMsg: msg, value: false };
 	}
@@ -669,7 +718,7 @@ function isDuplicate(duplicateValue, rowIndex) {
 		msg = `Invalid duplicate value in row ${rowIndex + 1}: "${duplicateValue}" must be between 1-9.`;
 		return { duplicateMsg: msg, value: false };
 	}
-	return { duplicateMsg: '', value: true };
+	return { duplicateMsg: "", value: true };
 }
 
 /**
@@ -679,15 +728,15 @@ function isDuplicate(duplicateValue, rowIndex) {
  * @returns {Object} An object containing the error message (if any) and a boolean success flag
  */
 function validateGap(gapValue, rowIndex) {
-	let msg = ''
+	let msg = "";
 
 	//DB defaults to zero if empty
-	if (gapValue === '' || gapValue === undefined || gapValue === null) {
-		return { gapMsg: '', value: true };
+	if (gapValue === "" || gapValue === undefined || gapValue === null) {
+		return { gapMsg: "", value: true };
 	}
 
 	//Check if it is a number
-	if (typeof gapValue !== 'number' && Number.isNaN(Number(gapValue))) {
+	if (typeof gapValue !== "number" && Number.isNaN(Number(gapValue))) {
 		msg = `Invalid Gap Reading in row ${rowIndex + 1}: "${gapValue}" is not a number.`;
 		return { gapMsg: msg, value: false };
 	}
@@ -706,8 +755,7 @@ function validateGap(gapValue, rowIndex) {
 		return { gapMsg: msg, value: false };
 	}
 
-	return { gapMsg: '', value: true };
-
+	return { gapMsg: "", value: true };
 }
 
 /**
@@ -718,15 +766,22 @@ function validateGap(gapValue, rowIndex) {
  * @returns {Object} An object containing the error message (if any) and a boolean success flag
  */
 function validateVariation(variationValue, rowIndex) {
-	let msg = '';
+	let msg = "";
 
 	//DB defaults to zero if empty, columns allow null
-	if (variationValue === '' || variationValue === undefined || variationValue === null) {
-		return { variationMsg: '', value: true };
+	if (
+		variationValue === "" ||
+		variationValue === undefined ||
+		variationValue === null
+	) {
+		return { variationMsg: "", value: true };
 	}
 
 	//Validate it is a number
-	if (typeof variationValue !== 'number' && Number.isNaN(Number(variationValue))) {
+	if (
+		typeof variationValue !== "number" &&
+		Number.isNaN(Number(variationValue))
+	) {
 		msg = `Invalid Reading Variation in row ${rowIndex + 1}: "${variationValue}" is not a number.`;
 		return { variationMsg: msg, value: false };
 	}
@@ -745,7 +800,7 @@ function validateVariation(variationValue, rowIndex) {
 		return { variationMsg: msg, value: false };
 	}
 
-	return { variationMsg: '', value: true };
+	return { variationMsg: "", value: true };
 }
 
 module.exports = uploadMeters;
