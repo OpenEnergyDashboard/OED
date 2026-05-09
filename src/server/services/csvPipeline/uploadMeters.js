@@ -8,7 +8,6 @@ const Meter = require("../../models/Meter");
 const readCsv = require("../pipeline-in-progress/readCsv");
 const Unit = require("../../models/Unit");
 const { normalizeBoolean } = require("./validateCsvUploadParams");
-const { HTTP_CODES } = require("../../util/httpCodes");
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
