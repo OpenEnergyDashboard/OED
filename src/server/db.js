@@ -67,7 +67,7 @@ function swapConnection(newConfig, newConnection) {
 	if (newConnection !== null) {
 		connmanager.connection = newConnection;
 	} else {
-		connmanager = getDB(connmanager.config);
+		connmanager.connection = getDB(connmanager.config);
 	}
 }
 

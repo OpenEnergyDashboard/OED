@@ -53,6 +53,7 @@ const E0 = moment(0).utc()
  *   Should only be true if honorDST is true and reading does not have proper time zone information. This feature is not great and should
  *   be avoided except in special circumstances.
  * @param {boolean} warnOnCumulativeReset true if each cumulative reset generates a warning message and false if not. Default is false.
+ * @param {string} timeZone timezone to use while processing data, default is undefined.
  * @param {boolean} useMeterFrequency true if isEndTime is true then any reading found with a different reading length that is longer than the meter
  * 	frequency will make the start time by the end time minus the meter reading frequency. The idea is that a change in the length represents
  * 	missing reading(s) then it will have a longer time but that is not what is desired for this meter. This only happens if the length of the reading
@@ -65,7 +66,8 @@ const E0 = moment(0).utc()
  */
 async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increasing, readingRepetition, isCumulative, cumulativeReset,
 	resetStart = '00:00:00.000', resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, isEndTime = false,
-	conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false, warnOnCumulativeReset = false, useMeterFrequency = false, useMeterFrequencyVariation = 0) {
+	conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false, warnOnCumulativeReset = false,
+	timeZone = undefined, useMeterFrequency = false, useMeterFrequencyVariation = 0) {
 	// Holds all the warning message to pass back to inform user.
 	// Note they use basic HTML because the messages can be long/complex and it was felt it would be easy to put it into a web browser
 	// to make them easier to read.
@@ -125,7 +127,7 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 	// These only happen if worried about DST.
 	if (honorDst) {
 		// Get the meter timezone since the same while processing this data.
-		meterZone = await meterTimezone(meter);
+		meterZone = (timeZone !== undefined && timeZone !== '') ? timeZone : await meterTimezone(meter);
 		// See if were processing a shift from DST (inDst) when last batch of readings ended so need to continue.
 		prevEndTimestamp = moment.parseZone(meter.previousEnd, true);
 		if (!isFirst(prevEndTimestamp)) {

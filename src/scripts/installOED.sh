@@ -52,10 +52,20 @@ while test $# -gt 0; do
 	esac
 done
 
-# Load .env if it exists
-
+# Load .env if it exists, but do not overwrite values already provided by the
+# runtime environment (for example from Docker Compose).
 if [ -f ".env" ]; then
-	source .env
+	while IFS='=' read -r name value; do
+		case "$name" in
+			''|'#'*)
+				continue
+				;;
+		esac
+
+		if [ -z "${!name+x}" ]; then
+			export "$name=$value"
+		fi
+	done < .env
 fi
 
 # Skip the install if the node_modules were installed before the package files.

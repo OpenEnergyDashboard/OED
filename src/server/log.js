@@ -4,10 +4,21 @@
 
 const fs = require('fs');
 const logFile = require('./config').logFile;
-const LogEmail = require('./models/LogEmail');
-const LogMsg = require('./models/LogMsg');
-const { getConnection } = require('./db');
 const moment = require('moment');
+
+/**
+ * Get a database connection if the database module is available.
+ * Logging should still work even if the database is unavailable, so this
+ * intentionally falls back to null instead of throwing.
+ * @returns {object|null}
+ */
+function getConnection() {
+	try {
+		return require('./db').getConnection();
+	} catch (err) {
+		return null;
+	}
+}
 
 /**
  * Represents the importance of a message to be logged
@@ -55,6 +66,8 @@ class Logger {
 		let messageToLog = `[${level.name}@${logTime.format('YYYY-MM-DDTHH:mm:ss.SSSZ')}] ${message}\n`;
 
 		const conn = getConnection();
+		const LogEmail = require('./models/LogEmail');
+		const LogMsg = require('./models/LogMsg');
 
 		// Add a stacktrace to the message if one was provided.
 		if (error !== null) {
@@ -169,24 +182,16 @@ const defaultLogger = new Logger(logFile);
  * Wherever logging is available, the Node.js runtime will call this function to log unhandled rejections.
  * This helps with debugging, especially in tests.
  */
-process.on('unhandledRejection', (reason, p) => {
-	p.catch(e => {
-		// Include both rejection reason and catch error text then pass a real Error object for stack logging
-		const reasonText = reason instanceof Error ? reason.message : String(reason);
-		const errorText = e instanceof Error ? e.message : String(e);
-		const loggedError = e instanceof Error ? e : (reason instanceof Error ? reason : null);
-		defaultLogger.error(`Unhandled Promise Rejection (reason: ${reasonText}; error (e): ${errorText})`, loggedError);
-	});
-});
 
-// Log uncaught exceptions
-process.on('uncaughtException', (error) => {
-	defaultLogger.error('Unhandled Exception:', error);
+process.on('unhandledRejection', (reason) => {
+	const message = reason instanceof Error ? reason.message : String(reason);
+	defaultLogger.error(`Unhandled Promise Rejection: ${message}`, reason instanceof Error ? reason : null);
 });
 
 defaultLogger.logToDb = true;
 defaultLogger.logToConsole = true;
 defaultLogger.level = LogLevel.DEBUG;
+
 
 /**
  * @type {{log: Logger, LogLevel: LogLevel}}

@@ -30,16 +30,27 @@ const processData = require('./processData');
  * @param {boolean} useMeterZone true if the readings are switched to the time zone (meter then site then server)), default if false.
  *   Should only be true if honorDST is true and reading does not have proper time zone information.
  * @param {boolean} warnOnCumulativeReset true if a warning is shown for each reset with cumulative data. cumulative must be true. default is false.
+ * @param {string} timeZone timezone to use while processing data, default is undefined.
  * @returns {object[]} {whether readings were all process (true) or false, all the messages from processing the readings as a string}
  */
+// NOTE (follow-up): Callers of this function sometimes omit optional trailing
+// parameters (for example `timeZone`). This works because JS allows omitted
+// trailing args, but it makes call sites inconsistent and harder to maintain.
+// Suggested follow-up: migrate to a single `options` object (e.g.
+// `loadArrayInput(dataRows, meterID, mapRowToModel, opts)`) or mandate
+// explicitly passing all arguments. Do NOT remove `timeZone` or other
+// parameters here in this PR — perform a backward-compatible refactor in a
+// separate change to avoid regressions.
+
 async function loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition, isCumulative,
 	cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly,
-	shouldUpdate, conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false, warnOnCumulativeReset = false) {
+	shouldUpdate, conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false,
+	warnOnCumulativeReset = false, timeZone = undefined) {
 	// Get the reading, then process them for acceptance and finally insert into the DB.
 	readingsArray = dataRows.map(mapRowToModel);
 	let { result: readingsToInsert, isAllReadingsOk, msgTotal } = await processData(readingsArray, meterID, timeSort, readingRepetition,
 		isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly,
-		conditionSet, conn, honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset);
+		conditionSet, conn, honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset, timeZone);
 	if (shouldUpdate) {
 		// New readings should replace old ones.
 		await Reading.insertOrUpdateAll(readingsToInsert, conn)

@@ -13,11 +13,13 @@ import { selectIsAdmin } from '../../redux/slices/currentUserSlice';
 import { ReadingsCSVUploadPreferences } from '../../types/csvUploadForm';
 import { TrueFalseType } from '../../types/items';
 import { MeterData, MeterTimeSortType } from '../../types/redux/meters';
+import { DisableChecksType } from '../../types/redux/units';
 import { submitReadings } from '../../utils/api/UploadCSVApi';
 import { ReadingsCSVUploadDefaults } from '../../utils/csvUploadDefaults';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
 import FormFileUploaderComponent from '../FormFileUploaderComponent';
+import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import CreateMeterModalComponent from '../meters/CreateMeterModalComponent';
@@ -116,7 +118,7 @@ export default function ReadingsCSVUploadComponent() {
 		}));
 	};
 
-	const handleFileChange = (file: File) => {
+	const handleFileChange = (file: File | null) => {
 		if (file) {
 			setSelectedFile(file);
 			if (file.name.slice(-4) === '.csv' || file.name.slice(-3) === '.gz') {
@@ -131,6 +133,13 @@ export default function ReadingsCSVUploadComponent() {
 				setInvalidFileEntry(true);
 			}
 		}
+	};
+
+	const handleTimeZoneChange = (timeZone: string) => {
+		setReadingsData(prevData => ({
+			...prevData,
+			timeZone: timeZone || ''
+		}));
 	};
 	/* END of Handlers for each type of input change */
 
@@ -672,6 +681,124 @@ export default function ReadingsCSVUploadComponent() {
 											</Input>
 										</FormGroup>
 									</Col>
+									<Col>
+										<FormGroup>
+											<Label>
+												<div className='pb-1'>
+													{translate('meter.time.zone')}
+												</div>
+											</Label>
+											<TimeZoneSelect current={readingsData.timeZone ?? null} handleClick={timeZone => handleTimeZoneChange(timeZone)} />
+										</FormGroup>
+									</Col>
+								</Row>
+								<Row xs='1' lg='2'>
+									<Col>
+										<FormGroup>
+											<Label for='minVal'>
+												<div className='pb-1'>
+													{translate('meter.minVal')}
+												</div>
+											</Label>
+											<Input
+												type='number'
+												id='minVal'
+												name='minVal'
+												value={readingsData.minVal || ''}
+												onChange={e => {handleChange(e);}}
+											/>
+										</FormGroup>
+									</Col>
+									<Col>
+										<FormGroup>
+											<Label for='maxVal'>
+												<div className='pb-1'>
+													{translate('meter.maxVal')}
+												</div>
+											</Label>
+											<Input
+												type='number'
+												id='maxVal'
+												name='maxVal'
+												value={readingsData.maxVal || ''}
+												onChange={e => {handleChange(e);}}
+											/>
+										</FormGroup>
+									</Col>
+								</Row>
+								<Row xs='1' lg='2'>
+									<Col>
+										<FormGroup>
+											<Label for='minDate'>
+												<div className='pb-1'>
+													{translate('meter.minDate')}
+												</div>
+											</Label>
+											<Input
+												type='text'
+												id='minDate'
+												name='minDate'
+												value={readingsData.minDate || ''}
+												onChange={e => {handleChange(e);}}
+											/>
+										</FormGroup>
+									</Col>
+									<Col>
+										<FormGroup>
+											<Label for='maxDate'>
+												<div className='pb-1'>
+													{translate('meter.maxDate')}
+												</div>
+											</Label>
+											<Input
+												type='text'
+												id='maxDate'
+												name='maxDate'
+												value={readingsData.maxDate || ''}
+												onChange={e => {handleChange(e);}}
+											/>
+										</FormGroup>
+									</Col>
+								</Row>
+								<Row xs='1' lg='2'>
+									<Col>
+										<FormGroup>
+											<Label for='maxError'>
+												<div className='pb-1'>
+													{translate('meter.maxError')}
+												</div>
+											</Label>
+											<Input
+												type='number'
+												id='maxError'
+												name='maxError'
+												value={readingsData.maxError || ''}
+												onChange={e => {handleChange(e);}}
+											/>
+										</FormGroup>
+									</Col>
+									<Col>
+										<FormGroup>
+											<Label for='disableChecks'>
+												<div className='pb-1'>
+													{translate('meter.disableChecks')}
+												</div>
+											</Label>
+											<Input
+												type='select'
+												id='disableChecks'
+												name='disableChecks'
+												value={readingsData.disableChecks || DisableChecksType.reject_all}
+												onChange={e => {handleChange(e);}}
+											>
+												{Object.values(DisableChecksType).map(disableChecks => {
+													return (
+														<option value={disableChecks} key={disableChecks}>{translate(`DisableChecksType.${disableChecks}`)}</option>
+													);
+												})}
+											</Input>
+										</FormGroup>
+									</Col>
 								</Row>
 								{/* TODO This feature is not working perfectly so disabling from web page but allowing in curl.
 									Rest of changes left so easy to add back in.
@@ -680,7 +807,7 @@ export default function ReadingsCSVUploadComponent() {
 									originally added to the web page input of import but decided to not allow
 									it at this time. Thus, the code was commented out. As of now
 									there is no plan to make this generally available due to its limitations.*/}
-								{/*
+								{/**
 									<Label check>
 										<Input
 											checked={useMeterZone}
@@ -689,11 +816,11 @@ export default function ReadingsCSVUploadComponent() {
 											onChange={handleCheckboxChange}
 										/>
 										<div className='ps-2'>
-											{translate('csv.readings.param.use.meter.zone' />
+											{translate('csv.readings.param.use.meter.zone')}
 										</div>
 									</Label>
 								*/}
-								{/*
+								{/**
 									<Label check>
 										<Input
 											checked={warnOnCumulativeReset}
@@ -702,7 +829,7 @@ export default function ReadingsCSVUploadComponent() {
 											onChange={handleCheckboxChange}
 										/>
 										<div className='ps-2'>
-											{translate('csv.readings.param.use.meter.zone' />
+											{translate('csv.readings.param.use.meter.zone')}
 										</div>
 									</Label>
 								*/}
@@ -720,11 +847,11 @@ export default function ReadingsCSVUploadComponent() {
 								</div>
 								<div className='pb-5'>
 								</div>
-							</Col>
-						</Row>
-					</Form>
-				</>)}
-			</Container>
-		</>
-	);
-}
+								</Col>
+							</Row>
+						</Form>
+					</>)}
+				</Container>
+			</>
+		);
+	}
