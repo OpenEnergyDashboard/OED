@@ -15,7 +15,12 @@ const pgp = require('pg-promise')({
 const path = require('path');
 const patchMomentType = require('./patch-moment-type');
 const patchPointType = require('./patch-point-type');
-const { log } = require('../log');
+// TODO This include causes the DB startup to fail.
+// It indicates a circular dependency which comes about because log.js includes
+// LogEmail.js that includes database.js which is this file. This needs to be resolved
+// but for now it is commented out and the logging below is replaced so it is okay.
+// Doing that is a temporary fix that is not idea.
+// const { log } = require('../log');
 
 patchMomentType(pgp);
 patchPointType(pgp);
@@ -60,7 +65,10 @@ function sqlFile(filePath) {
 	const sanitizedPath = filePath.replace(/\.\./g, ''); 
     const resolvedPath = path.resolve(sqlFilesDir, sanitizedPath);
 	if (!resolvedPath.startsWith(path.resolve(sqlFilesDir))) {
-		log.error(`Path traversal detected - resolved path: ${resolvedPath}, expected base: ${path.resolve(sqlFilesDir)}`);
+		// TODO The logging is replaces with a console statement
+		// until the require for log is fixed per TODO above.
+		// log.error(`Path traversal detected - resolved path: ${resolvedPath}, expected base: ${path.resolve(sqlFilesDir)}`);
+		console.error(`Path traversal detected - resolved path: ${resolvedPath}, expected base: ${path.resolve(sqlFilesDir)}`);
 		throw new Error('Invalid file path: path traversal detected');
 	}
 
