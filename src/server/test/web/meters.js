@@ -70,6 +70,12 @@ function expectMetersToBeEquivalent(meters, length, isAdmin, unit) {
 			expect(meter).to.have.property('previousEnd', '2020-03-05T13:15:13.000Z');
 			expect(meter).to.have.property('areaUnit', Unit.areaUnitType.METERS);
 			expect(meter).to.have.property('readingFrequency', 'PT13H57M19S');
+			expect(meter).to.have.property('minVal', Number.MIN_SAFE_INTEGER);
+			expect(meter).to.have.property('maxVal', Number.MAX_SAFE_INTEGER);
+			expect(meter).to.have.property('minDate', moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'));
+			expect(meter).to.have.property('maxDate', moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'));
+			expect(meter).to.have.property('maxError', 75);
+			expect(meter).to.have.property('disableChecks', Unit.disableChecksType.REJECT_ALL);
 		} else {
 			expect(meter).to.have.property('name', null);
 			expect(meter).to.have.property('url', null);
@@ -91,6 +97,12 @@ function expectMetersToBeEquivalent(meters, length, isAdmin, unit) {
 			expect(meter).to.have.property('previousEnd', null);
 			expect(meter).to.have.property('areaUnit', Unit.areaUnitType.METERS);
 			expect(meter).to.have.property('readingFrequency', null);
+			expect(meter).to.have.property('minVal', null);
+			expect(meter).to.have.property('maxVal', null);
+			expect(meter).to.have.property('minDate', null);
+			expect(meter).to.have.property('maxDate', null);
+			expect(meter).to.have.property('maxError', null);
+			expect(meter).to.have.property('disableChecks', null);
 		}
 	}
 }
