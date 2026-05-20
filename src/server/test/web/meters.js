@@ -470,14 +470,14 @@ mocha.describe('Meters', () => {
 				Unit.areaUnitType.METERS, undefined);
 
 			await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
-			const allExpectedMeters = await Meter.getAll(conn);
-			const allActualMeters = [meterA, meterB, meterC];
-			allExpectedMeters.sort((a,b) => a.id - b.id);
+			const allActualMeters = await Meter.getAll(conn);
+			const allExpectedMeters = [meterA, meterB, meterC];
 			allActualMeters.sort((a,b) => a.id - b.id);
+			allExpectedMeters.sort((a,b) => a.id - b.id);
 
-			expect(allExpectedMeters.length).to.be.equal(allActualMeters.length);
-			for (let i = 0; i < allExpectedMeters.length; ++i) {
-				expectMetersToBeEquivalent(allExpectedMeters[i], allActualMeters[i]);
+			expect(allActualMeters.length).to.be.equal(allExpectedMeters.length);
+			for (let i = 0; i < allActualMeters.length; ++i) {
+				expectMetersToBeEquivalent(allActualMeters[i], allExpectedMeters[i]);
 			}
 	});
 });
