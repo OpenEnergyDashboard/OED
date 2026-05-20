@@ -91,7 +91,6 @@ function expectMetersToBeEquivalent(meters, length, isAdmin, unit) {
 			expect(meter).to.have.property('previousEnd', null);
 			expect(meter).to.have.property('areaUnit', Unit.areaUnitType.METERS);
 			expect(meter).to.have.property('readingFrequency', null);
-
 		}
 	}
 }
