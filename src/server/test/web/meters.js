@@ -462,11 +462,11 @@ mocha.describe('Meters', () => {
 				Unit.areaUnitType.METERS, undefined);
 			const meterB = new Meter(undefined, 'MeterB', null, true, true, Meter.type.MAMAC, null, gps, 
 				'MeterB', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
-				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
+				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitB.id, unitB.id,
 				Unit.areaUnitType.METERS, undefined);
 			const meterC= new Meter(undefined, 'MeterC', null, true, true, Meter.type.MAMAC, null, gps, 
 				'MeterC', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
-				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
+				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitC.id, unitC.id,
 				Unit.areaUnitType.METERS, undefined);
 
 			await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
@@ -479,6 +479,38 @@ mocha.describe('Meters', () => {
 			for (let i = 0; i < allActualMeters.length; ++i) {
 				expectMetersToBeEquivalent(allActualMeters[i], allExpectedMeters[i]);
 			}
+	});
+
+	mocha.it('can check a meter with same name', async () => {
+		const conn = testDB.getConnection();
+		const meterA = new Meter(undefined, 'MeterOne', null, true, true, Meter.type.MAMAC, null, gps, 
+			'MeterA', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
+			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
+			Unit.areaUnitType.METERS, undefined);
+		const meterB = new Meter(undefined, 'MeterOne', null, true, true, Meter.type.MAMAC, null, gps, 
+			'MeterB', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
+			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
+			Unit.areaUnitType.METERS, undefined);
+		const meterC = new Meter(undefined, 'MeterTwo', null, true, true, Meter.type.MAMAC, null, gps, 
+			'MeterC', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
+			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
+			Unit.areaUnitType.METERS, undefined);
+		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
+
+		expect(meterA.existsByName(conn)).to.be.equal(true);
+		expect(meterB.existsByName(conn)).to.be.equal(true);
+		expect(meterC.existsByName(conn)).to.be.equal(false);
+	});
+
+	mocha.it('can make meter data valid', async () => {
+		const meter = new Meter(undefined, 'MeterOne', null, true, true, Meter.type.MAMAC, null, gps, 
+			'MeterA', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
+			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', -99, unitA.id,
+			Unit.areaUnitType.METERS, undefined);
+		Meter.makeMeterDataValid(meter);
+
+		expect(meter.defaultGraphicUnit).to.be.equal(-99);
+		expect(meter.displayable).to.be.equal(false);
 	});
 });
 
