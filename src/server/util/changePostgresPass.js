@@ -12,6 +12,7 @@ const dotenv = require('dotenv');
 const ROOT_ENV_PATH = path.resolve(__dirname, '..', '..', '..', '.env');
 const CWD_ENV_PATH = path.resolve(process.cwd(), '.env');
 const ENV_PATH = fs.existsSync(ROOT_ENV_PATH) ? ROOT_ENV_PATH : CWD_ENV_PATH;
+const MIN_PASSWORD_LENGTH = 12;
 
 // Load whichever .env file is available and override existing process vars
 // so repeated invocations in one session can pick up the newest credentials.
@@ -79,7 +80,7 @@ function updateEnvFile(postgresPassword, oedPassword) {
 
 	// Writing new passwords to .env or creating it if it doesn't exist yet, only allowing the current user to read and write
 	fs.writeFileSync(ENV_PATH, env, { mode: 0o600 });
-	console.log('.env updated with new PostgreSQL and OED passwords');
+	console.log('\n.env updated with new PostgreSQL and OED passwords');
 }
 
 // Pause execution
@@ -131,8 +132,39 @@ async function changePasswords() {
 
 	// If arguments are included, treat them as the new passwords
 	const currentPostgresPassword = fileEnv.POSTGRES_PASSWORD || process.env.POSTGRES_PASSWORD || 'pleaseChange';
-	const newPostgresPassword = process.argv[2] || generatePassword();
-	const newOedPassword = process.argv[3] || generatePassword();
+	let newPostgresPassword;
+	if (process.argv[2]) {
+		newPostgresPassword = process.argv[2];
+		// TODO OED is planning to implement password quality checks. When that is available, this should be
+		// switched to that since length isn't the best security.
+		if (newPostgresPassword.length < MIN_PASSWORD_LENGTH) {
+			console.error('');
+			console.error('The new Postgres password you entered is shorter than the minimum length of ' + MIN_PASSWORD_LENGTH);
+			console.error('You must rerun this again with an acceptable password.');
+			console.error('No password changes were made.');
+			console.error('');
+			process.exit(2);
+		}
+	} else {
+		newPostgresPassword = generatePassword();
+	}
+
+	let newOedPassword;
+	if (process.argv[3]) {
+		newOedPassword = process.argv[3];
+		// TODO OED is planning to implement password quality checks. When that is available, this should be
+		// switched to that since length isn't the best security.
+		if (newOedPassword.length < MIN_PASSWORD_LENGTH) {
+			console.error('');
+			console.error('The OED database password you entered is shorter than the minimum length of ' + MIN_PASSWORD_LENGTH);
+			console.error('You must rerun this again with an acceptable password.');
+			console.error('No password changes were made.');
+			console.error('');
+			process.exit(3);
+		}
+	} else {
+		newOedPassword = generatePassword();
+	}
 
 	const clientConfig = {
 		host: process.env.OED_DB_HOST || 'database',
@@ -162,8 +194,6 @@ async function changePasswords() {
 
 			console.log('********************************************************************************');
 			console.log('PostgreSQL and OED passwords applied successfully.');
-			console.log(`PostgreSQL (postgres) password: ${newPostgresPassword}`);
-			console.log(`OED user password: ${newOedPassword}`);
 			console.log('The passwords have been stored in ".env" for reference.');
 			if (isManual) {
 				console.log('');
@@ -177,7 +207,7 @@ async function changePasswords() {
 
 			process.exit(0);
 		} catch (error) {
-			await client.end().catch(() => {});
+			await client.end().catch(() => { });
 
 			if (shouldRetryError(error) && attempt < 3) {
 				console.error(`Transient Postgres error on attempt ${attempt}: ${error.message}`);
