@@ -244,8 +244,8 @@ if [ "$dostart" == "yes" ]; then
 			export OED_TOKEN_SECRET
 			
 			printf "\n********************************************************************************\n"
-			printf "Generated OED_TOKEN_SECRET: %s\n" "$OED_TOKEN_SECRET"
-			printf "\nMake sure to save or change this value"
+			printf "Generated OED_TOKEN_SECRET applied successfully.\n"
+			printf "Generated OED_TOKEN_SECRET has been stored in ".env" for reference.\n"
 			printf "********************************************************************************\n\n"
 
 			# Save to .env for future runs
