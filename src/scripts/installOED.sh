@@ -259,11 +259,10 @@ if [ "$dostart" == "yes" ]; then
 				echo "OED_TOKEN_SECRET=$OED_TOKEN_SECRET" > .env
 			fi
 		fi
-		# If the user is in production and their postgres password has been left default, generating a random one
-		if [ -z "$POSTGRES_PASSWORD" ] || [ "$POSTGRES_PASSWORD" = "pleaseChange" ]; then
-			printf "\nNo valid PostgreSQL password detected. Generating a secure random password...\n"
-			node ./src/server/util/changePostgresPass.js "" "" install
-		fi
+		# Check out the DB passwords to see if need to be changed.
+		npm run changePostgresPasswords $POSTGRES_PASSWORD $OED_DB_PASSWORD install "$INSTALL_MODE"
+		# Get OED running in production mode.
+		printf "%s\n" "Starting OED in production mode."
 		npm run start
 	else
 		# Warning the user if they've left their token or postgres password default, we don't randomly generate it in dev mode 

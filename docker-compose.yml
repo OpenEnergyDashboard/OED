@@ -13,7 +13,24 @@
 # *****************************************************************
 
 x-common-variables: &common-db-web-variables
-    # Default oed user postgres password that should be changed for security.
+    # The OED install process will not allow this password and it will
+    # be replaced with a random, secure password if not changed here.
+    # That is fine as many sites do not need regular access to the
+    # database so a password they created is not important. OED will
+    # provide the password created for future use.
+    # If the password is changed then it is important to make it secure to
+    # avoid unauthorized access. Note the double quotes ("") around the password
+    # are not part of the password.
+    # OED STRONGLY recommends that if this is a site/production build that the passwords
+    # are strong and be at least 12 characters for the database.
+    # This value should NEVER be changed after the first time OED is started.
+    # Doing it will cause OED not to know the current password and it will stop
+    # working. One should use the changePostgresPasswords command provided by OED
+    # and described in the documentation.
+    # For developers: This value must match the one used in src/server/util/changePostgresPass.js
+    # to work properly for security checks.
+    POSTGRES_PASSWORD: "pleaseChange"
+     # Default oed user postgres password that should be changed for security.
     # The OED install process will not allow this password and it will
     # be replaced with a random, secure password if not changed here.
     # That is fine as many sites do not need regular access to the
@@ -27,8 +44,11 @@ x-common-variables: &common-db-web-variables
     # TODO Enforce this restriction.
     # This value should NEVER be changed after the first time OED is started.
     # Doing it will cause OED not to know the current password and it will stop
-    # working. One should use the changePostgresPassword command provided by OED
+    # working. One should use the changePostgresPasswords command provided by OED
     # and described in the documentation.
+    # For developers: This value must match the one used in src/server/util/changePostgresPass.js
+    # to work properly for security checks.
+    # TODO Hope to fix, but for now this MUST match the same key value below.
     OED_DB_PASSWORD: "opened"
 
 services:
@@ -37,23 +57,7 @@ services:
         environment:
             # Includes the environment variables needed by database & web containers.
             <<: *common-db-web-variables
-            # The OED install process will not allow this password and it will
-            # be replaced with a random, secure password if not changed here.
-            # That is fine as many sites do not need regular access to the
-            # database so a password they created is not important. OED will
-            # provide the password created for future use.
-            # If the password is changed then it is important to make it secure to
-            # avoid unauthorized access. Note the double quotes ("") around the password
-            # are not part of the password.
-            # OED STRONGLY recommends that if this is a site/production build that the passwords
-            # are strong and be at least 12 characters for the database.
-            # TODO Enforce this restriction.
-            # This value should NEVER be changed after the first time OED is started.
-            # Doing it will cause OED not to know the current password and it will stop
-            # working. One should use the changePostgresPassword command provided by OED
-            # and described in the documentation.
-            POSTGRES_PASSWORD: "pleaseChange"
-            # Normally there is no reason to the next value. Changing them may break OED.
+           # Normally there is no reason to the next value. Changing them may break OED.
             # Custom PGDATA per recommendations from official Docker page
             PGDATA: /var/lib/postgresql/data/pgdata
         # Location of database Docker configuration and startup files.
@@ -64,7 +68,8 @@ services:
                 # the database build. However, it is not working.
                 # oedPassword: ${OED_DB_PASSWORD}
                 # TODO This is a fix (hopefully temporary) to pass the needed value.
-                OED_DB_PASSWORD: opened
+                # TODO Hope to fix, but for now this MUST match the same key value above.
+                OED_DB_PASSWORD: "opened"
         volumes:
             # This maps the proper Docker database directory back to the local file
             # system. It is critical that the changes actually be written back to

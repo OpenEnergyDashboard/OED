@@ -46,7 +46,7 @@
 		"testData": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsConversionsMetersGroups()'",
 		"webData": "node -e 'require(\"./src/server/data/websiteData.js\").insertWebsiteData()'",
 		"addLogMsg": "node -e 'require(\"./src/server/services/addLogMsg.js\").addLogMsgToDB()'",
-		"changePostgresPassword": "node ./src/server/util/changePostgresPass.js"
+		"changePostgresPasswords": "node -e 'require(\"./src/server/util/changePostgresPasswords.js\").changePostgresPasswords()'"
 	},
 	"nodemonConfig": {
 		"watch": [
