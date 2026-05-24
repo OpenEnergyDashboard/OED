@@ -25,6 +25,10 @@ x-common-variables: &common-db-web-variables
     # OED STRONGLY recommends that if this is a site/production build that the passwords
     # are strong and be at least 12 characters for the database.
     # TODO Enforce this restriction.
+    # This value should NEVER be changed after the first time OED is started.
+    # Doing it will cause OED not to know the current password and it will stop
+    # working. One should use the changePostgresPassword command provided by OED
+    # and described in the documentation.
     OED_DB_PASSWORD: "opened"
 
 services:
@@ -44,6 +48,10 @@ services:
             # OED STRONGLY recommends that if this is a site/production build that the passwords
             # are strong and be at least 12 characters for the database.
             # TODO Enforce this restriction.
+            # This value should NEVER be changed after the first time OED is started.
+            # Doing it will cause OED not to know the current password and it will stop
+            # working. One should use the changePostgresPassword command provided by OED
+            # and described in the documentation.
             POSTGRES_PASSWORD: "pleaseChange"
             # Normally there is no reason to the next value. Changing them may break OED.
             # Custom PGDATA per recommendations from official Docker page
