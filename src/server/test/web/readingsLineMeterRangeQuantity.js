@@ -173,7 +173,18 @@ mocha.describe('readings API', () => {
 					// Add LR18 here
 
 					mocha.it('LR18: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kg of CO2', async () => {
-					});
+
+					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+					const unitId = await getUnitId('kWh');
+
+					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_Electric_Utility_gu_kg_of_CO₂_st_-inf_et_inf.csv');
+					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+
+					expectRangeToEqualExpected(res, expected);
+
+					
+						});
 					/*
 					Test Case: LR18
 Goal:
