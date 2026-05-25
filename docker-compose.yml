@@ -141,7 +141,7 @@ services:
             OED_LOG_FILE: log.txt
             # If in a subdirectory, set it here
             # OED_SUBDIR: /subdir/
-            # Set the correct build environment.
+        # Set the correct build environment.
         build:
             context: ./
             dockerfile: ./containers/web/Dockerfile
@@ -158,7 +158,7 @@ services:
             # For production you might want something like:
             # - "80:3000"
             # and comment out the debug port and 3000:3000 line above
-            # Don't bring this up without the DB
+        # Don't bring this up without the DB
         depends_on:
             # - database
             database:

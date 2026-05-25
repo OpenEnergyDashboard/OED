@@ -20,7 +20,7 @@ const DEFAULT_POSTGRES_PASSWORD = 'pleaseChange';
 // Default OED database password - must match value in the unedited docker-compose.yml file.
 const DEFAULT_OED_DB__PASSWORD = 'opened';
 
-// Load whichever .env file is available and override existing process vars
+// Load whenever .env file is available and override existing process vars
 // so repeated invocations in one session can pick up the newest credentials.
 if (fs.existsSync(ENV_PATH)) {
 	dotenv.config({ path: ENV_PATH, override: true });
@@ -48,8 +48,6 @@ function parseEnvFile(envPath) {
  * updatePassword is only false if the currentPassword and proposedPassword are the same and true otherwise. ({ updatePassword, usePassword })
  */
 function acceptablePassword(currentPassword, proposedPassword, defaultPassword, whatPassword, productionInstall) {
-	console.log('currentPassword, proposedPassword, defaultPassword, whatPassword, productionInstall: ',
-		currentPassword, proposedPassword, defaultPassword, whatPassword, productionInstall);
 	// True if should replace the proposed password with a secure one.
 	let replacePassword;
 	// True if the password should be updated. Only false if same as current one so make it true here.
@@ -72,13 +70,12 @@ function acceptablePassword(currentPassword, proposedPassword, defaultPassword, 
 		console.log('');
 		replacePassword = true;
 	} else if (currentPassword === proposedPassword) {
-		console.log('same');
 		// Password is the same so will not change.
 		console.log('The new Postgres password for ' + whatPassword + ' is the same as the current one so not being changed.');
 		replacePassword = false;
 		updatePassword = false;
 	} else {
-		// It seems acceptable so do not need to update.
+		// It seems acceptable so do not need to update the provided password.
 		replacePassword = false;
 	}
 
@@ -149,13 +146,13 @@ function shouldRetryError(error) {
 	);
 }
 
-// Change the database passwords for both the default postgres user and the OED user
-// if this is done after the initial setup, OED must be restarted to get a connection with the server
+// Change the database passwords for both the default postgres user and the OED user.
+// If this is done after the initial setup, OED must be restarted to get a connection with the server.
 async function changePostgresPasswords() {
 	// Input/desired new passwords for postgres & OED DB user.
 	let proposedPostgresPassword, proposedOedDbPassword;
 	// If should set a new password for each type: true if should.
-	// This is used to allow user to decide if manual entry and also set again if not based on passwords given.
+	// This is used to stop when in development and empty password and also set again if not based on passwords given.
 	let updatePostgresPassword = true, updateOedDbPassword = true;
 	// Holds new DB passwords that OED will actually use.
 	let newPostgresPassword, newOedDbPassword;
@@ -177,38 +174,34 @@ async function changePostgresPasswords() {
 		// Input from user.
 		// TODO Should all user input be sanitized?
 		// TODO Might be good to add a parameter to ask for boolean questions to  standardize the way input since used in several places in code.
-		// See if want to set Postgres password and get if should.
+		// Get Postgres password.
 		proposedPostgresPassword = await ask('Enter new Postgres password (blank if want unchanged): ');
-		// See if want to set OED DB password and get if should.
+		// Get OED DB password.
 		proposedOedDbPassword = await ask('Enter new OED database password (blank if want unchanged): ');
 	}
 
 	const fileEnv = parseEnvFile(ENV_PATH);
 	// Is this a production install. First get from the environment variable.
-	let productionInstall = process.env.OED_PRODUCTION === 'yes';
-	if (!isManual && process.argv[4] === 'production') {
-		// This is from an OED install so the extra variable exists. It might be that the install had
-		// the production switch set so need to use that instead of the environment variable value.
-		productionInstall = true;
-		console.log('productionInstall set to true');
-	}
-	console.log('productionInstall: ', productionInstall);
-
-	// If this is not production and going to change that password and it is empty then
-	// don't update to leave current password.
-	// Note it is reset if in production.
 	// Note that when a developer manually sets the --production flag when starting OED,
 	// OED does not receive the updated environment variable so it does not know OED
 	// is in production mode. As a result, this does not work after the initial install.
 	// This isn't a big deal since it is unusual and only for developers but there is a note
 	// in the install file to fix it at some point.
-	if (!productionInstall && proposedPostgresPassword.length === 0) {
-		updatePostgresPassword = false;
-		console.log('The new Postgres password was empty to it is not being changed.');
+	let productionInstall = process.env.OED_PRODUCTION === 'yes';
+	if (!isManual && process.argv[4] === 'production') {
+		// This is from an OED install so the extra variable exists. It might be that the install had
+		// the production switch set so need to use that instead of the environment variable value.
+		productionInstall = true;
 	}
-	if (!productionInstall && proposedOedDbPassword.length === 0) {
+
+	// If the new password is empty then don't update to leave current password.
+	if (proposedPostgresPassword.length === 0) {
+		updatePostgresPassword = false;
+		console.log('The new Postgres password was empty so it is not being changed.');
+	}
+	if (proposedOedDbPassword.length === 0) {
 		updateOedDbPassword = false;
-		console.log('The new OED database password was empty to it is not being changed.');
+		console.log('The new OED database password was empty so it is not being changed.');
 	}
 
 	// Warn if manual invocation that all OED users will lose access until restart.
@@ -227,7 +220,7 @@ async function changePostgresPasswords() {
 		}
 	}
 
-	// TODO why is this needed given it has the currentPostgresPassword setting below with ||?????
+	// TODO why is this needed given it has the currentPostgresPassword setting below with ||?
 	// Prefer the most recent passwords from the .env file over process.env which may be outdated
 	if (fileEnv.POSTGRES_PASSWORD) {
 		process.env.POSTGRES_PASSWORD = fileEnv.POSTGRES_PASSWORD;
@@ -237,9 +230,9 @@ async function changePostgresPasswords() {
 		process.env.OED_DB_PASSWORD = fileEnv.OED_DB_PASSWORD;
 	}
 
-	// This should only needed if that password is being updated.
+	// This should only be needed if that password is being updated.
 	// However, it is used when you write to the .env so always set.
-	// Also, the currentPostgresPassword is need to make any change to connect to DB.
+	// Also, the currentPostgresPassword is needed to make any change to connect to DB.
 	// If no value for .env nor process env then set to default password so it is updated.
 	const currentPostgresPassword = fileEnv.POSTGRES_PASSWORD || process.env.POSTGRES_PASSWORD || DEFAULT_POSTGRES_PASSWORD;
 	// If no value for .env nor process env then set to default password so it is updated.
@@ -252,7 +245,6 @@ async function changePostgresPasswords() {
 		// Note this changes updatePostgresPassword from original value above.
 		({ updatePassword: updatePostgresPassword, usePassword: newPostgresPassword } =
 			acceptablePassword(currentPostgresPassword, proposedPostgresPassword, DEFAULT_POSTGRES_PASSWORD, 'Postgres', productionInstall));
-		console.log('newPostgresPassword: ', newPostgresPassword, 'updatePostgresPassword: ', updatePostgresPassword);
 	} else {
 		// Below it writes the new Postgres password to .env so set it to the current one so that works.
 		newPostgresPassword = currentPostgresPassword;
@@ -260,13 +252,12 @@ async function changePostgresPasswords() {
 
 	if (updateOedDbPassword) {
 		// For OED DB password. Only do if not stopped above.
-		console.log('currentOedDbPassword: ', currentOedDbPassword);
+
 		// Check and replace password as needed for OED DB user.
 		// It can be empty as it will be replaced in that case.
 		// Note this changes updateOedDbPassword from original value above.
 		({ updatePassword: updateOedDbPassword, usePassword: newOedDbPassword } =
 			acceptablePassword(currentOedDbPassword, proposedOedDbPassword, DEFAULT_OED_DB__PASSWORD, 'OED DB', productionInstall));
-		console.log('newOedDbPassword: ', newOedDbPassword, 'updateOedDbPassword: ', updateOedDbPassword);
 	} else {
 		// Below it writes the new OED DB password to .env so set it to the current one so that works.
 		newOedDbPassword = currentOedDbPassword;
@@ -346,6 +337,7 @@ async function changePostgresPasswords() {
 					console.error('Authentication failed: default password may already be changed or password used is incorrect.');
 				}
 
+				console.log('Stopping password change(s). Due to error it is unknown if any were changed.');
 				process.exit(1);
 			}
 		}

@@ -227,7 +227,6 @@ printf "%s\n" "OED install finished"
 # Start OED
 if [ "$dostart" == "yes" ]; then
 	if [ "$INSTALL_MODE" = "production" ]; then
-		printf "%s\n" "Starting OED in production mode"
 		# Checking if the user has set a mail method and left one of the mailing environment variables default, warning if so
 		if [ -z "$OED_MAIL_METHOD" ] || [ "$OED_MAIL_METHOD" != "none" ]; then
 			if [ "$OED_MAIL_SMTP" = "smtp.example.com" ] || \
