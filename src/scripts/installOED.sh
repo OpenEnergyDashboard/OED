@@ -63,13 +63,20 @@ INSTALL_MODE="production"
 
 if [ "$production" = "yes" ] || [ "$OED_PRODUCTION" = "yes" ]; then
 	INSTALL_MODE="production"
-elif [ "$production" = "no" ] || [ "$OED_PRODUCTION" = "no" ]; then
+elif [ "$OED_PRODUCTION" = "no" ]; then
 	INSTALL_MODE="development"
 else
 	printf "\nFailure: Invalid or missing environment configuration."
 	printf "\nSet OED_PRODUCTION to 'yes' for production or 'no' for development."
 	exit 10
 fi
+# TODO This does not work as it is not resetting the environment variable see in OED.
+# It isn't common and only for developers but should be fixed at some point.
+# if [ "$production" = "yes" ]; then
+	# The production switch was set so it likely overrode the environment variable.
+	# To make sure OED knows what is going on, reset the environment variable.
+	# OED_PRODUCTION="yes"
+# fi
 
 # Warn installer of unusual or incorrect installation settings.
 # OED_DOCKER_CONFIG_DEV should either be yes or not set in the config files.

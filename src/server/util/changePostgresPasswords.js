@@ -197,12 +197,16 @@ async function changePostgresPasswords() {
 	// If this is not production and going to change that password and it is empty then
 	// don't update to leave current password.
 	// Note it is reset if in production.
-	// if (updatePostgresPassword && proposedPostgresPassword.length === 0) {
-	if (proposedPostgresPassword.length === 0) {
+	// Note that when a developer manually sets the --production flag when starting OED,
+	// OED does not receive the updated environment variable so it does not know OED
+	// is in production mode. As a result, this does not work after the initial install.
+	// This isn't a big deal since it is unusual and only for developers but there is a note
+	// in the install file to fix it at some point.
+	if (!productionInstall && proposedPostgresPassword.length === 0) {
 		updatePostgresPassword = false;
 		console.log('The new Postgres password was empty to it is not being changed.');
 	}
-	if (proposedOedDbPassword.length === 0) {
+	if (!productionInstall && proposedOedDbPassword.length === 0) {
 		updateOedDbPassword = false;
 		console.log('The new OED database password was empty to it is not being changed.');
 	}
