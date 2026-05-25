@@ -2,6 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+/* eslint-disable @typescript-eslint/no-var-requires, no-undef, @typescript-eslint/indent, comma-dangle, max-len */
+
 /*
   This file tests the readings retrieval API for line chart quantity meters.
   See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
@@ -172,66 +174,82 @@ mocha.describe('readings API', () => {
 
 					// Add LR18 here
 
-					mocha.it('LR18: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as kg of CO2', async () => {
+					mocha.it('LR18: daily points for 15 minute readings and kg of CO2 range with +-inf start/end time', async () => {
+						const unitData = [
+							{
+								name: 'Electric_Utility',
+								identifier: '',
+								unitRepresent: Unit.unitRepresentType.QUANTITY,
+								secInRate: 3600,
+								typeOfUnit: Unit.unitType.METER,
+								suffix: '',
+								displayable: Unit.displayableType.NONE,
+								preferredDisplay: false,
+								note: 'special unit'
+							},
+							{
+								name: 'kg',
+								identifier: '',
+								unitRepresent: Unit.unitRepresentType.QUANTITY,
+								secInRate: 3600,
+								typeOfUnit: Unit.unitType.UNIT,
+								suffix: '',
+								displayable: Unit.displayableType.ALL,
+								preferredDisplay: false,
+								note: 'OED created standard unit'
+							},
+							{
+								name: 'kg CO₂',
+								identifier: '',
+								unitRepresent: Unit.unitRepresentType.QUANTITY,
+								secInRate: 3600,
+								typeOfUnit: Unit.unitType.UNIT,
+								suffix: 'CO₂',
+								displayable: Unit.displayableType.ALL,
+								preferredDisplay: false,
+								note: 'special unit'
+							}
+						];
+						const conversionData = [
+							{
+								sourceName: 'Electric_Utility',
+								destinationName: 'kg CO₂',
+								bidirectional: false,
+								slope: 0.709,
+								intercept: 0,
+								note: 'Electric_Utility → kg CO₂'
+							},
+							{
+								sourceName: 'kg CO₂',
+								destinationName: 'kg',
+								bidirectional: false,
+								slope: 1,
+								intercept: 0,
+								note: 'CO₂ → kg'
+							}
+						];
+						const meterData = [
+							{
+								name: 'Electric_Utility kg of CO₂',
+								unit: 'Electric_Utility',
+								displayable: true,
+								gps: undefined,
+								note: 'special meter',
+								file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+								deleteFile: false,
+								readingFrequency: '15 minutes',
+								id: METER_ID
+							}
+						];
 
-					await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
-					const unitId = await getUnitId('kWh');
+						await prepareTest(unitData, conversionData, meterData);
+						const unitId = await getUnitId('kg of CO₂');
+						const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_kgCO2_st_-inf_et_inf.csv');
+						const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+							.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 
-					const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_Electric_Utility_gu_kg_of_CO₂_st_-inf_et_inf.csv');
-					const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
-						.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
-
-					expectRangeToEqualExpected(res, expected);
-
-					
-						});
-					/*
-					Test Case: LR18
-Goal:
-Verify that the range API returns daily points for 15-minute intervals,
-converted from Electric_Utility readings to kg of CO₂.
-
-Steps:
-
-1. Setup Test Environment
-   - Load required units:
-       - kWh
-       - kg
-       - kg of CO₂
-       - any related graphic units
-   - Load required conversions:
-       - kWh -> kg of CO₂ conversion
-       - supporting conversion data
-   - Create/configure test meter with Electric_Utility readings
-
-2. Retrieve Graphic Unit ID
-   - Query the database/helper function for:
-       "kg of CO₂"
-   - Store resulting unit ID
-
-3. Load Expected Output
-   - Read expected CSV file:
-       expected_line_range_ri_15_mu_Electric_Utility_gu_kg_of_CO₂_st_-inf_et_inf.csv
-   - Parse CSV into expected data structure
-
-4. Call Unit Readings API
-   - Send GET request to:
-       /api/unitReadings/line/meters/{METER_ID}
-   - Include query parameters:
-       timeInterval = ETERNITY
-       graphicUnitId = kg_of_CO₂_unit_id
-
-5. Validate Response
-   - Compare API response against expected CSV data
-   - Ensure:
-       - all timestamps exist
-       - intervals are 15 minutes
-       - daily range points are correct
-       - values are properly converted to kg of CO₂
-
-6. Pass Condition
-   - API output exactly matches expected dataset
-					*/
+						expectRangeToEqualExpected(res, expected);
+					});
 
 					// Add LR19 here
 
