@@ -333,7 +333,82 @@ mocha.describe('readings API', () => {
 				});
 
 				// Add CG12 here
+				mocha.it('CG12: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as kg of CO2', async () => {
+					const unitData = unitDatakWh.concat([
+						{
+							// u10
+							name: 'kg',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						},
+						{
+							// u12
+							name: 'kg CO₂',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: 'CO₂',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'special unit'
+						}
+					]);
 
+					const conversionData = conversionDatakWh.concat([
+						{
+							// c11
+							sourceName: 'Electric_Utility',
+							destinationName: 'kg CO₂',
+							bidirectional: false,
+							slope: 0.709,
+							intercept: 0,
+							note: 'Electric_Utility → kg CO₂'
+						},
+						{
+							// c12
+							sourceName: 'kg CO₂',
+							destinationName: 'kg',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'CO₂ → kg'
+						}
+					]);
+
+					await prepareTest(
+						unitData,
+						conversionData,
+						meterDatakWhGroups,
+						groupDatakWh
+					);
+
+					const unitId = await getUnitId('kg of CO₂');
+
+					const expected = [
+						4017.44423365639,
+						4163.5451722303
+					];
+
+					const res = await chai.request(app)
+						.get(`/api/compareReadings/groups/${GROUP_ID}`)
+						.query({
+							curr_start: '2022-10-31 00:00:00',
+							curr_end: '2022-10-31 17:00:00',
+							shift: 'P1D',
+							graphicUnitId: unitId
+						});
+
+					expectCompareToEqualExpected(res, expected, GROUP_ID);
+				//run with docker compose exec web npm test -- --grep "CG12"
+				
+				});
 				// Add CG13 here
 
 				// Add CG14 here
