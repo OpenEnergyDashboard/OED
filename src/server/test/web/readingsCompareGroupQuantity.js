@@ -406,7 +406,7 @@ mocha.describe('readings API', () => {
 						});
 
 					expectCompareToEqualExpected(res, expected, GROUP_ID);
-				//run with docker compose exec web npm test -- --grep "CG12"
+				
 				
 				});
 				// Add CG13 here
