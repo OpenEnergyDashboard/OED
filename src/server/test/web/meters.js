@@ -477,8 +477,12 @@ mocha.describe('Meters', () => {
 			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitB.id, unitB.id,
 			Unit.areaUnitType.METERS, undefined);
 		const meterC = new Meter(undefined, 'Meter C', null, true, true, Meter.type.MAMAC, null);
+		const meterD = new Meter(undefined, 'MeterD', null, true, true, Meter.type.MAMAC, null, gps,
+			'MeterD', 'notes 2', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
+			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', -99, -99,
+			Unit.areaUnitType.METERS, undefined);
 
-		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
+		await Promise.all([meterA, meterB, meterC, meterD].map(meter => meter.insert(conn)));
 		const expectedMeters = [meterA, meterB];
 		const actualMeters = await Meter.getUnitNotNull(conn);
 		actualMeters.sort((a, b) => a.id - b.id);
