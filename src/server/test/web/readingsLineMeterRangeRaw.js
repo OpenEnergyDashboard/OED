@@ -183,8 +183,56 @@ mocha.describe('readings API', () => {
 
                     // Add LR16 here
 
-                    mocha.it('LR17: range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained & reverse conversions', async () +> {
-
+                    mocha.it('LR17: range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained & reverse conversions', async () => {
+                        const unitData = [
+                            {
+                                // u6 
+                                name: 'C', 
+                                identifier: '', 
+                                unitRepresent: Unit.unitRepresentType.RAW, 
+                                secInRate: 3600, 
+                                typeOfUnit: Unit.unitType.UNIT, 
+                                suffix: '', 
+                                displayable: Unit.displayableType.ALL, 
+                                preferredDisplay: true, 
+                                note: 'Celsius' 
+                            },
+                            {
+                                // u7 
+                                name: 'Degrees', 
+                                identifier: '', 
+                                unitRepresent: Unit.unitRepresentType.RAW, 
+                                secInRate: 3600, typeOfUnit: 
+                                Unit.unitType.METER, 
+                                suffix: '', displayable: Unit.displayableType.NONE, 
+                                preferredDisplay: false, 
+                                note: 'special unit' 
+                            },
+                            { 
+                                // u8
+                                name: 'F', 
+                                identifier: '', 
+                                unitRepresent: Unit.unitRepresentType.RAW, 
+                                secInRate: 3600, 
+                                typeOfUnit: Unit.unitType.UNIT, 
+                                suffix: '', 
+                                displayable: Unit.displayableType.ALL, 
+                                referredDisplay: false, 
+                                note: 'OED created standard unit' 
+                            },
+                            { 
+                                // u9
+                                name: 'Widget', 
+                                identifier: '', 
+                                unitRepresent: Unit.unitRepresentType.RAW, 
+                                secInRate: 3600, 
+                                typeOfUnit: Unit.unitType.UNIT, 
+                                suffix: '', 
+                                displayable: Unit.displayableType.ALL, 
+                                preferredDisplay: false, 
+                                note: 'fake unit' 
+                            }
+                        ];
                     });
 
                     mocha.it('LR22: range should have hourly points for middle readings of 15 minute for a 60 day period and raw units & C as F with intercept', async () => {
