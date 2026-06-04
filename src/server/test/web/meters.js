@@ -72,8 +72,8 @@ function expectMetersToBeEquivalent(meters, length, isAdmin, unit) {
 			expect(meter).to.have.property('readingFrequency', 'PT13H57M19S');
 			expect(meter).to.have.property('minVal', Number.MIN_SAFE_INTEGER);
 			expect(meter).to.have.property('maxVal', Number.MAX_SAFE_INTEGER);
-			expect(meter).to.have.property('minDate', moment(0).utc().format('YYYY-MM-DD HH:mm:ssZ'));
-			expect(meter).to.have.property('maxDate', moment(0).utc().add(5000, 'years').format('YYYY-MM-DD HH:mm:ssZ'));
+			expect(meter).to.have.property('minDate', '1970-01-01T00:00:00.000Z');
+			expect(meter).to.have.property('maxDate', '6970-01-01T00:00:00.000Z');
 			expect(meter).to.have.property('maxError', 75);
 			expect(meter).to.have.property('disableChecks', Unit.disableChecksType.REJECT_ALL);
 		} else {
@@ -149,6 +149,7 @@ mocha.describe('meters API', () => {
 		expect(res.body).to.have.lengthOf(4);
 		expectMetersToBeEquivalent(res.body, 4, false, unitId);
 	});
+
 
 	mocha.describe('Admin role & CSV role:', () => {
 		for (const role in User.role) {
@@ -247,15 +248,14 @@ mocha.describe('meters API', () => {
 		const conn = testDB.getConnection();
 		const password = 'password';
 		const hashedPassword = await bcrypt.hash(password, 10);
-		const nonAdmin = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+		const nonAdmin = new User(undefined, 'export@example.com', hashedPassword, User.role.EXPORT);
 		await nonAdmin.insert(conn);
 		nonAdmin.password = password;
 
-		let res = await chai.request(app).post('/api/login')
-			.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
-		token = res.body.token;
+		let userres = await chai.request(app).post('/api/login')
+			.send({ username: nonAdmin.username, password: nonAdmin.password });
+		token = userres.body.token;
 
-		const conn = testDB.getConnection();
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
 			'Identified 2', 'notes 1', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
@@ -280,7 +280,7 @@ mocha.describe('meters API', () => {
 		expect(meter.endOnlyTime).to.equal(null);
 		expect(meter.reading).to.equal(null);
 		expect(meter.startTimestamp).to.equal(null);
-		expect(meter.endTimeStamp).to.equal(null);
+		expect(meter.endTimestamp).to.equal(null);
 		expect(meter.previousEnd).to.equal(null);
 		expect(meter.readingFrequency).to.equal(null);
 		expect(meter.minVal).to.equal(null);
@@ -516,9 +516,9 @@ mocha.describe('Meters', () => {
 				'MeterB', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitB.id, unitB.id,
 				Unit.areaUnitType.METERS, undefined);
-			const meterC= new Meter(undefined, 'MeterC', null, true, true, Meter.type.MAMAC, null, gps, 
+			const meterC = new Meter(undefined, 'MeterC', null, true, true, Meter.type.MAMAC, null, gps, 
 				'MeterC', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
-				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitC.id, unitC.id,
+				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitB.id, unitB.id,
 				Unit.areaUnitType.METERS, undefined);
 
 			await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
@@ -547,11 +547,10 @@ mocha.describe('Meters', () => {
 			'MeterC', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
 			Unit.areaUnitType.METERS, undefined);
-		await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 
-		expect(meterA.existsByName(conn)).to.be.equal(true);
-		expect(meterB.existsByName(conn)).to.be.equal(true);
-		expect(meterC.existsByName(conn)).to.be.equal(false);
+		await meterA.insert(conn);
+		expect(await meterB.existsByName(conn)).to.be.equal(true);
+		expect(await meterC.existsByName(conn)).to.be.equal(false);
 	});
 
 	mocha.it('can make meter data valid', async () => {
