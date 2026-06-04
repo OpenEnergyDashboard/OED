@@ -8,9 +8,10 @@ const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
 const {
 	validateCommaSeparatedIdPatterns,
-	expectValidCommaSeparatedIds
+	expectValidCommaSeparatedIds,
+	validateRequiredQueryParams
 } = require('../util/validationHelpers');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 const {	STRING_GENERAL_MAX_LENGTH } = require('../../util/validationConstants');
 
 mocha.describe('Compare Readings Parameter Validation', () => {
@@ -69,24 +70,17 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get(`${BASE_METER_ENDPOINT}/${longMeterIds}`)
 					.query(validQuery);
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 		});
 
 		mocha.describe('Query Parameter Validation', () => {
 			mocha.it('should require all query parameters', async () => {
-				const requiredParams = ['curr_start', 'curr_end', 'shift', 'graphicUnitId'];
-
-				for (const param of requiredParams) {
-					const incompleteQuery = { ...validQuery };
-					delete incompleteQuery[param];
-
-					const res = await chai.request(app)
-						.get(`${BASE_METER_ENDPOINT}/1`)
-						.query(incompleteQuery);
-
-					expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
-				}
+				await validateRequiredQueryParams({
+					endpoint: `${BASE_METER_ENDPOINT}/1`,
+					baseQuery: validQuery,
+					requiredParams: ['curr_start', 'curr_end', 'shift', 'graphicUnitId']
+				});
 			});
 
 			mocha.it('should reject extra query parameters (parameter injection prevention)', async () => {
@@ -99,7 +93,7 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get(`${BASE_METER_ENDPOINT}/1`)
 					.query(queryWithExtra);
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 
 			// TODO: re-enable once compareReadings rejects invalid ISO values without hitting DB
@@ -115,7 +109,7 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 						curr_start: longDateString
 					});
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 
 			// TODO: re-enable once compareReadings rejects invalid ISO values without hitting DB
@@ -130,7 +124,7 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 						curr_end: longDateString
 					});
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 
 			// TODO: re-enable once compareReadings rejects invalid ISO values without hitting DB
@@ -146,7 +140,7 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 						shift: longDurationString
 					});
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 
 			mocha.it('should validate graphicUnitId parameter', async () => {
@@ -166,7 +160,7 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 							graphicUnitId: invalidId
 						});
 
-					expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+					expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 				}
 			});
 		});
@@ -224,24 +218,17 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get(`${BASE_GROUP_ENDPOINT}/${longGroupIds}`)
 					.query(validQuery);
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 		});
 
 		mocha.describe('Query Parameter Validation', () => {
 			mocha.it('should require all query parameters', async () => {
-				const requiredParams = ['curr_start', 'curr_end', 'shift', 'graphicUnitId'];
-
-				for (const param of requiredParams) {
-					const incompleteQuery = { ...validQuery };
-					delete incompleteQuery[param];
-
-					const res = await chai.request(app)
-						.get(`${BASE_GROUP_ENDPOINT}/1`)
-						.query(incompleteQuery);
-
-					expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
-				}
+				await validateRequiredQueryParams({
+					endpoint: `${BASE_GROUP_ENDPOINT}/1`,
+					baseQuery: validQuery,
+					requiredParams: ['curr_start', 'curr_end', 'shift', 'graphicUnitId']
+				});
 			});
 
 			mocha.it('should reject extra query parameters (parameter injection prevention)', async () => {
@@ -254,7 +241,7 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get(`${BASE_GROUP_ENDPOINT}/1`)
 					.query(queryWithExtra);
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 
 			// Query parameter validation is identical for both endpoints, 
@@ -287,8 +274,8 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get('/api/compareReadings/groups/1')
 					.query(maliciousQuery);
 
-				expect(res1.status).to.equal(HTTP_CODE.BAD_REQUEST);
-				expect(res2.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res1.status).to.equal(HTTP_CODES.BAD_REQUEST);
+				expect(res2.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			}
 		});
 
@@ -318,8 +305,8 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get('/api/compareReadings/groups/1')
 					.query(test.query);
 
-				expect(res1.status).to.equal(HTTP_CODE.BAD_REQUEST);
-				expect(res2.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res1.status).to.equal(HTTP_CODES.BAD_REQUEST);
+				expect(res2.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			}
 		});
 	});
