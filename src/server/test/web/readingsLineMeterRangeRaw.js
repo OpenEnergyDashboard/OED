@@ -233,7 +233,39 @@ mocha.describe('readings API', () => {
                                 note: 'fake unit' 
                             }
                         ];
-                    });
+                     
+                    const conversionData =[
+
+                       //c5
+                        { 
+                            sourceName: 'Degrees',
+                            destinationName: 'C', 
+                            bidirectional: false, 
+                            slope: 1, 
+                            intercept: 0, 
+                            note: 'Degrees → C' 
+                    },
+
+                        //c8
+                        { 
+                            sourceName: 'F', 
+                            destinationName: 'C', 
+                            bidirectional: true, 
+                            slope: 1 / 1.8, 
+                            intercept: -32 / 1.8, 
+                            note: 'Fahrenheit → Celsius' 
+                        },
+                        //c10
+                        { 
+                            sourceName: 'Widget', 
+                            destinationName: 'F', 
+                            bidirectional: true, 
+                            slope: 0.2, 
+                            intercept: -0.6, 
+                            note: 'Fahrenheit → Widget' 
+                        }
+                    ]
+                });
 
                     mocha.it('LR22: range should have hourly points for middle readings of 15 minute for a 60 day period and raw units & C as F with intercept', async () => {
                         const unitData = [
