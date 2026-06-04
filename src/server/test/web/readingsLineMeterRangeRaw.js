@@ -244,7 +244,7 @@ mocha.describe('readings API', () => {
                             slope: 1, 
                             intercept: 0, 
                             note: 'Degrees → C' 
-                    },
+                        },
 
                         //c8
                         { 
@@ -265,6 +265,20 @@ mocha.describe('readings API', () => {
                             note: 'Fahrenheit → Widget' 
                         }
                     ]
+                    const meterData = [
+                        {
+                            name: 'Degrees Widget',
+                            unit: 'Degrees',
+                            defaultGraphicUnit: 'Widget',
+                            displayable: true,
+                            gps: undefined,
+                            note: 'special meter',
+                            file: 'test/web/readingsData/readings_ri_15_days_75.csv',
+                            deleteFile: false,
+                            readingFrequency: '15 minutes',
+                            id: METER_ID
+                        }
+                    ];
                 });
 
                     mocha.it('LR22: range should have hourly points for middle readings of 15 minute for a 60 day period and raw units & C as F with intercept', async () => {
