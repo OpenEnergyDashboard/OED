@@ -130,19 +130,23 @@ mocha.describe('meters API', () => {
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-			Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 		await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
 			'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			2.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-			Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 		await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, '+03', gps,
 			'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			3.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-			Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 		await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, '+04', gps,
 			'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			4.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-			Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 
 		const res = await chai.request(app).get('/api/meters');
 		expect(res).to.have.status(200);
@@ -168,19 +172,23 @@ mocha.describe('meters API', () => {
 					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 						'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 						1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-						Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+						Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+						'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 					await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
 						'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 						2.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-						Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+						Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+						'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 					await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, '+03', gps,
 						'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 						3.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-						Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+						Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+						'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 					await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, '+04', gps,
 						'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 						4.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-						Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+						Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+						'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 
 					const res = await chai.request(app).get('/api/meters').set('token', token);
 					expect(res).to.have.status(200);
@@ -216,19 +224,23 @@ mocha.describe('meters API', () => {
 					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 						'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 						1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-						Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+						Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+						'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 					await new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
 						'Identified 2', 'notes 2', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 						2.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-						Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+						Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+						'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 					await new Meter(undefined, 'Meter 3', '1.1.1.1', true, true, Meter.type.MAMAC, '+03', gps,
 						'Identified 3', 'notes 3', 30.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 						3.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-						Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+						Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+						'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 					await new Meter(undefined, 'Not Visible', '1.1.1.1', true, false, Meter.type.MAMAC, '+04', gps,
 						'Identified 4', 'notes 4', 40.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 						4.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-						Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+						Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+						'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 
 					const res = await chai.request(app).get('/api/meters').set('token', token);
 					expect(res).to.have.status(200);
@@ -260,7 +272,8 @@ mocha.describe('meters API', () => {
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
 			'Identified 2', 'notes 1', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-			Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 		
 		const res = await chai.request(app).get('/api/meters').set('token', token);
 		const meter = res.body[0];
@@ -297,12 +310,14 @@ mocha.describe('meters API', () => {
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
 			'Identified 2', 'notes 1', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-			Unit.areaUnitType.METERS, '13:57:19').insert(conn);
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
 		// Bit of a hack to set the second meter to Identified 1 so passes test. Same for area and TZ.
 		const meter2 = new Meter(undefined, 'Meter 2', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'Identified 1', 'notes 2', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			2.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		await meter2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
@@ -316,7 +331,8 @@ mocha.describe('meters API', () => {
 		const meter = new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		await meter.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter.id + 1}`);
@@ -335,7 +351,8 @@ mocha.describe('Meter model', () => {
 		const meterPreInsert = new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', -99, -99,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		await meterPreInsert.insert(conn);
 
 		const meterPostInsert = await Meter.getByID(meterPreInsert.id, conn);
@@ -356,7 +373,8 @@ mocha.describe('Meter model', () => {
 		const meterPreInsert = new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
 			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		await meterPreInsert.insert(conn);
 
 		meterPreInsert.unitId = -99;
@@ -386,7 +404,8 @@ mocha.describe('Meters', () => {
 		const meterPreInsert = new Meter(undefined, 'Meter', '1.1.1.1', false, true, Meter.type.MAMAC, 'UTC',
 			gps, 'Identified', 'notes', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
 			25.5, '0001-01-01 23:59:59-05:00', '2020-07-02 01:00:10-06:00', '2020-03-05 02:12:00-06:00', unitA.id,
-			unitA.id, Unit.areaUnitType.METERS, '12:34:56');
+			unitA.id, Unit.areaUnitType.METERS, '12:34:56', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		await meterPreInsert.insert(conn);
 		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByName);
@@ -399,7 +418,8 @@ mocha.describe('Meters', () => {
 		const meterPreInsert = new Meter(undefined, 'Meter', '1.1.1.1', false, true, Meter.type.MAMAC, 'UTC',
 			gps, 'Identified', 'notes', 33.5, true, true, '05:05:09', '09:00:01', 0, 0, 1, 'increasing', false,
 			25.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', -99, -99,
-			Unit.areaUnitType.FEET, '13:57:19');
+			Unit.areaUnitType.FEET, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		await meterPreInsert.insert(conn);
 		const meterPostInsertByName = await Meter.getByName(meterPreInsert.name, conn);
 		expectMetersToBeEquivalent(meterPreInsert, meterPostInsertByName);
@@ -432,11 +452,13 @@ mocha.describe('Meters', () => {
 		const enabledMeter = new Meter(undefined, 'EnabledMeter', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'Identified', 'notes', 35.0, true, true, '01:01:25', '00:00:00', 7, 11, 1, 'increasing', false,
 			1.5, '0001-01-01 23:59:59+00:00', '2020-07-02 01:00:10+00:00', '2020-03-05 02:12:00+00:00', unitA.id, unitA.id,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		const disabledMeter = new Meter(undefined, 'DisabledMeter', '1.1.1.1', false, true, Meter.type.MAMAC, '+01', gps,
 			'Identified 1', 'Notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0002-01-01 23:59:59+00:00', '2020-07-02 01:00:10+00:00', '2020-03-05 02:12:00+00:00', unitA.id, unitA.id,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		await enabledMeter.insert(conn);
 		await disabledMeter.insert(conn);
 		// set default timestamps for testing.
@@ -454,11 +476,13 @@ mocha.describe('Meters', () => {
 		const visibleMeter = new Meter(undefined, 'VisibleMeter', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'Identified 1', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		const invisibleMeter = new Meter(undefined, 'InvisibleMeter', '1.1.1.1', true, false, Meter.type.MAMAC, '+01', gps,
 			'Identified 2', 'Notes 2', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0002-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 
 		await visibleMeter.insert(conn);
 		await invisibleMeter.insert(conn);
@@ -472,16 +496,19 @@ mocha.describe('Meters', () => {
 		const meterA = new Meter(undefined, 'MeterA', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'MeterA', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		const meterB = new Meter(undefined, 'MeterB', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'MeterB', 'notes 2', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitB.id, unitB.id,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		const meterC = new Meter(undefined, 'Meter C', '1.1.1.1', true, true, Meter.type.MAMAC, '+01');
 		const meterD = new Meter(undefined, 'MeterD', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'MeterD', 'notes 2', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', -99, -99,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 
 		await Promise.all([meterA, meterB, meterC, meterD].map(meter => meter.insert(conn)));
 		const expectedMeters = [meterA, meterB];
@@ -500,7 +527,8 @@ mocha.describe('Meters', () => {
 			const meterA = new Meter(undefined, 'MeterA', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps, 
 				'MeterA', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
-				Unit.areaUnitType.METERS, '13:57:19');
+				Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 			await meterA.insert(conn);
 
 			const identifierMeter = await Meter.getByIdentifier('MeterA', conn);
@@ -512,15 +540,18 @@ mocha.describe('Meters', () => {
 			const meterA = new Meter(undefined, 'MeterA', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps, 
 				'MeterA', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
-				Unit.areaUnitType.METERS, '13:57:19');
+				Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 			const meterB = new Meter(undefined, 'MeterB', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps, 
 				'MeterB', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitB.id, unitB.id,
-				Unit.areaUnitType.METERS, '13:57:19');
+				Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 			const meterC = new Meter(undefined, 'MeterC', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps, 
 				'MeterC', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 				1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitB.id, unitB.id,
-				Unit.areaUnitType.METERS, '13:57:19');
+				Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 
 			await Promise.all([meterA, meterB, meterC].map(meter => meter.insert(conn)));
 			const allActualMeters = await Meter.getAll(conn);
@@ -539,15 +570,18 @@ mocha.describe('Meters', () => {
 		const meterA = new Meter(undefined, 'MeterOne', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps, 
 			'MeterA', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		const meterB = new Meter(undefined, 'MeterOne', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps, 
 			'MeterB', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		const meterC = new Meter(undefined, 'MeterTwo', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps, 
 			'MeterC', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', unitA.id, unitA.id,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 
 		await meterA.insert(conn);
 		expect(await meterB.existsByName(conn)).to.be.equal(true);
@@ -558,7 +592,8 @@ mocha.describe('Meters', () => {
 		const meter = new Meter(undefined, 'MeterOne', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps, 
 			'MeterA', 'notes 1', 35.0, true, true, '01:01:25', '00:00:00', 5, 0, 1, 'increasing', false,
 			1.5, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 02:12:00', -99, unitA.id,
-			Unit.areaUnitType.METERS, '13:57:19');
+			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
+			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL);
 		Meter.makeMeterDataValid(meter);
 
 		expect(meter.defaultGraphicUnit).to.be.equal(-99);
