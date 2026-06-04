@@ -183,7 +183,9 @@ mocha.describe('readings API', () => {
 
                     // Add LR16 here
 
-                    // Add LR17 here
+                    mocha.it('LR17: range should have daily points for 15 minute reading intervals and raw units with +-inf start/end time & C as Widget with intercept & chained & reverse conversions', async () +> {
+
+                    });
 
                     mocha.it('LR22: range should have hourly points for middle readings of 15 minute for a 60 day period and raw units & C as F with intercept', async () => {
                         const unitData = [
