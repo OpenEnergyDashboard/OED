@@ -187,83 +187,82 @@ mocha.describe('readings API', () => {
                         const unitData = [
                             {
                                 // u6 
-                                name: 'C', 
-                                identifier: '', 
-                                unitRepresent: Unit.unitRepresentType.RAW, 
-                                secInRate: 3600, 
-                                typeOfUnit: Unit.unitType.UNIT, 
-                                suffix: '', 
-                                displayable: Unit.displayableType.ALL, 
-                                preferredDisplay: true, 
-                                note: 'Celsius' 
+                                name: 'C',
+                                identifier: '',
+                                unitRepresent: Unit.unitRepresentType.RAW,
+                                secInRate: 3600,
+                                typeOfUnit: Unit.unitType.UNIT,
+                                suffix: '',
+                                displayable: Unit.displayableType.ALL,
+                                preferredDisplay: true,
+                                note: 'Celsius'
                             },
                             {
                                 // u7 
-                                name: 'Degrees', 
-                                identifier: '', 
-                                unitRepresent: Unit.unitRepresentType.RAW, 
-                                secInRate: 3600, typeOfUnit: 
-                                Unit.unitType.METER, 
-                                suffix: '', displayable: Unit.displayableType.NONE, 
-                                preferredDisplay: false, 
-                                note: 'special unit' 
+                                name: 'Degrees',
+                                identifier: '',
+                                unitRepresent: Unit.unitRepresentType.RAW,
+                                secInRate: 3600,
+                                typeOfUnit: Unit.unitType.METER,
+                                suffix: '',
+                                displayable: Unit.displayableType.NONE,
+                                preferredDisplay: false,
+                                note: 'special unit'
                             },
-                            { 
+                            {
                                 // u8
-                                name: 'F', 
-                                identifier: '', 
-                                unitRepresent: Unit.unitRepresentType.RAW, 
-                                secInRate: 3600, 
-                                typeOfUnit: Unit.unitType.UNIT, 
-                                suffix: '', 
-                                displayable: Unit.displayableType.ALL, 
-                                preferredDisplay: false, 
-                                note: 'OED created standard unit' 
+                                name: 'F',
+                                identifier: '',
+                                unitRepresent: Unit.unitRepresentType.RAW,
+                                secInRate: 3600,
+                                typeOfUnit: Unit.unitType.UNIT,
+                                suffix: '',
+                                displayable: Unit.displayableType.ALL,
+                                preferredDisplay: false,
+                                note: 'OED created standard unit'
                             },
-                            { 
+                            {
                                 // u9
-                                name: 'Widget', 
-                                identifier: '', 
-                                unitRepresent: Unit.unitRepresentType.RAW, 
-                                secInRate: 3600, 
-                                typeOfUnit: Unit.unitType.UNIT, 
-                                suffix: '', 
-                                displayable: Unit.displayableType.ALL, 
-                                preferredDisplay: false, 
-                                note: 'fake unit' 
+                                name: 'Widget',
+                                identifier: '',
+                                unitRepresent: Unit.unitRepresentType.RAW,
+                                secInRate: 3600,
+                                typeOfUnit: Unit.unitType.UNIT,
+                                suffix: '',
+                                displayable: Unit.displayableType.ALL,
+                                preferredDisplay: false,
+                                note: 'fake unit'
                             }
                         ];
-                        const conversionData =[
-
-                        //c5
-                            { 
+                        const conversionData = [
+                            {
+                                // c5
                                 sourceName: 'Degrees',
-                                destinationName: 'C', 
-                                bidirectional: false, 
-                                slope: 1, 
-                                intercept: 0, 
-                                note: 'Degrees → C' 
+                                destinationName: 'C',
+                                bidirectional: false,
+                                slope: 1,
+                                intercept: 0,
+                                note: 'Degrees → C'
                             },
-
-                            //c8
-                            { 
-                                sourceName: 'F', 
-                                destinationName: 'C', 
-                                bidirectional: true, 
-                                slope: 1 / 1.8, 
-                                intercept: -32 / 1.8, 
-                                note: 'Fahrenheit → Celsius' 
+                            {
+                                // c8
+                                sourceName: 'F',
+                                destinationName: 'C',
+                                bidirectional: true,
+                                slope: 1 / 1.8,
+                                intercept: -32 / 1.8,
+                                note: 'Fahrenheit → Celsius'
                             },
-                            //c10
-                            { 
-                                sourceName: 'Widget', 
-                                destinationName: 'F', 
-                                bidirectional: true, 
-                                slope: 0.2, 
-                                intercept: -0.6, 
-                                note: 'Fahrenheit → Widget' 
+                            {
+                                // c10
+                                sourceName: 'Widget',
+                                destinationName: 'F',
+                                bidirectional: true,
+                                slope: 0.2,
+                                intercept: -0.6,
+                                note: 'Fahrenheit → Widget'
                             }
-                        ]
+                        ];
                         const meterData = [
                             {
                                 name: 'Degrees Widget',
@@ -280,17 +279,14 @@ mocha.describe('readings API', () => {
                         ];
                         //fill emptied database with test units/data defined above using prepareTest()
                         await prepareTest(unitData, conversionData, meterData);
-
-                        //Get graph unit ID for 'widget'
+                        //Get graph unit ID for 'Widget'
                         const graphicUnitId = await getUnitId('Widget');
-
                         //load expected readings
                         const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_C_gu_Widget_st_-inf_et_inf.csv');
-
                         //api call to get line chart readings from meter using METER_ID, convert to graphic unit defined above, then store in variable
                         const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
                             .query({ timeInterval: ETERNITY.toString(), graphicUnitId: graphicUnitId });
-                        
+                        //check if response from api call matches values in expected readings csv using expectRangeToEqualExpected()
                         expectRangeToEqualExpected(res, expected);
                     });
 
