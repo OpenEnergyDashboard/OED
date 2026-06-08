@@ -241,7 +241,6 @@ mocha.describe("readings API", () => {
 
 						// Add LR18 here
 
-						// Add LR19 here
 						mocha.it(
 							"LR19: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained",
 							async () => {
