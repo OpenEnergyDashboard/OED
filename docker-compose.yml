@@ -111,6 +111,8 @@ services:
         build:
             context: ./
             dockerfile: ./containers/web/Dockerfile
+        security_opt:
+            - no-new-privileges:true
         # Link to the database so the app can persist data.
         links:
             - database

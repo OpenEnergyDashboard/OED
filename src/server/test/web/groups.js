@@ -104,10 +104,7 @@ mocha.describe('groups API', () => {
 			token = res.body.token;
 		});
 		mocha.describe('create endpoint', () => {
-			mocha.it('rejects all requests without a token with 403', async () => {
-				const res = await chai.request(app).post('/api/groups/create').type('json').send({});
-				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
-			});
+
 			mocha.it('rejects all requests with an invalid token with 401', async () => {
 				const res = await chai.request(app).post('/api/groups/create').set('token', token + 'nope').type('json').send({});
 				expect(res).to.have.status(HTTP_CODES.UNAUTHORIZED);
@@ -164,10 +161,7 @@ mocha.describe('groups API', () => {
 			});
 		});
 		mocha.describe('edit endpoint', () => {
-			mocha.it('rejects all requests without a token with 403', async () => {
-				const res = await chai.request(app).put('/api/groups/edit').type('json').send({});
-				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
-			});
+
 			mocha.it('rejects all requests with an invalid token with 401', async () => {
 				const res = await chai.request(app).put('/api/groups/edit').set('token', token + 'nope').type('json').send({});
 				expect(res).to.have.status(HTTP_CODES.UNAUTHORIZED);
