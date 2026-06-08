@@ -2,43 +2,69 @@
 # * This Source Code Form is subject to the terms of the Mozilla Public
 # * License, v. 2.0. If a copy of the MPL was not distributed with this
 # * file, You can obtain one at http://mozilla.org/MPL/2.0/.
-# *
+
+# *****************************************************************
+# This is the default Docker configuration file that is used for
+# OED sites. Normally only places with comments indicating possible
+# changes should be modified as described.
+#
+# OED developers should change the other docker file and start OED
+# with a modified command. OED sites should NEVER do this.
+# *****************************************************************
 
 version: "3.8"
 services:
-    # Database service. It's PostgreSQL, see the
-    # Dockerfile in ./database
+    # Database service. It's PostgreSQL, see the Dockerfile in ./database.
     database:
-        build: ./containers/database/
         environment:
+            # Default postgres password that should be changed for security.
+            # The OED install process will not allow this password and it will
+            # be replaced with a random, secure password if not changed here.
+            # That is fine as many sites do not need regular access to the
+            # database so a password they created is not important. OED will
+            # provide the password created for future use.
+            # If the password is changed then it is important to make it secure to
+            # avoid unauthorized access.
+            - POSTGRES_PASSWORD=pleaseChange
             # Custom PGDATA per recommendations from official Docker page
             - PGDATA=/var/lib/postgresql/data/pgdata
-            - POSTGRES_PASSWORD=pleaseChange # default postgres password that should be changed for security.
+        # Location of database Docker configuration and startup files.
+        build: ./containers/database/
         volumes:
+            # This maps the proper Docker database directory back to the local file
+            # system. It is critical that the changes actually be written back to
+            # a non-docker file location so they will continue to exist between
+            # OED startups and not lost since Docker container information is reset.
             - ./postgres-data:/var/lib/postgresql/data/pgdata
+        # Tries to make sure postgres is running properly. For example, the DB can be
+        # running but not ready to accept connections.
         healthcheck:
             test: ["CMD-SHELL", "pg_isready -U postgres"]
             interval: 10s
             timeout: 10s
             retries: 3
-        # ports:
-        #    - "5432:5432"
-        # Uncomment the above lines to enable access to the PostgreSQL server
-        # from the host machine.
-        # Web service runs Node
+    # Web service runs Node
     web:
         # Configuration variables for the app.
         environment:
-            - OED_PRODUCTION=no
-            - OED_SERVER_PORT=3000
-            - OED_DB_USER=oed
-            - OED_DB_DATABASE=oed
-            - OED_DB_TEST_DATABASE=oed_testing
+            # Default oed user postgres password that should be changed for security.
+            # The OED install process will not allow this password and it will
+            # be replaced with a random, secure password if not changed here.
+            # That is fine as many sites do not need regular access to the
+            # database so a password they created is not important. OED will
+            # provide the password created for future use.
+            # If the password is changed then it is important to make it secure to
+            # avoid unauthorized access.
             - OED_DB_PASSWORD=opened
-            - OED_DB_HOST=database # Docker will set this hostname
-            - OED_DB_PORT=5432
+            # Default web token that should be changed for security.
+            # The OED install process will not allow this token and it will
+            # be replaced with a random, secure token if not changed.
+            # That is fine as there is normally no usage outside of the OED app for this.
+            # OED will provide the token created for future use.
+            # If the taken is changed here then it is important to make it secure to
+            # avoid unauthorized access.
             - OED_TOKEN_SECRET=?
-            - OED_LOG_FILE=log.txt
+            # The OED_MAIL_... values are set to enable OED to send email about issues.
             - OED_MAIL_METHOD=none # Method of sending mail. Supports "secure-smtp", "none". Case insensitive.
             - OED_MAIL_SMTP=smtp.example.com # Edit this
             - OED_MAIL_SMTP_PORT=465 # Edit this
@@ -51,13 +77,41 @@ services:
             # What it will change is the date/time stamp on logs, notes and change dates that place the current date/time.
             # It can also impact the interpretation of readings sent to OED such as Unix timestamps.
             - TZ=Etc/UTC # Set the timezone of the Docker container where OED runs the web services.
+            # OED_PRODUCTION should NEVER be changed here. If this is for an OED site then
+            # it is VERY important that it be yes for security reasons. If you are doing
+            # development then you should be changing the other docker file as per the help
+            # page for developers.
+            # - OED_PRODUCTION=yes
+            # TODO THIS VALUE IS TEMPORARILY BEING SET TO no DURING THE TRANSITION TO THE NEW SETUP WHERE
+            #       THERE IS A SEPARATE DOCKER CONFIGURATION FILE FOR DEVELOPERS. THIS ALLOWS DEVELOPERS
+            #       TO CONTINUE TO USE THE CURRENT COMMAND TO START UP OED. THE PLAN IS TO REMOVE THIS
+            #       AFTER THE PHASE IN PERIOD.
+            - OED_PRODUCTION=no
+            # See the ports mapping below to change the port used on your system.
+            # Normally OED_SERVER_PORT is not modified.
+            - OED_SERVER_PORT=3000
+            # Normally these users are fine and there should be no reason to change the next
+            # three items.
+            - OED_DB_USER=oed
+            - OED_DB_DATABASE=oed
+            # This user is used when the standard OED testing is run. It is left in this Docker
+            # config file in case sites want to run the test suite.
+            - OED_DB_TEST_DATABASE=oed_testing
+            # Docker will set this hostname.
+            - OED_DB_HOST=database
+            # This is the standard postgres port. At a site this should not cause issues as it
+            # is only used within the Docker container.
+            - OED_DB_PORT=5432
+            # This is the file where OED log messages are stored. It is now a backup location for
+            # messages since all should be logged to the database and available via an OED web page.
+            - OED_LOG_FILE=log.txt
             # If in a subdirectory, set it here
             # - OED_SUBDIR=/subdir/
             # Set the correct build environment.
         build:
             context: ./
             dockerfile: ./containers/web/Dockerfile
-        # Link to the database so the app can persist data
+        # Link to the database so the app can persist data.
         links:
             - database
         # Load the source code into the container.
@@ -67,16 +121,16 @@ services:
         # Map the default port.
         ports:
             - "3000:3000" # Should be commented out if you uncomment 80:3000 below.
-            - "9229:9229" # Debug port, should be commented out for production
             # For production you might want something like:
             # - "80:3000"
             # and comment out the debug port and 3000:3000 line above
-            # Don't bring this up without the DB
+        # Don't bring this up without the DB
         depends_on:
             # - database
             database:
               # We need the database and it has to be ready for work (see healthcheck above).
               condition: service_healthy
+        # As with the DB above, this tries to ensure all is okay.
         healthcheck:
             test: ["CMD", "curl", "-f", "http://localhost:3000"]
             interval: 10s
@@ -88,30 +142,4 @@ services:
             [
                 "bash",
                 "./src/scripts/installOED.sh",
-                "${install_args:-}"
             ]
-        # Use this if you are using a docker-compose that is earlier than version 2 and comment out the one above.
-        # command: ["bash", "./src/scripts/installOED.sh"]
-
-    # Cypress testing service
-    cypress:
-      image: cypress/included
-      profiles:
-        - ui-testing
-      environment:
-        - CYPRESS_BASE_URL=http://web:3000
-        - DISPLAY=:99
-      working_dir: /usr/src/app
-      depends_on:
-        web:
-          condition: service_healthy
-      volumes:
-        - ./:/usr/src/app
-      entrypoint: >
-        /bin/sh -c "
-        rm -f /tmp/.X99-lock &&
-        Xvfb :99 -screen 0 1024x768x16"
-      read_only: true
-      security_opt:
-        - no-new-privileges:true
-

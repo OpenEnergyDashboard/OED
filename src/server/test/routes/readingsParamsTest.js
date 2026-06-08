@@ -5,7 +5,7 @@
  */
 
 const { chai, mocha, expect, app } = require('../common');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 const { STRING_GENERAL_MAX_LENGTH } = require('../../util/validationConstants');
 const {
 	expectValidCommaSeparatedIds,
@@ -34,7 +34,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					baseEndpoint: LINE_COUNT_BASE_ENDPOINT,
 					validValues: ['1,2,3', '1'],
 					query: lineCountValidQuery,
-					expectedStatuses: [HTTP_CODE.OK, HTTP_CODE.NOT_FOUND, HTTP_CODE.INTERNAL_SERVER_ERROR]
+					expectedStatuses: [HTTP_CODES.OK, HTTP_CODES.NOT_FOUND, HTTP_CODES.INTERNAL_SERVER_ERROR]
 				});
 			});
 
@@ -43,7 +43,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					baseEndpoint: LINE_COUNT_BASE_ENDPOINT,
 					invalidValues: ['1,'.repeat(STRING_GENERAL_MAX_LENGTH + 1)],
 					query: lineCountValidQuery,
-					expectedStatus: HTTP_CODE.BAD_REQUEST
+					expectedStatus: HTTP_CODES.BAD_REQUEST
 				});
 			});
 		});
@@ -63,7 +63,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.get(`${LINE_COUNT_BASE_ENDPOINT}/1`)
 					.query({ timeInterval: hugeTimeInterval });
 
-				expect(res).to.have.status(HTTP_CODE.BAD_REQUEST);
+				expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 			});
 
 			mocha.it('should accept valid timeInterval format', async () => {
@@ -72,7 +72,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
 
 				// May return 200, 404, or 500 if meters/data don't exist
-				expect([HTTP_CODE.OK, HTTP_CODE.NOT_FOUND, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+				expect([HTTP_CODES.OK, HTTP_CODES.NOT_FOUND, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 			});
 
 			mocha.it('should reject extra query parameters (parameter injection)', async () => {
@@ -83,7 +83,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 						maliciousParam: 'injection_attempt'
 					});
 
-				expect(res).to.have.status(HTTP_CODE.BAD_REQUEST);
+				expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 			});
 		});
 
@@ -95,7 +95,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
 
 				// Should not crash server, may return 200, 400 or 500
-				expect([HTTP_CODE.OK, HTTP_CODE.BAD_REQUEST, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+				expect([HTTP_CODES.OK, HTTP_CODES.BAD_REQUEST, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 			});
 
 			mocha.it('should handle XSS attempts in timeInterval', async () => {
@@ -105,7 +105,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.query({ timeInterval: xssAttempt });
 
 				// XSS attempt causes moment.js warning and 500 error
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 			});
 		});
 	});
@@ -120,7 +120,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					baseEndpoint: RAW_READINGS_BASE_ENDPOINT,
 					validValues: ['1'],
 					query: rawReadingsValidQuery,
-					expectedStatuses: [HTTP_CODE.OK, HTTP_CODE.BAD_REQUEST, HTTP_CODE.NOT_FOUND, HTTP_CODE.INTERNAL_SERVER_ERROR]
+					expectedStatuses: [HTTP_CODES.OK, HTTP_CODES.BAD_REQUEST, HTTP_CODES.NOT_FOUND, HTTP_CODES.INTERNAL_SERVER_ERROR]
 				});
 			});
 
@@ -129,7 +129,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					baseEndpoint: RAW_READINGS_BASE_ENDPOINT,
 					invalidValues: ['not_a_number', '0', '-1', '1.5', String(INT32_MAX + 1), encodeURIComponent("1'; DROP TABLE readings; --"), '9'.repeat(32)],
 					query: rawReadingsValidQuery,
-					expectedStatus: HTTP_CODE.BAD_REQUEST
+					expectedStatus: HTTP_CODES.BAD_REQUEST
 				});
 			});
 		});
@@ -149,7 +149,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/1`)
 					.query({ timeInterval: hugeTimeInterval });
 
-				expect(res).to.have.status(HTTP_CODE.BAD_REQUEST);
+				expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 			});
 
 			mocha.it('should accept valid timeInterval format', async () => {
@@ -158,7 +158,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
 
 				// May return 400, 404, or 500 if meters/data don't exist
-				expect([HTTP_CODE.OK, HTTP_CODE.BAD_REQUEST, HTTP_CODE.NOT_FOUND, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+				expect([HTTP_CODES.OK, HTTP_CODES.BAD_REQUEST, HTTP_CODES.NOT_FOUND, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 			});
 
 			mocha.it('should reject extra query parameters (parameter injection)', async () => {
@@ -169,7 +169,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 						maliciousParam: 'injection_attempt'
 					});
 
-				expect(res).to.have.status(HTTP_CODE.BAD_REQUEST);
+				expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 			});
 		});
 
@@ -181,7 +181,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.query({ timeInterval: specialChars });
 
 				// Should be handled gracefully, not crash server
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 			});
 		});
 	});
@@ -193,7 +193,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
 
 			// Empty meter_ids may return 200 (empty result) or 404 depending on routing
-			expect([HTTP_CODE.OK, HTTP_CODE.NOT_FOUND]).to.include(res.status);
+			expect([HTTP_CODES.OK, HTTP_CODES.NOT_FOUND]).to.include(res.status);
 		});
 
 		mocha.it('should handle malformed timeInterval format', async () => {
@@ -202,7 +202,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				.query({ timeInterval: 'invalid_format' });
 
 			// Should not crash - may return 400 or 500 depending on TimeInterval.fromString handling
-			expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+			expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 		});
 	});
 });

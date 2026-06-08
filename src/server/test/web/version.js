@@ -6,13 +6,14 @@
  * It may be used as a template for future tests. */
 
 const { chai, mocha, expect, app } = require('../common');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 const VERSION = require('../../version');
 
 mocha.describe('version API', () => {
 	mocha.it('returns the app version', async () => {
 		const res = await chai.request(app).get('/api/version');
-		expect(res).to.have.status(200);
+		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res).to.be.json;
 		expect(res).to.be.string;
 	});

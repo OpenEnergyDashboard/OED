@@ -13,6 +13,7 @@ const Point = require('../../models/Point');
 const moment = require('moment-timezone');
 const gps = new Point(90, 45);
 const Unit = require('../../models/Unit');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 // TODO These tests are not as good as they should be now that information on
 // meters is returned to all users. They should be updated.
@@ -106,7 +107,7 @@ mocha.describe('meters API', () => {
 
 	mocha.it('returns nothing with no meters present', async () => {
 		const res = await chai.request(app).get('/api/meters');
-		expect(res).to.have.status(200);
+		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res).to.be.json;
 		expect(res.body).to.have.lengthOf(0);
 	});
@@ -131,7 +132,7 @@ mocha.describe('meters API', () => {
 			Unit.areaUnitType.METERS, '13:57:19').insert(conn);
 
 		const res = await chai.request(app).get('/api/meters');
-		expect(res).to.have.status(200);
+		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res).to.be.json;
 		expect(res.body).to.have.lengthOf(4);
 		expectMetersToBeEquivalent(res.body, 4, false, unitId);
@@ -168,7 +169,7 @@ mocha.describe('meters API', () => {
 						Unit.areaUnitType.METERS, '13:57:19').insert(conn);
 
 					const res = await chai.request(app).get('/api/meters').set('token', token);
-					expect(res).to.have.status(200);
+					expect(res).to.have.status(HTTP_CODES.OK);
 					expect(res).to.be.json;
 					expect(res.body).to.have.lengthOf(4);
 					expectMetersToBeEquivalent(res.body, 4, true, unitId);
@@ -216,7 +217,7 @@ mocha.describe('meters API', () => {
 						Unit.areaUnitType.METERS, '13:57:19').insert(conn);
 
 					const res = await chai.request(app).get('/api/meters').set('token', token);
-					expect(res).to.have.status(200);
+					expect(res).to.have.status(HTTP_CODES.OK);
 					expect(res).to.be.json;
 					expect(res.body).to.have.lengthOf(4);
 					expectMetersToBeEquivalent(res.body, 4, false, unitId);
@@ -224,7 +225,7 @@ mocha.describe('meters API', () => {
 
 				mocha.it(`should reject requests from ${role} to edit meters`, async () => {
 					let res = await chai.request(app).post('/api/meters/edit').set('token', token);
-					expect(res).to.have.status(403);
+					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 			}
 		}
@@ -244,7 +245,7 @@ mocha.describe('meters API', () => {
 		await meter2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter2.id}`);
-		expect(res).to.have.status(200);
+		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res).to.be.json;
 		expectMetersToBeEquivalent(res.body, 1, false, unitId);
 	});
@@ -258,6 +259,6 @@ mocha.describe('meters API', () => {
 		await meter.insert(conn);
 
 		const res = await chai.request(app).get(`/api/meters/${meter.id + 1}`);
-		expect(res).to.have.status(500);
+		expect(res).to.have.status(HTTP_CODES.INTERNAL_SERVER_ERROR);
 	});
 });

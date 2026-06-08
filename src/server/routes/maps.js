@@ -13,6 +13,7 @@ const { isTokenAuthorized } = require('../util/userRoles');
 const User = require('../models/User');
 const { DEFAULT_CIRCLE_SIZE } = require('../models/Map');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
+const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
 
@@ -64,7 +65,7 @@ router.get('/:map_id', optionalAuthMiddleware, async (req, res) => {
 		}
 	};
 	if (!validate(req.params, validParams).valid) {
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
@@ -72,7 +73,7 @@ router.get('/:map_id', optionalAuthMiddleware, async (req, res) => {
 			res.json(formatMapForResponse(map));
 		} catch (err) {
 			log.error(`Error while performing GET specific map by id query: ${err}`, err);
-			res.sendStatus(500);
+			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });
@@ -154,7 +155,7 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 	const validationResult = validate(req.body, validMap);
 	if (!validationResult.valid) {
 		log.error(`Invalid input for mapAPI. ${validationResult.errors}`);
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
@@ -178,13 +179,13 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 				);
 				await newMap.insert(t);
 			});
-			res.sendStatus(200);
+			res.sendStatus(HTTP_CODES.OK);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "maps_name_key"') {
-				res.status(400).json({ error: `Map "${req.body.name}" is already in use.` });
+				res.status(HTTP_CODES.BAD_REQUEST).json({ error: `Map "${req.body.name}" is already in use.` });
 			} else {
 				log.error(`Error while inserting new map ${err}`, err);
-				res.sendStatus(500);
+				res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
@@ -272,7 +273,7 @@ router.post('/edit', adminAuthMiddleware('edit maps'), async (req, res) => {
 	const validatorResult = validate(req.body, validMap);
 	if (!validatorResult.valid) {
 		log.error(`Invalid map data supplied, err: ${validatorResult.errors}`);
-		res.status(400);
+		res.status(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
@@ -294,15 +295,15 @@ router.post('/edit', adminAuthMiddleware('edit maps'), async (req, res) => {
 				);
 				await editedMap.update(t);
 			});
-			res.sendStatus(200);
+			res.sendStatus(HTTP_CODES.OK);
 			log.info(`Successfully edited map ${req.body.id}`);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "maps_name_key"') {
-				res.sendStatus(400);
+				res.sendStatus(HTTP_CODES.BAD_REQUEST);
 				log.error(`Map "${req.body.name}" is already in use.`);
 			} else {
 				log.error(`Error while updating map ${err}`, err);
-				res.sendStatus(500);
+				res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
@@ -322,15 +323,15 @@ router.post('/delete', adminAuthMiddleware('delete maps'), async (req, res) => {
 		}
 	};
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
 			await Map.delete(req.body.id, conn);
-			res.sendStatus(200);
+			res.sendStatus(HTTP_CODES.OK);
 		} catch (err) {
 			log.error(`Error while deleting group ${err}`, err);
-			res.sendStatus(500);
+			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });
