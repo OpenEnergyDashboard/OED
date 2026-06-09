@@ -13,7 +13,6 @@ const Point = require('../../models/Point');
 const moment = require('moment-timezone');
 const gps = new Point(90, 45);
 const Unit = require('../../models/Unit');
-const { meterTimezone } = require('../../services/meterTimezone');
 
 /**
  * Verifies the values in the meter are the ones expected.
@@ -154,7 +153,6 @@ mocha.describe('meters API', () => {
 		expect(res.body).to.have.lengthOf(4);
 		expectMetersToBeEquivalent(res.body, 4, false, unitId);
 	});
-
 
 	mocha.describe('Admin role & CSV role:', () => {
 		for (const role in User.role) {
