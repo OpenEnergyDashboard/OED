@@ -177,7 +177,7 @@ mocha.describe('readings API', () => {
                                 'src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_MJst-inf_et_inf.csv',
                             );
                             //Send API request using time range and graphic unit
-                            const res = await chai.request(app).get(/api/unitReadings/line/meters/${METER_ID})
+                            const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
                                 .query({
                                     timeInterval: createTimeString(-Infinity, '00:00:00', Infinity, '00:15:00'),
                                     graphicUnitId: unitId
