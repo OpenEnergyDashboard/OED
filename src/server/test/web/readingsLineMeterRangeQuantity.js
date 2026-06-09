@@ -165,6 +165,27 @@ mocha.describe('readings API', () => {
 					// Add LR10 here
 
 					// Add LR11 here
+					mocha.it(
+                        'LR11: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion',
+                        async () => {
+                            // Prepare test data using existing utility
+                            await prepareTest(unitDatakWh, conversionDatakWh, meterDatakWh);
+                            //Get unit ID for MJ
+                            const unitId = await getUnitId('kWh');
+                            //Load the expected data for the LR11 date range and unit configuration
+                            const expected = await parseExpectedCsv(
+                                'src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_MJst-inf_et_inf.csv',
+                            );
+                            //Send API request using time range and graphic unit
+                            const res = await chai.request(app).get(/api/unitReadings/line/meters/${METER_ID})
+                                .query({
+                                    timeInterval: createTimeString(-Infinity, '00:00:00', Infinity, '00:15:00'),
+                                    graphicUnitId: unitId
+                                });
+                            //Assert the response only includes data within that range and format
+                            expectRangeToEqualExpected(res, expected);
+                        },
+                    );
 
 					// Add LR12 here
 
