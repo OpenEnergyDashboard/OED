@@ -257,15 +257,15 @@ mocha.describe('meters API', () => {
 
 	mocha.it('certain parameters are correctly null on non-admin access', async () => {
 		const conn = testDB.getConnection();
-		const password = 'password';
+		const password = 'exportpassword';
 		const hashedPassword = await bcrypt.hash(password, 10);
 		const nonAdmin = new User(undefined, 'export@example.com', hashedPassword, User.role.EXPORT);
 		await nonAdmin.insert(conn);
 		nonAdmin.password = password;
 
-		let userres = await chai.request(app).post('/api/login')
+		let userRes = await chai.request(app).post('/api/login')
 			.send({ username: nonAdmin.username, password: nonAdmin.password });
-		token = userres.body.token;
+		token = userRes.body.token;
 
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
 			'Identified 2', 'notes 1', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
