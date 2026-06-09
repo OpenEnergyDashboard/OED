@@ -332,11 +332,10 @@ mocha.describe('readings API', () => {
 
 				});
 
-				// Add CG12 here
+				
 				mocha.it('CG12: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as kg of CO2', async () => {
 					const unitData = unitDatakWh.concat([
 						{
-							// u10
 							name: 'kg',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -348,7 +347,6 @@ mocha.describe('readings API', () => {
 							note: 'OED created standard unit'
 						},
 						{
-							// u12
 							name: 'kg CO₂',
 							identifier: '',
 							unitRepresent: Unit.unitRepresentType.QUANTITY,
@@ -363,7 +361,6 @@ mocha.describe('readings API', () => {
 
 					const conversionData = conversionDatakWh.concat([
 						{
-							// c11
 							sourceName: 'Electric_Utility',
 							destinationName: 'kg CO₂',
 							bidirectional: false,
@@ -372,7 +369,6 @@ mocha.describe('readings API', () => {
 							note: 'Electric_Utility → kg CO₂'
 						},
 						{
-							// c12
 							sourceName: 'kg CO₂',
 							destinationName: 'kg',
 							bidirectional: false,
