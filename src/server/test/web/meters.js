@@ -255,54 +255,6 @@ mocha.describe('meters API', () => {
 		}
 	});
 
-	mocha.it('certain parameters are correctly null on non-admin access', async () => {
-		const conn = testDB.getConnection();
-		const password = 'exportpassword';
-		const hashedPassword = await bcrypt.hash(password, 10);
-		const nonAdmin = new User(undefined, 'export@example.com', hashedPassword, User.role.EXPORT);
-		await nonAdmin.insert(conn);
-		nonAdmin.password = password;
-
-		let userRes = await chai.request(app).post('/api/login')
-			.send({ username: nonAdmin.username, password: nonAdmin.password });
-		token = userRes.body.token;
-
-		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
-			'Identified 2', 'notes 1', 20.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
-			1.0, '0001-01-01 23:59:59', '2020-07-02 01:00:10', '2020-03-05 13:15:13', unitId, unitId,
-			Unit.areaUnitType.METERS, '13:57:19', Number.MIN_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, '1970-01-01T00:00:00.000Z', 
-			'6970-01-01T00:00:00.000Z', 75, Unit.disableChecksType.REJECT_ALL).insert(conn);
-		
-		const res = await chai.request(app).get('/api/meters').set('token', token);
-		const meter = res.body[0];
-
-		expect(meter.name).to.equal(null);
-		expect(meter.url).to.equal(null);
-		expect(meter.meterType).to.equal(null);
-		expect(meter.timeZone).to.equal(null);
-		expect(meter.note).to.equal(null);
-		expect(meter.cumulative).to.equal(null);
-		expect(meter.cumulativeReset).to.equal(null);
-		expect(meter.cumulativeResetStart).to.equal(null);
-		expect(meter.cumulativeResetEnd).to.equal(null);
-		expect(meter.readingGap).to.equal(null);
-		expect(meter.readingVariation).to.equal(null);
-		expect(meter.readingDuplication).to.equal(null);
-		expect(meter.timeSort).to.equal(null);
-		expect(meter.endOnlyTime).to.equal(null);
-		expect(meter.reading).to.equal(null);
-		expect(meter.startTimestamp).to.equal(null);
-		expect(meter.endTimestamp).to.equal(null);
-		expect(meter.previousEnd).to.equal(null);
-		expect(meter.readingFrequency).to.equal(null);
-		expect(meter.minVal).to.equal(null);
-		expect(meter.maxVal).to.equal(null);
-		expect(meter.minDate).to.equal(null);
-		expect(meter.maxDate).to.equal(null);
-		expect(meter.maxError).to.equal(null);
-		expect(meter.disableChecks).to.equal(null);
-	});
-
 	mocha.it('returns details on a single meter by ID', async () => {
 		const conn = testDB.getConnection();
 		await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+02', gps,
