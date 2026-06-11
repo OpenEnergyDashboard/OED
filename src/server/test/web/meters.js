@@ -311,14 +311,11 @@ mocha.describe('Meter model', () => {
 	});
 
 	mocha.it('returns -99 when unitID & defaultGraphicUnit is updated to -99', async() => {
-		let unitId;
 		const conn = testDB.getConnection();
-		mocha.beforeEach(async () => {
-			const unit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.QUANTITY, 1000, Unit.unitType.UNIT,
-				'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
-			await unit.insert(conn);
-			unitId = unit.id;
-		});
+		const unit = new Unit(undefined, 'Unit', 'Unit', Unit.unitRepresentType.QUANTITY, 1000, Unit.unitType.UNIT,
+			'Unit Suffix', Unit.displayableType.ALL, true, 'Unit Note');
+		await unit.insert(conn);
+		const unitId = unit.id;
 
 		const meterPreInsert = new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 			'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
