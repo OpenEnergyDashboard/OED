@@ -6,8 +6,13 @@
 
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
-const { testInvalidField } = require('../util/validationHelpers');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const {
+	testInvalidField,
+	validateNumericIdInPath,
+	expectValidNumericIdInPath,
+	validateNoExtraFields
+} = require('../util/validationHelpers');
+const { HTTP_CODES } = require('../../util/httpCodes');
 const {
 	NUMERIC_ID_MAX_LENGTH,
 	STRING_GENERAL_MAX_LENGTH,
@@ -22,7 +27,7 @@ mocha.describe('Maps Parameter Validation', () => {
 				.get('/api/maps');
 
 			// Should return 200 (no auth required for reading)
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 		});
 	});
 
@@ -30,38 +35,27 @@ mocha.describe('Maps Parameter Validation', () => {
 		const BASE_ENDPOINT = '/api/maps';
 
 		mocha.it('should accept valid map ID', async () => {
-			const res = await chai.request(app)
-				.get(`${BASE_ENDPOINT}/1`);
-
-			// Should return 200 or 500 (DB error) - no auth required for reading
-			expect([HTTP_CODE.OK, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+			await expectValidNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				validValues: ['1'],
+				expectedStatuses: [HTTP_CODES.OK, HTTP_CODES.INTERNAL_SERVER_ERROR]
+			});
 		});
 
 		mocha.it('should reject invalid map ID patterns', async () => {
-			const invalidPatterns = [
-				'abc',           // Non-numeric
-				'1.5',           // Decimal
-				'-1',            // Negative
-				'1a',            // Mixed alphanumeric
-				'0',             // Zero
-			];
-
-			for (const invalidPattern of invalidPatterns) {
-				const res = await chai.request(app)
-					.get(`${BASE_ENDPOINT}/${invalidPattern}`);
-
-				//TODO
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
-			}
+			await validateNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				invalidValues: ['abc', '1.5', '-1', '1a', '0'],
+				expectedStatus: [HTTP_CODES.BAD_REQUEST, HTTP_CODES.INTERNAL_SERVER_ERROR]
+			});
 		});
 
 		mocha.it('should reject extremely long map ID strings (DoS prevention)', async () => {
-			const longMapId = 'x'.repeat(NUMERIC_ID_MAX_LENGTH + 1);
-
-			const res = await chai.request(app)
-				.get(`${BASE_ENDPOINT}/${longMapId}`);
-
-			expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+			await validateNumericIdInPath({
+				baseEndpoint: BASE_ENDPOINT,
+				invalidValues: ['x'.repeat(NUMERIC_ID_MAX_LENGTH + 1)],
+				expectedStatus: HTTP_CODES.BAD_REQUEST
+			});
 		});
 	});
 
@@ -81,7 +75,7 @@ mocha.describe('Maps Parameter Validation', () => {
 				.send(baseMapData);
 
 			// Should require admin authentication
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate required fields', async () => {
@@ -94,23 +88,18 @@ mocha.describe('Maps Parameter Validation', () => {
 					endpoint: CREATE_ENDPOINT,
 					basePayload: baseMapData,
 					// Will fail auth before validation
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
 
 		mocha.it('should reject extra fields (parameter injection prevention)', async () => {
-			const payloadWithExtra = {
-				...baseMapData,
-				maliciousField: 'injection_attempt'
-			};
-
-			const res = await chai.request(app)
-				.post(CREATE_ENDPOINT)
-				.send(payloadWithExtra);
-
-			// Will fail auth before validation
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			await validateNoExtraFields({
+				endpoint: CREATE_ENDPOINT,
+				basePayload: baseMapData,
+				extraFields: { maliciousField: 'injection_attempt' },
+				expectedStatus: HTTP_CODES.FORBIDDEN
+			});
 		});
 
 		mocha.it('should validate string field lengths (DoS prevention)', async () => {
@@ -139,7 +128,7 @@ mocha.describe('Maps Parameter Validation', () => {
 					invalidValue: test.value,
 					endpoint: CREATE_ENDPOINT,
 					basePayload: baseMapData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -183,7 +172,7 @@ mocha.describe('Maps Parameter Validation', () => {
 					.post(CREATE_ENDPOINT)
 					.send(payload);
 
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 
@@ -200,7 +189,7 @@ mocha.describe('Maps Parameter Validation', () => {
 					.post(CREATE_ENDPOINT)
 					.send(payload);
 
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 
@@ -217,7 +206,7 @@ mocha.describe('Maps Parameter Validation', () => {
 					.post(CREATE_ENDPOINT)
 					.send(payload);
 
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 	});
@@ -243,7 +232,7 @@ mocha.describe('Maps Parameter Validation', () => {
 				.send(baseEditData);
 
 			// Should require admin authentication
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate required fields', async () => {
@@ -255,22 +244,18 @@ mocha.describe('Maps Parameter Validation', () => {
 					invalidValue: undefined,
 					endpoint: EDIT_ENDPOINT,
 					basePayload: baseEditData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
 
 		mocha.it('should reject extra fields (parameter injection prevention)', async () => {
-			const payloadWithExtra = {
-				...baseEditData,
-				maliciousField: 'injection_attempt'
-			};
-
-			const res = await chai.request(app)
-				.post(EDIT_ENDPOINT)
-				.send(payloadWithExtra);
-
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			await validateNoExtraFields({
+				endpoint: EDIT_ENDPOINT,
+				basePayload: baseEditData,
+				extraFields: { maliciousField: 'injection_attempt' },
+				expectedStatus: HTTP_CODES.FORBIDDEN
+			});
 		});
 
 		mocha.it('should validate ID bounds', async () => {
@@ -282,7 +267,7 @@ mocha.describe('Maps Parameter Validation', () => {
 					invalidValue: id,
 					endpoint: EDIT_ENDPOINT,
 					basePayload: baseEditData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -296,7 +281,7 @@ mocha.describe('Maps Parameter Validation', () => {
 					invalidValue: invalid,
 					endpoint: EDIT_ENDPOINT,
 					basePayload: baseEditData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -315,7 +300,7 @@ mocha.describe('Maps Parameter Validation', () => {
 				.send(baseDeleteData);
 
 			// Should require admin authentication
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate required ID field', async () => {
@@ -324,21 +309,17 @@ mocha.describe('Maps Parameter Validation', () => {
 				invalidValue: undefined,
 				endpoint: DELETE_ENDPOINT,
 				basePayload: baseDeleteData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
 		mocha.it('should reject extra fields (parameter injection prevention)', async () => {
-			const payloadWithExtra = {
-				...baseDeleteData,
-				maliciousField: 'injection_attempt'
-			};
-
-			const res = await chai.request(app)
-				.post(DELETE_ENDPOINT)
-				.send(payloadWithExtra);
-
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			await validateNoExtraFields({
+				endpoint: DELETE_ENDPOINT,
+				basePayload: baseDeleteData,
+				extraFields: { maliciousField: 'injection_attempt' },
+				expectedStatus: HTTP_CODES.FORBIDDEN
+			});
 		});
 
 		mocha.it('should validate ID bounds', async () => {
@@ -350,7 +331,7 @@ mocha.describe('Maps Parameter Validation', () => {
 					invalidValue: id,
 					endpoint: DELETE_ENDPOINT,
 					basePayload: baseDeleteData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -382,7 +363,7 @@ mocha.describe('Maps Parameter Validation', () => {
 						.post(endpoint)
 						.send(maliciousPayload);
 
-					expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+					expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 				}
 			}
 		});
@@ -412,7 +393,7 @@ mocha.describe('Maps Parameter Validation', () => {
 					.post(test.endpoint)
 					.send(test.payload);
 
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 
@@ -445,7 +426,7 @@ mocha.describe('Maps Parameter Validation', () => {
 					.post('/api/maps/create')
 					.send(payload);
 
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 	});
@@ -458,14 +439,14 @@ mocha.describe('Maps Parameter Validation', () => {
 				.set('token', hugeToken);
 
 			// Accept either 401 (auth failure) or 403 (forbidden)
-			expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+			expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 
 			// Test invalid token format
 			res = await chai.request(app)
 				.post('/api/maps/create')
 				.set('token', 12345);
 
-			expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+			expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 		});
 	});
 });

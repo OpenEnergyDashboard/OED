@@ -6,9 +6,9 @@
 
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
-const { testInvalidField } = require('../util/validationHelpers');
+const { testInvalidField, validateInt, validateBool, validateNoExtraFields } = require('../util/validationHelpers');
 const { STRING_GENERAL_MAX_LENGTH } = require('../../util/validationConstants');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Conversions Parameter Validation', () => {
 
@@ -18,7 +18,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.get('/api/conversions');
 
 			// Should return 200 or 500 (DB error) - no auth required for reading
-			expect([HTTP_CODE.OK, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+			expect([HTTP_CODES.OK, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 		});
 	});
 
@@ -40,7 +40,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send(baseConversionData);
 
 			// Should require admin authentication
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate required fields', async () => {
@@ -55,62 +55,25 @@ mocha.describe('Conversions Parameter Validation', () => {
 					.send(payloadMissingField);
 
 				// Should fail due to missing required field (validation catches before auth)
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 
 		mocha.it('should validate integer field constraints', async () => {
-			// Test negative sourceId (minimum: 1)
-			await testInvalidField({
+			await validateInt({
 				field: 'sourceId',
-				invalidValue: 0,
 				endpoint: EDIT_ENDPOINT,
 				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				min: 1,
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 
-			await testInvalidField({
-				field: 'sourceId',
-				invalidValue: -1,
-				endpoint: EDIT_ENDPOINT,
-				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-
-			// Test negative destinationId (minimum: 1)
-			await testInvalidField({
+			await validateInt({
 				field: 'destinationId',
-				invalidValue: 0,
 				endpoint: EDIT_ENDPOINT,
 				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-
-			// Test oversized integers (exceeds MAX_SAFE_INTEGER)
-			await testInvalidField({
-				field: 'sourceId',
-				invalidValue: Number.MAX_SAFE_INTEGER + 1,
-				endpoint: EDIT_ENDPOINT,
-				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-
-			// Test non-integer values
-			await testInvalidField({
-				field: 'sourceId',
-				invalidValue: 'not_a_number',
-				endpoint: EDIT_ENDPOINT,
-				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-
-			await testInvalidField({
-				field: 'destinationId',
-				// Float instead of integer
-				invalidValue: 1.5,
-				endpoint: EDIT_ENDPOINT,
-				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				min: 1,
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -121,7 +84,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				invalidValue: 'invalid_slope',
 				endpoint: EDIT_ENDPOINT,
 				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 
 			// Test invalid intercept (non-numeric)
@@ -130,7 +93,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				invalidValue: 'invalid_intercept',
 				endpoint: EDIT_ENDPOINT,
 				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 
 			// Test edge case numeric values
@@ -141,33 +104,18 @@ mocha.describe('Conversions Parameter Validation', () => {
 					.send({ ...baseConversionData, slope: validValue });
 
 				// Should pass validation but fail auth
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 
 		mocha.it('should validate boolean field types', async () => {
-			const invalidBooleanValues = ['yes', 'no', '1', '0', 'on', 'off', 'true', 'false', 1, 0];
-
-			for (const invalidValue of invalidBooleanValues) {
-				await testInvalidField({
-					field: 'bidirectional',
-					invalidValue: invalidValue,
-					endpoint: EDIT_ENDPOINT,
-					basePayload: baseConversionData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
-				});
-			}
-
-			// Test valid boolean values
-			const validBooleanValues = [true, false];
-			for (const validValue of validBooleanValues) {
-				const res = await chai.request(app)
-					.post(EDIT_ENDPOINT)
-					.send({ ...baseConversionData, bidirectional: validValue });
-
-				// Should pass validation but fail auth
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
-			}
+			await validateBool({
+				field: 'bidirectional',
+				endpoint: EDIT_ENDPOINT,
+				basePayload: baseConversionData,
+				expectedStatus: HTTP_CODES.FORBIDDEN,
+				verifyValidBooleanValues: true
+			});
 		});
 
 		mocha.it('should validate note field (oneOf string/null)', async () => {
@@ -177,7 +125,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				invalidValue: 'x'.repeat(STRING_GENERAL_MAX_LENGTH + 1),
 				endpoint: EDIT_ENDPOINT,
 				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 
 			// Test valid null note
@@ -186,7 +134,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send({ ...baseConversionData, note: null });
 
 			// Should pass validation but fail auth
-			expect(res1.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res1.status).to.equal(HTTP_CODES.FORBIDDEN);
 
 			// Test valid string note at max length
 			const res2 = await chai.request(app)
@@ -194,26 +142,22 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send({ ...baseConversionData, note: 'x'.repeat(STRING_GENERAL_MAX_LENGTH) });
 
 			// Should pass validation but fail auth
-			expect(res2.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res2.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should reject parameter injection', async () => {
-			const payloadWithExtra = {
-				...baseConversionData,
-				maliciousField: 'injection attempt',
-				isAdmin: true,
-				deleteAll: true,
-				executeCommand: 'rm -rf /',
-				extraProperty: 'should be rejected',
-				anotherField: 'more injection'
-			};
-
-			const res = await chai.request(app)
-				.post(EDIT_ENDPOINT)
-				.send(payloadWithExtra);
-
-			// Should fail due to maxProperties: 6 (validation catches before auth)
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			await validateNoExtraFields({
+				endpoint: EDIT_ENDPOINT,
+				basePayload: baseConversionData,
+				extraFields: {
+					maliciousField: 'injection attempt',
+					isAdmin: true,
+					deleteAll: true,
+					executeCommand: 'rm -rf /',
+					extraProperty: 'should be rejected'
+				},
+				expectedStatus: HTTP_CODES.FORBIDDEN
+			});
 		});
 
 		mocha.it('should handle malicious string inputs in note field', async () => {
@@ -232,7 +176,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 					invalidValue: maliciousInput,
 					endpoint: EDIT_ENDPOINT,
 					basePayload: baseConversionData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -253,7 +197,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send(exactPayload);
 
 			// Should pass validation but fail auth
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 	});
 
@@ -275,7 +219,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send(baseConversionData);
 
 			// Should require admin authentication
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate all required fields for creation', async () => {
@@ -290,7 +234,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 					.send(payloadMissingField);
 
 				// Should fail validation or auth
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 
@@ -301,7 +245,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				invalidValue: -1,
 				endpoint: ADD_ENDPOINT,
 				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 
 			await testInvalidField({
@@ -309,7 +253,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				invalidValue: 'x'.repeat(STRING_GENERAL_MAX_LENGTH + 1),
 				endpoint: ADD_ENDPOINT,
 				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 
 			await testInvalidField({
@@ -317,7 +261,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				invalidValue: 'yes',
 				endpoint: ADD_ENDPOINT,
 				basePayload: baseConversionData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -334,7 +278,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send(payloadWithExtra);
 
 			// Should fail due to maxProperties: 6
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should handle type validation edge cases', async () => {
@@ -347,7 +291,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 					invalidValue: specialValue,
 					endpoint: ADD_ENDPOINT,
 					basePayload: baseConversionData,
-					expectedStatus: HTTP_CODE.FORBIDDEN
+					expectedStatus: HTTP_CODES.FORBIDDEN
 				});
 			}
 		});
@@ -367,7 +311,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send(baseDeleteData);
 
 			// Should require admin authentication
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate required fields for deletion', async () => {
@@ -382,45 +326,25 @@ mocha.describe('Conversions Parameter Validation', () => {
 					.send(payloadMissingField);
 
 				// Should fail validation or auth
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 
 		mocha.it('should validate ID constraints for deletion', async () => {
-			// Test negative sourceId
-			await testInvalidField({
+			await validateInt({
 				field: 'sourceId',
-				invalidValue: -1,
 				endpoint: DELETE_ENDPOINT,
 				basePayload: baseDeleteData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				min: 1,
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 
-			// Test zero destinationId
-			await testInvalidField({
+			await validateInt({
 				field: 'destinationId',
-				invalidValue: 0,
 				endpoint: DELETE_ENDPOINT,
 				basePayload: baseDeleteData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-
-			// Test non-integer ID
-			await testInvalidField({
-				field: 'sourceId',
-				invalidValue: 'not_a_number',
-				endpoint: DELETE_ENDPOINT,
-				basePayload: baseDeleteData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-
-			// Test float ID
-			await testInvalidField({
-				field: 'destinationId',
-				invalidValue: 2.5,
-				endpoint: DELETE_ENDPOINT,
-				basePayload: baseDeleteData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
+				min: 1,
+				expectedStatus: HTTP_CODES.FORBIDDEN
 			});
 		});
 
@@ -437,7 +361,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send(payloadWithExtra);
 
 			// Should fail due to maxProperties: 2
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should validate exact property count for deletion (maxProperties: 2)', async () => {
@@ -452,18 +376,9 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send(exactPayload);
 
 			// Should pass validation but fail auth
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
-		mocha.it('should handle oversized integer values', async () => {
-			await testInvalidField({
-				field: 'sourceId',
-				invalidValue: Number.MAX_SAFE_INTEGER + 1,
-				endpoint: DELETE_ENDPOINT,
-				basePayload: baseDeleteData,
-				expectedStatus: HTTP_CODE.FORBIDDEN
-			});
-		});
 	});
 
 	mocha.describe('Cross-Endpoint Security Tests', () => {
@@ -471,7 +386,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 			const EDIT_ENDPOINT = '/api/conversions/edit';
 			const conversionData = {
 				sourceId: 100,
-				destinationId: HTTP_CODE.OK,
+				destinationId: HTTP_CODES.OK,
 				bidirectional: true,
 				slope: 1.0,
 				intercept: 0.0,
@@ -489,7 +404,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 
 			// All should fail with 403 (auth required)
 			results.forEach(res => {
-				expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 			});
 		});
 
@@ -501,19 +416,19 @@ mocha.describe('Conversions Parameter Validation', () => {
 				const res1 = await chai.request(app)
 					.post(endpoint)
 					.send('not an object');
-				expect(res1.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res1.status).to.equal(HTTP_CODES.FORBIDDEN);
 
 				// Test array payload
 				const res2 = await chai.request(app)
 					.post(endpoint)
 					.send(['array', 'payload']);
-				expect(res2.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res2.status).to.equal(HTTP_CODES.FORBIDDEN);
 
 				// Test null payload
 				const res3 = await chai.request(app)
 					.post(endpoint)
 					.send(null);
-				expect(res3.status).to.equal(HTTP_CODE.FORBIDDEN);
+				expect(res3.status).to.equal(HTTP_CODES.FORBIDDEN);
 			}
 		});
 
@@ -535,7 +450,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send(sameSrcDest);
 
 			// Should pass validation (business logic may handle this separately) but fail auth
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 
 		mocha.it('should handle extremely large numeric values', async () => {
@@ -555,7 +470,7 @@ mocha.describe('Conversions Parameter Validation', () => {
 				.send(largeNumbers);
 
 			// Should pass validation but fail auth
-			expect(res.status).to.equal(HTTP_CODE.FORBIDDEN);
+			expect(res.status).to.equal(HTTP_CODES.FORBIDDEN);
 		});
 	});
 });
