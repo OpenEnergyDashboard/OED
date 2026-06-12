@@ -15,9 +15,6 @@ const gps = new Point(90, 45);
 const Unit = require('../../models/Unit');
 const { HTTP_CODES } = require('../../util/httpCodes');
 
-// TODO These tests are not as good as they should be now that information on
-// meters is returned to all users. They should be updated.
-
 /**
  * Verifies the values in the meter are the ones expected.
  * @param {*} meters If # meters > 1 then array of meters, else single meter
