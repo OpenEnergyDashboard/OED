@@ -201,15 +201,13 @@ function checkReceivedData(originalReading: any, shiftedReading: any) {
 		// If the number of points vary then then scales will not line up point by point. Warn the user.
 		numberPointsSame = false;
 		showWarnNotification(
-			translate('compare.line.original.shifted.count.a') + originalReading.length
-			+ translate('compare.line.original.shifted.count.b') + shiftedReading.length
-			+ translate('compare.line.original.shifted.count.c')
+			`${translate('compare.line.original.shifted.count.a')} ${originalReading.length} ${translate('compare.line.original.shifted.count.b')} ${shiftedReading.length} ${translate('compare.line.original.shifted.count.c')}`
 		);
 	}
 	// Now see if the original and shifted lines overlap.
 	if (moment(shiftedReading.at(-1).toString()) > moment(originalReading.at(0).toString())) {
 		showInfoNotification(
-			translate('compare.line.shifted.overlaps.start.prefix') + originalReading[0],
+			`${translate('compare.line.shifted.overlaps.start.prefix')} ${originalReading[0]}`,
 			toast.POSITION.TOP_RIGHT,
 			15000
 		);
@@ -235,8 +233,7 @@ function checkReceivedData(originalReading: any, shiftedReading: any) {
 			if (!monthDateSame(moment(originalReading.at(i)?.toString()), moment(shiftedReading.at(i)?.toString()))) {
 				// Mismatch so inform user. Should be due to leap year crossing and differing leap year.
 				// Only tell first mistmatch
-				message += translate('compare.line.month.day.align.until.prefix')
-					+ moment(originalReading.at(i)?.toString()).format('ll');
+				message += `${translate('compare.line.month.day.align.until.prefix')} ${moment(originalReading.at(i)?.toString()).format('ll')}`;
 				break;
 			}
 		}
