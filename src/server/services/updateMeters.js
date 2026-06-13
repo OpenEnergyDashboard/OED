@@ -23,15 +23,17 @@ async function updateAllMeters(dataReader, metersToUpdate, conn) {
 		// Issues from the pipeline will be logged by called functions.
 		await Promise.all(
 			metersToUpdate
-				.map(meter => dataReader(meter, conn))
-				.map(p => p.catch(err => {
-					let ipAddress = '[NO IP ADDRESS AVAILABLE]';
-					if (err.options !== undefined && err.options.ipAddress !== undefined) {
+				.map(meter => dataReader(meter, conn)
+					.catch(err => {
+						let ipAddress = '[NO IP ADDRESS AVAILABLE]';
+						if (err.options !== undefined && err.options.ipAddress !== undefined) {
 						ipAddress = err.options.ipAddress;
 					}
-					log.error(`ERROR ON REQUEST TO METER ${ipAddress}, ${err.message}`, err);
+					log.error(`ERROR ON REQUEST TO METER ${ipAddress}, Meter name: ${meter.name}, Meter ID: ${meter.id}, URL: ${meter.url}, ${err.message} `,  err);
 					return null;
-				})));
+				})
+			)
+		);
 		log.info('Update finished');
 	} catch (err) {
 		log.error(`Error updating all meters: ${err}`, err);
