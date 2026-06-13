@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import moment from 'moment';
+import * as moment from 'moment';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { Icons } from 'plotly.js';
@@ -203,9 +203,7 @@ function checkReceivedData(originalReading: any, shiftedReading: any) {
 		showWarnNotification(
 			translate('compare.line.original.shifted.count.a') + originalReading.length
 			+ translate('compare.line.original.shifted.count.b') + shiftedReading.length
-			+ translate('compare.line.original.shifted.count.c'),
-			toast.POSITION.TOP_RIGHT,
-			15000
+			+ translate('compare.line.original.shifted.count.c')
 		);
 	}
 	// Now see if the original and shifted lines overlap.
