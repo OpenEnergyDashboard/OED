@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import * as moment from 'moment';
+import moment from 'moment';
 import * as React from 'react';
 import Plot from 'react-plotly.js';
 import { Icons } from 'plotly.js';
@@ -135,14 +135,15 @@ export default function CompareLineChartComponent() {
 	}
 
 	// Adding information to the shifted data so that it can be plotted on the same graph with current data
+	const shiftedLabel = translate('shifted');
 	const updateDataNew = dataNew.map(item => ({
 		...item,
-		name: 'Shifted ' + item.name,
+		name: `${shiftedLabel} ${item.name}`,
 		line: { ...item.line, color: '#1AA5F0' },
 		xaxis: 'x2',
 		text: Array.isArray(item.text)
-			? item.text.map(text => text.replace('<br>', '<br>Shifted '))
-			: item.text?.replace('<br>', '<br>Shifted ')
+			? item.text.map(text => text.replace('<br>', `<br>${shiftedLabel} `))
+			: item.text?.replace('<br>', `<br>${shiftedLabel} `)
 	}));
 
 	return (
@@ -194,19 +195,23 @@ export default function CompareLineChartComponent() {
  * @param shiftedReading shifted data to compare
  */
 function checkReceivedData(originalReading: any, shiftedReading: any) {
+	const translate = useTranslate();
 	let numberPointsSame = true;
 	if (originalReading.length !== shiftedReading.length) {
 		// If the number of points vary then then scales will not line up point by point. Warn the user.
 		numberPointsSame = false;
 		showWarnNotification(
-			`The original line has ${originalReading.length} readings but the shifted line has ${shiftedReading.length}`
-			+ ' readings which means the points will not align horizontally.'
+			translate('compare.line.original.shifted.count.a') + originalReading.length
+			+ translate('compare.line.original.shifted.count.b') + shiftedReading.length
+			+ translate('compare.line.original.shifted.count.c'),
+			toast.POSITION.TOP_RIGHT,
+			15000
 		);
 	}
 	// Now see if the original and shifted lines overlap.
 	if (moment(shiftedReading.at(-1).toString()) > moment(originalReading.at(0).toString())) {
 		showInfoNotification(
-			`The shifted line overlaps the original line starting at ${originalReading[0]}`,
+			translate('compare.line.shifted.overlaps.start.prefix') + originalReading[0],
 			toast.POSITION.TOP_RIGHT,
 			15000
 		);
@@ -217,7 +222,7 @@ function checkReceivedData(originalReading: any, shiftedReading: any) {
 	const firstOriginReadingDay = moment(originalReading.at(0)?.toString());
 	const firstShiftedReadingDay = moment(shiftedReading.at(0)?.toString());
 	if (numberPointsSame && firstOriginReadingDay.day() === firstShiftedReadingDay.day()) {
-		showInfoNotification('Days of week align (unless missing readings)',
+		showInfoNotification(translate('compare.line.days.align'),
 			toast.POSITION.TOP_RIGHT,
 			15000
 		);
@@ -227,12 +232,13 @@ function checkReceivedData(originalReading: any, shiftedReading: any) {
 	if (numberPointsSame && monthDateSame(firstOriginReadingDay, firstShiftedReadingDay)) {
 		// Loop over all readings but the first. Really okay to do first but just checked that one.
 		// Note length of original and shifted same so just use original.
-		let message = 'The month and day of the month align for the original and shifted readings';
+		let message = translate('compare.line.month.day.align');
 		for (let i = 1; i < originalReading.length; i++) {
 			if (!monthDateSame(moment(originalReading.at(i)?.toString()), moment(shiftedReading.at(i)?.toString()))) {
 				// Mismatch so inform user. Should be due to leap year crossing and differing leap year.
 				// Only tell first mistmatch
-				message += ` until original reading at date ${moment(originalReading.at(i)?.toString()).format('ll')}`;
+				message += translate('compare.line.month.day.align.until.prefix')
+					+ moment(originalReading.at(i)?.toString()).format('ll');
 				break;
 			}
 		}
