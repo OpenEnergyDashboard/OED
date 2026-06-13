@@ -201,7 +201,9 @@ function checkReceivedData(originalReading: any, shiftedReading: any) {
 		// If the number of points vary then then scales will not line up point by point. Warn the user.
 		numberPointsSame = false;
 		showWarnNotification(
-			`${translate('compare.line.original.shifted.count.a')} ${originalReading.length} ${translate('compare.line.original.shifted.count.b')} ${shiftedReading.length} ${translate('compare.line.original.shifted.count.c')}`
+			`${translate('compare.line.original.shifted.count.a')} ${originalReading.length} ` +
+			`${translate('compare.line.original.shifted.count.b')} ${shiftedReading.length} ` +
+			`${translate('compare.line.original.shifted.count.c')}`
 		);
 	}
 	// Now see if the original and shifted lines overlap.
