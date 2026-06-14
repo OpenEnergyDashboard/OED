@@ -6,7 +6,7 @@
 
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('CIKs Parameter Validation', () => {
 
@@ -15,7 +15,7 @@ mocha.describe('CIKs Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get('/api/ciks');
 
-			expect(res).to.have.status(HTTP_CODE.OK);
+			expect(res).to.have.status(HTTP_CODES.OK);
 		});
 
 		mocha.it('should ignore query parameters if provided', async () => {
@@ -23,14 +23,14 @@ mocha.describe('CIKs Parameter Validation', () => {
 				.get('/api/ciks')
 				.query({ someParam: 'value', anotherParam: 123 });
 
-			expect(res).to.have.status(HTTP_CODE.OK);
+			expect(res).to.have.status(HTTP_CODES.OK);
 		});
 
 		mocha.it('should return JSON response', async () => {
 			const res = await chai.request(app)
 				.get('/api/ciks');
 
-			if (res.status === HTTP_CODE.OK) {
+			if (res.status === HTTP_CODES.OK) {
 				expect(res).to.be.json;
 				expect(res.body).to.be.an('array');
 			}
@@ -40,7 +40,7 @@ mocha.describe('CIKs Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get('/api/ciks');
 
-			if (res.status === HTTP_CODE.OK && res.body.length > 0) {
+			if (res.status === HTTP_CODES.OK && res.body.length > 0) {
 				const cik = res.body[0];
 				expect(cik).to.have.property('meterUnitId');
 				expect(cik).to.have.property('nonMeterUnitId');
@@ -56,7 +56,7 @@ mocha.describe('CIKs Parameter Validation', () => {
 				.get('/api/ciks')
 				.set('X-HTTP-Method-Override', 'POST');
 
-			expect(res).to.have.status(HTTP_CODE.OK);
+			expect(res).to.have.status(HTTP_CODES.OK);
 		});
 
 		mocha.it('should handle malformed headers gracefully', async () => {
@@ -65,7 +65,7 @@ mocha.describe('CIKs Parameter Validation', () => {
 				.set('Content-Type', 'application/malformed')
 				.set('Accept', 'text/invalid');
 
-			expect(res).to.have.status(HTTP_CODE.OK);
+			expect(res).to.have.status(HTTP_CODES.OK);
 		});
 	});
 });

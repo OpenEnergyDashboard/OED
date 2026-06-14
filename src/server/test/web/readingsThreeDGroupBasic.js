@@ -13,11 +13,11 @@ const { prepareTest,
     getUnitId,
     ETERNITY,
     GROUP_ID,
-    HTTP_CODE,
     unitDatakWh,
     conversionDatakWh,
     meterDatakWhGroups,
     groupDatakWh } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('readings API', () => {
     mocha.describe('readings test, test if data returned by API is as expected', () => {
@@ -34,7 +34,7 @@ mocha.describe('readings API', () => {
                     const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
                         .query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId, readingInterval: timePerReading });
                     // the route should return a bad request
-                    expect(res).to.have.status(HTTP_CODE.BAD_REQUEST);
+                    expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
                 });
                 mocha.it('response should be invalid if just over 1 year time', async () => {
                     // Load the data into the database
@@ -47,7 +47,7 @@ mocha.describe('readings API', () => {
                     const res = await chai.request(app).get(`/api/unitReadings/threeD/groups/${GROUP_ID}`)
                         .query({ timeInterval: createTimeString('2022-01-01', '00:00:00', '2023-01-02', '00:00:00'), graphicUnitId: unitId, readingInterval: timePerReading });
                     // the route should return a bad request
-                    expect(res).to.have.status(HTTP_CODE.BAD_REQUEST);
+                    expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
                 });
                 mocha.it('response should be valid if just 1 year time', async () => {
                     // Load the data into the database
@@ -62,7 +62,7 @@ mocha.describe('readings API', () => {
                     // unitReadings should return as json
                     expect(res).to.be.json;
                     // the route should return an ok request
-                    expect(res).to.have.status(HTTP_CODE.OK);
+                    expect(res).to.have.status(HTTP_CODES.OK);
                     // Check if has the expected properties.
                     expect(res.body).to.have.property('xData');
                     expect(res.body).to.have.property('yData');
@@ -84,7 +84,7 @@ mocha.describe('readings API', () => {
                         });
                     // expectThreeDReadingToEqualExpected not designed to handle no return data so test this specially.
                     expect(res).to.be.json;
-                    expect(res).to.have.status(HTTP_CODE.OK);
+                    expect(res).to.have.status(HTTP_CODES.OK);
                     // Did the response have the correct type of properties.
                     expect(res.body).to.have.property('xData');
                     expect(res.body).to.have.property('yData');
