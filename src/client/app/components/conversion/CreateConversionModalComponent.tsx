@@ -173,7 +173,7 @@ export default function CreateConversionModalComponent() {
 				})
 				.catch(err => {
 					showErrorNotification(
-						translate('group.failed.to.create.group') + '"' + err.data + '"');
+						translate('conversion.failed.to.create.conversion') + '"' + err.data + '"');
 				});
 			resetState();
 		} else {
