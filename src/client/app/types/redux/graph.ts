@@ -15,6 +15,9 @@ export enum ChartTypes {
 	radar = 'radar',
 	threeD = '3D',
 	compareLine = 'compare.line'
+	// TODO DEBUG: added to test failure
+	//compareLine = 'compare.line',
+	//test = 'test'
 }
 
 // Rates that can be graphed, only relevant to line graphs.

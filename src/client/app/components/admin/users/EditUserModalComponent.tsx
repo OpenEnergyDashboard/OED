@@ -75,7 +75,6 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	};
 
 	// user apis
-	// TODO DEBUG: added in to test the showErrorNotification
 	const [submitUserEdits] = userApi.useEditUserMutation();
 	const [submitDeleteUser] = userApi.useDeleteUsersMutation();
 
@@ -155,7 +154,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		setShowDeleteConfirmationModal(false);
 
 		// Delete the user using the username
-		deleteUser(userDetails.username);
+		deleteUser(props.user.username);
 	};
 	/* End Confirm Delete Modal */
 
@@ -185,28 +184,34 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 	const handleSaveChanges = async () => {
 		// close modal
 		props.handleClose();
-		// TODO DEBUG: added in to test the showErrorNotification
 		// set needed user details into a user and send to backend
-		// (Comment this out to test failure)
 		const editedUser: User = {
 			id: userDetails.id, username: userDetails.username, role: userDetails.role,
-			password: userDetails.password, note: userDetails.note
+			note: userDetails.note,
+			// this is needed otherwise the user must input the password
+			// for the change to be successful.
+			// This change is added because the textbox states
+			// "Only enter password to update password"
+			...(passwordModified && { password: userDetails.password })
 		};
 
 		// TODO DEBUG: added in to test the showErrorNotification
-		// set needed user details into a user and send to backend
-		//Promise.reject({ data: { message: 'Test error message' } })
+		//editedUser.username = 'test';
+
 		submitUserEdits(editedUser)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.edit.user') + userDetails.username +
-				'" (role: ' + userDetails.role + ')'
+				showSuccessNotification(
+					translate('users.successfully.edit.user') + userDetails.username +
+					translate('users.successfully.edit.user.username') + userDetails.username + ')' +
+					translate('users.successfully.edit.user.role') + userDetails.role + ')'
 				);
+				props.handleClose();
+				resetPasswordFields();
 			})
 			.catch(error => {
 				showErrorNotification(translate('users.failed.to.edit.user') + props.user.username + ' ' + error.data.message);
 			});
-		resetPasswordFields();
 	};
 
 	const deleteUser = (username: string) => {

@@ -10,7 +10,7 @@ import '../../styles/modal.css';
 import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
-import { UnitRepresentType, DisplayableType, UnitType, DisableChecksType } from '../../types/redux/units';
+import { UnitRepresentType, DisplayableType, UnitType, DisableChecksType, UnitData } from '../../types/redux/units';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { unitsApi } from '../../redux/api/unitsApi';
 import { useTranslate } from '../../redux/componentHooks';
@@ -212,22 +212,29 @@ export default function CreateUnitModalComponent() {
 			// set displayable to none if unit is meter
 			displayable: (state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) ? DisplayableType.none : state.displayable,
 			// set unit to suffix if suffix is not empty
-			typeOfUnit: (state.typeOfUnit != UnitType.suffix && state.suffix != '') ? UnitType.suffix : state.typeOfUnit
+			typeOfUnit: (state.typeOfUnit != UnitType.suffix && state.suffix != '') ? UnitType.suffix : state.typeOfUnit,
+			// Necessary to fix error message:
+			// Failed to create a unit."Got request to add units with invalid unit data,
+			// errors: instance is not allowed to have the additional property "id""
+			id: undefined
 		};
 		// TODO DEBUG: added in to test the showErrorNotification
-		//submitState.secInRate = -1;
+		submitState.secInRate = -1;
 		// Add the new unit and update the store
-		submitCreateUnit(submitState)
+		submitCreateUnit(submitState as unknown as UnitData)
 			.unwrap()
 			.then(() => {
 				showSuccessNotification(
-					translate('unit.successfully.create.unit') + ' "' + submitState.name +
-					'" (identifier: ' + submitState.identifier + ', type: ' + submitState.typeOfUnit + ')'
+					translate('unit.successfully.create.unit') + ' "' + submitState.name + '"' +
+					translate('unit.successfully.create.unit.identifier') + submitState.identifier +
+					translate('unit.successfully.create.unit.type') + submitState.typeOfUnit + ')'
 				);
 			})
 			.catch(err => {
 				showErrorNotification(
-					translate('unit.failed.to.create.unit') + '"' + err.data + '"'
+					translate('unit.failed.to.create.unit') + '"' + submitState.name + '"' +
+					translate('unit.successfully.create.unit.identifier') + submitState.identifier +
+					translate('unit.successfully.create.unit.type') + submitState.typeOfUnit + ') ' + err.data
 				);
 			});
 		resetState();

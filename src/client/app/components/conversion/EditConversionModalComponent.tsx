@@ -20,6 +20,7 @@ import { UnitData, UnitType } from '../../types/redux/units';
 import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import { conversionArrow } from '../../utils/conversionArrow';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
@@ -409,8 +410,11 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		deleteConversion(payload)
 			.unwrap()
 			.then(() => {
+				// Show source/destination identifiers (not numeric IDs)
 				showSuccessNotification(translate('conversion.delete.success') +
-				' (sourceID: ' + payload.sourceId + ', destinationID: ' + payload.destinationId + ')'
+				' "' + unitDataById[payload.sourceId]?.identifier + '"' +
+				conversionArrow(props.conversion.bidirectional) +
+				'"' + unitDataById[payload.destinationId]?.identifier + '"'
 				);
 			}).catch(error => {
 				showErrorNotification(translate('conversion.delete.failure') + error.data.message);
@@ -479,9 +483,25 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					...state,
 					bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
 				}, shouldRedoCik
-			});
+			})
+				.unwrap()
+				.then(() => {
+					// Show source/destination identifiers (not numeric IDs)
+					showSuccessNotification(
+						translate('conversion.successfully.edited.conversion') +
+						' "' + unitDataById[state.sourceId]?.identifier + '"' +
+						conversionArrow(state.bidirectional) +
+						'"' + unitDataById[state.destinationId]?.identifier + '"'
+					);
+				})
+				.catch(err => {
+					showErrorNotification(
+						translate('conversion.failed.to.edit.conversion') + '"' + err.data + '"'
+					);
+				});
 		}
 	};
+
 	const handleWarningCancel = () => {
 		// Close the warning modal
 		setShowWarningModal(false);
@@ -523,9 +543,12 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				})
 					.unwrap()
 					.then(() => {
+						// Show source/destination identifiers (not numeric IDs)
 						showSuccessNotification(
 							translate('conversion.successfully.edited.conversion') +
-						' (sourceID: ' + state.sourceId + ', destinationID: ' + state.destinationId + ')'
+						' "' + unitDataById[state.sourceId]?.identifier + '"' +
+						conversionArrow(state.bidirectional) +
+						'"' + unitDataById[state.destinationId]?.identifier + '"'
 						);
 					})
 					.catch(err => {

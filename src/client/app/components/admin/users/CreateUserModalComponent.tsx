@@ -8,10 +8,8 @@ import {
 	Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal,
 	ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
-// TODO DEBUG: added in to test the showErrorNotification
 import { userApi } from '../../../redux/api/userApi';
 import { User, UserRole, userDefaults } from '../../../types/items';
-//import { UserRole, userDefaults } from '../../../types/items';
 import { showErrorNotification, showSuccessNotification } from '../../../utils/notifications';
 import { useTranslate } from '../../../redux/componentHooks';
 import TooltipHelpComponent from '../../TooltipHelpComponent';
@@ -48,7 +46,6 @@ export default function CreateUserModal() {
 	const [userDetails, setUserDetails] = useState(userDefaults);
 
 	// user api
-	// TODO DEBUG: added in to test the showErrorNotification
 	const [createUser] = userApi.useCreateUserMutation();
 
 	const userRoleIsSelected = userDetails.role !== UserRole.INVALID;
@@ -114,12 +111,14 @@ export default function CreateUserModal() {
 	const handleSubmit = async () => {
 		const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
 		// TODO DEBUG: added in to test the showErrorNotification
+		//newUser.username = 'test';
 		createUser(newUser)
-		//Promise.reject({ data: { message: 'Test error message' } })
-			//.unwrap()
+			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.create.user') + userDetails.username +
-				'" (role: ' + userDetails.role + ')'
+				showSuccessNotification(
+					translate('users.successfully.edit.user') + userDetails.username +
+					translate('users.successfully.edit.user.username') + userDetails.username + ')' +
+					translate('users.successfully.edit.user.role') + userDetails.role + ')'
 				);
 				resetForm();
 				handleCloseModal();

@@ -38,6 +38,11 @@ export default function PreferencesComponent() {
 	// Compare the API response against the localState to determine changes
 	React.useEffect(() => { setHasChanges(!isEqual(adminPreferences, localAdminPref)); }, [localAdminPref, adminPreferences]);
 
+	// TODO DEBUG: added to test failure
+	//React.useEffect(() => {
+	//	setLocalAdminPref(cloneDeep({...adminPreferences, defaultChartToRender: ChartTypes.test}));
+	//}, [adminPreferences]);
+
 	const makeLocalChanges = (key: keyof PreferenceRequestItem, value: PreferenceRequestItem[keyof PreferenceRequestItem]) => {
 		setLocalAdminPref({ ...localAdminPref, [key]: value });
 	};

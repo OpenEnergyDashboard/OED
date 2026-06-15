@@ -186,11 +186,16 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				identifier: !meterDetails.identifier || meterDetails.identifier.length === 0 ? meterDetails.name : meterDetails.identifier,
 				// The default value for timeZone is an empty string but that should be null for DB.
 				// See below for usage of timeZoneValue.
-				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone)
-			};
+				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone),
+				// Necessary to fix error message:
+				// Failed to create a meter with message: "test615" (identifier: test615,
+				// type: egauge) validation failed with instance.id must be greater than or equal to 1
+				id: undefined
+			} as unknown as MeterData;
+
 			// TODO DEBUG: added in to test the showErrorNotification
-			submitState.name = '';
-			submitState.identifier = '';
+			//submitState.name = '';
+			//submitState.identifier = '';
 
 			// Submit new meter if checks where ok.
 			// Attempt to add meter to database
@@ -199,8 +204,9 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				.then(() => {
 					// if successful, the mutation will invalidate existing cache causing all meter details to be retrieved
 					showSuccessNotification(
-						translate('meter.successfully.create.meter') + '"' + submitState.name +
-						'" (identifier: ' + submitState.identifier + ', type: ' + submitState.meterType + ')'
+						translate('meter.successfully.create.meter') + '"' + submitState.name + '"' +
+						translate('meter.successfully.create.meter.identifier') + submitState.identifier +
+						translate('meter.successfully.create.meter.type') + submitState.meterType + ')'
 					);
 					resetState();
 					// if props exist, then return the identifier
@@ -214,7 +220,11 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 					}
 				})
 				.catch(err => {
-					showErrorNotification(translate('meter.failed.to.create.meter') + '"' + err.data + '"');
+					showErrorNotification(
+						translate('meter.failed.to.create.meter') + '"' + meterDetails.name + '"' +
+						translate('meter.successfully.create.meter.identifier') + meterDetails.identifier + '",' +
+						translate('meter.successfully.create.meter.type') + meterDetails.meterType + ') ' + err.data
+					);
 				});
 		} else {
 			// Tell user that not going to update due to input issues.

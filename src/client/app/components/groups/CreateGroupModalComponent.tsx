@@ -238,25 +238,35 @@ export default function CreateGroupModalComponent() {
 		if (inputOk) {
 			// The input passed validation.
 			// GPS may have been updated so create updated state to submit.
-			const submitState = { ...state, gps: gps };
+
+			// To address this error message:
+			// Failed to create a group with message: "Got request to creat group with invalid data.
+			// Error(s): instance is not allowed to have the additional property "deepMeters",instance.defaultGraphicUnit
+			// must be greater than or equal to 1"
+			//const submitState = { ...state, gps: gps };
+			const { defaultGraphicUnit, ...submitStateWithoutDeepMeters } = { ...state, gps: gps };
+			const finalSubmitState = {
+				...submitStateWithoutDeepMeters,
+				...(defaultGraphicUnit !== -99 && { defaultGraphicUnit })
+			} as unknown as GroupData;
+
 			// TODO DEBUG: added in to test the showErrorNotification
-			submitState.name = '';
+			finalSubmitState.name = '';
 
 			//createGroup(submitState);
-			createGroup(submitState)
+			createGroup(finalSubmitState)
 				.unwrap()
 				.then(() => {
 					showSuccessNotification(
-						translate('group.successfully.create.group') + ' "' + submitState.name +
-						'" (id: ' + submitState.id + ', default graphic unit: ' + submitState.defaultGraphicUnit + ')'
+						translate('group.successfully.create.group') + ' "' + finalSubmitState.name + '"'
 					);
 					resetState();
 				})
 				.catch(err => {
 					showErrorNotification(
-						translate('group.failed.to.create.group') + '"' + err.data + '"');
+						translate('group.failed.to.create.group') + '"' + state.name + '" ' + err.data
+					);
 				});
-			resetState();
 		} else {
 			// Tell user that not going to update due to input issues.
 			showErrorNotification(translate('group.input.error'));

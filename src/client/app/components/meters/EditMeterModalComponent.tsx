@@ -247,13 +247,16 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					.unwrap()
 					.then(() => {
 						showSuccessNotification(
-							translate('meter.successfully.edited.meter') + '"' + submitState.name +
-						'" (identifier: ' + submitState.identifier + ', type: ' + submitState.meterType + ')'
+							translate('meter.successfully.edited.meter') + '"' + submitState.name + '"' +
+							translate('meter.successfully.create.meter.identifier') + submitState.identifier +
+							translate('meter.successfully.create.meter.type') + submitState.meterType + ')'
 						);
 					})
 					.catch(err => {
 						showErrorNotification(
-							translate('meter.failed.to.edit.meter') + '"' + err.data + '"'
+							translate('meter.failed.to.edit.meter') + '"' + localMeterEdits.name + '"' +
+							translate('meter.successfully.create.meter.identifier') + localMeterEdits.identifier +
+							translate('meter.successfully.create.meter.type') + localMeterEdits.meterType + ') ' + err.data
 						);
 					});
 			} else if (error_message) {

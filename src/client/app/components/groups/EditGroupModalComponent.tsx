@@ -360,11 +360,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					const submitState = {
 						id: thisGroupState.id, name: thisGroupState.name, childMeters: thisGroupState.childMeters,
 						childGroups: thisGroupState.childGroups, gps: gps, displayable: thisGroupState.displayable,
-						note: thisGroupState.note, area: thisGroupState.area, defaultGraphicUnit: thisGroupState.defaultGraphicUnit, areaUnit: thisGroupState.areaUnit
-					};
+						note: thisGroupState.note, area: thisGroupState.area,
+						areaUnit: thisGroupState.areaUnit,
+						// Necessary to address the error message:
+						// Failed to edit group with message: "Got request to edit group with invalid data.
+						// Error(s): instance.defaultGraphicUnit must be greater than or equal to 1"
+						...(thisGroupState.defaultGraphicUnit !== -99 && { defaultGraphicUnit: thisGroupState.defaultGraphicUnit })
+					} as unknown as Omit<GroupData, 'deepMeters'>;
 
 					// TODO DEBUG: added in to test the showErrorNotification
-					//submitState.name = '';
+					submitState.name = '';
 
 					// This saves group to the DB and then refreshes the window if the last group being updated and
 					// changes were made to the children. This avoid a reload on name change, etc.
@@ -372,13 +377,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						.unwrap()
 						.then(() => {
 							showSuccessNotification(
-								translate('group.successfully.edited.group') + ' "' + submitState.name +
-								'" (id: ' + submitState.id + ', default graphic unit: ' + submitState.defaultGraphicUnit + ')'
+								translate('group.successfully.edited.group') + ' "' + submitState.name + '"'
 							);
 						})
 						.catch(err => {
 							showErrorNotification(
-								translate('group.failed.to.edit.group') + '"' + err.data + '"');
+								translate('group.failed.to.edit.group') + '"' + thisGroupState.name + '" ' + err.data);
 						});
 				});
 			} else {

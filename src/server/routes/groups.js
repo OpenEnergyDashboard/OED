@@ -270,7 +270,7 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 	const validatorResult = validate(req.body, validGroup);
 	if (!validatorResult.valid) {
 		log.error(`Got request to create group with invalid data, errors: ${validatorResult.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to creat group with invalid data. Error(s): " + validatorResult.errors.toString());
+		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to create group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {

@@ -391,14 +391,17 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				.unwrap()
 				.then(() => {
 					showSuccessNotification(
-						translate('unit.successfully.edited.unit') + ' "' + submitState.name +
-						'" (identifier: ' + submitState.identifier + ', type: ' + submitState.typeOfUnit + ')'
+						translate('unit.successfully.edited.unit') + ' "' + submitState.name + '"' +
+						translate('unit.successfully.create.unit.identifier') + submitState.identifier +
+						translate('unit.successfully.create.unit.type') + submitState.typeOfUnit + ')'
 					);
 				})
 				.catch(err => {
 					showErrorNotification(
-						translate('unit.failed.to.edit.unit') + '"' + err.data + '"')
-					;
+						translate('unit.failed.to.edit.unit') + '"' + submitState.name + '"' +
+						translate('unit.successfully.create.unit.identifier') + submitState.identifier +
+						translate('unit.successfully.create.unit.type') + submitState.typeOfUnit + ') ' + err.data
+					);
 				});
 		}
 	};
