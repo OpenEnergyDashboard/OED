@@ -178,69 +178,67 @@ export default function CompareLineChartComponent() {
 			}
 
 		</>
-
 	);
 
-}
-
-/**
- * If the number of points differs for the original and shifted lines, the data will not appear at the same places horizontally.
- * The time interval in the original and shifted line for the actual readings can have issues.
- * While the requested time ranges should be the same, the actually returned readings may differ.
- * This can happen if there are readings missing including start, end or between. If the number of readings vary then there is an issue.
- * If not, it is unlikely but can happen if there are missing readings in both lines that do not align but there are the same number missing in both.
- * This is an ugly edge case that OED is not going to try to catch now.
- * Use the last index in Redux state as a proxy for the number since need that below.
- * @param originalReading original data to compare
- * @param shiftedReading shifted data to compare
- */
-function checkReceivedData(originalReading: any, shiftedReading: any) {
-	const translate = useTranslate();
-	let numberPointsSame = true;
-	if (originalReading.length !== shiftedReading.length) {
-		// If the number of points vary then then scales will not line up point by point. Warn the user.
-		numberPointsSame = false;
-		showWarnNotification(
-			`${translate('compare.line.original.shifted.count.a')} ${originalReading.length} ` +
-			`${translate('compare.line.original.shifted.count.b')} ${shiftedReading.length} ` +
-			`${translate('compare.line.original.shifted.count.c')}`
-		);
-	}
-	// Now see if the original and shifted lines overlap.
-	if (moment(shiftedReading.at(-1).toString()) > moment(originalReading.at(0).toString())) {
-		showInfoNotification(
-			`${translate('compare.line.shifted.overlaps.start.prefix')} ${originalReading[0]}`,
-			toast.POSITION.TOP_RIGHT,
-			15000
-		);
-	}
-
-	// Now see if day of the week aligns.
-	// If the number of points is not the same then no horizontal alignment so do not tell user.
-	const firstOriginReadingDay = moment(originalReading.at(0)?.toString());
-	const firstShiftedReadingDay = moment(shiftedReading.at(0)?.toString());
-	if (numberPointsSame && firstOriginReadingDay.day() === firstShiftedReadingDay.day()) {
-		showInfoNotification(translate('compare.line.days.align'),
-			toast.POSITION.TOP_RIGHT,
-			15000
-		);
-	}
-	// Now see if the month and day align. If the number of points is not the same then no horizontal
-	// alignment so do not tell user. Check if the first reading matches because only notify if this is true.
-	if (numberPointsSame && monthDateSame(firstOriginReadingDay, firstShiftedReadingDay)) {
-		// Loop over all readings but the first. Really okay to do first but just checked that one.
-		// Note length of original and shifted same so just use original.
-		let message = translate('compare.line.month.day.align');
-		for (let i = 1; i < originalReading.length; i++) {
-			if (!monthDateSame(moment(originalReading.at(i)?.toString()), moment(shiftedReading.at(i)?.toString()))) {
-				// Mismatch so inform user. Should be due to leap year crossing and differing leap year.
-				// Only tell first mistmatch
-				message += `${translate('compare.line.month.day.align.until.prefix')} ${moment(originalReading.at(i)?.toString()).format('ll')}`;
-				break;
-			}
+	/**
+	 * If the number of points differs for the original and shifted lines, the data will not appear at the same places horizontally.
+	 * The time interval in the original and shifted line for the actual readings can have issues.
+	 * While the requested time ranges should be the same, the actually returned readings may differ.
+	 * This can happen if there are readings missing including start, end or between. If the number of readings vary then there is an issue.
+	 * If not, it is unlikely but can happen if there are missing readings in both lines that do not align but there are the same number missing in both.
+	 * This is an ugly edge case that OED is not going to try to catch now.
+	 * Use the last index in Redux state as a proxy for the number since need that below.
+	 * @param originalReading original data to compare
+	 * @param shiftedReading shifted data to compare
+	 */
+	function checkReceivedData(originalReading: any, shiftedReading: any) {
+		let numberPointsSame = true;
+		if (originalReading.length !== shiftedReading.length) {
+			// If the number of points vary then then scales will not line up point by point. Warn the user.
+			numberPointsSame = false;
+			showWarnNotification(
+				`${translate('compare.line.original.shifted.count.first')} ${originalReading.length} ` +
+				`${translate('compare.line.original.shifted.count.second')} ${shiftedReading.length} ` +
+				`${translate('compare.line.original.shifted.count.third')}`
+			);
 		}
-		showInfoNotification(message, toast.POSITION.TOP_RIGHT, 15000);
+		// Now see if the original and shifted lines overlap.
+		if (moment(shiftedReading.at(-1).toString()) > moment(originalReading.at(0).toString())) {
+			showInfoNotification(
+				`${translate('compare.line.shifted.overlaps.start.prefix')} ${originalReading[0]}`,
+				toast.POSITION.TOP_RIGHT,
+				15000
+			);
+		}
+
+		// Now see if day of the week aligns.
+		// If the number of points is not the same then no horizontal alignment so do not tell user.
+		const firstOriginReadingDay = moment(originalReading.at(0)?.toString());
+		const firstShiftedReadingDay = moment(shiftedReading.at(0)?.toString());
+		if (numberPointsSame && firstOriginReadingDay.day() === firstShiftedReadingDay.day()) {
+			showInfoNotification(translate('compare.line.days.align'),
+				toast.POSITION.TOP_RIGHT,
+				15000
+			);
+		}
+		// Now see if the month and day align. If the number of points is not the same then no horizontal
+		// alignment so do not tell user. Check if the first reading matches because only notify if this is true.
+		if (numberPointsSame && monthDateSame(firstOriginReadingDay, firstShiftedReadingDay)) {
+			// Loop over all readings but the first. Really okay to do first but just checked that one.
+			// Note length of original and shifted same so just use original.
+			let message = translate('compare.line.month.day.align');
+			for (let i = 1; i < originalReading.length; i++) {
+				if (!monthDateSame(moment(originalReading.at(i)?.toString()), moment(shiftedReading.at(i)?.toString()))) {
+					// Mismatch so inform user. Should be due to leap year crossing and differing leap year.
+					// Only tell first mistmatch
+					message += `${translate('compare.line.month.day.align.until.prefix')} ${moment(originalReading.at(i)?.toString()).format('ll')}`;
+					break;
+				}
+			}
+			showInfoNotification(message, toast.POSITION.TOP_RIGHT, 15000);
+		}
 	}
+
 }
 
 /**
