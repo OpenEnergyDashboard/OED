@@ -77,6 +77,15 @@ class Unit {
 	}
 
 	/**
+	 * Returns a promise to create the temperature UnitType enum.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<>}
+	 */
+	static createTemperatureUnitTypesEnum(conn) {
+		return conn.none(sqlFile('unit/create_temperature_unit_types_enum.sql'));
+	}
+
+	/**
 	 * Returns a promise to create the displayableType enum of admin, all, and none.
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<>}
@@ -274,6 +283,12 @@ Unit.areaUnitType = Object.freeze({
 	FEET: 'feet',
 	METERS: 'meters',
 	NONE: 'none'
+
+});
+
+Unit.temperatureUnitType = Object.freeze({
+	CELSIUS: 'celsius',
+	FAHRENHEIT: 'fahrenheit'
 
 });
 

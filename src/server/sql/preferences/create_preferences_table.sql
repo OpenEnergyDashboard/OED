@@ -16,8 +16,11 @@ CREATE TABLE IF NOT EXISTS preferences (
 	default_area_unit area_unit_type NOT NULL,
 	default_meter_reading_frequency INTERVAL NOT NULL,
 	default_meter_minimum_date TIMESTAMP NOT NULL,
-    default_meter_maximum_date TIMESTAMP NOT NULL,
+	default_meter_maximum_date TIMESTAMP NOT NULL,
 	default_meter_reading_gap REAL NOT NULL,
-    default_meter_maximum_errors INTEGER NOT NULL,
-	default_help_url TEXT DEFAULT NULL
+	default_meter_maximum_errors INTEGER NOT NULL,
+	default_help_url TEXT DEFAULT NULL,
+	default_temperature_unit temperature_unit_type NOT NULL,
+	default_weather_location INTEGER DEFAULT NULL,
+	FOREIGN KEY (default_weather_location) REFERENCES weather_location(id)
 );

@@ -32,6 +32,7 @@ unit_id: The foreign key to the unit table. The meter receives data and points t
 default_graphic_unit: The foreign key to the unit table represents the preferred unit to display this meter
 area_unit: The area unit enum
 reading_frequency: The time between readings
+weather_location_id: A foreign key, that indicates which weather_location_id is associated with the meter
 */
 CREATE TABLE IF NOT EXISTS meters (
     id SERIAL PRIMARY KEY,
@@ -72,3 +73,7 @@ CREATE TABLE IF NOT EXISTS meters (
     max_error INTEGER NOT NULL DEFAULT 75,
     disable_checks disable_checks_type NOT NULL DEFAULT 'reject_all'
 );
+
+-- TODO: Include weather_location_id to meter table
+-- ALTER TABLE meters
+-- ADD COLUMN weather_location_id INTEGER REFERENCES weather_location(id);

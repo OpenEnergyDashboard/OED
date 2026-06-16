@@ -38,73 +38,56 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 		required: ['preferences'],
 		properties: {
 			preferences: {
-				type: 'object',
-				additionalProperties: false,
-				properties: {
-					displayTitle: {
-						type: 'string',
-						maxLength: SHORT_STRING_MAX_LENGTH
-					},
-					defaultChartToRender: {
-						type: 'string',
-						maxLength: SHORT_STRING_MAX_LENGTH
-					},
-					defaultBarStacking: {
-						type: 'boolean'
-					},
-					defaultLanguage: {
-						type: 'string',
-						maxLength: 10
-					},
-					defaultTimezone: {
-						oneOf: [
-							{ type: 'string', maxLength: SHORT_STRING_MAX_LENGTH },
-							{ type: 'null' }
-						]
-					},
-					defaultWarningFileSize: {
-						type: 'number',
-						minimum: 0,
-						maximum: 1000000000
-					},
-					defaultFileSizeLimit: {
-						type: 'number',
-						minimum: 0,
-						maximum: 1000000000
-					},
-					defaultAreaNormalization: {
-						type: 'boolean'
-					},
-					defaultAreaUnit: {
-						type: 'string',
-						maxLength: SHORT_STRING_MAX_LENGTH
-					},
-					defaultMeterReadingFrequency: {
-						type: 'string',
-						maxLength: SHORT_STRING_MAX_LENGTH
-					},
-					defaultMeterMinimumDate: {
-						type: 'string',
-						maxLength: STRING_GENERAL_MAX_LENGTH
-					},
-					defaultMeterMaximumDate: {
-						type: 'string',
-						maxLength: STRING_GENERAL_MAX_LENGTH
-					},
-					defaultMeterReadingGap: {
-						type: 'number',
-						minimum: 0,
-						maximum: 86400
-					},
-					defaultMeterMaximumErrors: {
-						type: 'number',
-						minimum: 0,
-						maximum: 10000
-					},
-					defaultHelpUrl: {
-						type: 'string',
-						maxLength: 500
-					}
+				displayTitle: {
+					type: 'string'
+				},
+				defaultChartToRender: {
+					type: 'string'
+				},
+				defaultBarStacking: {
+					type: 'boolean'
+				},
+				defaultLanguage: {
+					type: 'string'
+				},
+				defaultTimezone: {
+					oneOf: [
+						{ type: 'string' },
+						{ type: 'null' }
+					]
+				},
+				defaultWarningFileSize: {
+					type: 'number'
+				},
+				defaultFileSizeLimit: {
+					type: 'number'
+				},
+				defaultAreaNormalization: {
+					type: 'boolean'
+				},
+				defaultTemperatureUnit: {
+					type: 'string'
+				},
+				defaultMeterReadingFrequency: {
+					type: 'string'
+				},
+				defaultMeterMinimumDate: {
+					type: 'string'
+				},
+				defaultMeterMaximumDate: {
+					type: 'string'
+				},
+				defaultMeterReadingGap: {
+					type: 'number'
+				},
+				defaultMeterMaximumErrors: {
+					type: 'number'
+				},
+				defaultHelpUrl: {
+					type: 'string'
+				},
+				defaultWeatherLocation: {
+					type: 'integer'
 				}
 			}
 		}

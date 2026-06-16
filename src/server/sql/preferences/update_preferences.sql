@@ -13,10 +13,12 @@ SET
 	default_file_size_limit = ${defaultFileSizeLimit},
 	default_area_normalization = ${defaultAreaNormalization},
 	default_area_unit = ${defaultAreaUnit},
+	default_temperature_unit = ${defaultTemperatureUnit},
 	default_meter_reading_frequency = ${defaultMeterReadingFrequency},
 	default_meter_minimum_date = ${defaultMeterMinimumDate},
 	default_meter_maximum_date = ${defaultMeterMaximumDate},
 	default_meter_reading_gap = ${defaultMeterReadingGap},
 	default_meter_maximum_errors = ${defaultMeterMaximumErrors},
-	default_help_url = ${defaultHelpUrl}
+	default_help_url = ${defaultHelpUrl},
+	default_weather_location = ${defaultWeatherLocation}
 ;

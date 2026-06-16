@@ -21,6 +21,10 @@ import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
 import { checkboxStyle, labelStyle } from '../../styles/modalStyle';
+import { TemperatureUnitType } from '../../utils/getTemperatureUnitConversion';
+import { weatherLocationApi, selectAllWeatherLocations } from '../../redux/api/weatherLocationApi';
+import { useSelector } from 'react-redux';
+import Select from 'react-select';
 
 /**
  * @returns Preferences Component for Administrative use
@@ -38,7 +42,7 @@ export default function PreferencesComponent() {
 	// Compare the API response against the localState to determine changes
 	React.useEffect(() => { setHasChanges(!isEqual(adminPreferences, localAdminPref)); }, [localAdminPref, adminPreferences]);
 
-	const makeLocalChanges = (key: keyof PreferenceRequestItem, value: PreferenceRequestItem[keyof PreferenceRequestItem]) => {
+	const makeLocalChanges = (key: keyof PreferenceRequestItem, value: PreferenceRequestItem[keyof PreferenceRequestItem] | null) => {
 		setLocalAdminPref({ ...localAdminPref, [key]: value });
 	};
 
@@ -80,6 +84,13 @@ export default function PreferencesComponent() {
 				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit);
 		}
 	};
+
+	weatherLocationApi.useGetWeatherLocationDetailsQuery();
+	const weatherLocations = useSelector(selectAllWeatherLocations);
+	const weatherLocationOptions = [
+		{ value: null, label: translate('weather.location.no') },
+		...weatherLocations.map(loc => ({ value: String(loc.id), label: loc.identifier }))
+	];
 
 	return (
 		<div className='d-flex flex-column '>
@@ -168,6 +179,38 @@ export default function PreferencesComponent() {
 							checked={localAdminPref.defaultAreaUnit === AreaUnitType.meters}
 						/>
 						{translate('AreaUnitType.meters')}
+					</label>
+				</div>
+			</div>
+			<div>
+				<p className='mt-2' style={labelStyle}>
+					{translate('default.temperature.unit')}
+
+				</p>
+				<div className='radio'>
+					<label>
+						<input
+							type='radio'
+							name='temperatureUnitType'
+							style={checkboxStyle}
+							value={TemperatureUnitType.celsius}
+							onChange={e => makeLocalChanges('defaultTemperatureUnit', e.target.value)}
+							checked={localAdminPref.defaultTemperatureUnit === TemperatureUnitType.celsius}
+						/>
+						{translate('TemperatureUnitType.celsius')}
+					</label>
+				</div>
+				<div className='radio'>
+					<label>
+						<input
+							type='radio'
+							name='temperatureUnitType'
+							style={checkboxStyle}
+							value={TemperatureUnitType.fahrenheit}
+							onChange={e => makeLocalChanges('defaultTemperatureUnit', e.target.value)}
+							checked={localAdminPref.defaultTemperatureUnit === TemperatureUnitType.fahrenheit}
+						/>
+						{translate('TemperatureUnitType.fahrenheit')}
 					</label>
 				</div>
 			</div>
@@ -356,6 +399,18 @@ export default function PreferencesComponent() {
 					type='text'
 					value={localAdminPref.defaultHelpUrl}
 					onChange={e => makeLocalChanges('defaultHelpUrl', e.target.value)}
+				/>
+			</div>
+			<div>
+				<p className='mt-2' style={titleStyle}>
+					<FormattedMessage id='default.weather.location' />:
+				</p>
+				<Select
+					menuPlacement='bottom'
+					menuShouldScrollIntoView={true}
+					value={weatherLocationOptions.find(opt => opt.value === String(localAdminPref.defaultWeatherLocation)) ?? weatherLocationOptions[0]}
+					onChange={selected => makeLocalChanges('defaultWeatherLocation', selected?.value ?? null)}
+					options={weatherLocationOptions}
 				/>
 			</div>
 			<div className='d-flex justify-content-end mt-3'>

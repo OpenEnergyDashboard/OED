@@ -8,6 +8,7 @@ import { AreaUnitType } from '../utils/getAreaUnitConversion';
 import { MeterData } from './redux/meters';
 import { GroupData } from './redux/groups';
 import { UnitData } from './redux/units';
+import { TemperatureUnitType } from 'utils/getTemperatureUnitConversion';
 
 /**
  * The type of options displayed in Select components.
@@ -56,12 +57,14 @@ export interface PreferenceRequestItem {
 	defaultFileSizeLimit: number;
 	defaultAreaNormalization: boolean;
 	defaultAreaUnit: AreaUnitType;
+	defaultTemperatureUnit: TemperatureUnitType;
 	defaultMeterReadingFrequency: string;
 	defaultMeterMinimumDate: string;
 	defaultMeterMaximumDate: string;
 	defaultMeterReadingGap: number;
 	defaultMeterMaximumErrors: number;
 	defaultHelpUrl: string;
+	defaultWeatherLocation: string;
 }
 
 /**

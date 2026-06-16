@@ -27,6 +27,7 @@ mocha.describe('preferences API', () => {
 					defaultFileSizeLimit: 25,
 					defaultAreaNormalization: true,
 					defaultAreaUnit: 'meters',
+					defaultTemperatureUnit: 'celsius',
 					defaultMeterReadingFrequency: '1:13:17'
 				}
 				res = await chai.request(app).post('/api/preferences').set('token', token).send({ preferences });

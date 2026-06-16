@@ -134,6 +134,35 @@ mocha.describe('Enums JS to DB', () => {
 			)
 	})
 
+	//Unit.temperatureUnitType JS object to temperature_unit_type SQL ENUM
+	mocha.it('can equate Unit.temperatureUnitType to SQL enum', async () => {
+		const conn = DB.getConnection();
+		let serverEnum = [];
+		let jsObject = [];
+		//SQL query returning temperature_unit_type ENUM
+		await conn.result('SELECT unnest(enum_range(NULL::temperature_unit_type));')
+			.then(data => {
+				//get temperature_unit_type enum as nested enumerations
+				let resultArray = data.rows;
+				//unnest into array for comparison
+				resultArray.forEach((item) => {
+					serverEnum.push(item.unnest);
+				});
+				//convert Unit.temperatureUnitType JS object properties to array for comparison
+				for (let key in Unit.temperatureUnitType) {
+					if (Unit.temperatureUnitType.hasOwnProperty(key)) {
+						let value = Unit.temperatureUnitType[key];
+						jsObject.push(value);
+					}
+				}
+				//sort each array before testing
+				serverEnum.sort();
+				jsObject.sort();
+				expect(serverEnum.toString()).to.equal(jsObject.toString());
+			}
+			)
+	})
+
 	//Unit.unitType JS object to unit_type SQL ENUM
 	mocha.it('can equate Unit.unitType to SQL enum', async () => {
 		const conn = DB.getConnection();
