@@ -27,12 +27,12 @@ async function updateAllMeters(dataReader, metersToUpdate, conn) {
 					.catch(err => {
 						let ipAddress = '[NO IP ADDRESS AVAILABLE]';
 						if (err.options !== undefined && err.options.ipAddress !== undefined) {
-						ipAddress = err.options.ipAddress;
-					}
-					log.error(`ERROR ON REQUEST TO METER ${ipAddress}, Meter name: ${meter.name}, Meter ID: ${meter.id}, URL: ${meter.url}, ${err.message} `,  err);
-					return null;
-				})
-			)
+								ipAddress = err.options.ipAddress;
+						}
+						log.error(`ERROR ON REQUEST TO METER ${ipAddress}, Meter name: ${meter.name}, URL: ${meter.url}, ${err.message} `,  err);
+						return null;
+					})
+				)
 		);
 		log.info('Update finished');
 	} catch (err) {
