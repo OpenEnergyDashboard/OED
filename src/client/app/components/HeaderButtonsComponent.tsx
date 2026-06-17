@@ -66,6 +66,7 @@ export default function HeaderButtonsComponent() {
 		shouldConversionsButtonDisabled: true,
 		shouldLogMsgButtonDisabled: true,
 		shouldVisualUnitMapButtonDisabled: true,
+		shouldVisualGroupMapButtonDisabled: true,
 		// Translated menu title that depend on whether logged in.
 		menuTitle: '',
 		// link to help page for page choices. Should not see default but use general help URL.
@@ -78,7 +79,6 @@ export default function HeaderButtonsComponent() {
 	// TODO Re-implement AFTER RTK Migration
 	// hard-coded for the time being. Rework w/admin pages
 	const unsavedChangesState = false;
-
 
 	// Must update in case the version was not set when the page was loaded.
 	useEffect(() => {
@@ -103,7 +103,8 @@ export default function HeaderButtonsComponent() {
 			shouldUnitsButtonDisabled: pathname === '/units',
 			shouldConversionsButtonDisabled: pathname === '/conversions',
 			shouldLogMsgButtonDisabled: pathname === '/logmsg',
-			shouldVisualUnitMapButtonDisabled: pathname === '/visual-unit'
+			shouldVisualUnitMapButtonDisabled: pathname === '/visual-unit',
+			shouldVisualGroupMapButtonDisabled: pathname === '/visual-group'
 		}));
 	}, [pathname]);
 
@@ -230,6 +231,13 @@ export default function HeaderButtonsComponent() {
 								tag={Link}
 								to="/units">
 								<FormattedMessage id='units' />
+							</DropdownItem>
+							<DropdownItem
+								style = {state.adminViewableLinkStyle}
+								disabled = {state.shouldVisualGroupMapButtonDisabled}
+								tag = {Link}
+								to="/visual-group">
+								<FormattedMessage id='visual.group'/>
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}
