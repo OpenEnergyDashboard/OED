@@ -220,15 +220,18 @@ async function changePostgresPasswords() {
 		}
 	}
 
-	// TODO why is this needed given it has the currentPostgresPassword setting below with ||?
+	// This does not seem needed given it has the currentPostgresPassword setting below with ||
+	// Commenting it out did not seem to cause any issues. Confirmation could not be obtained from
+	// the original developer so the commented out code is being left in case something goes wrong in the future.
+	// If nothing goes wrong for a while it can probably be removed
+
 	// Prefer the most recent passwords from the .env file over process.env which may be outdated
-	if (fileEnv.POSTGRES_PASSWORD) {
-		process.env.POSTGRES_PASSWORD = fileEnv.POSTGRES_PASSWORD;
-	}
-	// TODO is this used???
-	if (fileEnv.OED_DB_PASSWORD) {
-		process.env.OED_DB_PASSWORD = fileEnv.OED_DB_PASSWORD;
-	}
+	// if (fileEnv.POSTGRES_PASSWORD) {
+	// 	process.env.POSTGRES_PASSWORD = fileEnv.POSTGRES_PASSWORD;
+	// }
+	// if (fileEnv.OED_DB_PASSWORD) {
+	// 	process.env.OED_DB_PASSWORD = fileEnv.OED_DB_PASSWORD;
+	// }
 
 	// This should only be needed if that password is being updated.
 	// However, it is used when you write to the .env so always set.
