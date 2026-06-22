@@ -32,7 +32,19 @@ const conversionArray = require('./routes/conversionArray');
 const units = require('./routes/units');
 const conversions = require('./routes/conversions');
 const ciks = require('./routes/ciks');
+const { HTTP_CODES } = require('./util/httpCodes');
 const crypto = require('node:crypto');
+
+// Detect test environment and use higher rate limits during tests.
+// Rate limiting is critical for security in production but interferes with automated testing.
+// Using a separate test rate limiter (100x production limits) ensures the middleware is still
+// exercised during tests while preventing test failures from rate limiting.
+// 100x is certainly big enough to avoid issues and the exact value should not be important as
+// the goal is to avoid hitting rate limiting in testing.
+// Note that NODE_ENV of test should only be set for the testing environment and is done in
+// package.json in the script section for the test ones.
+const isTestEnvironment = process.env.NODE_ENV === 'test';
+const testMultiplier = isTestEnvironment ? 100 : 1;
 
 // Limit the rate of overall requests to OED
 // TODO Verify that user see the message returned, see https://express-rate-limit.mintlify.app/reference/configuration#message
