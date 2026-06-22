@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
- 
+
 import 'bootstrap/dist/css/bootstrap.css';
 import * as React from 'react';
 import { createRoot } from 'react-dom/client';
@@ -32,7 +32,7 @@ document.head.appendChild = function (node: any) {
 	if (
 		node instanceof HTMLStyleElement
 	) {
-		node.setAttribute('nonce',__webpack_nonce__|| '');
+		node.setAttribute('nonce', __webpack_nonce__ || '');
 	}
 
 	try {
