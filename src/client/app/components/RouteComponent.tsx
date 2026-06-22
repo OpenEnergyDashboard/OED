@@ -27,6 +27,7 @@ import ErrorComponent from './router/ErrorComponent';
 import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import LogMsgComponent from './admin/LogMsgComponent';
 import VisualUnitDetailComponent from './visual-unit/VisualUnitDetailComponent';
+import { CreateVisualGroupComponent } from './visual-group/CreateVisualGroupComponent';
 
 /**
  * @returns the router component Responsible for client side routing.
@@ -63,7 +64,8 @@ const router = createBrowserRouter([
 					{ path: 'users', element: <UsersDetailComponent /> },
 					{ path: 'logmsg', element: <LogMsgComponent /> },
 					{ path: 'users', element: <UsersDetailComponent /> },
-					{ path: 'visual-unit', element: <VisualUnitDetailComponent/> }
+					{ path: 'visual-unit', element: <VisualUnitDetailComponent /> },
+					{ path: 'visual-group', element: <CreateVisualGroupComponent /> }
 				]
 			},
 			{

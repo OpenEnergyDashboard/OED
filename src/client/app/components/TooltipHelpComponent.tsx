@@ -71,7 +71,8 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.groups.groupdetails': { link: `${helpUrl}/groupViewing/#groupDetails` },
 		'help.groups.groupview': { link: `${helpUrl}/groupViewing/` },
 		'help.meters.meterview': { link: `${helpUrl}/meterViewing/` },
-		'help.admin.unitconversionvisuals': { link: `${helpUrl}/adminUnitVisual/` }
+		'help.admin.unitconversionvisuals': { link: `${helpUrl}/adminUnitVisual/` },
+		'help.admin.groupvisuals': { link: `${helpUrl}/adminGroupVisuals/` }
 	};
 
 	return (
