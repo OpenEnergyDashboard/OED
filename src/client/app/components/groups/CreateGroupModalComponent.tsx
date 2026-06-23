@@ -86,6 +86,7 @@ export default function CreateGroupModalComponent() {
 		childMeters: [] as number[],
 		childGroups: [] as number[],
 		deepMeters: [] as number[],
+		deepGroups: [] as number[],
 		gps: null,
 		displayable: false,
 		note: '',
