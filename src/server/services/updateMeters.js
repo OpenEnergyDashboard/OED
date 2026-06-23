@@ -25,11 +25,7 @@ async function updateAllMeters(dataReader, metersToUpdate, conn) {
 			metersToUpdate
 				.map(meter => dataReader(meter, conn)
 					.catch(err => {
-						let ipAddress = '[NO IP ADDRESS AVAILABLE]';
-						if (err.options !== undefined && err.options.ipAddress !== undefined) {
-								ipAddress = err.options.ipAddress;
-						}
-						log.error(`ERROR ON REQUEST TO METER ${ipAddress}, Meter name: ${meter.name}, URL: ${meter.url}, ${err.message} `,  err);
+						log.error(`ERROR ON REQUEST TO METER, Meter name: ${meter.name}, URL: ${meter.url}, ${err.message} `, err);
 						return null;
 					})
 				)
