@@ -11,26 +11,24 @@
 # or an appropriate variant to cause the values in this file to override
 # the ones in the default docker file.
 # *****************************************************************
-
-version: "3.8"
 services:
     database:
         # The next lines enable access to the PostgreSQL server from the host machine.
         # It can be very valuable for debugging the database via tools such as PGAdmin.
         # They can be commented out to close that port but it will stop that type of debugging.
         ports:
-           - "5432:5432"
+            - "5432:5432"
     web:
         environment:
             # Set this value to yes or no, other values wil result in a configuration error.
             # Unless you are testing a production setup, this is normally no.
-            - OED_PRODUCTION=no
+            OED_PRODUCTION: no
             # This is to let the install know that the second, developer docker file was used.
             # It is mostly as a safety check and during the transition to warn developers to
             # transition to the new system. It should NOT be changed.
             # The value is not set in the production config file to avoid someone wanting to
             # set it there and that is not desired.
-            - OED_DOCKER_CONFIG_DEV=yes
+            OED_DOCKER_CONFIG_DEV: yes
         ports:
             # If you are experiencing port conflicts with 3000 then you can modify this to
             # use another port. For example, to switch to port xxxx you would do:
@@ -44,19 +42,21 @@ services:
                 "./src/scripts/installOED.sh",
                 # This allows for starting OED with special values for a developer.
                 # See developer docs for details.
+                # If environment variable install_args is not set then it becomes blank without warning user.
                 "${install_args:-}"
             ]
 
     # Cypress testing service
     # This is used for UI testing and normally only creates this Docker container
     # if you specially start up UI testing.
+    # TODO This is not longer working. It is unclear why.
     cypress:
       image: cypress/included
       profiles:
         - ui-testing
       environment:
-        - CYPRESS_BASE_URL=http://web:3000
-        - DISPLAY=:99
+        CYPRESS_BASE_URL: http://web:3000
+        DISPLAY: 99
       working_dir: /usr/src/app
       depends_on:
         web:

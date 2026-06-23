@@ -19,7 +19,8 @@ const {
 } = require('../../util/validationConstants');
 
 /** Non-numeric path values reused across group_id route tests. */
-const INVALID_GROUP_ID_PATH_VALUES = ['abc', '12abc', 'group123', 'null', ''];
+// TODO This used to include '' but that went to the wrong route. Once these are sent as a parameter (not /:) then it could be added back.
+const INVALID_GROUP_ID_PATH_VALUES = ['abc', '12abc', 'group123', 'null'];
 /** Some group routes still return HTTP_CODES.OK for malformed group_id until path validation is strict; test encodes current behavior. */
 const GROUP_ID_MALFORMED_EXPECTED_STATUSES = [HTTP_CODES.OK, HTTP_CODES.BAD_REQUEST];
 

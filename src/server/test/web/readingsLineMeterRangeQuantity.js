@@ -218,7 +218,91 @@ mocha.describe('readings API', () => {
 
 					// Add LR18 here
 
-					// Add LR19 here
+					mocha.it(
+						'LR19: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained',
+						async () => {
+							// 1) Define additional units: kg, metric ton, kg CO₂
+							const unitDatakWhMTonCO2 = unitDatakWh.concat([
+								{
+									name: 'kg',
+									identifier: '',
+									unitRepresent: Unit.unitRepresentType.QUANTITY,
+									secInRate: 3600,
+									typeOfUnit: Unit.unitType.UNIT,
+									suffix: '',
+									displayable: Unit.displayableType.ALL,
+									preferredDisplay: false,
+									note: 'OED created standard unit',
+								},
+								{
+									name: 'metric ton',
+									identifier: '',
+									unitRepresent: Unit.unitRepresentType.QUANTITY,
+									secInRate: 3600,
+									typeOfUnit: Unit.unitType.UNIT,
+									suffix: '',
+									displayable: Unit.displayableType.ALL,
+									preferredDisplay: false,
+									note: 'OED created standard unit',
+								},
+								{
+									name: 'kg CO₂',
+									identifier: '',
+									unitRepresent: Unit.unitRepresentType.QUANTITY,
+									secInRate: 3600,
+									typeOfUnit: Unit.unitType.UNIT,
+									suffix: 'CO₂',
+									displayable: Unit.displayableType.ALL,
+									preferredDisplay: false,
+									note: 'special unit',
+								},
+							]);
+
+							// 2) Define chained conversions: Electric_Utility → kg CO₂ → kg → metric ton
+							const conversionDatakWhMTonCO2 = conversionDatakWh.concat([
+								{
+									sourceName: 'Electric_Utility',
+									destinationName: 'kg CO₂',
+									bidirectional: false,
+									slope: 0.709,
+									intercept: 0,
+									note: 'Electric_Utility → kg CO₂',
+								},
+								{
+									sourceName: 'kg CO₂',
+									destinationName: 'kg',
+									bidirectional: false,
+									slope: 1,
+									intercept: 0,
+									note: 'CO₂ → kg',
+								},
+								{
+									sourceName: 'kg',
+									destinationName: 'metric ton',
+									bidirectional: true,
+									slope: 1e-3,
+									intercept: 0,
+									note: 'kg → Metric ton',
+								},
+							]);
+
+							// 3) Prepare test database with units and conversions
+							await prepareTest(unitDatakWhMTonCO2, conversionDatakWhMTonCO2, meterDatakWh);
+
+							// 4) Get the metric ton of CO₂ unit ID
+							const unitId = await getUnitId('metric ton of CO₂');
+
+							// 5) Load expected response data from the corresponding csv file
+							const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_MTonCO2_st_-inf_et_inf.csv');
+
+							// 6) Create a request to the API for unbounded reading times and save the response
+							const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+								.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+
+							// 7) Check that the API reading is equal to what it is expected to equal
+							expectRangeToEqualExpected(res, expected);
+						}
+					);
 
 					// Add LR20 here
 
