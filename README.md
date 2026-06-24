@@ -1,6 +1,3 @@
-# These are contributions made by matterwoven! #
-Changes made to README are to reflect the users contributions.
-
 # Open Energy Dashboard #
 
 ![Github Build](https://github.com/OpenEnergyDashboard/OED/workflows/Build/badge.svg)
