@@ -154,7 +154,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		setShowDeleteConfirmationModal(false);
 
 		// Delete the user using the username
-		deleteUser(props.user.username);
+		deleteUser(userDetails.username);
 	};
 	/* End Confirm Delete Modal */
 
@@ -195,23 +195,19 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 			...(passwordModified && { password: userDetails.password })
 		};
 
-		// TODO DEBUG: added in to test the showErrorNotification
-		//editedUser.username = 'test';
-
 		submitUserEdits(editedUser)
 			.unwrap()
 			.then(() => {
 				showSuccessNotification(
-					translate('users.successfully.edit.user') + userDetails.username +
-					translate('users.successfully.edit.user.username') + userDetails.username + ')' +
-					translate('users.successfully.edit.user.role') + userDetails.role + ')'
+					translate('users.successfully.edit.user') + ' (username: ' + userDetails.username + ')' +
+					' (role: ' + userDetails.role + ')'
 				);
 				props.handleClose();
-				resetPasswordFields();
 			})
 			.catch(error => {
-				showErrorNotification(translate('users.failed.to.edit.user') + props.user.username + ' ' + error.data.message);
+				showErrorNotification(translate('users.failed.to.edit.user') + error.data.message);
 			});
+		resetPasswordFields();
 	};
 
 	const deleteUser = (username: string) => {

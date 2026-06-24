@@ -205,21 +205,17 @@ export default function CreateUnitModalComponent() {
 	const handleSaveChanges = () => {
 		// Close modal first to avoid repeat clicks
 		setShowModal(false);
+		const { ...stateWithoutId } = state;
 		const submitState = {
-			...state,
+			...stateWithoutId,
 			// Set default identifier as name if left blank
 			identifier: !state.identifier || state.identifier.length === 0 ? state.name : state.identifier,
 			// set displayable to none if unit is meter
 			displayable: (state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) ? DisplayableType.none : state.displayable,
 			// set unit to suffix if suffix is not empty
-			typeOfUnit: (state.typeOfUnit != UnitType.suffix && state.suffix != '') ? UnitType.suffix : state.typeOfUnit,
-			// Necessary to fix error message:
-			// Failed to create a unit."Got request to add units with invalid unit data,
-			// errors: instance is not allowed to have the additional property "id""
-			id: undefined
+			typeOfUnit: (state.typeOfUnit != UnitType.suffix && state.suffix != '') ? UnitType.suffix : state.typeOfUnit
 		};
-		// TODO DEBUG: added in to test the showErrorNotification
-		submitState.secInRate = -1;
+
 		// Add the new unit and update the store
 		submitCreateUnit(submitState as unknown as UnitData)
 			.unwrap()
@@ -264,12 +260,7 @@ export default function CreateUnitModalComponent() {
 						handleClose();
 					}}
 					onCancel={() => setShowUnsavedWarning(false)}
-					// TODO DEBUG: Disabled is always set to false,
-					// which ignores the cases of invalid saves being rejected
-					// This is needed in order to test the showErrorNotification
-					// Test does not work*****
 					disabled={!canSave}
-					//disabled={false}
 				/>
 			)}
 			{/* Show modal button */}
@@ -569,13 +560,6 @@ export default function CreateUnitModalComponent() {
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					{/*
-						// TODO DEBUG: Disabled is always set to false,
-						// which ignores the cases of invalid saves being rejected
-						// This is needed in order to test the showErrorNotification
-						// This test does not work***
-						//disabled={!canSave}
-					*/}
 					<Button color="primary" onClick={handleSaveChanges} disabled={!canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>

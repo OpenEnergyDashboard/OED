@@ -16,7 +16,6 @@ import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
-import { conversionArrow } from '../../utils/conversionArrow';
 import { useTranslate } from '../../redux/componentHooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
@@ -135,16 +134,19 @@ export default function CreateConversionModalComponent() {
 			.then(() => {
 				showSuccessNotification(
 					translate('conversion.successfully.create.conversion') +
-					' "' + unitDataById[pendingConversion.sourceId]?.identifier + '"' +
-					conversionArrow(pendingConversion.bidirectional) +
-					'"' + unitDataById[pendingConversion.destinationId]?.identifier + '"'
+					' (source: "' + unitDataById[pendingConversion.sourceId]?.identifier + '"' +
+					', destination: "' + unitDataById[pendingConversion.destinationId]?.identifier + '")'
 				);
-				resetState();
 			})
 			.catch(err => {
 				showErrorNotification(
-					translate('conversion.failed.to.create.conversion') + '"' + err.data + '"');
+					translate('conversion.failed.to.create.conversion') +
+					' (source: "' + unitDataById[pendingConversion.sourceId]?.identifier + '"' +
+					', destination: "' + unitDataById[pendingConversion.destinationId]?.identifier + '") ' +
+					err.data
+				);
 			});
+		resetState();
 	};
 
 	const handleWarningCancel = () => {
@@ -161,19 +163,18 @@ export default function CreateConversionModalComponent() {
 
 	// Submit
 	const handleSubmit = () => {
+		// Used for the ShowErrorNotification
+		const pending = {...omit(conversionState, 'sourceOptions', 'destinationOptions'),
+			bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional};
+		setPendingConversion(pending);
+
 		// Show warning modal if slope and intercept are both 0
 		if (conversionState.slope === 0 && conversionState.intercept === 0) {
-			setPendingConversion({...omit(conversionState, 'sourceOptions', 'destinationOptions'),
-				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
 			setWarningMessage(translate('conversion.slope.intercept.zero'));
 			setShowWarningModal(true);
 		} else if (validConversion) {
 			// Close modal first to avoid repeat clicks
 			setShowModal(false);
-
-			// TODO DEBUG: added in to test the showErrorNotification
-			//conversionState.sourceId = -1;
-			//conversionState.destinationId = -1;
 
 			// Add the new conversion and update the store
 			// Omit the source options , do not need to send in request so remove here.
@@ -186,16 +187,19 @@ export default function CreateConversionModalComponent() {
 					// Show source/destination identifiers (not numeric IDs)
 					showSuccessNotification(
 						translate('conversion.successfully.create.conversion') +
-						' "' + unitDataById[conversionState.sourceId]?.identifier + '"' +
-						conversionArrow(conversionState.bidirectional) +
-						'"' + unitDataById[conversionState.destinationId]?.identifier + '"'
+						' (source: "' + unitDataById[pending.sourceId]?.identifier + '"' +
+						', destination: "' + unitDataById[pending.destinationId]?.identifier + '")'
 					);
-					resetState();
 				})
 				.catch(err => {
 					showErrorNotification(
-						translate('conversion.failed.to.create.conversion') + '"' + err.data + '"');
+						translate('conversion.failed.to.create.conversion') +
+						' (source: "' + unitDataById[pending.sourceId]?.identifier + '"' +
+						', destination: "' + unitDataById[pending.destinationId]?.identifier + '") ' +
+						err.data
+					);
 				});
+			resetState();
 		} else {
 			showErrorNotification(reason);
 		}
@@ -254,26 +258,25 @@ export default function CreateConversionModalComponent() {
 
 							addConversionMutation({...omit(conversionState, 'sourceOptions', 'destinationOptions'),
 								bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional
-								// TODO DEBUG: added in to test the showErrorNotification (comment out above when uncommenting below)
-								//bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional,
-								//sourceId: -1,
-								//destinationId: -1
 							})
 								.unwrap()
 								.then(() => {
 									// Show source/destination identifiers (not numeric IDs)
 									showSuccessNotification(
 										translate('conversion.successfully.create.conversion') +
-										' "' + unitDataById[conversionState.sourceId]?.identifier + '"' +
-										conversionArrow(conversionState.bidirectional) +
-										'"' + unitDataById[conversionState.destinationId]?.identifier + '"'
+										' (source: "' + unitDataById[conversionState.sourceId]?.identifier + '"' +
+										', destination: "' + unitDataById[conversionState.destinationId]?.identifier + '")'
 									);
-									resetState();
 								})
 								.catch(err => {
 									showErrorNotification(
-										translate('conversion.failed.to.create.conversion') + '"' + err.data + '"');
+										translate('conversion.failed.to.create.conversion') +
+										' (source: "' + unitDataById[conversionState.sourceId]?.identifier + '"' +
+										', destination: "' + unitDataById[conversionState.destinationId]?.identifier + '") ' +
+										err.data
+									);
 								});
+							resetState();
 						}
 						else {
 							handleClose();

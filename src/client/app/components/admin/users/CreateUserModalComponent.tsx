@@ -110,21 +110,18 @@ export default function CreateUserModal() {
 
 	const handleSubmit = async () => {
 		const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
-		// TODO DEBUG: added in to test the showErrorNotification
-		//newUser.username = 'test';
 		createUser(newUser)
 			.unwrap()
 			.then(() => {
 				showSuccessNotification(
-					translate('users.successfully.edit.user') + userDetails.username +
-					translate('users.successfully.edit.user.username') + userDetails.username + ')' +
-					translate('users.successfully.edit.user.role') + userDetails.role + ')'
+					translate('users.successfully.create.user') + ' (username: ' + userDetails.username + ')' +
+					' (role: ' + userDetails.role + ')'
 				);
 				resetForm();
 				handleCloseModal();
 			})
 			.catch(error => {
-				showErrorNotification(translate('users.failed.to.create.user') + userDetails.username + ' ' + error.data.message);
+				showErrorNotification(translate('users.failed.to.create.user') + error.data.message);
 				resetPasswordFields();
 			});
 	};

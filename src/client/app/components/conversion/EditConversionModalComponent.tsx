@@ -20,7 +20,6 @@ import { UnitData, UnitType } from '../../types/redux/units';
 import { useTranslate } from '../../redux/componentHooks';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
-import { conversionArrow } from '../../utils/conversionArrow';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
 
@@ -412,12 +411,16 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			.then(() => {
 				// Show source/destination identifiers (not numeric IDs)
 				showSuccessNotification(translate('conversion.delete.success') +
-				' "' + unitDataById[payload.sourceId]?.identifier + '"' +
-				conversionArrow(props.conversion.bidirectional) +
-				'"' + unitDataById[payload.destinationId]?.identifier + '"'
+				' (source: "' + unitDataById[payload.sourceId]?.identifier + '"' +
+				', destination: "' + unitDataById[payload.destinationId]?.identifier + '")'
 				);
 			}).catch(error => {
-				showErrorNotification(translate('conversion.delete.failure') + error.data.message);
+				showErrorNotification(
+					translate('conversion.delete.failure') +
+					' (source: "' + unitDataById[payload.sourceId]?.identifier + '"' +
+					', destination: "' + unitDataById[payload.destinationId]?.identifier + '") ' +
+					error.data.message
+				);
 			});
 	};
 
@@ -489,14 +492,16 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					// Show source/destination identifiers (not numeric IDs)
 					showSuccessNotification(
 						translate('conversion.successfully.edited.conversion') +
-						' "' + unitDataById[state.sourceId]?.identifier + '"' +
-						conversionArrow(state.bidirectional) +
-						'"' + unitDataById[state.destinationId]?.identifier + '"'
+						' (source: "' + unitDataById[state.sourceId]?.identifier + '"' +
+						', destination: "' + unitDataById[state.destinationId]?.identifier + '")'
 					);
 				})
 				.catch(err => {
 					showErrorNotification(
-						translate('conversion.failed.to.edit.conversion') + '"' + err.data + '"'
+						translate('conversion.failed.to.edit.conversion') +
+						' (source: "' + unitDataById[values.sourceId]?.identifier + '"' +
+						', destination: "' + unitDataById[values.destinationId]?.identifier + '") ' +
+						err.data
 					);
 				});
 		}
@@ -530,10 +535,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			// Only do work if there are changes
 			if (conversionHasChanges) {
 
-				// TODO DEBUG: added in to test the showErrorNotification
-				//state.sourceId = -1;
-				//state.destinationId = -1;
-
 				// Save our changes
 				editConversion({
 					conversionData: {
@@ -546,14 +547,16 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 						// Show source/destination identifiers (not numeric IDs)
 						showSuccessNotification(
 							translate('conversion.successfully.edited.conversion') +
-						' "' + unitDataById[state.sourceId]?.identifier + '"' +
-						conversionArrow(state.bidirectional) +
-						'"' + unitDataById[state.destinationId]?.identifier + '"'
+							' (source: "' + unitDataById[state.sourceId]?.identifier + '"' +
+							', destination: "' + unitDataById[state.destinationId]?.identifier + '")'
 						);
 					})
 					.catch(err => {
 						showErrorNotification(
-							translate('conversion.failed.to.edit.conversion') + '"' + err.data + '"'
+							translate('conversion.failed.to.edit.conversion') +
+							' (source: "' + unitDataById[values.sourceId]?.identifier + '"' +
+							', destination: "' + unitDataById[values.destinationId]?.identifier + '") ' +
+							err.data
 						);
 					});
 			}

@@ -178,24 +178,17 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 
 		if (inputOk) {
 			// The input passed validation.
+			const { ...meterDetailsWithoutId } = meterDetails;
 			const submitState = {
-				...meterDetails,
+				...meterDetailsWithoutId,
 				// GPS may have been updated so create updated state to submit.
 				gps: gps,
 				// Set default identifier as name if left blank
 				identifier: !meterDetails.identifier || meterDetails.identifier.length === 0 ? meterDetails.name : meterDetails.identifier,
 				// The default value for timeZone is an empty string but that should be null for DB.
 				// See below for usage of timeZoneValue.
-				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone),
-				// Necessary to fix error message:
-				// Failed to create a meter with message: "test615" (identifier: test615,
-				// type: egauge) validation failed with instance.id must be greater than or equal to 1
-				id: undefined
+				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone)
 			} as unknown as MeterData;
-
-			// TODO DEBUG: added in to test the showErrorNotification
-			//submitState.name = '';
-			//submitState.identifier = '';
 
 			// Submit new meter if checks where ok.
 			// Attempt to add meter to database
