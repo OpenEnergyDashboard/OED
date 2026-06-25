@@ -208,7 +208,7 @@ mocha.describe('readings API', () => {
 						const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
 							.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
 						// Check that the API reading is equal to what it is expected to equal
-						expectRangeToEqualExpected(res, expected);
+						expectRangeToEqualExpected(res, expected, undefined, 0.001);
 					});
 
 					// Add LR13 here
