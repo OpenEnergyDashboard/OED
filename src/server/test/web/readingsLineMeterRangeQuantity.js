@@ -167,9 +167,52 @@ mocha.describe('readings API', () => {
 					// Add LR11 here
 
 					// Add LR12 here
+					mocha.it('LR12: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained', async () => {
+						// u1 (kWh) and u2 (Electric_Utility) come from unitDatakWh; add u3 (MJ) and u16 (BTU).
+						const unitData = unitDatakWh.concat([
+							{
+								name: 'MJ',
+								identifier: 'megaJoules',
+								unitRepresent: Unit.unitRepresentType.QUANTITY,
+								secInRate: 3600,
+								typeOfUnit: Unit.unitType.UNIT,
+								suffix: '',
+								displayable: Unit.displayableType.ALL,
+								preferredDisplay: false,
+								note: 'MJ'
+							},
+							{
+								name: 'BTU',
+								identifier: '',
+								unitRepresent: Unit.unitRepresentType.QUANTITY,
+								secInRate: 3600,
+								typeOfUnit: Unit.unitType.UNIT,
+								suffix: '',
+								displayable: Unit.displayableType.ALL,
+								preferredDisplay: true,
+								note: 'OED created standard unit'
+							}
+						]);
+						// c1 (Electric_Utility → kWh) comes from conversionDatakWh; add c2 (kWh → MJ) and c3 (MJ → BTU) for the chain.
+						const conversionData = conversionDatakWh.concat([
+							{ sourceName: 'kWh', destinationName: 'MJ', bidirectional: true, slope: 3.6, intercept: 0, note: 'kWh → MJ' },
+							{ sourceName: 'MJ', destinationName: 'BTU', bidirectional: true, slope: 947.8, intercept: 0, note: 'MJ → BTU' }
+						]);
+						// Load the data into the database
+						await prepareTest(unitData, conversionData, meterDatakWh);
+						// Get the unit ID since the DB could use any value.
+						const unitId = await getUnitId('BTU');
+						// Load the expected response data from the corresponding csv file
+						const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_BTU_st_-inf_et_inf.csv');
+						// Create a request to the API for unbounded reading times and save the response
+						const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+							.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+						// Check that the API reading is equal to what it is expected to equal
+						expectRangeToEqualExpected(res, expected);
+					});
 
 					// Add LR13 here
-
+					
 					// Add LR18 here
 
 					mocha.it(
