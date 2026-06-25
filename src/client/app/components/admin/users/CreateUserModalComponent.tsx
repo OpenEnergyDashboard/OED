@@ -114,14 +114,18 @@ export default function CreateUserModal() {
 			.unwrap()
 			.then(() => {
 				showSuccessNotification(
-					translate('users.successfully.create.user') + ' (username: ' + userDetails.username + ')' +
-					' (role: ' + userDetails.role + ')'
+					translate('users.successfully.create.user') +
+					translate('users.successfully.edit.user.username') + userDetails.username + ')' +
+					translate('users.successfully.edit.user.role') + userDetails.role + ')'
 				);
 				resetForm();
 				handleCloseModal();
 			})
 			.catch(error => {
-				showErrorNotification(translate('users.failed.to.create.user') + error.data.message);
+				showErrorNotification(
+					translate('users.failed.to.create.user') +
+					translate('users.successfully.edit.user.username') + userDetails.username + ') ' +
+					error.data.message);
 				resetPasswordFields();
 			});
 	};

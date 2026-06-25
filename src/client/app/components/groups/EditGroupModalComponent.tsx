@@ -371,12 +371,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						.unwrap()
 						.then(() => {
 							showSuccessNotification(
-								translate('group.successfully.edited.group') + ' (name: "' + submitState.name + '")'
+								translate('group.successfully.edited.group') + ' (' + translate('name') + ' "' + submitState.name + '")'
 							);
 						})
 						.catch(err => {
 							showErrorNotification(
-								translate('group.failed.to.edit.group') + '(name: "' + thisGroupState.name + '") ' + err.data);
+								translate('group.failed.to.edit.group') + '(' + translate('name') + ' "' + thisGroupState.name + '") ' + err.data);
 						});
 				});
 			} else {

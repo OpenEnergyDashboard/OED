@@ -134,15 +134,15 @@ export default function CreateConversionModalComponent() {
 			.then(() => {
 				showSuccessNotification(
 					translate('conversion.successfully.create.conversion') +
-					' (source: "' + unitDataById[pendingConversion.sourceId]?.identifier + '"' +
-					', destination: "' + unitDataById[pendingConversion.destinationId]?.identifier + '")'
+					' (' + translate('conversion.source') + ' "' + unitDataById[pendingConversion.sourceId]?.identifier + '"' +
+					', ' + translate('conversion.destination') + ' "' + unitDataById[pendingConversion.destinationId]?.identifier + '")'
 				);
 			})
 			.catch(err => {
 				showErrorNotification(
 					translate('conversion.failed.to.create.conversion') +
-					' (source: "' + unitDataById[pendingConversion.sourceId]?.identifier + '"' +
-					', destination: "' + unitDataById[pendingConversion.destinationId]?.identifier + '") ' +
+					' (' + translate('conversion.source') + ' "' + unitDataById[pendingConversion.sourceId]?.identifier + '"' +
+					', ' + translate('conversion.destination') + ' "' + unitDataById[pendingConversion.destinationId]?.identifier + '") ' +
 					err.data
 				);
 			});
@@ -187,15 +187,15 @@ export default function CreateConversionModalComponent() {
 					// Show source/destination identifiers (not numeric IDs)
 					showSuccessNotification(
 						translate('conversion.successfully.create.conversion') +
-						' (source: "' + unitDataById[pending.sourceId]?.identifier + '"' +
-						', destination: "' + unitDataById[pending.destinationId]?.identifier + '")'
+						' (' + translate('conversion.source') + ' "' + unitDataById[pending.sourceId]?.identifier + '"' +
+						', ' + translate('conversion.destination') + ' "' + unitDataById[pending.destinationId]?.identifier + '")'
 					);
 				})
 				.catch(err => {
 					showErrorNotification(
 						translate('conversion.failed.to.create.conversion') +
-						' (source: "' + unitDataById[pending.sourceId]?.identifier + '"' +
-						', destination: "' + unitDataById[pending.destinationId]?.identifier + '") ' +
+						' (' + translate('conversion.source') + ' "' + unitDataById[pending.sourceId]?.identifier + '"' +
+						', ' + translate('conversion.destination') + ' "' + unitDataById[pending.destinationId]?.identifier + '") ' +
 						err.data
 					);
 				});
@@ -264,15 +264,15 @@ export default function CreateConversionModalComponent() {
 									// Show source/destination identifiers (not numeric IDs)
 									showSuccessNotification(
 										translate('conversion.successfully.create.conversion') +
-										' (source: "' + unitDataById[conversionState.sourceId]?.identifier + '"' +
-										', destination: "' + unitDataById[conversionState.destinationId]?.identifier + '")'
+										' (' + translate('conversion.source') + ' "' + unitDataById[conversionState.sourceId]?.identifier + '"' +
+										', ' + translate('conversion.destination') + ' "' + unitDataById[conversionState.destinationId]?.identifier + '")'
 									);
 								})
 								.catch(err => {
 									showErrorNotification(
 										translate('conversion.failed.to.create.conversion') +
-										' (source: "' + unitDataById[conversionState.sourceId]?.identifier + '"' +
-										', destination: "' + unitDataById[conversionState.destinationId]?.identifier + '") ' +
+										' (' + translate('conversion.source') + ' "' + unitDataById[conversionState.sourceId]?.identifier + '"' +
+										', ' + translate('conversion.destination') + ' "' + unitDataById[conversionState.destinationId]?.identifier + '") ' +
 										err.data
 									);
 								});

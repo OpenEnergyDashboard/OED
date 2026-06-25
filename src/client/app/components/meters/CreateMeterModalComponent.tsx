@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { range } from 'lodash';
+import { range, omit } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -178,9 +178,8 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 
 		if (inputOk) {
 			// The input passed validation.
-			const { ...meterDetailsWithoutId } = meterDetails;
 			const submitState = {
-				...meterDetailsWithoutId,
+				...omit(meterDetails, 'id'),
 				// GPS may have been updated so create updated state to submit.
 				gps: gps,
 				// Set default identifier as name if left blank
@@ -188,11 +187,11 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				// The default value for timeZone is an empty string but that should be null for DB.
 				// See below for usage of timeZoneValue.
 				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone)
-			} as unknown as MeterData;
+			};
 
 			// Submit new meter if checks where ok.
 			// Attempt to add meter to database
-			submitAddMeter(submitState)
+			submitAddMeter(submitState as unknown as MeterData)
 				.unwrap()
 				.then(() => {
 					// if successful, the mutation will invalidate existing cache causing all meter details to be retrieved
@@ -215,7 +214,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				.catch(err => {
 					showErrorNotification(
 						translate('meter.failed.to.create.meter') + '"' + meterDetails.name + '"' +
-						translate('meter.successfully.create.meter.identifier') + meterDetails.identifier + '",' +
+						translate('meter.successfully.create.meter.identifier') + meterDetails.identifier +
 						translate('meter.successfully.create.meter.type') + meterDetails.meterType + ') ' + err.data
 					);
 				});

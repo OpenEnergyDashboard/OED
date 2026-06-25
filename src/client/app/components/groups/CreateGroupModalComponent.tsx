@@ -239,17 +239,13 @@ export default function CreateGroupModalComponent() {
 		if (inputOk) {
 			// The input passed validation.
 			// GPS may have been updated so create updated state to submit.
+			const submitState = { ...state, gps: gps };
 
-			const { ...submitStateWithoutDeepMeters } = { ...state, gps: gps };
-			const finalSubmitState = {
-				...submitStateWithoutDeepMeters
-			} as GroupData;
-
-			createGroup(finalSubmitState)
+			createGroup(submitState)
 				.unwrap()
 				.then(() => {
 					showSuccessNotification(
-						translate('group.successfully.create.group') + ' (name: "' + finalSubmitState.name + '")'
+						translate('group.successfully.create.group') + ' (name: "' + submitState.name + '")'
 					);
 					resetState();
 				})

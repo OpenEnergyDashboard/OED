@@ -19,6 +19,7 @@ import { MIN_VAL, MAX_VAL } from '../../utils/input';
 import { LineGraphRates } from '../../types/redux/graph';
 import { customRateValid, isCustomRate } from '../../utils/unitInput';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
+import { omit } from 'lodash';
 
 /**
  * Defines the create unit modal form
@@ -205,9 +206,9 @@ export default function CreateUnitModalComponent() {
 	const handleSaveChanges = () => {
 		// Close modal first to avoid repeat clicks
 		setShowModal(false);
-		const { ...stateWithoutId } = state;
 		const submitState = {
-			...stateWithoutId,
+			// id is not part of create.
+			...omit(state, 'id'),
 			// Set default identifier as name if left blank
 			identifier: !state.identifier || state.identifier.length === 0 ? state.name : state.identifier,
 			// set displayable to none if unit is meter
@@ -228,7 +229,7 @@ export default function CreateUnitModalComponent() {
 			})
 			.catch(err => {
 				showErrorNotification(
-					translate('unit.failed.to.create.unit') + '"' + submitState.name + '"' +
+					translate('unit.failed.to.create.unit') + ' "' + submitState.name + '"' +
 					translate('unit.successfully.create.unit.identifier') + submitState.identifier +
 					translate('unit.successfully.create.unit.type') + submitState.typeOfUnit + ') ' + err.data
 				);

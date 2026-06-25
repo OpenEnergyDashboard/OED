@@ -410,15 +410,16 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			.unwrap()
 			.then(() => {
 				// Show source/destination identifiers (not numeric IDs)
-				showSuccessNotification(translate('conversion.delete.success') +
-				' (source: "' + unitDataById[payload.sourceId]?.identifier + '"' +
-				', destination: "' + unitDataById[payload.destinationId]?.identifier + '")'
+				showSuccessNotification(
+					translate('conversion.delete.success') +
+					' (' + translate('conversion.source') + ' "' + unitDataById[payload.sourceId]?.identifier + '"' +
+					', ' + translate('conversion.destination') + ' "' + unitDataById[payload.destinationId]?.identifier + '")'
 				);
 			}).catch(error => {
 				showErrorNotification(
 					translate('conversion.delete.failure') +
-					' (source: "' + unitDataById[payload.sourceId]?.identifier + '"' +
-					', destination: "' + unitDataById[payload.destinationId]?.identifier + '") ' +
+					' (' + translate('conversion.source') + ' "' + unitDataById[payload.sourceId]?.identifier + '"' +
+					', ' + translate('conversion.destination') + ' "' + unitDataById[payload.destinationId]?.identifier + '") ' +
 					error.data.message
 				);
 			});
@@ -480,6 +481,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		const conversionHasChanges = shouldRedoCik || props.conversion.note != state.note;
 		// Only do work if there are changes
 		if (conversionHasChanges) {
+
 			// Save our changes
 			editConversion({
 				conversionData: {
@@ -492,15 +494,15 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					// Show source/destination identifiers (not numeric IDs)
 					showSuccessNotification(
 						translate('conversion.successfully.edited.conversion') +
-						' (source: "' + unitDataById[state.sourceId]?.identifier + '"' +
-						', destination: "' + unitDataById[state.destinationId]?.identifier + '")'
+						' (' + translate('conversion.source') + ' "' + unitDataById[state.sourceId]?.identifier + '"' +
+						', ' + translate('conversion.destination') + ' "' + unitDataById[state.destinationId]?.identifier + '")'
 					);
 				})
 				.catch(err => {
 					showErrorNotification(
 						translate('conversion.failed.to.edit.conversion') +
-						' (source: "' + unitDataById[values.sourceId]?.identifier + '"' +
-						', destination: "' + unitDataById[values.destinationId]?.identifier + '") ' +
+						' (' + translate('conversion.source') + ' "' + unitDataById[values.sourceId]?.identifier + '"' +
+						', ' + translate('conversion.destination') + ' "' + unitDataById[values.destinationId]?.identifier + '") ' +
 						err.data
 					);
 				});
@@ -547,15 +549,15 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 						// Show source/destination identifiers (not numeric IDs)
 						showSuccessNotification(
 							translate('conversion.successfully.edited.conversion') +
-							' (source: "' + unitDataById[state.sourceId]?.identifier + '"' +
-							', destination: "' + unitDataById[state.destinationId]?.identifier + '")'
+							' (' + translate('conversion.source') + ' "' + unitDataById[state.sourceId]?.identifier + '"' +
+							', ' + translate('conversion.destination') + ' "' + unitDataById[state.destinationId]?.identifier + '")'
 						);
 					})
 					.catch(err => {
 						showErrorNotification(
 							translate('conversion.failed.to.edit.conversion') +
-							' (source: "' + unitDataById[values.sourceId]?.identifier + '"' +
-							', destination: "' + unitDataById[values.destinationId]?.identifier + '") ' +
+							' (' + translate('conversion.source') + ' "' + unitDataById[values.sourceId]?.identifier + '"' +
+							', ' + translate('conversion.destination') + ' "' + unitDataById[values.destinationId]?.identifier + '") ' +
 							err.data
 						);
 					});
