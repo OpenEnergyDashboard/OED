@@ -276,7 +276,7 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 					minimum: 1
 				}
 			},
-			defaultGraphicUnit: { type: 'integer', minimum: 1 },
+			defaultGraphicUnit: {'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }]},
 			areaUnit: {
 				type: 'string',
 				minLength: 1,
@@ -289,7 +289,7 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 	const validatorResult = validate(req.body, validGroup);
 	if (!validatorResult.valid) {
 		log.error(`Got request to create group with invalid data, errors: ${validatorResult.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to creat group with invalid data. Error(s): " + validatorResult.errors.toString());
+		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to create group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -377,7 +377,7 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 					minimum: 1
 				}
 			},
-			defaultGraphicUnit: { type: 'integer', minimum: 1 },
+			defaultGraphicUnit: {'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }]},
 			areaUnit: {
 				type: 'string',
 				minLength: 1,
