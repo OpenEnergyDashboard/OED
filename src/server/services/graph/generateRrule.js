@@ -5,6 +5,8 @@
 const { datetime, RRule } = require('rrule');
 const Week = require('../../models/Week');
 const DaySegment = require('../../models/DaySegment');
+const { log } = require('../../log');
+const moment = require('moment');
 
 /**
  * Uses the provided week & start/end dates to return the RRule for this pattern.
@@ -85,6 +87,48 @@ async function generateRrule(weekId, startDate, endDate, conn) {
 		// console.log('dayId, dayId.rruleDays: ', dayId, ' ', dayId.rruleDays);
 		console.log('day.dayId, day.rruleDays: ', day.dayId, day.rruleDays);
 	});
+
+	// Want to limit the number of cik_vary entries so don't do a case where this pattern generate
+	// too many. The number is determined by the number of day_segments for the days in the pattern.
+	// This sums all the day_segments across the week pattern and then determines the average
+	// number per day across the week since the exact days at the start/end of the conversion_segment
+	// can vary (not all days in the week) but this minor variation is not too important so just use
+	// the average. This average day segments is multiplied by the number of days in the conversion
+	// segment to get the expected number of items to generate and store in cik_vary. The limit on this
+	// number is not absolute but it is current set to 36400 per the design document discussion.
+	// The maximum number of cik_entries allowed for a pattern. For now it is a fixed value.
+	const maxCikVary = 36400;
+	// Holds the total number of segments in the week pattern.
+	let totalSegmentsInWeek = 0;
+	// Loop over all the unique days in the week pattern.
+	dayIdMappings.forEach((day) => {
+		// Get the number of times this day shows up in the week.
+		const numDayUsed = day.rruleDays.length;
+		const currDaySegment = daySegments.find(ds => ds.dayId === day.dayId);
+		// Get the number of segments in this day.
+		const numSegments = currDaySegment.segments.length;
+		// Update the total number of segments by the number of times used * number of days.
+		totalSegmentsInWeek += numDayUsed * numSegments;
+	});
+	// The average number of segments per day for this week - see global comment above for details.
+	const aveSegmentsPerDay = totalSegmentsInWeek / 7;
+	// Get the number of days for this conversion segment.
+	// Even though other aspects of RRule currently use Date, using moment as generally done in OED.
+	const numDays = moment(endDate).diff(moment(startDate), 'days');
+	// The total number of segments is the average * # days.
+	const totalSegments = aveSegmentsPerDay * numDays;
+	console.log('aveSegmentsPerDay, numDays, totalSegments: ', aveSegmentsPerDay, numDays, totalSegments);
+	// See if too many expected values.
+	if (totalSegments > maxCikVary) {
+		// TODO Check earlier for -infinity/infinity for start/end and stop then. Change message below.
+		log.error(`The weekly patten of "${week.name}" over conversion segment with start/end times of ${startDate}/${endDate}` +
+			` is estimated to produce ${totalSegments} entries which exceeds the maximum of ${maxCikVary}.` +
+			' This may be due to having a conversion segment start/end time that involved -infinity/infinity.'
+		);
+		// Throw an exception to be dealt with in other code.
+		throw new Error('Too many cik_vary items');
+	}
+
 
 	daySegments.forEach((day) => {
 		day.segments.forEach((segment) => {
