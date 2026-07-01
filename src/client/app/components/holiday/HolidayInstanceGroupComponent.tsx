@@ -6,7 +6,7 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
 	Alert, Button, FormFeedback, FormGroup, Input, Label,
-	Pagination, PaginationItem, PaginationLink, Table
+	Pagination, PaginationItem, PaginationLink, Table, Modal, ModalHeader, ModalBody
 } from 'reactstrap';
 import { titleStyle } from '../../styles/modalStyle';
 import { HolidayInstance } from 'types/redux/holiday';
@@ -15,7 +15,6 @@ const PER_PAGE = 20;
 
 interface HolidayInstanceGroupComponentProps {
 	holidayInstances?: HolidayInstance[];
-	initialSelectedHolidayInstanceIds?: number[];
 	handleUpdateHolidayLimit?: (holidayLimit: number) => void;
 	handleCreateHolidayInstanceGroup?: (holidayInstanceIds: number[]) => void;
 }
@@ -31,10 +30,14 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 	const [displayLimit, setDisplayLimit] = React.useState(PER_PAGE);
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const [showAllHolidays, setShowAllHolidays] = React.useState(false);
-	const [selectedHolidayInstanceIds, setSelectedHolidayInstanceIds] = React.useState<number[]>(
-		props.initialSelectedHolidayInstanceIds ?? []);
-
+	const [selectedHolidayInstanceIds, setSelectedHolidayInstanceIds] = React.useState<number[]>([]);
 	const holidayLimit = Number(holidayLimitText);
+	// Modal state for displaying full log message
+	const [modalOpen, setModalOpen] = React.useState(false);
+	// holiday name to display in the modal header
+	const [modelHeader, setModelHeader] = React.useState('');
+	// Holiday note to display in the modal
+	const [modalHolidayNote, setModalHolidayNote] = React.useState('');
 	const holidayLimitInvalid = holidayLimitText.trim() === ''
 		|| !Number.isInteger(holidayLimit)
 		|| holidayLimit < 1;
@@ -45,10 +48,9 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 	const paginatedHolidayInstances = showAllHolidays
 		? displayedHolidayInstances
 		: displayedHolidayInstances.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
-
-	React.useEffect(() => {
-		setSelectedHolidayInstanceIds(props.initialSelectedHolidayInstanceIds ?? []);
-	}, [props.initialSelectedHolidayInstanceIds]);
+	const selectedHolidayInstanceIdsForGroup = holidayInstances
+		.filter(holidayInstance => selectedHolidayInstanceIds.includes(holidayInstance.id))
+		.map(holidayInstance => holidayInstance.id);
 
 	React.useEffect(() => {
 		if (currentPage > totalPages) {
@@ -67,6 +69,13 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 		props.handleUpdateHolidayLimit?.(holidayLimit);
 	};
 
+	//open modal to show full holiday name and note
+	const handleHolidayNoteModal = (holidayName: string, holidayNote: string) => {
+		setModelHeader(holidayName);
+		setModalHolidayNote(holidayNote);
+		setModalOpen(true);
+	};
+
 	const handleHolidayInstanceSelect = (holidayInstanceId: number) => {
 		setSelectedHolidayInstanceIds(currentIds => currentIds.includes(holidayInstanceId)
 			? currentIds.filter(id => id !== holidayInstanceId)
@@ -74,7 +83,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 	};
 
 	const handleCreateHolidayInstanceGroup = () => {
-		props.handleCreateHolidayInstanceGroup?.(selectedHolidayInstanceIds);
+		props.handleCreateHolidayInstanceGroup?.(selectedHolidayInstanceIdsForGroup);
 	};
 
 	return (
@@ -85,7 +94,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 
 			<div style={holidayFilterStyle}>
 				<FormGroup style={holidayLimitGroupStyle}>
-					<Label for='holidayLimit' style={holidayLimitLabelStyle}>
+					<Label for='holidayLimit' style={{fontWeight: 'bold', margin: '0'}}>
 						<FormattedMessage
 							id='holiday.number.display'
 							defaultMessage='Number of holidays to display' />
@@ -99,7 +108,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 						value={holidayLimitText}
 						invalid={holidayLimitInvalid}
 						onChange={e => setHolidayLimitText(e.target.value)}
-						style={holidayLimitInputStyle} />
+					/>
 					<FormFeedback>
 						<FormattedMessage
 							id='holiday.limit.required'
@@ -111,40 +120,43 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 					outline
 					disabled={holidayLimitInvalid}
 					onClick={handleUpdateHolidayLimit}
-					style={outlineButtonStyle}>
+				>
 					<FormattedMessage id='update' defaultMessage='Update' />
 				</Button>
 			</div>
 
+			{/* Display holiday instances table */}
 			{holidayInstances.length > 0 ? (
 				<div style={tableWrapStyle}>
 					<Table bordered style={tableStyle}>
 						<thead>
 							<tr>
-								<th style={{ ...tableHeaderStyle, ...holidayNameColumnStyle }}>
+								<th>
 									<FormattedMessage id='holiday.instance' defaultMessage='Holiday Instance' />
 								</th>
-								<th style={{ ...tableHeaderStyle, ...holidayNoteColumnStyle }}>
+								<th>
 									<FormattedMessage id='note' defaultMessage='Note' />
 								</th>
-								<th style={{ ...tableHeaderStyle, ...holidaySelectColumnStyle }}>
+								<th>
 									<FormattedMessage id='select' defaultMessage='Select' />
 								</th>
 							</tr>
 						</thead>
-						<tbody>
+						<tbody style={bodyStyle}>
 							{paginatedHolidayInstances.map(holidayInstance => {
 								const selected = selectedHolidayInstanceIds.includes(holidayInstance.id);
 
 								return (
 									<tr key={holidayInstance.id}>
-										<td style={{ ...tableCellStyle, ...holidayNameColumnStyle }}>
+										<td>
 											{holidayInstance.name}
 										</td>
-										<td style={{ ...tableCellStyle, ...holidayNoteColumnStyle }}>
-											{holidayInstance.note}
+										<td style={{ cursor: 'pointer' }}
+											onClick={() => handleHolidayNoteModal(holidayInstance.name, holidayInstance.note)}
+										>
+											{holidayInstance.note.length > 80 ? `${holidayInstance.note.slice(0, 80)}...` : holidayInstance.note}
 										</td>
-										<td style={{ ...tableCellStyle, ...holidaySelectColumnStyle }}>
+										<td>
 											<Label check style={checkboxLabelStyle}>
 												<Input
 													type='checkbox'
@@ -171,8 +183,9 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 				</Alert>
 			)}
 
+			{/* Pagination */}
 			{!showAllHolidays && holidayInstances.length > 0 && (
-				<Pagination aria-label='Holiday instance pagination' style={paginationStyle}>
+				<Pagination aria-label='Holiday instance pagination' style={{justifyContent: 'center', margin: '1% auto'}}>
 					<PaginationItem disabled={currentPage === 1}>
 						<PaginationLink onClick={() => setCurrentPage(1)}>
 							{'<<'}
@@ -203,6 +216,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 				</Pagination>
 			)}
 
+			{/* Action buttons for showing all holiday instances and creating holiday instance groups */}
 			{holidayInstances.length > 0 && (
 				<div style={actionContainerStyle}>
 					<Button
@@ -225,6 +239,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 					<Button
 						color='secondary'
 						outline
+						disabled={selectedHolidayInstanceIdsForGroup.length === 0}
 						onClick={handleCreateHolidayInstanceGroup}
 						style={wideOutlineButtonStyle}>
 						<FormattedMessage
@@ -233,12 +248,23 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 					</Button>
 				</div>
 			)}
+
+			{/* Modal for displaying full holiday note */}
+			<Modal isOpen={modalOpen} toggle={() => setModalOpen(false)}>
+				<ModalHeader toggle={() => setModalOpen(false)}>
+					{modelHeader}
+				</ModalHeader>
+				<ModalBody>
+					{modalHolidayNote}
+				</ModalBody>
+			</Modal>
 		</div>
 	);
 }
 
 const pageStyle: React.CSSProperties = {
-	padding: '4rem 0 2rem'
+	padding: '4rem 0 2rem',
+	width: '100%'
 };
 
 const holidayTitleStyle: React.CSSProperties = {
@@ -264,68 +290,18 @@ const holidayLimitGroupStyle: React.CSSProperties = {
 	width: '21rem'
 };
 
-const holidayLimitLabelStyle: React.CSSProperties = {
-	display: 'block',
-	fontSize: '1.05rem',
-	fontWeight: 400,
-	margin: '0 0 0.25rem',
-	textAlign: 'center'
-};
-
-const holidayLimitInputStyle: React.CSSProperties = {
-	border: '1px solid #222',
-	borderRadius: 0,
-	fontSize: '1rem',
-	height: '2.05rem'
-};
-
 const tableWrapStyle: React.CSSProperties = {
 	margin: '0 auto',
-	maxWidth: '92%',
-	overflowX: 'auto'
+	width: '92%'
 };
 
 const tableStyle: React.CSSProperties = {
-	border: '1px solid #222',
-	borderCollapse: 'collapse',
-	margin: 0,
-	minWidth: '720px',
-	tableLayout: 'fixed',
-	width: '100%'
+	width: '90%',
+	margin: '1% auto'
 };
 
-const tableHeaderStyle: React.CSSProperties = {
-	border: '1px solid #222',
-	fontSize: '1.45rem',
-	fontWeight: 400,
-	height: '5.1rem',
-	textAlign: 'center',
-	verticalAlign: 'middle'
-};
-
-const tableCellStyle: React.CSSProperties = {
-	border: '1px solid #222',
-	fontSize: '1.35rem',
-	height: '2.45rem',
-	lineHeight: 1.15,
-	overflow: 'hidden',
-	padding: '0.35rem 0.75rem',
-	textAlign: 'center',
-	textOverflow: 'ellipsis',
-	verticalAlign: 'middle',
-	whiteSpace: 'nowrap'
-};
-
-const holidayNameColumnStyle: React.CSSProperties = {
-	width: '36%'
-};
-
-const holidayNoteColumnStyle: React.CSSProperties = {
-	width: '55%'
-};
-
-const holidaySelectColumnStyle: React.CSSProperties = {
-	width: '9%'
+const bodyStyle: React.CSSProperties = {
+	textAlign: 'left'
 };
 
 const checkboxLabelStyle: React.CSSProperties = {
@@ -356,11 +332,6 @@ const checkboxSquareStyle: React.CSSProperties = {
 	justifyContent: 'center',
 	lineHeight: 1,
 	width: '1.25rem'
-};
-
-const paginationStyle: React.CSSProperties = {
-	justifyContent: 'center',
-	margin: '14.5rem auto 2.25rem'
 };
 
 const actionContainerStyle: React.CSSProperties = {
