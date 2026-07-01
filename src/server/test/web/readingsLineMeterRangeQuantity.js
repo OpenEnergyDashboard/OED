@@ -166,7 +166,6 @@ mocha.describe('readings API', () => {
 
 					// Add LR11 here
 
-					// Add LR12 here
 					mocha.it('LR12: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained', async () => {
 						// u1 (kWh) and u2 (Electric_Utility) come from unitDatakWh; add u3 (MJ) and u16 (BTU).
 						const unitData = unitDatakWh.concat([
@@ -212,7 +211,7 @@ mocha.describe('readings API', () => {
 					});
 
 					// Add LR13 here
-					
+
 					// Add LR18 here
 
 					mocha.it(
