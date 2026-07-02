@@ -100,7 +100,8 @@ async function timeVaryingPathConversion(path, conn) {
 				ruleInfo.forEach((info) => {
 					// The third parameter of true means start and end are included. See generateRrule where
 					// the end date is adjusted so it is correct.
-					console.log('info.rule.between(start, end, true): ', info.rule.between(start, end));
+					console.log('info: ', info);
+					console.log('info.rule.between(start, end, true): ', info.rule.between(start, end, true));
 					occurrences.push(info.rule.between(start, end, true));
 
 					// 2.b. If reversed is true then invert the slope/intercept for each conversion using invertConversion().
@@ -122,7 +123,12 @@ async function timeVaryingPathConversion(path, conn) {
 					patternOccurrences.forEach((occur) => {
 						console.log('occur: ', occur);
 						const end = new Date(occur);
-						end.setHours(ruleInfo[r].duration, 0, 0, 0);
+						// console.log('end start: ', end);
+						console.log('ruleInfo[r].duration: ', ruleInfo[r].duration);
+						// end.setHours(ruleInfo[r].duration, 0, 0, 0);
+						// The end time is the start time shifted by the duration in hours.
+						// end = setMinutes(end.getMinutes() - 1);
+						end.setHours(end.getHours() + ruleInfo[r].duration);
 						console.log('end: ', end);
 
 						const newSegment = new ConversionSegment(
@@ -156,8 +162,8 @@ async function timeVaryingPathConversion(path, conn) {
 
 	// 3. Main loop
 	console.log('3.');
-	// console.log('edgeSegments.length: ', edgeSegments.length);
-	// console.log('edgeSegments: ', edgeSegments);
+	console.log('edgeSegments.length: ', edgeSegments.length);
+	console.log('edgeSegments: ', edgeSegments);
 	// process.exit(99); // DEBUG!!!!!!!!
 	// console.log('edgeSegments[0]: ', edgeSegments[0]);
 	// console.log('edgeSegments[1]: ', edgeSegments[1]);
@@ -166,12 +172,13 @@ async function timeVaryingPathConversion(path, conn) {
 	let done = false;
 	while (!done) {
 		// Find current segments for each edge
-		// console.log('pointers: ', pointers);
+		console.log('pointers: ', pointers);
 		const currentSegments = edgeSegments.map((segments, idx) => segments[pointers[idx]]);
-		// console.log('currentSegments: ', currentSegments);
+		console.log('currentSegments: ', currentSegments);
 
 		// Find minimum end time among current segments
 		let currentEnd = Math.min(...currentSegments.map(seg => parsePostgresDate(seg.endTime)));
+		console.log('currentEnd: ', currentEnd);
 
 		// Combine conversions for the path
 		let slope = 1, intercept = 0;

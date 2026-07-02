@@ -151,15 +151,16 @@ async function generateRrule(weekId, startDate, endDate, conn) {
 			console.log('endDate: ', endDate);
 			const end = getRruleDate(endDate);
 			// There is an issue with including or excluding the start/end date. The usage in the calling
-			// function does inclusive so the end date is also included. Thus, remove the last day to
-			// avoid this. It is safe to subtract a whole day since this system assumes pattern segments
+			// function does inclusive so the end date is also included. Thus, shift the last day to
+			// avoid this. It is safe to subtract 1 minute since this system assumes pattern segments
 			// start/end on the day because patterns are for whole days and RRule does each day.
+			// Thus, it is only part of the last hour into the previous say which allows all hours through 23.
 			// The inverse issue would occur if the calling function did not use inclusive and the start
 			// time would need to be fixed up.
 			// I tried the RRule exdate but it did not easily work for me so did it this way. Will probably
 			// need something like exdate to get holiday exclusions to work so this could be revised once
 			// that is done.
-			end.setDate(end.getDate() - 1);
+			end.setMinutes(end.getMinutes() - 1);
 			console.log('end: ', end);
 			console.log('weekDayArray: ', weekDayArray);
 
