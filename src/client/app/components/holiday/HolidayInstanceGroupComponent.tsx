@@ -10,6 +10,7 @@ import {
 } from 'reactstrap';
 import { titleStyle } from '../../styles/modalStyle';
 import { HolidayInstance } from 'types/redux/holiday';
+import { testHolidayInstances } from './holidayInstanceTestData'; // For testing purposes, remove this import in production
 
 const PER_PAGE = 20;
 
@@ -25,7 +26,7 @@ interface HolidayInstanceGroupComponentProps {
  * @returns Holiday instance group page element
  */
 export default function HolidayInstanceGroupComponent(props: HolidayInstanceGroupComponentProps) {
-	const holidayInstances = props.holidayInstances ?? [];
+	const holidayInstances = props.holidayInstances ?? testHolidayInstances;
 	const [holidayLimitText, setHolidayLimitText] = React.useState(PER_PAGE.toString());
 	const [displayLimit, setDisplayLimit] = React.useState(PER_PAGE);
 	const [currentPage, setCurrentPage] = React.useState(1);
