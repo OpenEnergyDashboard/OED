@@ -7,6 +7,8 @@ const Conversion = require('../../models/Conversion');
 const invertConversion = require('./pathConversion').invertConversion;
 const updatedConversion = require('./pathConversion').updatedConversion;
 const { generateRrule, getRruleDate } = require('./generateRrule');
+const sortBy = require('lodash/sortBy');
+const moment = require('moment'); // TODO DEBUG
 
 /**
  * Chains time-varying conversions along a path, producing combined segments for cik_vary.
@@ -17,6 +19,7 @@ const { generateRrule, getRruleDate } = require('./generateRrule');
  * @returns Array of {source, destination, startTime, endTime, slope, intercept}
  */
 async function timeVaryingPathConversion(path, conn) {
+	// The numbering corresponds to the design document for time-varying conversions.
 	// 1. Fetch and sort segments for each edge
 	// This is an array where each entry is an array that contains information on each
 	// conversion segment for current path vertices/edge.
@@ -78,9 +81,16 @@ async function timeVaryingPathConversion(path, conn) {
 				console.log('pattern');
 				// Deal with conversionSegments that have a WEEK_PATTERN_ID
 
+				// Get the actual week pattern id for this segment.
 				const weekId = curSegment.weekPatternsId;
 
-				// 1. Use the pattern for this segment to create an RRULE.
+				// I. Use the pattern for this segment to create an RRULE.
+				// This encodes all the unique day segments for the week pattern into ruleInfo so it can reproduce
+				// all the needed conversion segment. The way it works is it puts reused day/day segments into a
+				// single pattern. For example, if Saturday and Sunday use the same day then the day segments for
+				// those two days are the same. The generated RRule stored in ruleInfo will have one rule for this
+				// where it has a repetition for Saturday and Sunday in the rule. The number of RRules is the
+				// number of unique day segments in the week.
 				const ruleInfo = await generateRrule(weekId, curSegment.startTime, curSegment.endTime, conn);
 				// TODO DEBUG
 				// console.log("ruleInfo:", ruleInfo.map((r) => ({
@@ -90,21 +100,33 @@ async function timeVaryingPathConversion(path, conn) {
 				// 	intercept: r.intercept,
 				// })));
 
-				// 2. Use an RRULE generator to create all the needed conversions from segments.start_time to segments.end_time
+				// II. Use an RRULE generator to create all the needed conversions from segments.start_time to segments.end_time.
+				// occurrences is 2D array, each array index is the occurrences for each generated rrule for a given day segment
+				// in the week pattern. The occurrence is the start day/time of that day segment for each instance that day and time
+				// occurs across the conversion segment. Note since day segments can be used multiple times in a week pattern,
+				// this means there may be multiple entries of the day/time in a given week.
 				const occurrences = [];
-				// occurrences is 2D array, each array the occurrences for each generated rrule 
 				// console.log('curSegment.startTime, curSegment.endTime: ', curSegment.startTime, curSegment.endTime);
+				// Get the start and end date for this conversion segment where uses a function to fix up infinity cases.
 				const start = getRruleDate(curSegment.startTime);
 				const end = getRruleDate(curSegment.endTime);
 				console.log('start, end: ', start, end);
+				// This loops over the unique day segments RRules in the week pattern to use each one for the
+				// date range of the current conversion segment to generate all the occurrences needed
+				// for each RRule across the current conversion segment. The number is the number of unique
+				// day segments in the week pattern.
 				ruleInfo.forEach((info) => {
+					// Generate all the occurrences of this RRule for the current conversion segment.
 					// The third parameter of true means start and end are included. See generateRrule where
-					// the end date is adjusted so it is correct.
+					// the end date is adjusted so it is correct and not included.
 					console.log('info: ', info);
 					console.log('info.rule.between(start, end, true): ', info.rule.between(start, end, true));
+					// There is an array entry in occurrences for each unique day segment in the week pattern.
+					// That array entry contains all the start days/times that occur across the current
+					// conversion segment.
 					occurrences.push(info.rule.between(start, end, true));
 
-					// 2.b. If reversed is true then invert the slope/intercept for each conversion using invertConversion().
+					// II.b. If reversed is true then invert the slope/intercept for each conversion using invertConversion().
 					if (reversed) {
 						// Reversed so invert segment found.
 						const { convertedSlope, convertedIntercept } = invertConversion(ruleInfo.slope, ruleInfo.intercept)
@@ -116,47 +138,65 @@ async function timeVaryingPathConversion(path, conn) {
 					}
 				});
 
-				// 3. Each segment is added to edgeSegments with the start_time, end_time, slope & intercept.
+				// III. Each segment is added to edgeSegments with the start_time, end_time, slope & intercept.
+				// r tracks which item the loop corresponds to in the ruleInfo array.
 				var r = 0;
 				console.log('occurrences: ', occurrences);
+				// Loops over all the unique day segments (see above).
 				occurrences.forEach((patternOccurrences) => {
+					// Loops over all the start day/time occurrences across the current conversion segment
+					// for the current unique day segment. This will generate all the segments.
 					patternOccurrences.forEach((occur) => {
 						console.log('occur: ', occur);
+						// Figure out the end date which is the occurrence (start day/time) plus the duration of
+						// this day segment stored in the ruleInfo.
 						const end = new Date(occur);
 						// console.log('end start: ', end);
 						console.log('ruleInfo[r].duration: ', ruleInfo[r].duration);
 						// end.setHours(ruleInfo[r].duration, 0, 0, 0);
-						// The end time is the start time shifted by the duration in hours.
-						// end = setMinutes(end.getMinutes() - 1);
 						end.setHours(end.getHours() + ruleInfo[r].duration);
 						console.log('end: ', end);
-
+						// Stores the new instance of a conversion segment for this unique instance of the
+						// current unique day segment pattern at a given day/time.
+						// The conversion is for the current segment's source/destination.
+						// The pattern has now been analyzed so this uses null since no pattern.
+						// The pattern gave the slope/intercept and the new two values are the start/end time
+						// of this instance. The note is left blank since only used internally by this process.
 						const newSegment = new ConversionSegment(
-							curSegment.sourceId, 					// sourceId
-							curSegment.destinationId,			// destinationId
-							null,													// weekPatternsId
+							curSegment.sourceId,
+							curSegment.destinationId,
+							null,
 							ruleInfo[r].slope,						// slope
 							ruleInfo[r].intercept,				// intercept
 							occur,												// startTime
 							end,													// endTime
 							''														// note
 						);
+						// Add this to the current path segment. The path from the meter unit to the
+						// graphic unit can involve multiple conversions that OED chains together to
+						// get the overall conversion. That is done below.
 						edgeSegments[i].push(newSegment);
 					});
 
 					r++;
 				});
-				// It can be done one at a time or all at once. If possible, this should be done without another copy as patterns can
-				// generate a lot of items so fewer copies is better.
-				// Note the next step assumes the segments/conversions are sorted by start_time order for each entry in edgeSegments. It does not matter
-				// how these are generated but they must be sorted in the end so manually sort the ones created by RRULE if needed. This may be needed
-				// if each day segment is generated by its own RRULE so all the segments have to be merged together. If this is done
-				// the the values across segments will be fine as they are processed in the sorted order of time.
+				// It can be done one at a time or all at once. If possible, this should be done without
+				// another copy as patterns can generate a lot of items so fewer copies is better.
+				// Note the next step assumes the segments/conversions are sorted by start_time order for
+				// each entry in edgeSegments. It does not matter how these are generated but they must be
+				// sorted. The sorting must be done since each unique day segment is generated by its own RRULE
+				// which can be multiple days and the conversion segment may not start at the beginning of
+				// the week. Thus, the edgeSegments for this unique segment in the conversion path must now
+				// be sorted so step 3. works properly.
+				// sortBy returns a new array and does not sort in place.
+				console.log('i, sorted edgeSegments: ', i, sortBy(edgeSegments[i], 'startTime'));
+				edgeSegments[i] = sortBy(edgeSegments[i], 'startTime');
 			}
 		}
 	}
 
-	// 2. Initialize pointers for each edge
+	// 2. Initialize pointers for each edge. It starts with the first item for each segment along
+	// the path.
 	console.log('2.');
 	const pointers = Array(path.length - 1).fill(0);
 
@@ -178,7 +218,8 @@ async function timeVaryingPathConversion(path, conn) {
 
 		// Find minimum end time among current segments
 		let currentEnd = Math.min(...currentSegments.map(seg => parsePostgresDate(seg.endTime)));
-		console.log('currentEnd: ', currentEnd);
+		// currentSegments.map(seg => console.log(seg.endTime));
+		console.log('moment(currentEnd).toString(): ', moment(currentEnd).toString());
 
 		// Combine conversions for the path
 		let slope = 1, intercept = 0;
