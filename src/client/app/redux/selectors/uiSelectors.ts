@@ -515,11 +515,8 @@ export const selectChartLink = createAppSelector(
 		if (chartLinkHideOptions) {
 			linkText += '&optionsVisibility=false';
 		}
-		if (isKeepCurrent) {
-			const timeCreatedEnd = current.timeCreated.getEndTimestamp();
-			const sliderStart = current.rangeSliderInterval.getStartTimestamp();
-			const diffDays = timeCreatedEnd.diff(sliderStart, 'days', true);
-			linkText += `&timeSpan=${diffDays.toFixed(5)}`;
+		if (isKeepCurrent && current.queryTimeInterval.getStartTimestamp() && !current.queryTimeInterval.getEndTimestamp()) {
+			linkText += `&currentTime=${encodeURIComponent(current.timeCreated)}`;
 		}
 		return linkText;
 	}

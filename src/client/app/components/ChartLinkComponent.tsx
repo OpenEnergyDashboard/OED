@@ -42,17 +42,12 @@ export default function ChartLinkComponent() {
 	const isKeepCurrent = useAppSelector(selectIsKeepCurrent);
 	const ref = React.useRef<HTMLDivElement>(null);
 
-	// This react.UseMemo only returns true when the conditions are met for using keep current (left is is bounded and right is unbounded)
-	const shouldShowKeepCurrentCheckbox = React.useMemo(() => {
-		if (!queryTimeInterval) return false;
-		if (queryTimeInterval.getIsBounded()) return false;
-		if (
-			queryTimeInterval.getStartTimestamp() == null &&
-			!queryTimeInterval.getIsBounded()
-		)
-			return false;
-		return true;
-	}, [queryTimeInterval]);
+	const keepCurrentAvailable = queryTimeInterval.getStartTimestamp() != null && queryTimeInterval.getEndTimestamp() == null;
+	React.useEffect(() => {
+		if (!keepCurrentAvailable && isKeepCurrent) {
+			dispatch(setIsKeepCurrent(false));
+		}
+	}, [keepCurrentAvailable, isKeepCurrent]);
 
 	const handleButtonClick = () => {
 		// First attempt to write directly to user's clipboard.
@@ -102,8 +97,7 @@ export default function ChartLinkComponent() {
 						helpTextId="help.home.toggle.chart.link"
 					/>
 				</div>
-				{/* keep current checkbox ----> */}
-				{/* USE shouldShowKeepCurrentCheckbox AS THE CONDITIONAL BOOLEAN */}
+				{/* keep current checkbox */}
 				<div className="checkbox">
 					<Input
 						type="checkbox"
@@ -116,22 +110,18 @@ export default function ChartLinkComponent() {
 						}}
 						checked={isKeepCurrent}
 						onChange={e => dispatch(setIsKeepCurrent(e.target.checked))}
-						disabled={!shouldShowKeepCurrentCheckbox}
-						// shouldShow is the value we use to tell if it should be disabled or not
-						//when disabled = true, you CANNOT click the checkbox
+						disabled={!keepCurrentAvailable}
 					/>
 
 					<label
-					// uses the default value when shouldShowKeepCurrentCheckbox is true, and the greyed out color when it's false
 						style={{
-							color: shouldShowKeepCurrentCheckbox
+							color: keepCurrentAvailable
 								? undefined
 								: 'hsl(0, 0%, 70%)'
 						}}
 					>
 						{translate('keep.chart.current.label')}
 					</label>
-					{/* we need to create a tool tip for "keep chart current" checkbox */}
 					<TooltipMarkerComponent page="home" helpTextId="help.home.toggle.chart.link.keep.current" />
 				</div>
 
