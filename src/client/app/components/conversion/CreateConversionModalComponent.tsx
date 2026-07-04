@@ -9,12 +9,13 @@ import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row } from 'reactstrap';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import { conversionsApi } from '../../redux/api/conversionsApi';
+import { selectUnitDataById } from '../../redux/api/unitsApi';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { selectDefaultCreateConversionValues, selectIsValidConversion } from '../../redux/selectors/adminSelectors';
 import '../../styles/modal.css';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { TrueFalseType } from '../../types/items';
-import { showErrorNotification } from '../../utils/notifications';
+import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
@@ -56,6 +57,9 @@ export default function CreateConversionModalComponent() {
 	// Want units in sorted order by identifier regardless of case.
 
 	const defaultValues = useAppSelector(selectDefaultCreateConversionValues);
+	// Look up unit identifiers (not IDs) from Redux using the selected sourceId/destinationId,
+	// same approach as ConversionViewComponent and the source/destination selection menus.
+	const unitDataById = useAppSelector(selectUnitDataById);
 
 	/* State */
 	// Modal show
@@ -125,7 +129,23 @@ export default function CreateConversionModalComponent() {
 
 		//Proceed with the creation of the conversion
 		setShowModal(false);
-		addConversionMutation(pendingConversion);
+		addConversionMutation(pendingConversion)
+			.unwrap()
+			.then(() => {
+				showSuccessNotification(
+					translate('conversion.successfully.create.conversion') +
+					' (' + translate('conversion.source') + ' "' + unitDataById[pendingConversion.sourceId]?.identifier + '"' +
+					', ' + translate('conversion.destination') + ' "' + unitDataById[pendingConversion.destinationId]?.identifier + '")'
+				);
+			})
+			.catch(err => {
+				showErrorNotification(
+					translate('conversion.failed.to.create.conversion') +
+					' (' + translate('conversion.source') + ' "' + unitDataById[pendingConversion.sourceId]?.identifier + '"' +
+					', ' + translate('conversion.destination') + ' "' + unitDataById[pendingConversion.destinationId]?.identifier + '") ' +
+					err.data
+				);
+			});
 		resetState();
 	};
 
@@ -143,21 +163,42 @@ export default function CreateConversionModalComponent() {
 
 	// Submit
 	const handleSubmit = () => {
+		// Used for the ShowErrorNotification
+		const pending = {...omit(conversionState, 'sourceOptions', 'destinationOptions'),
+			bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional};
+		setPendingConversion(pending);
+
 		// Show warning modal if slope and intercept are both 0
 		if (conversionState.slope === 0 && conversionState.intercept === 0) {
-			setPendingConversion({...omit(conversionState, 'sourceOptions'),
-				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
 			setWarningMessage(translate('conversion.slope.intercept.zero'));
 			setShowWarningModal(true);
 		} else if (validConversion) {
 			// Close modal first to avoid repeat clicks
 			setShowModal(false);
+
 			// Add the new conversion and update the store
 			// Omit the source options , do not need to send in request so remove here.
 			// If source is a meter, make bidirectional false
 			// If source or destination is a suffix unit, make bidirectional false
-			addConversionMutation({...omit(conversionState, 'sourceOptions'),
-				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+			addConversionMutation({...omit(conversionState, 'sourceOptions', 'destinationOptions'),
+				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional})
+				.unwrap()
+				.then(() => {
+					// Show source/destination identifiers (not numeric IDs)
+					showSuccessNotification(
+						translate('conversion.successfully.create.conversion') +
+						' (' + translate('conversion.source') + ' "' + unitDataById[pending.sourceId]?.identifier + '"' +
+						', ' + translate('conversion.destination') + ' "' + unitDataById[pending.destinationId]?.identifier + '")'
+					);
+				})
+				.catch(err => {
+					showErrorNotification(
+						translate('conversion.failed.to.create.conversion') +
+						' (' + translate('conversion.source') + ' "' + unitDataById[pending.sourceId]?.identifier + '"' +
+						', ' + translate('conversion.destination') + ' "' + unitDataById[pending.destinationId]?.identifier + '") ' +
+						err.data
+					);
+				});
 			resetState();
 		} else {
 			showErrorNotification(reason);
@@ -207,15 +248,34 @@ export default function CreateConversionModalComponent() {
 						setShowUnsavedWarning(false);
 						setHasUnsavedChanges(false);
 						if (conversionState.slope === 0 && conversionState.intercept === 0) {
-							setPendingConversion({...omit(conversionState, 'sourceOptions'),
+							setPendingConversion({...omit(conversionState, 'sourceOptions', 'destinationOptions'),
 								bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
 							setWarningMessage(translate('conversion.slope.intercept.zero'));
 							setShowWarningModal(true);
 						}
 						else if (validConversion) {
 							setShowModal(false);
-							addConversionMutation({...omit(conversionState, 'sourceOptions'),
-								bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+
+							addConversionMutation({...omit(conversionState, 'sourceOptions', 'destinationOptions'),
+								bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional
+							})
+								.unwrap()
+								.then(() => {
+									// Show source/destination identifiers (not numeric IDs)
+									showSuccessNotification(
+										translate('conversion.successfully.create.conversion') +
+										' (' + translate('conversion.source') + ' "' + unitDataById[conversionState.sourceId]?.identifier + '"' +
+										', ' + translate('conversion.destination') + ' "' + unitDataById[conversionState.destinationId]?.identifier + '")'
+									);
+								})
+								.catch(err => {
+									showErrorNotification(
+										translate('conversion.failed.to.create.conversion') +
+										' (' + translate('conversion.source') + ' "' + unitDataById[conversionState.sourceId]?.identifier + '"' +
+										', ' + translate('conversion.destination') + ' "' + unitDataById[conversionState.destinationId]?.identifier + '") ' +
+										err.data
+									);
+								});
 							resetState();
 						}
 						else {

@@ -10,6 +10,8 @@ const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const validate = require('jsonschema').validate;
 const { success, failure } = require('./response');
+const { HTTP_CODES } = require('../util/httpCodes');
+const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH } = require('../util/validationConstants');
 const router = express.Router();
 
 function formatUnitForResponse(unit) {
@@ -40,7 +42,7 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 		res.json(rows.map(formatUnitForResponse));
 	} catch (err) {
 		log.error(`Error fetching units: ${err}`, err);
-		res.sendStatus(500);
+		res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 	}
 });
 
@@ -50,40 +52,55 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 	const validUnit = {
 		type: 'object',
+		additionalProperties: false,
 		required: ['id', 'identifier'],
 		// TODO Consider updating once decide exactly what want.
 		// required: ['id', 'name', 'identifier', 'unitRepresent', 'secInRate', 'typeOfUnit', 'suffix'],
 		properties: {
-			id: { type: 'integer' },
+			id: { type: 'integer', minimum: 1 },
 			name: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH
 			},
-			identifier: { type: 'string' },
+			identifier: {
+				type: 'string',
+				maxLength: STRING_SHORT_MAX_LENGTH
+			},
 			unitRepresent: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.unitRepresentType)
 			},
-			secInRate: { type: 'number' },
+			secInRate: { type: 'number', minimum: 0 },
 			typeOfUnit: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.unitType)
 			},
-			suffix: { type: 'string' },
+			suffix: {
+				type: 'string',
+				maxLength: STRING_SHORT_MAX_LENGTH
+			},
 			displayable: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.displayableType)
 			},
 			preferredDisplay: { type: 'boolean' },
-			note: { type: 'string' },
+			note: {
+				type: 'string',
+				maxLength: STRING_GENERAL_MAX_LENGTH
+			},
 			minVal: { type: 'number' },
 			maxVal: { type: 'number' },
 			disableChecks: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.disableChecksType)
 			}
 		}
@@ -91,7 +108,7 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 	const validatorResult = validate(req.body, validUnit);
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
-		failure(res, 400, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -111,7 +128,7 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 			success(res, 'Successfully edited unit');
 		} catch (err) {
 			log.error(`Failed to update unit: ${err}`, err);
-			failure(res, 500, 'Unable to update unit');
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, 'Unable to update unit');
 		}
 	}
 });
@@ -122,44 +139,50 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 	const validUnit = {
 		type: 'object',
+		additionalProperties: false,
 		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay', 'minVal', 'maxVal', 'disableChecks'],
 		properties: {
 			// TODO Probably should not be passed
 			// id: { type: 'integer' },
 			name: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH
 			},
 			identifier: {
 				type: 'string',
-				minLength: 1
+				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH
 			},
 			unitRepresent: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.unitRepresentType)
 			},
-			secInRate: { type: 'number' },
+			secInRate: { type: 'number', minimum: 0 },
 			typeOfUnit: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.unitType)
 			},
 			suffix: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_SHORT_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
 			displayable: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.displayableType)
 			},
 			preferredDisplay: { type: 'boolean' },
 			note: {
 				oneOf: [
-					{ type: 'string' },
+					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 					{ type: 'null' }
 				]
 			},
@@ -168,6 +191,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 			disableChecks: {
 				type: 'string',
 				minLength: 1,
+				maxLength: STRING_SHORT_MAX_LENGTH,
 				enum: Object.values(Unit.disableChecksType)
 			}
 		}
@@ -175,7 +199,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 	const validationResult = validate(req.body, validUnit);
 	if (!validationResult.valid) {
 		log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
-		failure(res, 400, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -200,7 +224,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 			success(res, 'Unit created successfully');
 		} catch (err) {
 			log.error(`Error while inserting new unit: ${err}`, err);
-			failure(res, 500, `Error while inserting new unit: ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while inserting new unit: ${err}`);
 		}
 	}
 });
@@ -211,16 +235,17 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => {
 	const validParams = {
 		type: 'object',
+		additionalProperties: false,
 		maxProperties: 1,
 		required: ['id'],
-		properties: { id: { type: 'integer' } }
+		properties: { id: { type: 'integer', minimum: 1 } }
 	};
 	// Ensure delete request is valid
 	const validatorResult = validate(req.body, validParams);
 	if (!validatorResult.valid) {
 		const errorMsg = `Got request to delete a unit with invalid data, error(s):  ${validatorResult.errors}`;
 		log.warn(errorMsg);
-		failure(res, 400, errorMsg);
+		failure(res, HTTP_CODES.BAD_REQUEST, errorMsg);
 	} else {
 		const conn = getConnection();
 		const unitId = req.body.id;
@@ -232,7 +257,7 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 		} catch (err) {
 			const errorMsg = `Error while deleting unit with error(s): ${err}`;
 			log.error(errorMsg);
-			failure(res, 500, errorMsg);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, errorMsg);
 		}
 	}
 });

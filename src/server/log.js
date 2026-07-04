@@ -171,8 +171,17 @@ const defaultLogger = new Logger(logFile);
  */
 process.on('unhandledRejection', (reason, p) => {
 	p.catch(e => {
-		defaultLogger.error(`Unhandled Promise Rejection: ${reason}`, e);
+		// Include both rejection reason and catch error text then pass a real Error object for stack logging
+		const reasonText = reason instanceof Error ? reason.message : String(reason);
+		const errorText = e instanceof Error ? e.message : String(e);
+		const loggedError = e instanceof Error ? e : (reason instanceof Error ? reason : null);
+		defaultLogger.error(`Unhandled Promise Rejection (reason: ${reasonText}; error (e): ${errorText})`, loggedError);
 	});
+});
+
+// Log uncaught exceptions
+process.on('uncaughtException', (error) => {
+	defaultLogger.error('Unhandled Exception:', error);
 });
 
 defaultLogger.logToDb = true;

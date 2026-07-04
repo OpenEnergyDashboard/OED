@@ -6,7 +6,9 @@ const express = require('express');
 const { getConnection } = require('../db');
 const { redoCik } = require('../services/graph/redoCik');
 const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const validate = require('jsonschema').validate;
 const { adminAuthMiddleware } = require('./authenticator');
+const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
 
@@ -14,6 +16,26 @@ const router = express.Router();
  * Route for redoing Cik and/or refreshing reading views.
  */
 router.post('/refresh', adminAuthMiddleware('conversion refresh system data'), async (req, res) => {
+	const validParams = {
+		type: 'object',
+		additionalProperties: false,
+		properties: {
+			redoCik: {
+				type: 'boolean'
+			},
+			refreshReadingViews: {
+				type: 'boolean'
+			}
+		}
+	};
+
+	if (!validate(req.body, validParams).valid) {
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		return;
+	}
+
+	// TODO: Add try/catch error handling to properly handle failures during Cik refresh
+	// or reading view refresh operations and return appropriate error responses.
 	if (req.body.redoCik) {
 		const conn = getConnection();
 		await redoCik(conn);
@@ -21,7 +43,7 @@ router.post('/refresh', adminAuthMiddleware('conversion refresh system data'), a
 	if (req.body.refreshReadingViews) {
 		await refreshAllReadingViews();
 	}
-	res.sendStatus(200);
+	res.sendStatus(HTTP_CODES.OK);
 });
 
 module.exports = router;

@@ -16,8 +16,8 @@
 		"check:typescript": "./src/scripts/checkTypescript.sh",
 		"check:types": "tsc -p . --noEmit",
 		"check:lint": "eslint --ignore-path .eslintignore --ext .ts,.tsx,.js,.jsx ./src/client/app",
-		"test": "mocha --timeout 15000 \"src/server/test/**/*.js\"",
-		"testsome": "mocha --timeout 15000",
+		"test": "NODE_ENV=test mocha --timeout 15000 \"src/server/test/**/*.js\"",
+		"testsome": "NODE_ENV=test mocha --timeout 15000",
 		"createdb": "node ./src/server/services/createDB.js",
 		"developerdb": "node -e 'require(\"./src/server/util/developer.js\").createShiftReadingsFunction()'",
 		"migratedb": "node ./src/server/services/migrateDB.js",
@@ -45,7 +45,8 @@
 		"generateTestingData": "node -e 'require(\"./src/server/data/automatedTestingData\").generateTestingData()'",
 		"testData": "node -e 'require(\"./src/server/data/automatedTestingData.js\").insertSpecialUnitsConversionsMetersGroups()'",
 		"webData": "node -e 'require(\"./src/server/data/websiteData.js\").insertWebsiteData()'",
-		"addLogMsg": "node -e 'require(\"./src/server/services/addLogMsg.js\").addLogMsgToDB()'"
+		"addLogMsg": "node -e 'require(\"./src/server/services/addLogMsg.js\").addLogMsgToDB()'",
+		"changePostgresPasswords": "node -e 'require(\"./src/server/util/changePostgresPasswords.js\").changePostgresPasswords()'"
 	},
 	"nodemonConfig": {
 		"watch": [

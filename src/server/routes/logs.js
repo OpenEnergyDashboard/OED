@@ -11,6 +11,8 @@ const { adminAuthMiddleware } = require('./authenticator');
 const LogMsg = require('../models/LogMsg');
 const { getConnection } = require('../db');
 const { TimeInterval } = require('../../common/TimeInterval');
+const { STRING_GENERAL_MAX_LENGTH } = require('../util/validationConstants');
+const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
 
@@ -20,7 +22,8 @@ const validLog = {
 	properties: {
 		message: {
 			type: 'string',
-			minLength: 1
+			minLength: 1,
+			maxLength: STRING_GENERAL_MAX_LENGTH
 		}
 	}
 };
@@ -51,10 +54,10 @@ router.post('/info', adminAuthMiddleware('create info log'), async (req, res) =>
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.info(req.body.message);
-		res.sendStatus(200);
+		res.sendStatus(HTTP_CODES.OK);
 	} else {
 		log.error('invalid input from client logger');
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	}
 });
 
@@ -62,10 +65,10 @@ router.post('/warn', adminAuthMiddleware('create warn log'), async (req, res) =>
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.warn(req.body.message);
-		res.sendStatus(200);
+		res.sendStatus(HTTP_CODES.OK);
 	} else {
 		log.error('invalid input from client logger');
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	}
 });
 
@@ -73,10 +76,10 @@ router.post('/error', adminAuthMiddleware('create error log'), async (req, res) 
 	const validationResult = validate(req.body, validLog);
 	if (validationResult.valid) {
 		log.error(req.body.message);
-		res.sendStatus(200);
+		res.sendStatus(HTTP_CODES.OK);
 	} else {
 		log.error('invalid input from client logger');
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	}
 });
 
@@ -84,7 +87,7 @@ router.get('/logsmsg/getLogsByDateRangeAndType', adminAuthMiddleware('view logs'
 	const validationResult = validate(req.query, validLogMsg);
 	if (!validationResult.valid) {
 		log.error('invalid request to getLogsByDateRangeAndType');
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
@@ -97,7 +100,7 @@ router.get('/logsmsg/getLogsByDateRangeAndType', adminAuthMiddleware('view logs'
 			res.json(rows);
 		} catch (err) {
 			log.error(`Failed to fetch logs filtered by date range and type: ${err}`);
-			res.sendStatus(500);
+			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });

@@ -198,12 +198,209 @@ mocha.describe('readings API', () => {
 					expectCompareToEqualExpected(res, expected, GROUP_ID);
 				});
 				
-				// Add CG10 here
+				mocha.it('CG10: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as BTU', async () => {
+                    
+					// Define unit u3 for MJ (megajoules)
+					const u3 = {
+						name: 'MJ',
+						identifier: 'megaJoules',
+						unitRepresent: Unit.unitRepresentType.QUANTITY,
+						secInRate: 3600,
+						typeOfUnit: Unit.unitType.UNIT, 
+						suffix: '',
+						displayable: Unit.displayableType.ALL,
+						preferredDisplay: false,
+						note: 'MJ'
+					}
+					// Define unit u16 for BTU
+                    const u16 = {
+                    	name: 'BTU',
+                    	identifier: '', 
+                    	unitRepresent: Unit.unitRepresentType.QUANTITY,
+                    	secInRate: 3600,
+                    	typeOfUnit: Unit.unitType.UNIT, 
+						suffix: '',
+                    	displayable: Unit.displayableType.ALL,
+                    	preferredDisplay: true,
+                    	note: 'OED created standard unit'
+                	}
+                    // Define conversion c2 for kWh to MJ
+					const c2 = {
+                    	sourceName: 'kWh',
+                    	destinationName: 'MJ',
+                    	bidirectional: true,
+                    	slope: 3.6,
+                    	intercept: 0,
+                    	note: 'kWh → MJ'
+                	}
+					// Define conversion c3 for MJ to BTU
+					const c3 = {
+                    	sourceName: 'MJ',
+                    	destinationName: 'BTU',
+                    	bidirectional: true,
+                    	slope: 947.8,
+                    	intercept: 0,
+                    	note: 'MJ → BTU'
+                	}
+                    await prepareTest(
+						// adds u3 and u16 to u1, u2
+						unitDatakWh.concat([u3, u16]),
+						// adds c2 and c3 to c1
+    					conversionDatakWh.concat([c2, c3]),
+                        meterDatakWhGroups,
+                        groupDatakWh
+                    );
+                    // Get the unit ID since the DB could use any value.
+                    const unitId = await getUnitId('BTU');
+                    const expected = [19334049.5356478, 20037163.9086933];
 
-				// Add CG11 here
+                    // for comparison, need the unitID, currentStart, currentEnd, shift
+                    const res = await chai.request(app).get(`/api/compareReadings/groups/${GROUP_ID}`)
+                        .query({
+                            curr_start: '2022-10-31 00:00:00',
+                            curr_end: '2022-10-31 17:00:00',
+                            shift: 'P1D',
+                            graphicUnitId: unitId
+                        });
+                    expectCompareToEqualExpected(res, expected, GROUP_ID);
+                });
 
-				// Add CG12 here
+				mocha.it('CG11 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as BTU reverse conversion', async() => {
+					
+					const u3 = {
+						name: 'MJ',
+						identifier: 'megaJoules',
+						unitRepresent: Unit.unitRepresentType.QUANTITY,
+						secInRate: 3600,
+						typeOfUnit: Unit.unitType.UNIT, 
+						suffix: '',
+						displayable: Unit.displayableType.ALL,
+						preferredDisplay: false,
+						note: 'MJ'
+					}
+					// Define unit u16 for BTU
+                    const u16 = {
+                    	name: 'BTU',
+                    	identifier: '', 
+                    	unitRepresent: Unit.unitRepresentType.QUANTITY,
+                    	secInRate: 3600,
+                    	typeOfUnit: Unit.unitType.UNIT, 
+						suffix: '',
+                    	displayable: Unit.displayableType.ALL,
+                    	preferredDisplay: true,
+                    	note: 'OED created standard unit'
+                	}
 
+					// Define conversion c6 for MJ to kWh
+					const c6 = {
+						sourceName: 'MJ',
+						destinationName: 'kWh',
+						bidirectional: true,
+						slope: 1 / 3.6,
+						intercept: 0,
+						note: 'MJ -> kWh (reverse of c2)'
+					};
+
+					// Define conversion c3 for MJ to BTU
+					const c3 = {
+                    	sourceName: 'MJ',
+                    	destinationName: 'BTU',
+                    	bidirectional: true,
+                    	slope: 947.8,
+                    	intercept: 0,
+                    	note: 'MJ → BTU'
+                	}
+                    await prepareTest(
+						// adds u3 and u16 to u1, u2
+						unitDatakWh.concat([u3, u16]),
+						// adds c6 and c3 to c1
+    					conversionDatakWh.concat([c6, c3]), 
+                        meterDatakWhGroups,
+                        groupDatakWh
+                    );
+
+					const unitId = await getUnitId('BTU');
+					const expected = [19334049.5356478, 20037163.9086933];
+
+					const res = await chai.request(app).get(`/api/compareReadings/groups/${GROUP_ID}`).query({
+						curr_start: '2022-10-31 00:00:00',
+						curr_end: '2022-10-31 17:00:00',
+						shift: 'P1D',
+						graphicUnitId: unitId
+					});
+					expectCompareToEqualExpected(res, expected, GROUP_ID);
+
+				});
+
+				mocha.it('CG12: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as kg of CO2', async () => {
+					const unitData = unitDatakWh.concat([
+						{
+							name: 'kg',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'OED created standard unit'
+						},
+						{
+							name: 'kg CO₂',
+							identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: 'CO₂',
+							displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
+							note: 'special unit'
+						}
+					]);
+
+					const conversionData = conversionDatakWh.concat([
+						{
+							sourceName: 'Electric_Utility',
+							destinationName: 'kg CO₂',
+							bidirectional: false,
+							slope: 0.709,
+							intercept: 0,
+							note: 'Electric_Utility → kg CO₂'
+						},
+						{
+							sourceName: 'kg CO₂',
+							destinationName: 'kg',
+							bidirectional: false,
+							slope: 1,
+							intercept: 0,
+							note: 'CO₂ → kg'
+						}
+					]);
+
+					await prepareTest(
+						unitData,
+						conversionData,
+						meterDatakWhGroups,
+						groupDatakWh
+					);
+
+					const unitId = await getUnitId('kg of CO₂');
+
+					const expected = [
+						4017.44423365639,
+						4163.5451722303
+					];
+
+					const res = await chai.request(app)
+						.get(`/api/compareReadings/groups/${GROUP_ID}`)
+						.query({
+							curr_start: '2022-10-31 00:00:00',
+							curr_end: '2022-10-31 17:00:00',
+							shift: 'P1D',
+							graphicUnitId: unitId
+						});
+					expectCompareToEqualExpected(res, expected, GROUP_ID);
+				});
 				// Add CG13 here
 
 				// Add CG14 here
