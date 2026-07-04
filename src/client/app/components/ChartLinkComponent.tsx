@@ -5,7 +5,7 @@
 import * as React from 'react';
 import { toast } from 'react-toastify';
 import ReactTooltip from 'react-tooltip';
-import { Button, ButtonGroup,Input} from 'reactstrap';
+import { Button, ButtonGroup, Input} from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectChartLink } from '../redux/selectors/uiSelectors';
 import {
@@ -27,7 +27,6 @@ import { wellStyle, rowFlexStart, labelStyle } from '../styles/modalStyle';
 import { checkboxStyle } from '../styles/modalStyle';
 
 
-
 /**
  * @returns chartLinkComponent
  */
@@ -43,7 +42,7 @@ export default function ChartLinkComponent() {
 	const isKeepCurrent = useAppSelector(selectIsKeepCurrent);
 	const ref = React.useRef<HTMLDivElement>(null);
 
-	// THIS react.UseMemo ONLY RETURNS TRUE WHEN THE CONDITIONS ARE MET FOR USING KEEP CURRENT (left is is bounded and right is unbounded)
+	// This react.UseMemo only returns true when the conditions are met for using keep current (left is is bounded and right is unbounded)
 	const shouldShowKeepCurrentCheckbox = React.useMemo(() => {
 		if (!queryTimeInterval) return false;
 		if (queryTimeInterval.getIsBounded()) return false;
@@ -79,7 +78,6 @@ export default function ChartLinkComponent() {
 	if (selectedMeters.length > 0 || selectedGroups.length > 0) {
 		return (
 			<div>
-				{/* inputting new "keep chart current" feature */}
 				<div style={labelStyle}>{translate('chart.link.options.title')}</div>
 				{/* hide options checkbox */}
 				<div className="checkbox">

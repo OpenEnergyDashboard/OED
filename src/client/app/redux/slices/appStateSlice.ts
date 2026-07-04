@@ -139,7 +139,6 @@ export const appStateSlice = createThunkSlice({
 		selectChartLinkHideOptions: state => state.chartLinkHideOptions,
 		selectRefreshingReadings: state => state.refreshingReadings,
 		selectIsKeepCurrent: state => state.isKeepCurrent
-
 	}
 });
 

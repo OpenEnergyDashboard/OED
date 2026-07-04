@@ -12,7 +12,7 @@ import {
 	changeSliderRange, selectChartToRender, selectHistoryIsDirty,
 	selectSelectedGroups, selectSelectedMeters,
 	selectSliderRangeInterval, selectInitialXAxisRange,
-	selectQueryTimeInterval, updateTimeIntervalAndSliderRange,updateTimeCreated
+	selectQueryTimeInterval, updateTimeIntervalAndSliderRange, updateTimeCreated
 } from '../redux/slices/graphSlice';
 import HistoryComponent from './HistoryComponent';
 import { ChartTypes } from '../types/redux/graph';

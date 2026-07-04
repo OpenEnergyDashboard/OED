@@ -456,7 +456,7 @@ export const selectChartLink = createAppSelector(
 		selectIsKeepCurrent,
 		state => state.maps.selectedMap
 	],
-	(current, chartLinkHideOptions, rangeSliderInterval, isKeepCurrent,selectedMap) => {
+	(current, chartLinkHideOptions, rangeSliderInterval, isKeepCurrent, selectedMap) => {
 		// Determine the beginning of the URL to add arguments to.
 		// This is the current URL.
 		const winLocHref = window.location.href;
@@ -519,7 +519,7 @@ export const selectChartLink = createAppSelector(
 			const timeCreatedEnd = current.timeCreated.getEndTimestamp();
 			const sliderStart = current.rangeSliderInterval.getStartTimestamp();
 			const diffDays = timeCreatedEnd.diff(sliderStart, 'days', true);
-			linkText += `&timeSpan=${diffDays.toFixed(2)}`;
+			linkText += `&timeSpan=${diffDays.toFixed(5)}`;
 		}
 		return linkText;
 	}
