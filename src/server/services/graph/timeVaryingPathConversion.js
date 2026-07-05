@@ -24,16 +24,13 @@ async function timeVaryingPathConversion(path, conn) {
 	// This is an array where each entry is an array that contains information on each
 	// conversion segment for current path vertices/edge.
 	const edgeSegments = [];
-	console.log('path.length: ', path.length);
 	for (let i = 0; i < path.length - 1; ++i) {
 		// Create new entry to hold the conversion segments for this edge in the path.
 		edgeSegments.push([]);
 		const sourceId = path[i].id;
 		const destinationId = path[i + 1].id;
-		console.log('sourceId, destinationId: ', sourceId, destinationId);
 		// segments are sorted by start_time in getBySourceDestination
 		let segments = await ConversionSegment.getBySourceDestination(sourceId, destinationId, conn);
-		console.log('segments: ', segments);
 		// Tell if the conversion direction is okay (false) or must be reversed (true). Assumed false unless found otherwise in next step.
 		let reversed = false;
 		// Did not find the conversion segments. Since conversion should exist, it must be the other way around and bidirectional.
@@ -54,14 +51,11 @@ async function timeVaryingPathConversion(path, conn) {
 		}
 
 		// loop through segments, ..., and push to edgeSegments
-		// console.log('segments.length: ', segments.length);
 		for (let segmentIndex = 0; segmentIndex < segments.length; segmentIndex++) {
-			console.log('segmentIndex: ', segmentIndex)
 			const curSegment = segments[segmentIndex];
 
 			// deal with conversionSegments that have a SLOPE & INTERCEPT
 			if (curSegment.weekPatternsId == null) {
-				console.log('slope/intercept');
 				// The segment does not have a pattern so can use the segments found above for slope/intercept.
 				if (reversed) {
 					// Reversed so invert segment found.
@@ -72,13 +66,10 @@ async function timeVaryingPathConversion(path, conn) {
 						intercept: convertedIntercept
 					};
 				}
-				// console.log('curSegment: ', curSegment);
 				// It may be possible to avoid this push by directly putting segments into edgeSegments. Given there should not be
 				// too many without a pattern it probably is not too important.
 				edgeSegments[i].push(curSegment);
-				// console.log('edgeSegments: ', edgeSegments);
 			} else {
-				console.log('pattern');
 				// Deal with conversionSegments that have a WEEK_PATTERN_ID
 
 				// Get the actual week pattern id for this segment.
@@ -92,13 +83,6 @@ async function timeVaryingPathConversion(path, conn) {
 				// where it has a repetition for Saturday and Sunday in the rule. The number of RRules is the
 				// number of unique day segments in the week.
 				const ruleInfo = await generateRrule(weekId, curSegment.startTime, curSegment.endTime, conn);
-				// TODO DEBUG
-				// console.log("ruleInfo:", ruleInfo.map((r) => ({
-				// 	rrule: r.rule.toString(),
-				// 	duration: r.duration,
-				// 	slope: r.slope,
-				// 	intercept: r.intercept,
-				// })));
 
 				// II. Use an RRULE generator to create all the needed conversions from segments.start_time to segments.end_time.
 				// occurrences is 2D array, each array index is the occurrences for each generated rrule for a given day segment
@@ -106,11 +90,9 @@ async function timeVaryingPathConversion(path, conn) {
 				// occurs across the conversion segment. Note since day segments can be used multiple times in a week pattern,
 				// this means there may be multiple entries of the day/time in a given week.
 				const occurrences = [];
-				// console.log('curSegment.startTime, curSegment.endTime: ', curSegment.startTime, curSegment.endTime);
 				// Get the start and end date for this conversion segment where uses a function to fix up infinity cases.
 				const start = getRruleDate(curSegment.startTime);
 				const end = getRruleDate(curSegment.endTime);
-				console.log('start, end: ', start, end);
 				// This loops over the unique day segments RRules in the week pattern to use each one for the
 				// date range of the current conversion segment to generate all the occurrences needed
 				// for each RRule across the current conversion segment. The number is the number of unique
@@ -119,8 +101,6 @@ async function timeVaryingPathConversion(path, conn) {
 					// Generate all the occurrences of this RRule for the current conversion segment.
 					// The third parameter of true means start and end are included. See generateRrule where
 					// the end date is adjusted so it is correct and not included.
-					console.log('info: ', info);
-					console.log('info.rule.between(start, end, true): ', info.rule.between(start, end, true));
 					// There is an array entry in occurrences for each unique day segment in the week pattern.
 					// That array entry contains all the start days/times that occur across the current
 					// conversion segment.
@@ -141,21 +121,15 @@ async function timeVaryingPathConversion(path, conn) {
 				// III. Each segment is added to edgeSegments with the start_time, end_time, slope & intercept.
 				// r tracks which item the loop corresponds to in the ruleInfo array.
 				var r = 0;
-				console.log('occurrences: ', occurrences);
 				// Loops over all the unique day segments (see above).
 				occurrences.forEach((patternOccurrences) => {
 					// Loops over all the start day/time occurrences across the current conversion segment
 					// for the current unique day segment. This will generate all the segments.
 					patternOccurrences.forEach((occur) => {
-						console.log('occur: ', occur);
 						// Figure out the end date which is the occurrence (start day/time) plus the duration of
 						// this day segment stored in the ruleInfo.
 						const end = new Date(occur);
-						// console.log('end start: ', end);
-						console.log('ruleInfo[r].duration: ', ruleInfo[r].duration);
-						// end.setHours(ruleInfo[r].duration, 0, 0, 0);
 						end.setHours(end.getHours() + ruleInfo[r].duration);
-						console.log('end: ', end);
 						// Stores the new instance of a conversion segment for this unique instance of the
 						// current unique day segment pattern at a given day/time.
 						// The conversion is for the current segment's source/destination.
@@ -189,7 +163,6 @@ async function timeVaryingPathConversion(path, conn) {
 				// the week. Thus, the edgeSegments for this unique segment in the conversion path must now
 				// be sorted so step 3. works properly.
 				// sortBy returns a new array and does not sort in place.
-				console.log('i, sorted edgeSegments: ', i, sortBy(edgeSegments[i], 'startTime'));
 				edgeSegments[i] = sortBy(edgeSegments[i], 'startTime');
 			}
 		}
@@ -197,36 +170,24 @@ async function timeVaryingPathConversion(path, conn) {
 
 	// 2. Initialize pointers for each edge. It starts with the first item for each segment along
 	// the path.
-	console.log('2.');
 	const pointers = Array(path.length - 1).fill(0);
 
 	// 3. Main loop
-	console.log('3.');
-	console.log('edgeSegments.length: ', edgeSegments.length);
-	console.log('edgeSegments: ', edgeSegments);
-	// process.exit(99); // DEBUG!!!!!!!!
-	// console.log('edgeSegments[0]: ', edgeSegments[0]);
-	// console.log('edgeSegments[1]: ', edgeSegments[1]);
 	let currentStart = Number.NEGATIVE_INFINITY;
 	const results = [];
 	let done = false;
 	while (!done) {
 		// Find current segments for each edge
-		console.log('pointers: ', pointers);
 		const currentSegments = edgeSegments.map((segments, idx) => segments[pointers[idx]]);
-		console.log('currentSegments: ', currentSegments);
 
 		// Find minimum end time among current segments
 		let currentEnd = Math.min(...currentSegments.map(seg => parsePostgresDate(seg.endTime)));
-		// currentSegments.map(seg => console.log(seg.endTime));
-		console.log('moment(currentEnd).toString(): ', moment(currentEnd).toString());
 
 		// Combine conversions for the path
 		let slope = 1, intercept = 0;
 		for (const seg of currentSegments) {
 			[slope, intercept] = updatedConversion(slope, intercept, seg.slope, seg.intercept);
 		}
-		// console.log('before push');
 		results.push({
 			source: path[0].id,
 			destination: path[path.length - 1].id,
@@ -235,26 +196,20 @@ async function timeVaryingPathConversion(path, conn) {
 			slope,
 			intercept
 		});
-		// console.log('results: ', results);
 
 		if (currentEnd === Number.POSITIVE_INFINITY) {
-			// console.log('done');
 			done = true;
 		} else {
 			// Advance pointers for segments ending at currentEnd
-			// console.log('pointers.length: ', pointers.length)
 			for (let i = 0; i < pointers.length; ++i) {
-				// console.log('i, pointers: ', i, pointers);
 				if (parsePostgresDate(currentSegments[i].endTime) === currentEnd) {
 					pointers[i]++;
-					// console.log('advancing i: pointers[i]', i, pointers[i])
 				}
 			}
 		}
 		currentStart = currentEnd;
 	}
 
-	console.log('done');
 	return results;
 }
 

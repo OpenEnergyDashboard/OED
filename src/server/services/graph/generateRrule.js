@@ -48,7 +48,6 @@ async function generateRrule(weekId, startDate, endDate, conn) {
 		dayId,
 		segments: daySegmentResponses[i],
 	}));
-	console.log('daySegments: ', daySegments);
 
 	const occurrences = [];
 
@@ -80,12 +79,8 @@ async function generateRrule(weekId, startDate, endDate, conn) {
 		}
 		// Add the rruleDay from the current pair to this dayId's rruleDays array
 		existing.rruleDays.push(pair.rruleDay);
-		// console.log('existing: ', existing);
 	});
-	// console.log('dayIdMappings: ', dayIdMappings);
 	dayIdMappings.forEach((day) => {
-		// console.log('dayId, dayId.rruleDays: ', dayId, ' ', dayId.rruleDays);
-		console.log('day.dayId, day.rruleDays: ', day.dayId, day.rruleDays);
 	});
 
 	// Want to limit the number of cik_vary entries so don't do a case where this pattern generate
@@ -117,7 +112,6 @@ async function generateRrule(weekId, startDate, endDate, conn) {
 	const numDays = moment(endDate).diff(moment(startDate), 'days');
 	// The total number of segments is the average * # days.
 	const totalSegments = aveSegmentsPerDay * numDays;
-	console.log('aveSegmentsPerDay, numDays, totalSegments: ', aveSegmentsPerDay, numDays, totalSegments);
 	// See if too many expected values.
 	if (totalSegments > maxCikVary) {
 		// TODO Check earlier for -infinity/infinity for start/end and stop then. Change message below.
@@ -137,18 +131,12 @@ async function generateRrule(weekId, startDate, endDate, conn) {
 			const { startHour, endHour, slope, intercept } = segment;
 			const weekDayArray = dayIdMappings.find(d => d.dayId === dayId).rruleDays;
 			const duration = endHour - startHour;
-			console.log('startHour, endHour, slope, intercept : ', startHour, endHour, slope, intercept);
 
-			// start = startDate +/& startHour
 			// rrule dtstart must be both the first day of the event done via getRruleDate and
 			// the time of the event done with setHours where it is only a whole hour.
-			console.log('startDate: ', startDate);
-			// const start = new Date(startDate);
 			const start = getRruleDate(startDate);
 			// minutes, seconds and ms should default to 0 but passed to be sure.
 			start.setHours(startHour, 0, 0, 0);
-			console.log('start: ', start);
-			console.log('endDate: ', endDate);
 			const end = getRruleDate(endDate);
 			// There is an issue with including or excluding the start/end date. The usage in the calling
 			// function does inclusive so the end date is also included. Thus, shift the last day to
@@ -161,8 +149,6 @@ async function generateRrule(weekId, startDate, endDate, conn) {
 			// need something like exdate to get holiday exclusions to work so this could be revised once
 			// that is done.
 			end.setMinutes(end.getMinutes() - 1);
-			console.log('end: ', end);
-			console.log('weekDayArray: ', weekDayArray);
 
 			const rule = new RRule({
 				freq: RRule.WEEKLY,
@@ -181,12 +167,12 @@ async function generateRrule(weekId, startDate, endDate, conn) {
 		});
 	});
 
-	console.log("Generated rules:", occurrences.map((r) => ({
-		rrule: r.rule.toString(),
-		duration: r.duration,
-		slope: r.slope,
-		intercept: r.intercept,
-	})));
+	// console.log("Generated rules:", occurrences.map((r) => ({
+	// 	rrule: r.rule.toString(),
+	// 	duration: r.duration,
+	// 	slope: r.slope,
+	// 	intercept: r.intercept,
+	// })));
 
 	return occurrences;
 }
