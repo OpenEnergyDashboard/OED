@@ -187,15 +187,30 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		// set needed user details into a user and send to backend
 		const editedUser: User = {
 			id: userDetails.id, username: userDetails.username, role: userDetails.role,
-			password: userDetails.password, note: userDetails.note
+			note: userDetails.note,
+			// this is needed otherwise the user must input the password
+			// for the change to be successful.
+			// This change is added because the textbox states
+			// "Only enter password to update password"
+			...(passwordModified && { password: userDetails.password })
 		};
+
 		submitUserEdits(editedUser)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.edit.user') + props.user.username);
+				showSuccessNotification(
+					translate('users.successfully.edit.user') +
+					translate('users.successfully.edit.user.username') + userDetails.username + ')' +
+					translate('users.successfully.edit.user.role') + userDetails.role + ')'
+				);
+				props.handleClose();
 			})
 			.catch(error => {
-				showErrorNotification(translate('users.failed.to.edit.user') + props.user.username + ' ' + error.data.message);
+				showErrorNotification(
+					translate('users.failed.to.edit.user') +
+					translate('users.successfully.edit.user.username') + userDetails.username + ') ' +
+					error.data.message
+				);
 			});
 		resetPasswordFields();
 	};
@@ -204,10 +219,17 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 		submitDeleteUser(username)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.delete.user') + props.user.username);
+				showSuccessNotification(
+					translate('users.successfully.delete.user') +
+					translate('users.successfully.edit.user.username') + props.user.username + ')'
+				);
 			})
 			.catch(error => {
-				showErrorNotification(translate('users.failed.to.delete.user') + props.user.username + ' ' + error.data.message);
+				showErrorNotification(
+					translate('users.failed.to.delete.user') +
+					translate('users.successfully.edit.user.username') + props.user.username + ') ' +
+					error.data.message
+				);
 			});
 	};
 

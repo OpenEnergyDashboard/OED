@@ -6,7 +6,7 @@
 
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Version Parameter Validation', () => {
 
@@ -15,14 +15,14 @@ mocha.describe('Version Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get('/api/version');
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 		});
 
 		mocha.it('should return JSON response', async () => {
 			const res = await chai.request(app)
 				.get('/api/version');
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 			expect(res).to.be.json;
 			expect(res.body).to.be.a('string');
 		});
@@ -32,7 +32,7 @@ mocha.describe('Version Parameter Validation', () => {
 				.get('/api/version')
 				.query({ someParam: 'value', anotherParam: 123 });
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 			expect(res).to.be.json;
 		});
 
@@ -40,7 +40,7 @@ mocha.describe('Version Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get('/api/version');
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 			expect(res.body).to.be.a('string');
 			expect(res.body.length).to.be.greaterThan(0);
 		});
@@ -52,8 +52,8 @@ mocha.describe('Version Parameter Validation', () => {
 			const res2 = await chai.request(app)
 				.get('/api/version');
 
-			expect(res1.status).to.equal(HTTP_CODE.OK);
-			expect(res2.status).to.equal(HTTP_CODE.OK);
+			expect(res1.status).to.equal(HTTP_CODES.OK);
+			expect(res2.status).to.equal(HTTP_CODES.OK);
 			expect(res1.body).to.equal(res2.body);
 		});
 	});
@@ -64,7 +64,7 @@ mocha.describe('Version Parameter Validation', () => {
 				.get('/api/version')
 				.set('X-HTTP-Method-Override', 'POST');
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 		});
 
 		mocha.it('should handle malformed headers gracefully', async () => {
@@ -73,14 +73,14 @@ mocha.describe('Version Parameter Validation', () => {
 				.set('Content-Type', 'application/malformed')
 				.set('Accept', 'text/invalid');
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 		});
 
 		mocha.it('should not leak sensitive information in version string', async () => {
 			const res = await chai.request(app)
 				.get('/api/version');
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 
 			// Version should not contain sensitive paths or internal details
 			const version = res.body.toLowerCase();
@@ -109,7 +109,7 @@ mocha.describe('Version Parameter Validation', () => {
 
 			// All should succeed with same version
 			responses.forEach(res => {
-				expect(res.status).to.equal(HTTP_CODE.OK);
+				expect(res.status).to.equal(HTTP_CODES.OK);
 				expect(res.body).to.be.a('string');
 			});
 
@@ -127,7 +127,7 @@ mocha.describe('Version Parameter Validation', () => {
 				.post('/api/version')
 				.send({});
 
-			expect([HTTP_CODE.NOT_FOUND, HTTP_CODE.METHOD_NOT_ALLOWED]).to.include(res.status);
+			expect([HTTP_CODES.NOT_FOUND, HTTP_CODES.METHOD_NOT_ALLOWED]).to.include(res.status);
 		});
 
 		mocha.it('should reject PUT requests', async () => {
@@ -135,14 +135,14 @@ mocha.describe('Version Parameter Validation', () => {
 				.put('/api/version')
 				.send({});
 
-			expect([HTTP_CODE.NOT_FOUND, HTTP_CODE.METHOD_NOT_ALLOWED]).to.include(res.status);
+			expect([HTTP_CODES.NOT_FOUND, HTTP_CODES.METHOD_NOT_ALLOWED]).to.include(res.status);
 		});
 
 		mocha.it('should reject DELETE requests', async () => {
 			const res = await chai.request(app)
 				.delete('/api/version');
 
-			expect([HTTP_CODE.NOT_FOUND, HTTP_CODE.METHOD_NOT_ALLOWED]).to.include(res.status);
+			expect([HTTP_CODES.NOT_FOUND, HTTP_CODES.METHOD_NOT_ALLOWED]).to.include(res.status);
 		});
 
 		mocha.it('should reject PATCH requests', async () => {
@@ -150,7 +150,7 @@ mocha.describe('Version Parameter Validation', () => {
 				.patch('/api/version')
 				.send({});
 
-			expect([HTTP_CODE.NOT_FOUND, HTTP_CODE.METHOD_NOT_ALLOWED]).to.include(res.status);
+			expect([HTTP_CODES.NOT_FOUND, HTTP_CODES.METHOD_NOT_ALLOWED]).to.include(res.status);
 		});
 	});
 
@@ -159,7 +159,7 @@ mocha.describe('Version Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get('/api/version');
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 			expect(res).to.have.header('content-type', /application\/json/);
 		});
 
@@ -167,7 +167,7 @@ mocha.describe('Version Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get('/api/version');
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 			expect(() => JSON.parse(JSON.stringify(res.body))).to.not.throw();
 		});
 
@@ -175,7 +175,7 @@ mocha.describe('Version Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get('/api/version');
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 			expect(res.body).to.be.a('string');
 
 			// Version should be a reasonable format (not just random text)
@@ -189,7 +189,7 @@ mocha.describe('Version Parameter Validation', () => {
 			const res = await chai.request(app)
 				.get('/api/version');
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 
 			// Version endpoint could potentially be cached
 			// This test documents current behavior
@@ -202,7 +202,7 @@ mocha.describe('Version Parameter Validation', () => {
 			const res1 = await chai.request(app)
 				.get('/api/version');
 
-			expect(res1.status).to.equal(HTTP_CODE.OK);
+			expect(res1.status).to.equal(HTTP_CODES.OK);
 
 			// Test with If-None-Match if ETag is present
 			if (res1.headers.etag) {
@@ -211,7 +211,7 @@ mocha.describe('Version Parameter Validation', () => {
 					.set('If-None-Match', res1.headers.etag);
 
 				// Should either return 304 Not Modified or 200 with same content
-				expect([HTTP_CODE.OK, HTTP_CODE.NOT_MODIFIED]).to.include(res2.status);
+				expect([HTTP_CODES.OK, HTTP_CODES.NOT_MODIFIED]).to.include(res2.status);
 			}
 		});
 	});
@@ -223,7 +223,7 @@ mocha.describe('Version Parameter Validation', () => {
 				.set('Accept-Encoding', 'invalid-encoding')
 				.set('User-Agent', 'x'.repeat(1000));
 
-			expect(res.status).to.equal(HTTP_CODE.OK);
+			expect(res.status).to.equal(HTTP_CODES.OK);
 		});
 
 		mocha.it('should handle version module errors gracefully', async () => {
@@ -233,8 +233,8 @@ mocha.describe('Version Parameter Validation', () => {
 				.get('/api/version');
 
 			// Should either succeed or fail gracefully
-			if (res.status !== HTTP_CODE.OK) {
-				expect([HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+			if (res.status !== HTTP_CODES.OK) {
+				expect([HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 			} else {
 				expect(res.body).to.be.a('string');
 			}

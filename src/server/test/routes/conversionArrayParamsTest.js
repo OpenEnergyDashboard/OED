@@ -7,6 +7,7 @@
 const { expect } = require('chai');
 const { chai, mocha, app } = require('../common');
 const { testInvalidField } = require('../util/validationHelpers');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Conversion Array Parameter Validation', () => {
 
@@ -26,7 +27,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 				.post(REFRESH_ENDPOINT)
 				.send(validRefreshData);
 			
-			expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+			expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 		});
 		*/
 
@@ -47,7 +48,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 						.post(REFRESH_ENDPOINT)
 						.send(payload);
 					
-					expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+					expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 				}
 			});
 
@@ -56,7 +57,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send({ redoCik: false, refreshReadingViews: false });
 				
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 
 			mocha.it('should reject empty request body', async () => {
@@ -64,7 +65,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send({});
 				
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 
 			mocha.it('should reject extra fields', async () => {
@@ -78,7 +79,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send(payloadWithExtra);
 				
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 
 			mocha.it('should validate redoCik is boolean type', async () => {
@@ -90,7 +91,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 						invalidValue: invalid,
 						endpoint: REFRESH_ENDPOINT,
 						basePayload: { refreshReadingViews: true },
-						expectedStatus: HTTP_CODE.FORBIDDEN
+						expectedStatus: HTTP_CODES.FORBIDDEN
 					});
 				}
 			});
@@ -104,7 +105,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 						invalidValue: invalid,
 						endpoint: REFRESH_ENDPOINT,
 						basePayload: { redoCik: true },
-						expectedStatus: HTTP_CODE.FORBIDDEN
+						expectedStatus: HTTP_CODES.FORBIDDEN
 					});
 				}
 			});
@@ -127,7 +128,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 						.post(REFRESH_ENDPOINT)
 						.send(payload);
 					
-					expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+					expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 				}
 			});
 
@@ -142,7 +143,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 						.post(REFRESH_ENDPOINT)
 						.send(payload);
 					
-					expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+					expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 				}
 			});
 		});
@@ -176,7 +177,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 						.post(REFRESH_ENDPOINT)
 						.send(payload);
 					
-					expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+					expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 				}
 			});
 
@@ -197,7 +198,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 						.post(REFRESH_ENDPOINT)
 						.send(payload);
 					
-					expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+					expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 				}
 			});
 
@@ -216,7 +217,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send(hugePayload);
 				
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 		});
 		*/
@@ -229,7 +230,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send(null);
 				
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 
 			mocha.it('should handle non-object request body', async () => {
@@ -240,7 +241,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 						.post(REFRESH_ENDPOINT)
 						.send(body);
 					
-					expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+					expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 				}
 			});
 
@@ -250,7 +251,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.set('Content-Type', 'application/json')
 					.send('{"invalid": json}');
 				
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 
 			mocha.it('should handle undefined field values', async () => {
@@ -263,7 +264,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send(payload);
 				
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 		});
 		*/
@@ -276,7 +277,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send({ redoCik: true });
 				
-				expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 
 			mocha.it('should handle refreshReadingViews only', async () => {
@@ -284,7 +285,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send({ refreshReadingViews: true });
 				
-				expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 
 			mocha.it('should handle both operations', async () => {
@@ -292,7 +293,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send({ redoCik: true, refreshReadingViews: true });
 				
-				expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 
 			mocha.it('should reject when both are explicitly false', async () => {
@@ -300,7 +301,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send({ redoCik: false, refreshReadingViews: false });
 				
-				expect([HTTP_CODE.BAD_REQUEST, HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN]).to.include(res.status);
+				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN]).to.include(res.status);
 			});
 		});
 		*/
@@ -315,7 +316,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send({ redoCik: true });
 				
-				expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+				expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 			});
 
 			mocha.it('should not crash on service errors', async () => {
@@ -323,7 +324,7 @@ mocha.describe('Conversion Array Parameter Validation', () => {
 					.post(REFRESH_ENDPOINT)
 					.send({ refreshReadingViews: true });
 				
-				expect([HTTP_CODE.UNAUTHORIZED, HTTP_CODE.FORBIDDEN, HTTP_CODE.INTERNAL_SERVER_ERROR]).to.include(res.status);
+				expect([HTTP_CODES.UNAUTHORIZED, HTTP_CODES.FORBIDDEN, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 			});
 		});
 		*/

@@ -11,6 +11,7 @@ const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
 const moment = require('moment');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 const origin = new Point(0.000001, 0.000001);
 const opposite = new Point(179.999999, 89.999999);
@@ -54,7 +55,7 @@ mocha.describe('maps API', () => {
 
 	mocha.it('returns nothing when no map is present', async () => {
 		const res = await chai.request(app).get('/api/maps');
-		expect(res).to.have.status(200);
+		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res).to.be.json;
 		expect(res.body).to.have.lengthOf(0);
 	});
@@ -68,7 +69,7 @@ mocha.describe('maps API', () => {
 		await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0).insert(conn);
 
 		const res = await chai.request(app).get('/api/maps');
-		expect(res).to.have.status(200);
+		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res).to.be.json;
 		expect(res.body).to.have.lengthOf(3);
 
@@ -92,7 +93,7 @@ mocha.describe('maps API', () => {
 			await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 4.0, 0.4).insert(conn);
 
 			const res = await chai.request(app).get('/api/maps').set('token', token);
-			expect(res).to.have.status(200);
+			expect(res).to.have.status(HTTP_CODES.OK);
 			expect(res).to.be.json;
 			expect(res.body).to.have.lengthOf(4);
 
@@ -121,17 +122,17 @@ mocha.describe('maps API', () => {
 				mocha.it(`should reject requests from ${role} to create maps`, async () => {
 					// get maps
 					let res = await chai.request(app).post('/api/maps/create').set('token', token);
-					expect(res).to.have.status(403);
+					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 
 				mocha.it(`should reject requests from ${role} to edit maps`, async () => {
 					let res = await chai.request(app).post('/api/maps/edit').set('token', token);
-					expect(res).to.have.status(403);
+					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 
 				mocha.it(`should reject requests from ${role} to delete maps`, async () => {
 					let res = await chai.request(app).post('/api/maps/delete').set('token', token);
-					expect(res).to.have.status(403);
+					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 				mocha.it(`should only show visible maps to ${role}`, async () => {
 					const conn = testDB.getConnection();
@@ -146,7 +147,7 @@ mocha.describe('maps API', () => {
 
 					// get maps
 					let res = await chai.request(app).get('/api/maps').set('token', token);
-					expect(res).to.have.status(200);
+					expect(res).to.have.status(HTTP_CODES.OK);
 					expect(res).to.be.json;
 					expect(res.body).to.have.lengthOf(3);
 					const allMapsAreDisplayable = res.body.reduce((acc, map) => acc && map.displayable, true);
@@ -163,7 +164,7 @@ mocha.describe('maps API', () => {
 		await map2.insert(conn);
 
 		const res = await chai.request(app).get(`/api/maps/${map2.id}`);
-		expect(res).to.have.status(200);
+		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res).to.be.json;
 		expect(res.body).to.have.property('id', map2.id);
 		expect(res.body).to.have.property('name', 'Map 2');
@@ -175,6 +176,6 @@ mocha.describe('maps API', () => {
 		await map.insert(conn);
 
 		const res = await chai.request(app).get(`/api/maps/${map.id + 1}`);
-		expect(res).to.have.status(500);
+		expect(res).to.have.status(HTTP_CODES.INTERNAL_SERVER_ERROR);
 	});
 });

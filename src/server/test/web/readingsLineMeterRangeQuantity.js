@@ -166,13 +166,139 @@ mocha.describe('readings API', () => {
 
 					// Add LR11 here
 
-					// Add LR12 here
+					mocha.it('LR12: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained', async () => {
+						// u1 (kWh) and u2 (Electric_Utility) come from unitDatakWh; add u3 (MJ) and u16 (BTU).
+						const unitData = unitDatakWh.concat([
+							{
+								name: 'MJ',
+								identifier: 'megaJoules',
+								unitRepresent: Unit.unitRepresentType.QUANTITY,
+								secInRate: 3600,
+								typeOfUnit: Unit.unitType.UNIT,
+								suffix: '',
+								displayable: Unit.displayableType.ALL,
+								preferredDisplay: false,
+								note: 'MJ'
+							},
+							{
+								name: 'BTU',
+								identifier: '',
+								unitRepresent: Unit.unitRepresentType.QUANTITY,
+								secInRate: 3600,
+								typeOfUnit: Unit.unitType.UNIT,
+								suffix: '',
+								displayable: Unit.displayableType.ALL,
+								preferredDisplay: true,
+								note: 'OED created standard unit'
+							}
+						]);
+						// c1 (Electric_Utility → kWh) comes from conversionDatakWh; add c2 (kWh → MJ) and c3 (MJ → BTU) for the chain.
+						const conversionData = conversionDatakWh.concat([
+							{ sourceName: 'kWh', destinationName: 'MJ', bidirectional: true, slope: 3.6, intercept: 0, note: 'kWh → MJ' },
+							{ sourceName: 'MJ', destinationName: 'BTU', bidirectional: true, slope: 947.8, intercept: 0, note: 'MJ → BTU' }
+						]);
+						// Load the data into the database
+						await prepareTest(unitData, conversionData, meterDatakWh);
+						// Get the unit ID since the DB could use any value.
+						const unitId = await getUnitId('BTU');
+						// Load the expected response data from the corresponding csv file
+						const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_BTU_st_-inf_et_inf.csv');
+						// Create a request to the API for unbounded reading times and save the response
+						const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+							.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+						// Check that the API reading is equal to what it is expected to equal
+						expectRangeToEqualExpected(res, expected, undefined, 0.001);
+					});
 
 					// Add LR13 here
 
 					// Add LR18 here
 
-					// Add LR19 here
+					mocha.it(
+						'LR19: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as metric ton of CO2 & chained',
+						async () => {
+							// 1) Define additional units: kg, metric ton, kg CO₂
+							const unitDatakWhMTonCO2 = unitDatakWh.concat([
+								{
+									name: 'kg',
+									identifier: '',
+									unitRepresent: Unit.unitRepresentType.QUANTITY,
+									secInRate: 3600,
+									typeOfUnit: Unit.unitType.UNIT,
+									suffix: '',
+									displayable: Unit.displayableType.ALL,
+									preferredDisplay: false,
+									note: 'OED created standard unit',
+								},
+								{
+									name: 'metric ton',
+									identifier: '',
+									unitRepresent: Unit.unitRepresentType.QUANTITY,
+									secInRate: 3600,
+									typeOfUnit: Unit.unitType.UNIT,
+									suffix: '',
+									displayable: Unit.displayableType.ALL,
+									preferredDisplay: false,
+									note: 'OED created standard unit',
+								},
+								{
+									name: 'kg CO₂',
+									identifier: '',
+									unitRepresent: Unit.unitRepresentType.QUANTITY,
+									secInRate: 3600,
+									typeOfUnit: Unit.unitType.UNIT,
+									suffix: 'CO₂',
+									displayable: Unit.displayableType.ALL,
+									preferredDisplay: false,
+									note: 'special unit',
+								},
+							]);
+
+							// 2) Define chained conversions: Electric_Utility → kg CO₂ → kg → metric ton
+							const conversionDatakWhMTonCO2 = conversionDatakWh.concat([
+								{
+									sourceName: 'Electric_Utility',
+									destinationName: 'kg CO₂',
+									bidirectional: false,
+									slope: 0.709,
+									intercept: 0,
+									note: 'Electric_Utility → kg CO₂',
+								},
+								{
+									sourceName: 'kg CO₂',
+									destinationName: 'kg',
+									bidirectional: false,
+									slope: 1,
+									intercept: 0,
+									note: 'CO₂ → kg',
+								},
+								{
+									sourceName: 'kg',
+									destinationName: 'metric ton',
+									bidirectional: true,
+									slope: 1e-3,
+									intercept: 0,
+									note: 'kg → Metric ton',
+								},
+							]);
+
+							// 3) Prepare test database with units and conversions
+							await prepareTest(unitDatakWhMTonCO2, conversionDatakWhMTonCO2, meterDatakWh);
+
+							// 4) Get the metric ton of CO₂ unit ID
+							const unitId = await getUnitId('metric ton of CO₂');
+
+							// 5) Load expected response data from the corresponding csv file
+							const expected = await parseExpectedCsv('src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_MTonCO2_st_-inf_et_inf.csv');
+
+							// 6) Create a request to the API for unbounded reading times and save the response
+							const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+								.query({ timeInterval: ETERNITY.toString(), graphicUnitId: unitId });
+
+							// 7) Check that the API reading is equal to what it is expected to equal
+							expectRangeToEqualExpected(res, expected);
+						}
+					);
 
 					// Add LR20 here
 
