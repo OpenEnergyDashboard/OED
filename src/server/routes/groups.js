@@ -228,8 +228,8 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 		type: 'object',
 		additionalProperties: false,
 		required: ['name', 'childGroups', 'childMeters'],
+		maxProperties: 9,
 		properties: {
-			id: { type: 'integer', minimum: 1 },
 			name: {
 				type: 'string',
 				minLength: 1,

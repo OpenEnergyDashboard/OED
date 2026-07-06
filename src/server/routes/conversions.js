@@ -171,21 +171,21 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		properties: {
 			sourceId: {
 				type: 'integer',
-				minimum: 0
+				minimum: 1
 			},
 			destinationId: {
 				type: 'integer',
-				minimum: 0
+				minimum: 1
 			},
 			meterIds: {
 				type: 'array',
-				items: { type: 'integer', minimum: 0 },
+				items: { type: 'integer', minimum: 1 },
 				uniqueItems: true,
 				maxItems: 1000
 			},
 			groupIds: {
 				type: 'array',
-				items: { type: 'integer', minimum: 0 },
+				items: { type: 'integer', minimum: 1 },
 				uniqueItems: true,
 				maxItems: 1000
 			}
