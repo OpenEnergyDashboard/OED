@@ -207,7 +207,7 @@ mocha.describe('readings API', () => {
                                     graphicUnitId: unitId
                                 });
                             //Assert the response only includes data within that range and format
-                            expectRangeToEqualExpected(res, expected);
+                            expectRangeToEqualExpected(res, expected, METER_ID, 1);
                         },
                     );
 
