@@ -187,7 +187,7 @@ mocha.describe('readings API', () => {
                                     sourceName: 'MJ', 
                                     destinationName: 'kWh', 
                                     bidirectional: true, 
-                                    slope: 0.2777777777777778, 
+                                    slope: 1/3.6, 
                                     intercept: 0, 
                                     note: 'MJ → kWh' 
                                 },
