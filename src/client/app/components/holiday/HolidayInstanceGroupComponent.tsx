@@ -42,13 +42,10 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 	const holidayLimitInvalid = holidayLimitText.trim() === ''
 		|| !Number.isInteger(holidayLimit)
 		|| holidayLimit < 1;
-	const displayedHolidayInstances = showAllHolidays
-		? holidayInstances
-		: holidayInstances.slice(0, displayLimit);
-	const totalPages = Math.max(1, Math.ceil(displayedHolidayInstances.length / PER_PAGE));
+	const totalPages = Math.max(1, Math.ceil(holidayInstances.length / displayLimit));
 	const paginatedHolidayInstances = showAllHolidays
-		? displayedHolidayInstances
-		: displayedHolidayInstances.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+		? holidayInstances
+		: holidayInstances.slice((currentPage - 1) * displayLimit, currentPage * displayLimit);
 	const selectedHolidayInstanceIdsForGroup = holidayInstances
 		.filter(holidayInstance => selectedHolidayInstanceIds.includes(holidayInstance.id))
 		.map(holidayInstance => holidayInstance.id);
