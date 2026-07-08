@@ -14,8 +14,14 @@ import { testHolidayInstances } from './holidayInstanceTestData'; // For testing
 
 const PER_PAGE = 20;
 
+interface HolidayInstanceGroup {
+	id: number;
+	holidayInstanceIds: number[];
+}
+
 interface HolidayInstanceGroupComponentProps {
 	holidayInstances?: HolidayInstance[];
+	holidayInstanceGroups?: HolidayInstanceGroup[];
 	handleUpdateHolidayLimit?: (holidayLimit: number) => void;
 	handleCreateHolidayInstanceGroup?: (holidayInstanceIds: number[]) => void;
 }
@@ -32,6 +38,8 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const [showAllHolidays, setShowAllHolidays] = React.useState(false);
 	const [selectedHolidayInstanceIds, setSelectedHolidayInstanceIds] = React.useState<number[]>([]);
+	const [createdHolidayInstanceGroups, setCreatedHolidayInstanceGroups] = React.useState<HolidayInstanceGroup[]>([]);
+	const [selectedHolidayInstanceGroupId, setSelectedHolidayInstanceGroupId] = React.useState('');
 	const holidayLimit = Number(holidayLimitText);
 	// Modal state for displaying full log message
 	const [modalOpen, setModalOpen] = React.useState(false);
@@ -42,10 +50,18 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 	const holidayLimitInvalid = holidayLimitText.trim() === ''
 		|| !Number.isInteger(holidayLimit)
 		|| holidayLimit < 1;
-	const totalPages = Math.max(1, Math.ceil(holidayInstances.length / displayLimit));
+	const holidayInstanceGroups = props.holidayInstanceGroups ?? createdHolidayInstanceGroups;
+	const selectedHolidayInstanceGroup = holidayInstanceGroups.find(holidayInstanceGroup =>
+		holidayInstanceGroup.id.toString() === selectedHolidayInstanceGroupId);
+	const viewingHolidayInstanceGroup = selectedHolidayInstanceGroup !== undefined;
+	const tableHolidayInstances = viewingHolidayInstanceGroup
+		? holidayInstances.filter(holidayInstance =>
+			selectedHolidayInstanceGroup.holidayInstanceIds.includes(holidayInstance.id))
+		: holidayInstances;
+	const totalPages = Math.max(1, Math.ceil(tableHolidayInstances.length / displayLimit));
 	const paginatedHolidayInstances = showAllHolidays
-		? holidayInstances
-		: holidayInstances.slice((currentPage - 1) * displayLimit, currentPage * displayLimit);
+		? tableHolidayInstances
+		: tableHolidayInstances.slice((currentPage - 1) * displayLimit, currentPage * displayLimit);
 	const selectedHolidayInstanceIdsForGroup = holidayInstances
 		.filter(holidayInstance => selectedHolidayInstanceIds.includes(holidayInstance.id))
 		.map(holidayInstance => holidayInstance.id);
@@ -67,6 +83,20 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 		props.handleUpdateHolidayLimit?.(holidayLimit);
 	};
 
+	const handleHolidayInstanceGroupChange = (holidayInstanceGroupId: string) => {
+		setSelectedHolidayInstanceGroupId(holidayInstanceGroupId);
+		setSelectedHolidayInstanceIds([]);
+		setCurrentPage(1);
+		setShowAllHolidays(false);
+	};
+
+	const handleCreateNewHolidayInstanceGroup = () => {
+		setSelectedHolidayInstanceGroupId('');
+		setSelectedHolidayInstanceIds([]);
+		setCurrentPage(1);
+		setShowAllHolidays(false);
+	};
+
 	//open modal to show full holiday name and note
 	const handleHolidayNoteModal = (holidayName: string, holidayNote: string) => {
 		setModelHeader(holidayName);
@@ -81,7 +111,27 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 	};
 
 	const handleCreateHolidayInstanceGroup = () => {
+		if (selectedHolidayInstanceIdsForGroup.length === 0) {
+			return;
+		}
+
 		props.handleCreateHolidayInstanceGroup?.(selectedHolidayInstanceIdsForGroup);
+
+		if (props.holidayInstanceGroups === undefined) {
+			setCreatedHolidayInstanceGroups(currentGroups => {
+				const nextHolidayInstanceGroupId = Math.max(0, ...currentGroups.map(group => group.id)) + 1;
+
+				return [
+					...currentGroups,
+					{
+						id: nextHolidayInstanceGroupId,
+						holidayInstanceIds: selectedHolidayInstanceIdsForGroup
+					}
+				];
+			});
+		}
+
+		setSelectedHolidayInstanceIds([]);
 	};
 
 	return (
@@ -91,6 +141,40 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 			</h1>
 
 			<div style={holidayFilterStyle}>
+				<FormGroup style={holidayInstanceGroupSelectStyle}>
+					<Label for='holidayInstanceGroup' style={{fontWeight: 'bold', margin: '0'}}>
+						<FormattedMessage
+							id='holiday.instance.group.previous'
+							defaultMessage='Previous holiday instance group' />
+					</Label>
+					<Input
+						id='holidayInstanceGroup'
+						name='holidayInstanceGroup'
+						type='select'
+						value={selectedHolidayInstanceGroupId}
+						onChange={e => handleHolidayInstanceGroupChange(e.target.value)}
+					>
+						<option value=''>
+							Select previous group
+						</option>
+						{holidayInstanceGroups.map(holidayInstanceGroup => (
+							<option
+								key={holidayInstanceGroup.id}
+								value={holidayInstanceGroup.id}
+							>
+								{`Holiday Instance Group ${holidayInstanceGroup.id}`}
+							</option>
+						))}
+					</Input>
+				</FormGroup>
+				<Button
+					color='primary'
+					onClick={handleCreateNewHolidayInstanceGroup}
+				>
+					<FormattedMessage
+						id='holiday.instance.group.create.new'
+						defaultMessage='New Holiday instance group' />
+				</Button>
 				<FormGroup style={holidayLimitGroupStyle}>
 					<Label for='holidayLimit' style={{fontWeight: 'bold', margin: '0'}}>
 						<FormattedMessage
@@ -123,7 +207,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 			</div>
 
 			{/* Display holiday instances table */}
-			{holidayInstances.length > 0 ? (
+			{tableHolidayInstances.length > 0 ? (
 				<div style={tableWrapStyle}>
 					<Table bordered style={tableStyle}>
 						<thead>
@@ -134,9 +218,11 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 								<th>
 									<FormattedMessage id='note' defaultMessage='Note' />
 								</th>
-								<th>
-									<FormattedMessage id='select' defaultMessage='Select' />
-								</th>
+								{!viewingHolidayInstanceGroup && (
+									<th>
+										<FormattedMessage id='select' defaultMessage='Select' />
+									</th>
+								)}
 							</tr>
 						</thead>
 						<tbody style={bodyStyle}>
@@ -153,16 +239,18 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 										>
 											{holidayInstance.note.length > 80 ? `${holidayInstance.note.slice(0, 80)}...` : holidayInstance.note}
 										</td>
-										<td>
-											<Label check style={{ display: 'flex', justifyContent: 'center', margin: 0 }}>
-												<Input
-													type='checkbox'
-													checked={selected}
-													aria-label={`Select ${holidayInstance.name}`}
-													onChange={() => handleHolidayInstanceSelect(holidayInstance.id)}
-												/>
-											</Label>
-										</td>
+										{!viewingHolidayInstanceGroup && (
+											<td>
+												<Label check style={{ display: 'flex', justifyContent: 'center', margin: 0 }}>
+													<Input
+														type='checkbox'
+														checked={selected}
+														aria-label={`Select ${holidayInstance.name}`}
+														onChange={() => handleHolidayInstanceSelect(holidayInstance.id)}
+													/>
+												</Label>
+											</td>
+										)}
 									</tr>
 								);
 							})}
@@ -178,7 +266,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 			)}
 
 			{/* Pagination */}
-			{!showAllHolidays && holidayInstances.length > 0 && (
+			{!showAllHolidays && tableHolidayInstances.length > 0 && (
 				<Pagination aria-label='Holiday instance pagination' style={{justifyContent: 'center', margin: '1% auto'}}>
 					<PaginationItem disabled={currentPage === 1}>
 						<PaginationLink first onClick={() => setCurrentPage(1)} />
@@ -203,7 +291,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 			)}
 
 			{/* Action buttons for showing all holiday instances and creating holiday instance groups */}
-			{holidayInstances.length > 0 && (
+			{tableHolidayInstances.length > 0 && (
 				<div style={actionContainerStyle}>
 					<Button
 						color='primary'
@@ -218,23 +306,25 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 							<FormattedMessage
 								id='show.all.holidays'
 								defaultMessage='Show all holidays ({count})'
-								values={{ count: holidayInstances.length }} />
+								values={{ count: tableHolidayInstances.length }} />
 						)}
 					</Button>
-					<Button
-						color='primary'
-						disabled={selectedHolidayInstanceIdsForGroup.length === 0}
-						onClick={handleCreateHolidayInstanceGroup}
-						style={{ margin: '0% 40% 1%'}}>
-						<FormattedMessage
-							id='holiday.instance.group.create'
-							defaultMessage='Create Holiday Instance Group' />
-					</Button>
+					{!viewingHolidayInstanceGroup && (
+						<Button
+							color='primary'
+							disabled={selectedHolidayInstanceIdsForGroup.length === 0}
+							onClick={handleCreateHolidayInstanceGroup}
+							style={{ margin: '0% 40% 1%'}}>
+							<FormattedMessage
+								id='holiday.instance.group.create'
+								defaultMessage='Create Holiday Instance Group' />
+						</Button>
+					)}
 				</div>
 			)}
 
 			{/* Modal for displaying full holiday note */}
-			<Modal isOpen={modalOpen} toggle={() => setModalOpen(false)}>
+			<Modal isOpen={modalOpen} toggle={() => setModalOpen(false)} centered>
 				<ModalHeader toggle={() => setModalOpen(false)}>
 					{modelHeader}
 				</ModalHeader>
@@ -254,11 +344,19 @@ const pageStyle: React.CSSProperties = {
 const holidayFilterStyle: React.CSSProperties = {
 	display: 'flex',
 	justifyContent: 'center',
+	flexWrap: 'wrap',
 	gap: '1.5%',
 	alignItems: 'center',
-	margin: 'auto 25%',
+	margin: 'auto',
+	width: '92%',
+	maxWidth: '72rem',
 	padding: '20px',
 	border: '2px solid lightgrey'
+};
+
+const holidayInstanceGroupSelectStyle: React.CSSProperties = {
+	margin: 0,
+	width: '18rem'
 };
 
 const holidayLimitGroupStyle: React.CSSProperties = {
