@@ -58,21 +58,14 @@ class Cik {
 	 * @param {*} cik is the OED conversion array from the graph.
 	 * @param {*} conn The database connection to use.
 	 */
-	static async insert(cik, conn) {
+	static async insert(conn) {
 		// TODO This should be a transaction to avoid issues for any request made to the database.
 
 		// Remove all the current values in the table.
 		await conn.none(sqlFile('cik/delete_all_conversions.sql'));
 
-		// Loop over all conversions in cik array and insert each in DB.
-		cik.forEach(async (conversion) => {
-			await conn.none(sqlFile('cik/insert_new_conversion.sql'), {
-				sourceId: conversion.source,
-				destinationId: conversion.destination,
-				slope: conversion.slope,
-				intercept: conversion.intercept
-			});
-		});
+		// This places all the distinct/unique source & destination from cik_vary into cik.
+		await conn.none(sqlFile('cik/update_from_cik_vary.sql'));
 	}
 }
 

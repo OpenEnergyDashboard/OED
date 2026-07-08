@@ -16,14 +16,10 @@ const { log } = require('../../log');
  * in the cik table in the database.
  */
 async function redoCik(conn) {
-	// Create graph based on units and conversions.
-	const graph = await createConversionGraph(conn);
-	// Processes suffix units to update graph and database.
-	await handleSuffixUnits(graph, conn);
-	// Uses final graph to create cik array.
-	const cik = await createCikArray(graph, conn);
-	// Inserts cik array into database where old values are deleted.
-	await Cik.insert(cik, conn);
+	// TODO This should be going away but leaving until fix up all uses.
+	// For now it calls redoCikVary that should work with the new code.
+	// It now also creates cik in the DB.
+	await redoCikVary(conn);
 }
 
 /**
@@ -52,6 +48,13 @@ async function redoCikVary(conn) {
 
 		// Inserts cik_vary array into database where old values are deleted.
 		await CikVary.insert(cikVary, conn);
+
+		// TODO This may be a temporary fix to set cik. It finds all the unique cik_vary
+		// and adds them to cik. This guarantees they remain the same but could be a little
+		// slower than getting from the createCikVaryArray. Only change if too slow but
+		// probably wont't be. If leave it really should be a transaction to do cikVary and
+		// this so they are never out of sync.
+		await Cik.insert(conn);
 	} catch (error) {
 		// Something went wrong. The main known error is if timeVaryingPathConversion finds too many
 		// expected entries. Could check what the error was but for now just log it.
