@@ -159,7 +159,7 @@ router.get('/:meter_id', optionalAuthMiddleware, async (req, res) => {
 });
 
 // This checks params for both edit and create. The id property is only validated on edit since the DB assigns it on create.
-function validateMeterParams(params, isEdit = false) {
+function validateMeterParams(params, isEdit = true) {
 	const properties = {
 			name: { type: 'string', maxLength: SHORT_STRING_MAX_LENGTH },
 			url: {
@@ -230,7 +230,6 @@ function validateMeterParams(params, isEdit = false) {
 				]
 			},
 			unitId: { type: 'integer' },
-			//defaultGraphicUnit: { type: 'integer' },
 			defaultGraphicUnit: {'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }]},
 			areaUnit: {
 				type: 'string',
@@ -256,7 +255,9 @@ function validateMeterParams(params, isEdit = false) {
 		properties.id = { type: 'integer', minimum: 1 };
 	}
 
+	// We can get rid of some of these if we defaulted more values in the meter model.
 	const required = ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'];
+
 	if (isEdit) {
 		required.push('id');
 	}
@@ -264,7 +265,6 @@ function validateMeterParams(params, isEdit = false) {
 	const validParams = {
 		type: 'object',
 		additionalProperties: false,
-		// We can get rid of some of these if we defaulted more values in the meter model.
 		required,
 		properties
 	};

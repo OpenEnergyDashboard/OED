@@ -179,10 +179,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 		if (inputOk) {
 			// The input passed validation.
 			const submitState = {
-				// TODO DEBUG: commenting out omit to make sure that the create request payload gets sent with an id and confirm the server rejects it.
-				// With the new changes to validateMeterParams(), an id will be rejected since isEdit flag is not raised for /create requests.
 				...omit(meterDetails, 'id'),
-				//...meterDetails,
 				// GPS may have been updated so create updated state to submit.
 				gps: gps,
 				// Set default identifier as name if left blank
@@ -788,9 +785,6 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 						<FormattedMessage id="discard.changes" />
 					</Button>
 					{/* On click calls the function handleSaveChanges in this component */}
-					{/* TODO DEBUG: disabling this line disables the defaultGraphicUnitIsSelected which prevents the
-					defaultGraphicUnit error from being raised unlike in CreateGroupModalComponent.tsx */}
-					{/*<Button color='primary' onClick={handleSubmit} disabled={!meterIsValid || !canSave}>*/}
 					<Button color='primary' onClick={handleSubmit} disabled={!meterIsValid || !canSave}>
 						<FormattedMessage id="save.all" />
 					</Button>
