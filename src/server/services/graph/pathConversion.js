@@ -26,7 +26,7 @@ async function conversionValues(sourceUnit, destinationUnit, conn) {
 			throw Error(`The conversions from ${sourceUnit} to ${destinationUnit} doesn't exist`);
 		}
 		// We need to invert the conversion since it needs to go the other way from how stored.
-		[slope, intercept] = invertConversion(desiredConversion.slope, desiredConversion.intercept);
+		({ convertedSlope: slope, convertedIntercept: intercept } = invertConversion(desiredConversion.slope, desiredConversion.intercept));
 		// Since we inverted the conversion, we use the suffix from the destination.
 		suffix = (await Unit.getById(destinationUnit, conn)).suffix;
 	} else {
@@ -42,17 +42,18 @@ async function conversionValues(sourceUnit, destinationUnit, conn) {
  * Returns the inverted conversion of one provided as a slope and intercept.
  * @param {*} slope The conversion's slope.
  * @param {*} intercept The conversion's intercept.
- * @returns 
+ * @returns {object} the inverted conversion as { convertedSlope, convertedIntercept }.
  */
 function invertConversion(slope, intercept) {
 	// What is stored for this entry in the units table:
 	// destination_value = slope * source_value + intercept
 	// Invert this equation to give:
 	// source_value = (1/slope) * destination_value - (intercept / slope)
-	// TODO: fix when slope is 0 !
-	const convertedSlope = 1.0 / slope;
-	const convertedIntercept = -(intercept / slope);
-	return [convertedSlope, convertedIntercept];
+	// If slope is zero then return that, otherwise invert.
+	const convertedSlope = slope === 0 ? 0 : 1.0 / slope;
+	// If intercept is zero then return that (otherwise get -0), otherwise invert.
+	const convertedIntercept = intercept === 0 ? 0 : -(intercept / slope);
+	return { convertedSlope, convertedIntercept };
 }
 
 /**

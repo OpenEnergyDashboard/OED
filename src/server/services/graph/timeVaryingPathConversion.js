@@ -8,7 +8,6 @@ const invertConversion = require('./pathConversion').invertConversion;
 const updatedConversion = require('./pathConversion').updatedConversion;
 const { generateRrule, getRruleDate } = require('./generateRrule');
 const sortBy = require('lodash/sortBy');
-const moment = require('moment'); // TODO DEBUG
 
 /**
  * Chains time-varying conversions along a path, producing combined segments for cik_vary.
@@ -41,10 +40,10 @@ async function timeVaryingPathConversion(path, conn) {
 			if (!reverseConversion || !reverseConversion.bidirectional) {
 				throw Error(`No bidirectional conversion found between ${sourceId} and ${destinationId}`);
 			}
-			// Fetch reverse segments and invert them
-			const reverseSegments = await ConversionSegment.getBySourceDestination(destinationId, sourceId, conn);
+			// Fetch reverse segments. The inversion happens in next step.
+			segments = await ConversionSegment.getBySourceDestination(destinationId, sourceId, conn);
 			// This is also really weird that it exist and yet no segments found.
-			if (!reverseSegments || reverseSegments.length === 0) {
+			if (!segments || segments.length === 0) {
 				throw Error(`No conversion segments found for reverse direction between ${destinationId} and ${sourceId}`);
 			}
 			reversed = true;
@@ -52,14 +51,14 @@ async function timeVaryingPathConversion(path, conn) {
 
 		// loop through segments, ..., and push to edgeSegments
 		for (let segmentIndex = 0; segmentIndex < segments.length; segmentIndex++) {
-			const curSegment = segments[segmentIndex];
+			let curSegment = segments[segmentIndex];
 
 			// deal with conversionSegments that have a SLOPE & INTERCEPT
 			if (curSegment.weekPatternsId == null) {
 				// The segment does not have a pattern so can use the segments found above for slope/intercept.
 				if (reversed) {
 					// Reversed so invert segment found.
-					const { convertedSlope, convertedIntercept } = invertConversion(curSegment.slope, curSegment.intercept)
+					const { convertedSlope, convertedIntercept } = invertConversion(curSegment.slope, curSegment.intercept);
 					curSegment = {
 						...curSegment,
 						slope: convertedSlope,
