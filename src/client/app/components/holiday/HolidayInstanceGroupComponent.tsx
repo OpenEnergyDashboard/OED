@@ -89,7 +89,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 
 	return (
 		<div className='flexGrowOne' style={pageStyle}>
-			<h1 style={holidayTitleStyle}>
+			<h1 style={titleStyle}>
 				<FormattedMessage id='holiday.instance.group' defaultMessage='Holiday Instance Group' />
 			</h1>
 
@@ -117,8 +117,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 					</FormFeedback>
 				</FormGroup>
 				<Button
-					color='secondary'
-					outline
+					color='primary'
 					disabled={holidayLimitInvalid}
 					onClick={handleUpdateHolidayLimit}
 				>
@@ -158,16 +157,13 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 											{holidayInstance.note.length > 80 ? `${holidayInstance.note.slice(0, 80)}...` : holidayInstance.note}
 										</td>
 										<td>
-											<Label check style={checkboxLabelStyle}>
+											<Label check style={{ display: 'flex', justifyContent: 'center', margin: 0 }}>
 												<Input
 													type='checkbox'
 													checked={selected}
 													aria-label={`Select ${holidayInstance.name}`}
 													onChange={() => handleHolidayInstanceSelect(holidayInstance.id)}
-													style={hiddenCheckboxStyle} />
-												<span style={checkboxSquareStyle}>
-													{selected ? 'X' : ''}
-												</span>
+												/>
 											</Label>
 										</td>
 									</tr>
@@ -188,15 +184,11 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 			{!showAllHolidays && holidayInstances.length > 0 && (
 				<Pagination aria-label='Holiday instance pagination' style={{justifyContent: 'center', margin: '1% auto'}}>
 					<PaginationItem disabled={currentPage === 1}>
-						<PaginationLink onClick={() => setCurrentPage(1)}>
-							{'<<'}
-						</PaginationLink>
+						<PaginationLink first onClick={() => setCurrentPage(1)} />
+					</PaginationItem><PaginationItem disabled={currentPage === 1}>
+						<PaginationLink previous onClick={() => setCurrentPage(currentPage - 1)} />
 					</PaginationItem>
-					<PaginationItem disabled={currentPage === 1}>
-						<PaginationLink onClick={() => setCurrentPage(currentPage - 1)}>
-							{'<'}
-						</PaginationLink>
-					</PaginationItem>
+
 					{Array.from({ length: totalPages }, (_, index) => (
 						<PaginationItem key={index + 1} active={currentPage === index + 1}>
 							<PaginationLink onClick={() => setCurrentPage(index + 1)}>
@@ -204,15 +196,11 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 							</PaginationLink>
 						</PaginationItem>
 					))}
+
 					<PaginationItem disabled={currentPage === totalPages}>
-						<PaginationLink onClick={() => setCurrentPage(currentPage + 1)}>
-							{'>'}
-						</PaginationLink>
-					</PaginationItem>
-					<PaginationItem disabled={currentPage === totalPages}>
-						<PaginationLink onClick={() => setCurrentPage(totalPages)}>
-							{'>>'}
-						</PaginationLink>
+						<PaginationLink next onClick={() => setCurrentPage(currentPage + 1)} />
+					</PaginationItem><PaginationItem disabled={currentPage === totalPages}>
+						<PaginationLink last onClick={() => setCurrentPage(totalPages)} />
 					</PaginationItem>
 				</Pagination>
 			)}
@@ -221,13 +209,12 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 			{holidayInstances.length > 0 && (
 				<div style={actionContainerStyle}>
 					<Button
-						color='secondary'
-						outline
+						color='primary'
 						onClick={() => {
 							setShowAllHolidays(!showAllHolidays);
 							setCurrentPage(1);
 						}}
-						style={wideOutlineButtonStyle}>
+						style={{ margin: '0% 40% 1%' }}>
 						{showAllHolidays ? (
 							<FormattedMessage id='show.in.pages' defaultMessage='Show in pages' />
 						) : (
@@ -238,11 +225,10 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 						)}
 					</Button>
 					<Button
-						color='secondary'
-						outline
+						color='primary'
 						disabled={selectedHolidayInstanceIdsForGroup.length === 0}
 						onClick={handleCreateHolidayInstanceGroup}
-						style={wideOutlineButtonStyle}>
+						style={{ margin: '0% 40% 1%'}}>
 						<FormattedMessage
 							id='holiday.instance.group.create'
 							defaultMessage='Create Holiday Instance Group' />
@@ -268,22 +254,14 @@ const pageStyle: React.CSSProperties = {
 	width: '100%'
 };
 
-const holidayTitleStyle: React.CSSProperties = {
-	...titleStyle,
-	color: '#111',
-	fontSize: '2.75rem',
-	fontWeight: 400,
-	margin: '0 0 1.35rem',
-	textAlign: 'center'
-};
-
 const holidayFilterStyle: React.CSSProperties = {
-	alignItems: 'flex-end',
 	display: 'flex',
-	flexWrap: 'wrap',
-	gap: '2rem',
 	justifyContent: 'center',
-	margin: '0 auto 2rem'
+	gap: '1.5%',
+	alignItems: 'center',
+	margin: 'auto 25%',
+	padding: '20px',
+	border: '2px solid lightgrey'
 };
 
 const holidayLimitGroupStyle: React.CSSProperties = {
@@ -305,58 +283,11 @@ const bodyStyle: React.CSSProperties = {
 	textAlign: 'left'
 };
 
-const checkboxLabelStyle: React.CSSProperties = {
-	alignItems: 'center',
-	cursor: 'pointer',
-	display: 'inline-flex',
-	justifyContent: 'center',
-	margin: 0,
-	minHeight: '1.35rem',
-	minWidth: '1.35rem',
-	position: 'relative'
-};
-
-const hiddenCheckboxStyle: React.CSSProperties = {
-	height: '1px',
-	opacity: 0,
-	position: 'absolute',
-	width: '1px'
-};
-
-const checkboxSquareStyle: React.CSSProperties = {
-	alignItems: 'center',
-	border: '1px solid #222',
-	color: '#111',
-	display: 'inline-flex',
-	fontSize: '1.05rem',
-	height: '1.25rem',
-	justifyContent: 'center',
-	lineHeight: 1,
-	width: '1.25rem'
-};
-
 const actionContainerStyle: React.CSSProperties = {
 	alignItems: 'center',
 	display: 'flex',
 	flexDirection: 'column',
 	gap: '1.25rem'
-};
-
-const outlineButtonStyle: React.CSSProperties = {
-	border: '1px solid #222',
-	borderRadius: 0,
-	color: '#111',
-	fontSize: '1rem',
-	height: '2.05rem',
-	minWidth: '7.2rem'
-};
-
-const wideOutlineButtonStyle: React.CSSProperties = {
-	...outlineButtonStyle,
-	fontSize: '1.45rem',
-	height: '2.4rem',
-	maxWidth: '90%',
-	width: '37rem'
 };
 
 const emptyHolidayStyle: React.CSSProperties = {
