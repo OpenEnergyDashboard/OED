@@ -29,6 +29,7 @@ import RoleOutlet from './router/RoleOutlet';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
 import VisualUnitDetailComponent from './visual-unit/VisualUnitDetailComponent';
 import WeeksDetailComponent from './weeks/WeeksDetailComponent';
+import HolidayInstancePage from './holiday-instances/HolidayInstancePage';
 
 /**
  * @returns the router component Responsible for client side routing.
@@ -53,6 +54,7 @@ const router = createBrowserRouter([
 			{ path: 'groups', element: <GroupsDetailComponent /> },
 			{ path: 'meters', element: <MetersDetailComponent /> },
 			{ path: 'graph', element: <GraphLink /> },
+			{ path: 'holiday-instances', element: <HolidayInstancePage /> },
 			{
 				element: <AdminOutlet />,
 				children: [
