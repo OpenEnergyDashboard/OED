@@ -70,6 +70,32 @@ class Reading {
 	}
 
 	/**
+	 * Returns a promise to create the hourly TimescaleDB continuous aggregate view for hourly readings.
+	 * @param conn the database connection to use
+	 */
+	static createTimescaleDBHourlyCagg(conn) {
+		return conn.none(sqlFile('reading/cagg_create_reading_views_hourly.sql'));
+	}
+
+	/**
+	 * Returns a promise to create the hourly TimescaleDB continuous aggregate view for hourly readings.
+	 * @param conn the database connection to use
+	 */
+	static updateMeterLineReadingHourlyCaag(conn) {
+		return conn.none(sqlFile('reading/cagg_update_meter_line_readings_unit.sql'));
+	}
+
+	/**
+	 * Rebuilds and refreshes the hourly TimescaleDB continuous aggregate.
+	 * @param conn The connection to use
+	 * @returns {Promise<void>}
+	 */
+	static async refreshHourlyCagg(conn) {
+		await conn.any('SELECT rebuild_hourly_hypertable_split()');
+		await conn.none("CALL refresh_continuous_aggregate('meter_hourly_readings_unit_cagg', NULL, NULL)");
+	}
+
+	/**
 	 * Refreshes the hourly readings view.
 	 * Should be called at least once a day but need to do hourly if the site wants zooming in
 	 * to see hourly data as it is available. This function can take more time than refreshing
@@ -79,10 +105,11 @@ class Reading {
 	 * @param conn The connection to use
 	 * @returns {Promise<void>}
 	 */
-	static refreshHourlyReadings(conn) {
+	static async refreshHourlyReadings(conn) {
 		// This can't be a function because you can't call REFRESH inside a function
 		// TODO This will be removed once we completely transition to the unit version.
-		return conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
+		await conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
+		await Reading.refreshHourlyCagg(conn);
 	}
 
 	/**
@@ -104,6 +131,7 @@ class Reading {
 	 */
 	static async refreshMeterReadingsViews(conn) {
 		await conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
+		await Reading.refreshHourlyCagg(conn);
 		await conn.none('REFRESH MATERIALIZED VIEW meter_daily_readings_unit');
 	}
 

@@ -122,6 +122,11 @@ async function createSchema(conn) {
 	await LogMsg.createTable(conn);
 	await Reading.createReadingsMaterializedViews(conn);
 	await Reading.createCompareReadingsFunction(conn);
+
+	// Create the TimescaleDB continuous aggregate view for hourly readings
+	await Reading.createTimescaleDBHourlyCagg(conn);
+	await Reading.updateMeterLineReadingHourlyCaag(conn);
+
 	// For 3D reading
 	await Reading.create3DReadingsFunction(conn);
 	await Baseline.createTable(conn);
