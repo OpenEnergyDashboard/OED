@@ -150,6 +150,8 @@ async function generateRrule(weekId, startDate, endDate, conn) {
 			// that is done.
 			end.setMinutes(end.getMinutes() - 1);
 
+			// For the record in case someone is looking at this:
+			// RRule seems to make Monday be item 0 so Sunday is item 6.
 			const rule = new RRule({
 				freq: RRule.WEEKLY,
 				byweekday: weekDayArray,
