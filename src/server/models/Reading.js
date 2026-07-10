@@ -78,7 +78,7 @@ class Reading {
 	}
 
 	/**
-	 * Returns a promise to create the hourly TimescaleDB continuous aggregate view for hourly readings.
+	 * Returns a promise to update the hourly TimescaleDB continuous aggregate function for hourly readings.
 	 * @param conn the database connection to use
 	 */
 	static updateMeterLineReadingHourlyCaag(conn) {
