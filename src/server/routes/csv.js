@@ -159,6 +159,8 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	let csvFilepath;
 	let isAllReadingsOk;
 	let msgTotal;
+	let startTimestamp;
+	let endTimestamp;
 	try {
 		log.info(`The uploaded file ${uploadedFilepath} was created to upload readings csv data`);
 		let fileBuffer = await fs.readFile(uploadedFilepath);
@@ -174,10 +176,12 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 			csvFilepath = uploadedFilepath;
 		}
 		const conn = getConnection();
-		({ isAllReadingsOk, msgTotal } = await uploadReadings(req, res, csvFilepath, conn));
+		({ isAllReadingsOk, msgTotal, startTimestamp, endTimestamp } = await uploadReadings(req, res, csvFilepath, conn));
 		if (isRefreshReadings) {
 			// Refresh readings so show when daily data is used.
-			await refreshAllReadingViews();
+			await refreshAllReadingViews(startTimestamp && endTimestamp
+				? { startTimestamp, endTimestamp, rebuild: false }
+				: undefined);
 		}
 	} catch (error) {
 		failure(req, res, error);

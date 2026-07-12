@@ -1,54 +1,37 @@
 /*
- * This script continues the work introduced in PR#1546, which established the
- * benchmark for migrating hourly meter reading queries from PostgreSQL
- * materialized views to TimescaleDB hypertables and continuous aggregates.
- *
- * Only the database objects required from PR#1546 were carried forward and
- * adapted to integrate TimescaleDB continuous aggregates with the existing
- * hourly meter reading workflow in the timeVary branch.
- *
- * Overview:
- *
- *   readings
- *       |
- *       |  (trigger: insert/update/delete)
- *       v
- *   hypertable_hourly_split
- *       |
- *       |  (continuous aggregate)
- *       v
- *   meter_hourly_readings_unit_cagg
- *
- *
- * The original meter_hourly_readings_unit materialized view splits readings
- * that span multiple hours into hourly intervals. Since TimescaleDB continuous
- * aggregates operate on stored rows, the hourly splitting is performed first
- * and persisted in hypertable_hourly_split.
- *
- * The cik_vary conversion values (slope, intercept, and destination unit) are
- * applied and stored during the split process. This avoids runtime joins to
- * cik_vary when querying the continuous aggregate and preserves the correct
- * time-varying conversion that applied when the reading occurred.
- *
- * hypertable_hourly_split stores normalized hourly slices. The continuous
- * aggregate built on top of it provides pre-computed aggregation results,
- * similar to a PostgreSQL materialized view, while allowing TimescaleDB to
- * incrementally refresh only affected time ranges.
+ * create_prerequisites.sql
  *
  * Purpose:
  *
- *   Compare query performance and behavior between:
+ *   Create the TimescaleDB infrastructure required by the hourly and daily
+ *   continuous aggregates.
  *
- *     1. Existing PostgreSQL materialized views
- *     2. TimescaleDB continuous aggregates
+ * This script creates:
  *
- *   The goal is to determine whether migrating the timeVary branch reporting
- *   workload to TimescaleDB provides measurable performance benefits.
+ *   1. hypertable_hourly_split
+ *   2. TimescaleDB hypertable
+ *   3. Supporting indexes
+ *   4. Trigger function to maintain the hypertable
+ *   5. Trigger on readings
+ *   6. Rebuild function
  *
+ * Data flow:
+ *
+ *   readings
+ *       │
+ *       ▼
+ *   hypertable_hourly_split
+ *
+ * Notes:
+ *
+ *   - This script does not create any continuous aggregates.
+ *   - The trigger maintains the hypertable as readings are inserted,
+ *     updated, or deleted.
+ *   - The rebuild function allows the hypertable to be regenerated from
+ *     readings when required (for example after rebuilding cik_vary).
  */
 
-
-/*
+ /*
  * 1. Create hypertable_hourly_split.
  *
  * Stores readings after they have been split into hourly intervals.
@@ -302,13 +285,25 @@ ON readings;
  * The trigger fires after changes are committed to readings so the trigger
  * function can query the updated source row when generating hourly slices.
  *
+ * This trigger maintains the source data used by TimescaleDB continuous
+ * aggregates.
+ *
+ * TimescaleDB continuous aggregates do not refresh immediately from this
+ * trigger. They track affected time ranges through invalidation and are
+ * refreshed separately using:
+ *
+ *     refresh_continuous_aggregate()
+ *
+ *     or a continuous aggregate refresh policy.
+ *
  * Events:
  *
  *   INSERT:
  *       Creates hourly split records for the new reading.
  *
  *   UPDATE:
- *       Refreshes hourly split records for the modified reading.
+ *       Removes old hourly split records and recreates them from the
+ *       modified reading.
  *
  *   DELETE:
  *       Removes hourly split records generated from the deleted reading.
@@ -434,145 +429,3 @@ BEGIN
 	) gen(interval_start);
 END;
 $$;
-
-
-/*
- * 7. Create continuous aggregate for hourly meter readings.
- *
- * This continuous aggregate replaces the existing
- * meter_hourly_readings_unit materialized view using TimescaleDB's
- * incremental aggregation engine.
- *
- * Data flow:
- *
- *   hypertable_hourly_split
- *           |
- *           v
- *   meter_hourly_readings_unit_cagg
- *
- *
- * The hourly split table already contains:
- *
- *   - hourly overlap calculations
- *   - cik_vary conversion parameters
- *   - unit metadata
- *
- * Therefore, the continuous aggregate does not need to join against
- * cik_vary or other lookup tables during query execution.
- *
- *
- * Reading calculation:
- *
- * hypertable_hourly_split stores reading contributions scaled by the
- * duration overlap within each hourly slice.
- *
- * To calculate the final hourly reading rate:
- *
- *   1. Convert the stored contribution back into a rate.
- *   2. Apply the cik_vary conversion:
- *
- *          converted_value = rate * slope + intercept
- *
- *   3. Weight the converted rate by the duration of the slice.
- *   4. Divide by the total duration to produce the weighted average.
- *
- * This reproduces the calculation performed by the original
- * meter_hourly_readings_unit materialized view.
- */
-DROP MATERIALIZED VIEW IF EXISTS meter_hourly_readings_unit_cagg;
-
-CREATE MATERIALIZED VIEW meter_hourly_readings_unit_cagg
-WITH (timescaledb.continuous) 
-AS
-SELECT
-    meter_id,
-    graphic_unit_id,
-
-    /*
-     * Group hourly slices into TimescaleDB continuous aggregate buckets.
-     */
-    time_bucket(
-        '1 hour',
-        start_timestamp
-    ) AS bucket,
-
-
-    /*
-     * Weighted average reading rate with cik_vary conversion applied.
-     *
-     * Each slice contributes based on its duration within the hour.
-     */
-    sum(
-        (
-            reading
-            /
-            extract(
-                EPOCH FROM (end_timestamp - start_timestamp)
-            )
-            * slope
-            + intercept
-        )
-        *
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-    )
-    /
-    sum(
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-    ) AS reading_rate,
-
-
-    /*
-     * Maximum converted reading rate observed within the hour.
-     */
-    max(
-        reading
-        /
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-        * slope
-        + intercept
-    ) AS max_rate,
-
-
-    /*
-     * Minimum converted reading rate observed within the hour.
-     */
-    min(
-        reading
-        /
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-        * slope
-        + intercept
-    ) AS min_rate,
-
-
-    /*
-     * Unit metadata is preserved so consumers can interpret the aggregate
-     * values correctly.
-     */
-    unit_represent,
-    sec_in_rate
-
-
-FROM hypertable_hourly_split
-
-
-GROUP BY
-    meter_id,
-    graphic_unit_id,
-    time_bucket('1 hour', start_timestamp),
-    unit_represent,
-    sec_in_rate
-WITH NO DATA;
-
-ALTER MATERIALIZED VIEW meter_hourly_readings_unit_cagg
-SET (
-    timescaledb.materialized_only = false
-);

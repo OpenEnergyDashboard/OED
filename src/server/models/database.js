@@ -91,6 +91,9 @@ async function createSchema(conn) {
 	const Cik = require('./Cik');
 	const CikVary = require('./CikVary');
 
+	// TimescaleDB
+	const TimeScaleDBReading = require('./TimeScaleDB/Reading');
+
 	/* eslint-enable global-require */
 	await Unit.createUnitTypesEnum(conn);
 	await Unit.createAreaUnitTypesEnum(conn);
@@ -123,9 +126,11 @@ async function createSchema(conn) {
 	await Reading.createReadingsMaterializedViews(conn);
 	await Reading.createCompareReadingsFunction(conn);
 
-	// Create the TimescaleDB continuous aggregate view for hourly readings
-	await Reading.createTimescaleDBHourlyCagg(conn);
-	await Reading.updateMeterLineReadingHourlyCaag(conn);
+	// Create the TimescaleDB continuous aggregate view for readings
+	await TimeScaleDBReading.createPrerequisites(conn);
+	await TimeScaleDBReading.createHourlyReadings(conn);
+	await TimeScaleDBReading.createDailyReadings(conn);
+	await TimeScaleDBReading.updateMeterLineReadings(conn);
 
 	// For 3D reading
 	await Reading.create3DReadingsFunction(conn);

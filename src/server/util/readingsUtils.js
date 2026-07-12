@@ -11,7 +11,6 @@ const { refreshAllReadingViews } = require('../services/refreshAllReadingViews')
 const readCsv = require('../services/pipeline-in-progress/readCsv');
 const moment = require('moment');
 const Group = require('../models/Group');
-const Reading = require('../models/Reading');
 
 const ETERNITY = TimeInterval.unbounded();
 // Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions
@@ -43,14 +42,13 @@ async function prepareTest(unitData, conversionData, meterData, groupData = []) 
 	await insertGroups(groupData, conn);
 	await redoCikVary(conn);
 
-    // Only refresh meter views if there is no group changes.
-    if (groupData.length == 0) {
-        await Reading.refreshMeterReadingsViews(conn);
-    }
-    else {
+    if (groupData.length != 0) {
         await Group.refreshGroupsDeepMetersView(conn);
-        await refreshAllReadingViews();
     }
+
+    // Refresh both the legacy materialized views and the TimescaleDB
+    // continuous aggregates through the centralized refresh service.
+    await refreshAllReadingViews();
 }
 
 /**

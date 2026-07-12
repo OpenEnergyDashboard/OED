@@ -9,7 +9,7 @@ const updateMeters = require('../updateMeters');
 const { log } = require('../../log');
 const { getConnection } = require('../../db');
 const readEgaugeData = require('./readEgaugeData');
-const { refreshMeterReadingsViews } = require('../../models/Reading');
+const { refreshAllReadingViews } = require('../refreshAllReadingViews');
 
 /**
  * For every enabled eGauge meter, update the readings in the database.
@@ -29,7 +29,7 @@ async function updateEgaugeMeters() {
 		// We refresh the readings so they can be graphed to see the new ones.
 		// TODO If the system is getting other types of meters this may cause the refresh
 		// to happen multiple times. Might want to work on this in the future.
-		await refreshMeterReadingsViews(conn);
+		await refreshAllReadingViews();
 	} catch (err) {
 		log.error(`Error fetching eGauge meter data: ${err}`, err);
 	}

@@ -31,40 +31,16 @@
  *       before aggregation, avoiding runtime joins to cik_vary.
  *
  *   Daily:
- *       Uses:
+ *       Uses the TimescaleDB continuous aggregate:
  *
- *           meter_daily_readings_unit
+ *           meter_daily_readings_unit_cagg
  *
+ *       The daily continuous aggregate is built on top of:
  *
- * Parameters:
+ *           meter_hourly_readings_unit_cagg
  *
- *   meter_ids:
- *       Array of meter IDs to retrieve readings for.
- *
- *   passed_graphic_unit_id:
- *       Destination graphic unit ID used for converting readings.
- *
- *   start_stamp:
- *       Beginning timestamp of the requested range.
- *
- *   end_stamp:
- *       Ending timestamp of the requested range.
- *
- *   point_accuracy:
- *       Controls the resolution selection.
- *
- *       Values:
- *
- *           raw     - Return raw readings.
- *           hourly  - Return hourly aggregated readings.
- *           daily   - Return daily aggregated readings.
- *           auto    - Automatically select the best resolution.
- *
- *   max_raw_points:
- *       Maximum raw points allowed when point_accuracy = 'auto'.
- *
- *   max_hour_points:
- *       Maximum hourly points allowed when point_accuracy = 'auto'.
+ *       Daily aggregation reuses precomputed hourly aggregate values instead
+ *       of recalculating from the hourly split hypertable.
  *
  *
  * Resolution selection:
@@ -76,7 +52,7 @@
  *
  *       1. Raw readings
  *       2. Hourly continuous aggregate
- *       3. Daily readings
+ *       3. Daily continuous aggregate
  *
  *
  * Notes:
@@ -92,6 +68,14 @@
  *
  *         meter_hourly_readings_unit_cagg
  *
+ *   - The daily data path previously queried the PostgreSQL materialized view:
+ *
+ *         meter_daily_readings_unit
+ *
+ *     and now uses the TimescaleDB continuous aggregate:
+ *
+ *         meter_daily_readings_unit_cagg
+ *
  *   - Design details:
  *
  *                           meter_line_readings_unit
@@ -99,11 +83,35 @@
  *                    +----------------+----------------+
  *                    |                |                |
  *                    v                v                v
- *                readings     hourly continuous     daily view
- *                                 aggregate
- *                                     |
- *                                     v
+ *                readings     hourly continuous   daily continuous
+ *                                 aggregate          aggregate
+ *                                     |                |
+ *                                     v                v
  *                      meter_hourly_readings_unit_cagg
+ *                                                     |
+ *                                                     v
+ *                                      meter_daily_readings_unit_cagg
+ */
+
+
+/*
+ * DAILY READINGS
+ *
+ * Uses TimescaleDB daily continuous aggregate.
+ *
+ * Data source:
+ *
+ *     meter_daily_readings_unit_cagg
+ *
+ * The daily continuous aggregate rolls up hourly aggregate values into
+ * one-day intervals.
+ *
+ * The time interval is stored as a PostgreSQL tsrange:
+ *
+ *     ("2021-06-01 00:00:00","2021-06-02 00:00:00")
+ *
+ * The lower and upper bounds are converted back into timestamps so the
+ * result matches the function return type.
  */
 
 
@@ -553,43 +561,47 @@ BEGIN
 
         /*
          * DAILY READINGS
+		 *
+         * Uses TimescaleDB continuous aggregate.
          */
         ELSE
 
-            RETURN QUERY
-
-            SELECT
-
-                daily.meter_id,
-
-                daily.reading_rate,
-
-                daily.min_rate,
-
-                daily.max_rate,
-
-                lower(daily.time_interval),
-
-                upper(daily.time_interval)
-
-
-            FROM meter_daily_readings_unit daily
-
-
-            WHERE requested_range @>
-                daily.time_interval
-
-            AND daily.meter_id = current_meter_id
-
-            AND daily.graphic_unit_id =
-                passed_graphic_unit_id
-
-
-            ORDER BY
-                start_timestamp ASC;
-
-
-        END IF;
+		    RETURN QUERY
+		
+		    SELECT
+		
+		        daily.meter_id,
+		
+		        daily.reading_rate,
+		
+		        daily.min_rate,
+		
+		        daily.max_rate,
+		
+		        lower(daily.time_interval) AS start_timestamp,
+		
+		        upper(daily.time_interval) AS end_timestamp
+		
+		
+		    FROM meter_daily_readings_unit_cagg daily
+		
+		
+		    WHERE requested_range @>
+		        daily.time_interval
+		
+		
+		    AND daily.meter_id = current_meter_id
+		
+		
+		    AND daily.graphic_unit_id =
+		        passed_graphic_unit_id
+		
+		
+		    ORDER BY
+		        start_timestamp ASC;
+		
+		
+		END IF;
 
 
         current_meter_index :=

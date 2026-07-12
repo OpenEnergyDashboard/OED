@@ -17,6 +17,7 @@ const { insertUnits, insertConversions } = require('../../util/insertData');
 const { redoCikVary } = require('../../services/graph/redoCik');
 const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
 const { getUnitId, unitDatakWh, conversionDatakWh } = require('../../util/readingsUtils');
+const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
 // Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions
 const { DELTA } = require('../../util/readingsUtils.js');
 
@@ -122,6 +123,40 @@ mocha.describe('Line & bar Readings', () => {
 
 			expect(meter_id).to.equal(meter.id);
 			expect(reading_rate).to.be.closeTo(((50 * 1) + (100 * 2)) / (1 + 2), 0.0001);
+		});
+
+		mocha.it('TimescaleDB hourly and daily aggregates match the legacy views', async () => {
+			await Reading.insertAll([
+				new Reading(meter.id, 100, timestamp1, timestamp2),
+				new Reading(meter.id, 200, timestamp2, timestamp3),
+				new Reading(meter.id, 300, timestamp3, timestamp4),
+				new Reading(meter.id, 400, timestamp4, timestamp5)
+			], conn);
+
+			await refreshAllReadingViews();
+
+			const hourly = await conn.many(`
+				SELECT legacy.reading_rate AS legacy_rate, timescale.reading_rate AS timescale_rate
+				FROM meter_hourly_readings_unit legacy
+				INNER JOIN meter_hourly_readings_unit_cagg timescale
+					ON legacy.meter_id = timescale.meter_id
+					AND legacy.graphic_unit_id = timescale.graphic_unit_id
+					AND lower(legacy.time_interval) = timescale.bucket
+				ORDER BY legacy.time_interval
+			`);
+			const daily = await conn.many(`
+				SELECT legacy.reading_rate AS legacy_rate, timescale.reading_rate AS timescale_rate
+				FROM meter_daily_readings_unit legacy
+				INNER JOIN meter_daily_readings_unit_cagg timescale
+					USING (meter_id, graphic_unit_id, time_interval)
+				ORDER BY time_interval
+			`);
+
+			expect(hourly).to.have.length(4);
+			expect(daily).to.have.length(1);
+			for (const row of [...hourly, ...daily]) {
+				expect(row.timescale_rate).to.be.closeTo(row.legacy_rate, DELTA);
+			}
 		});
 	});
 
