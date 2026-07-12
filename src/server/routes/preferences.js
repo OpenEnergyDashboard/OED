@@ -113,24 +113,26 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 			}
 		}
 	};
-	const prefs = req.body.preferences || {};
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
-	} else if (
+		return res.sendStatus(HTTP_CODES.BAD_REQUEST);
+	}
+
+	const prefs = req.body.preferences;
+	if (
 		// preferences.js does not use moment; validate date strings directly
 		(prefs.defaultMeterMinimumDate && !isValidIsoDateTime(prefs.defaultMeterMinimumDate)) ||
 		(prefs.defaultMeterMaximumDate && !isValidIsoDateTime(prefs.defaultMeterMaximumDate))
 	) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
-	} else {
-		const conn = getConnection();
-		try {
-			const rows = await Preferences.update(req.body.preferences, conn);
-			res.json(rows);
-		} catch (err) {
-			log.error(`Error while performing POST update preferences: ${err}`, err);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
-		}
+		return res.sendStatus(HTTP_CODES.BAD_REQUEST);
+	}
+
+	const conn = getConnection();
+	try {
+		const rows = await Preferences.update(prefs, conn);
+		return res.json(rows);
+	} catch (err) {
+		log.error(`Error while performing POST update preferences: ${err}`, err);
+		return res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 	}
 });
 

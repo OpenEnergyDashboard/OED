@@ -112,6 +112,14 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 				}
 			});
 
+			mocha.it('should accept legacy date-time format with a space separator', async () => {
+				const res = await chai.request(app)
+					.get(`${BASE_METER_ENDPOINT}/1`)
+					.query({ ...validQuery, curr_start: '2023-01-01 00:00:00', curr_end: '2023-01-02 00:00:00' });
+
+				expect(res.status).to.equal(HTTP_CODES.OK);
+			});
+
 			mocha.it('should reject invalid curr_end format', async () => {
 				const invalidDates = [
 					'not-a-date',

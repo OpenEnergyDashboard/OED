@@ -11,7 +11,9 @@ const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { STRING_GENERAL_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
-const { isValidIsoDateTime, isValidIsoDuration } = require('../util/timeValidation');
+const { isValidIsoDuration } = require('../util/timeValidation');
+
+const DATE_TIME_WITH_TIME_REGEX = /^\d{4}-\d{2}-\d{2}(?:T| )\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?$/;
 
 function validateMeterCompareReadingsParams(params) {
 	const validParams = {
@@ -77,9 +79,6 @@ function validateQueryParams(queryParams) {
 }
 
 function isValidCompareDateTime(value) {
-	if (typeof value !== 'string') {
-		return false;
-	}
 	return DATE_TIME_WITH_TIME_REGEX.test(value) && moment.parseZone(value, [moment.ISO_8601, 'YYYY-MM-DD HH:mm:ss'], true).isValid();
 }
 
@@ -126,6 +125,7 @@ function createRouter() {
 		const shiftRaw = req.query.shift;
 
 		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
+		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			return;
 		}
@@ -148,6 +148,7 @@ function createRouter() {
 		const currEndRaw = req.query.curr_end;
 		const shiftRaw = req.query.shift;
 
+		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
 		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			return;

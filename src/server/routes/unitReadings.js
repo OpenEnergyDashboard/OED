@@ -408,7 +408,7 @@ function createRouter() {
 	router.get('/line/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -423,7 +423,7 @@ function createRouter() {
 	router.get('/line/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
@@ -438,7 +438,7 @@ function createRouter() {
 	router.get('/bar/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -454,7 +454,7 @@ function createRouter() {
 	router.get('/bar/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
@@ -470,7 +470,7 @@ function createRouter() {
 	router.get('/radar/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -485,7 +485,7 @@ function createRouter() {
 	router.get('/radar/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));

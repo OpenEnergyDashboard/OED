@@ -5,6 +5,7 @@
 const moment = require('moment');
 
 const ISO_DURATION_REGEX = /^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$/;
+const ISO_DATETIME_WITH_TIMEZONE_REGEX = /^\d{4}-\d{2}-\d{2}T.+(?:Z|[+-]\d{2}:?\d{2})$/;
 
 /**
  * Returns true if value is a strictly valid ISO 8601 datetime string (with timezone).
@@ -12,7 +13,7 @@ const ISO_DURATION_REGEX = /^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+(\.\
  * @returns {boolean}
  */
 function isValidIsoDateTime(value) {
-	return moment.parseZone(value, moment.ISO_8601, true).isValid();
+	return ISO_DATETIME_WITH_TIMEZONE_REGEX.test(value) && moment.parseZone(value, moment.ISO_8601, true).isValid();
 }
 
 /**
@@ -21,26 +22,41 @@ function isValidIsoDateTime(value) {
  * @returns {boolean}
  */
 function isValidIsoDuration(value) {
-	return ISO_DURATION_REGEX.test(value);
+	const duration = moment.duration(value);
+	return ISO_DURATION_REGEX.test(value) && moment.isDuration(duration) && duration.isValid() && duration.asMilliseconds() > 0;
 }
 
 /**
  * Returns true if value is a valid timeInterval string as used by OED's TimeInterval class.
- * Accepted forms: 'all', 'ISO_ISO', 'ISO_' (right unbounded), '_ISO' (left unbounded).
+ * Accepted forms: 'all', 'ISO_ISO', and optionally 'ISO_' (right unbounded) or '_ISO' (left unbounded).
  * Each non-empty timestamp component must be a valid ISO 8601 datetime.
  * @param {string} value
+ * @param {boolean} allowOneSided true if 'ISO_' and '_ISO' should be accepted
  * @returns {boolean}
  */
-function isValidTimeInterval(value) {
-	if (value === 'all') return true;
+function isValidTimeInterval(value, allowOneSided = false) {
+	if (value === 'all') {
+		return true;
+	}
 	const underscoreIndex = value.indexOf('_');
-	if (underscoreIndex === -1) return false;
+	if (underscoreIndex === -1) {
+		return false;
+	}
 	const start = value.substring(0, underscoreIndex);
 	const end = value.substring(underscoreIndex + 1);
-	// At least one side must be present, and any present side must be a valid ISO datetime.
-	if (!start && !end) return false;
-	if (start && !isValidIsoDateTime(start)) return false;
-	if (end && !isValidIsoDateTime(end)) return false;
+	// One-sided intervals have an empty start or end around the underscore.
+	if ((!start || !end) && !allowOneSided) {
+		return false;
+	}
+	if (!start && !end) {
+		return false;
+	}
+	if (start && !isValidIsoDateTime(start)) {
+		return false;
+	}
+	if (end && !isValidIsoDateTime(end)) {
+		return false;
+	}
 	return true;
 }
 
