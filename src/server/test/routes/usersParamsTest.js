@@ -62,7 +62,8 @@ mocha.describe('Users Parameter Validation', () => {
 
 		mocha.it('should validate user_id parameter', async () => {
 			// Test invalid user ID patterns (non-numeric)
-			const invalidIds = ['abc', '12abc', 'user123', 'null', ''];
+			// TODO This used to include '' but that went to the wrong route. Once these are sent as a parameter (not /:) then it could be added back.
+			const invalidIds = ['abc', '12abc', 'user123', 'null'];
 
 			for (const invalidId of invalidIds) {
 				const res = await chai.request(app)

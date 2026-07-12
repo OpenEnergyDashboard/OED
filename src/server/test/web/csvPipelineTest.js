@@ -7,8 +7,9 @@ const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Point = require('../../models/Point');
 const Unit = require('../../models/Unit');
-const { insertStandardUnits, insertStandardConversions, insertUnits, insertConversions } = require('../../util/insertData')
+const { insertStandardUnits, insertStandardConversions, insertUnits, insertConversions } = require('../../util/insertData');
 const { redoCik } = require('../../services/graph/redoCik');
+const { expectMetersToBeEquivalent } = require('./meters');
 const util = require('util');
 const fs = require('fs');
 const csv = require('csv');
@@ -31,6 +32,28 @@ const CHAI_METERS_REQUEST_EMAIL = `chai.request(app).post('${UPLOAD_METERS_ROUTE
 // Note there is only one description for all uploads in a test (not an array)
 // but all other keys are arrays of length number of uploads in test.
 // Note the use of double quotes for strings because some have single quotes within.
+
+/**
+ * Adds the expanded pipeline log status fields to expected response messages.
+ * @param {string} message The expected response message before the extra log status fields are added.
+ * @param {boolean} honorDst The expected honorDst log value. This is intentionally explicit so missing values do not silently default.
+ * @returns {string} The expected response message with the extra log status fields added.
+ */
+function appendPipelineLogStatusValues(message, honorDst) {
+	return message.replace(
+		/; onlyEndTime (true|false)<br>/g,
+		`; onlyEndTime $1; honorDst ${honorDst}; relaxedParsing false; useMeterZone false; warnOnCumulativeReset false; useMeterFrequency false; useMeterFrequencyVariation 0<br>`
+	);
+}
+
+/**
+ * Checks whether a readings upload request enables DST handling.
+ * @param {string} chaiRequest The Chai request construction string for the upload.
+ * @returns {boolean} true if the request sets honorDst to true.
+ */
+function requestUsesHonorDst(chaiRequest) {
+	return chaiRequest.includes(".field('honorDst', true)");
+}
 
 /**
  * description, what the tests aims to test
@@ -526,6 +549,12 @@ const testCases = {
 	}
 }
 
+Object.values(testCases).forEach(testCase => {
+	testCase.responseString = testCase.responseString.map((message, index) =>
+		appendPipelineLogStatusValues(message, requestUsesHonorDst(testCase.chaiRequest[index]))
+	);
+});
+
 for (let fileKey in testCases) {
 	mocha.describe('Test CSV Pipeline', () => {
 		mocha.beforeEach(async () => {
@@ -897,50 +926,8 @@ for (let fileKey in testMeters) {
 				// Get the database value for the meter.
 				let meter = await Meter.getByName(expectMeter.name, conn);
 				// Verify they are the same.
-				compareMeters(expectMeter, meter);
+				expectMetersToBeEquivalent(expectMeter, meter);
 			}
 		});
 	});
-}
-
-// TODO It would be nice to make this use the code in src/server/test/db/meterTests.js and make
-// all meter tests use one common function fo meter comparison.
-/**
- * Compares the two provided meters to make sure they are the same.
- * @param {*} expectMeter A meter object that gives the values expected for the meter.
- * @param {*} receivedMeter A meter object that has the actual values (normally from database).
- */
-function compareMeters(expectMeter, receivedMeter) {
-	// Make sure it has all the expected properties with the values expected.
-	expect(receivedMeter).to.have.property('name', expectMeter.name);
-	expect(receivedMeter).to.have.property('url', expectMeter.url);
-	expect(receivedMeter).to.have.property('enabled', expectMeter.enabled);
-	expect(receivedMeter).to.have.property('displayable', expectMeter.displayable);
-	expect(receivedMeter).to.have.property('type', expectMeter.type);
-	expect(receivedMeter).to.have.property('meterTimezone', expectMeter.meterTimezone);
-	expect(receivedMeter).to.have.property('gps');
-	// Only check GPS value if it exists.
-	if (receivedMeter.gps !== null) {
-		expect(receivedMeter.gps).to.have.property('latitude', expectMeter.gps.latitude);
-		expect(receivedMeter.gps).to.have.property('longitude', expectMeter.gps.longitude);
-	}
-	expect(receivedMeter).to.have.property('identifier', expectMeter.identifier);
-	expect(receivedMeter).to.have.property('note', expectMeter.note);
-	expect(receivedMeter).to.have.property('area', expectMeter.area);
-	expect(receivedMeter).to.have.property('cumulative', expectMeter.cumulative);
-	expect(receivedMeter).to.have.property('cumulativeReset', expectMeter.cumulativeReset);
-	expect(receivedMeter).to.have.property('cumulativeResetStart', expectMeter.cumulativeResetStart);
-	expect(receivedMeter).to.have.property('cumulativeResetEnd', expectMeter.cumulativeResetEnd);
-	expect(receivedMeter).to.have.property('readingGap', expectMeter.readingGap);
-	expect(receivedMeter).to.have.property('readingVariation', expectMeter.readingVariation);
-	expect(receivedMeter).to.have.property('readingDuplication', expectMeter.readingDuplication);
-	expect(receivedMeter).to.have.property('timeSort', expectMeter.timeSort);
-	expect(receivedMeter).to.have.property('endOnlyTime', expectMeter.endOnlyTime);
-	expect(receivedMeter).to.have.property('reading', expectMeter.reading);
-	expect(receivedMeter).to.have.property('startTimestamp', expectMeter.startTimestamp);
-	expect(receivedMeter).to.have.property('endTimestamp', expectMeter.endTimestamp);
-	expect(receivedMeter.previousEnd.isSame(moment.parseZone(expectMeter.previousEnd, true).tz('UTC', true))).to.equal(true);
-	expect(receivedMeter).to.have.property('unitId', expectMeter.unitId);
-	expect(receivedMeter).to.have.property('defaultGraphicUnit', expectMeter.defaultGraphicUnit);
-	expect(receivedMeter).to.have.property('areaUnit', expectMeter.areaUnit);
 }

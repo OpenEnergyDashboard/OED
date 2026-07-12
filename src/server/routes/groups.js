@@ -32,7 +32,7 @@ function formatGroupForResponse(item) {
 	return {
 		id: item.id, name: item.name, gps: item.gps, displayable: item.displayable,
 		note: item.note, area: item.area, defaultGraphicUnit: item.defaultGraphicUnit,
-		deepMeters: item.children, areaUnit: item.areaUnit
+		deepMeters: item.deepMeters, deepGroups: item.deepGroups, areaUnit: item.areaUnit
 	};
 }
 
@@ -53,11 +53,10 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
-		deepChildren = [];
-		promises = await rows.map(async (row) => {
-			const deepChildren = await Group.getDeepMetersByGroupID(row.id, conn);
-			return { ...row, children: deepChildren };
-		})
+		const promises = await rows.map(async (row) => {
+			const deepMeters = await Group.getDeepMetersByGroupID(row.id, conn);
+			return { ...row, deepMeters: deepMeters};
+		});
 		Promise.all(promises).then(function (values) {
 			res.json(values.map(formatGroupForResponse));
 		})
@@ -76,6 +75,26 @@ router.get('/idname', optionalAuthMiddleware, async (req, res) => {
 		res.json(rows.map(formatToOnlyNameID));
 	} catch (err) {
 		log.error(`Error while performing GET all groups query: ${err}`, err);
+	}
+});
+
+/**GET info of all deep group children for every group
+ * Will return an array where every entry is a group with deep groups property
+ * @param item group
+*/
+router.get('/deep/groups', adminAuthMiddleware('view deep groups'), async (req, res) => {
+	const conn = getConnection();
+	try{
+		const rows = await Group.getAll(conn);
+		const promises = await rows.map(async (row) => {
+			const deepGroups = await Group.getDeepGroupsByGroupID(row.id, conn);
+			return { ...row, deepGroups: deepGroups, deepMeters: [] };
+		});
+		Promise.all(promises).then(function (values) {
+			res.json(values.map(formatGroupForResponse));
+		});
+	} catch (err) {
+		log.error(`Error while performing GET deep groups for all groups query: ${err}`, err);
 	}
 });
 
@@ -209,8 +228,8 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 		type: 'object',
 		additionalProperties: false,
 		required: ['name', 'childGroups', 'childMeters'],
+		maxProperties: 9,
 		properties: {
-			id: { type: 'integer', minimum: 1 },
 			name: {
 				type: 'string',
 				minLength: 1,
@@ -257,7 +276,7 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 					minimum: 1
 				}
 			},
-			defaultGraphicUnit: { type: 'integer', minimum: 1 },
+			defaultGraphicUnit: {'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }]},
 			areaUnit: {
 				type: 'string',
 				minLength: 1,
@@ -270,7 +289,7 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 	const validatorResult = validate(req.body, validGroup);
 	if (!validatorResult.valid) {
 		log.error(`Got request to create group with invalid data, errors: ${validatorResult.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to creat group with invalid data. Error(s): " + validatorResult.errors.toString());
+		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to create group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -358,7 +377,7 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 					minimum: 1
 				}
 			},
-			defaultGraphicUnit: { type: 'integer', minimum: 1 },
+			defaultGraphicUnit: {'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }]},
 			areaUnit: {
 				type: 'string',
 				minLength: 1,

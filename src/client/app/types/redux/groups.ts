@@ -18,6 +18,7 @@ export interface GroupData {
 	childMeters: number[];
 	childGroups: number[];
 	deepMeters: number[];
+	deepGroups: number[];
 	gps: GPSPoint | null;
 	displayable: boolean;
 	note?: string;
@@ -26,7 +27,6 @@ export interface GroupData {
 	defaultGraphicUnit: number;
 	areaUnit: AreaUnitType;
 }
-
 
 // TODO this duplicates two fields in ones above so decide if should somehow merge.
 export interface GroupChildren {
