@@ -72,6 +72,7 @@ mocha.describe('timeValidation utility', () => {
 			const invalid = [
 				'P',          // empty duration
 				'P1X',        // invalid designator
+				'PT0S',       // zero duration
 				'1D',         // missing leading P
 				'not-a-duration',
 				'2023-01-01T00:00:00Z',  // datetime, not duration
@@ -93,14 +94,19 @@ mocha.describe('timeValidation utility', () => {
 			expect(isValidTimeInterval(v)).to.equal(true);
 		});
 
-		mocha.it('should accept left-unbounded _ISO format', () => {
+		mocha.it('should accept left-unbounded _ISO format when one-sided intervals are allowed', () => {
 			const v = '_2023-12-31T23:59:59.999Z';
-			expect(isValidTimeInterval(v)).to.equal(true);
+			expect(isValidTimeInterval(v, true)).to.equal(true);
 		});
 
-		mocha.it('should accept right-unbounded ISO_ format', () => {
+		mocha.it('should accept right-unbounded ISO_ format when one-sided intervals are allowed', () => {
 			const v = '2023-01-01T00:00:00.000Z_';
-			expect(isValidTimeInterval(v)).to.equal(true);
+			expect(isValidTimeInterval(v, true)).to.equal(true);
+		});
+
+		mocha.it('should reject one-sided intervals by default', () => {
+			expect(isValidTimeInterval('_2023-12-31T23:59:59.999Z')).to.equal(false);
+			expect(isValidTimeInterval('2023-01-01T00:00:00.000Z_')).to.equal(false);
 		});
 
 		mocha.it('should reject strings with no underscore', () => {
