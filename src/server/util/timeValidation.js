@@ -35,22 +35,26 @@ function isValidIsoDuration(value) {
  * @returns {boolean}
  */
 function isValidTimeInterval(value, allowOneSided = false) {
+	// 'all' means an unbounded interval covering all available data.
 	if (value === 'all') {
 		return true;
 	}
+	// A time interval needs an underscore between the start and end times.
 	const underscoreIndex = value.indexOf('_');
 	if (underscoreIndex === -1) {
 		return false;
 	}
 	const start = value.substring(0, underscoreIndex);
 	const end = value.substring(underscoreIndex + 1);
-	// One-sided intervals have an empty start or end around the underscore.
+	// Empty start or end times are allowed only when the route supports them.
 	if ((!start || !end) && !allowOneSided) {
 		return false;
 	}
+	// Reject '_' because it has no start or end time.
 	if (!start && !end) {
 		return false;
 	}
+	// Check the start and end times only if they were provided.
 	if (start && !isValidIsoDateTime(start)) {
 		return false;
 	}
