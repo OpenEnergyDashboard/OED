@@ -72,13 +72,27 @@ export default function PreferencesComponent() {
 
 		warningFileSize: (): boolean => {
 			return Number(localAdminPref.defaultWarningFileSize) < 0
-				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit);
+				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit)
+				|| Number(localAdminPref.defaultWarningFileSize) > Number.MAX_SAFE_INTEGER;
 		},
 
 		fileSizeLimit: (): boolean => {
 			return Number(localAdminPref.defaultFileSizeLimit) < 0
-				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit);
+				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit)
+				|| Number(localAdminPref.defaultFileSizeLimit) > Number.MAX_SAFE_INTEGER;
 		}
+	};
+
+	const getInvalidFieldNames = (): string => {
+		let invalidFieldNames = '';
+		if (invalidFuncs.readingFreq()) invalidFieldNames += translate('default.meter.reading.frequency') + ', ';
+		if (invalidFuncs.minDate()) invalidFieldNames += translate('default.meter.minimum.date') + ', ';
+		if (invalidFuncs.maxDate()) invalidFieldNames += translate('default.meter.maximum.date') + ', ';
+		if (invalidFuncs.readingGap()) invalidFieldNames += translate('default.meter.reading.gap') + ', ';
+		if (invalidFuncs.meterErrors()) invalidFieldNames += translate('default.meter.maximum.errors') + ', ';
+		if (invalidFuncs.warningFileSize()) invalidFieldNames += translate('default.warning.file.size') + ', ';
+		if (invalidFuncs.fileSizeLimit()) invalidFieldNames += translate('default.file.size.limit') + ', ';
+		return invalidFieldNames.slice(0, -2);
 	};
 
 	return (
@@ -394,6 +408,14 @@ export default function PreferencesComponent() {
 				<Button
 					type='submit'
 					onClick={() => {
+						const invalidFieldNames = getInvalidFieldNames();
+						if (invalidFieldNames) {
+							showErrorNotification(
+								translate('failed.to.submit.changes') + '(' + invalidFieldNames + translate('failed.to.submit.changes.fields')
+							);
+							return;
+						}
+
 						submitPreferences(localAdminPref)
 							.unwrap()
 							.then(() => {
@@ -403,6 +425,8 @@ export default function PreferencesComponent() {
 								showErrorNotification(translate('failed.to.submit.changes') + err.data);
 							});
 					}}
+					/* TODO DEBUG: removed the invalidFuncs check so that we can test the new error messages that display specific reasons */
+					/*disabled={!hasChanges}*/
 					disabled={!hasChanges || Object.values(invalidFuncs).some(check => check())}
 					color='primary'
 				>
