@@ -53,8 +53,6 @@
  * The lower bound is the start of the day and the upper bound is the start
  * of the following day.
  */
-DROP MATERIALIZED VIEW IF EXISTS meter_daily_readings_unit_cagg;
-
 CREATE MATERIALIZED VIEW meter_daily_readings_unit_cagg
 WITH (timescaledb.continuous)
 AS

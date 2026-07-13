@@ -68,8 +68,6 @@
  * This reproduces the calculation performed by the original
  * meter_hourly_readings_unit materialized view.
  */
-DROP MATERIALIZED VIEW IF EXISTS meter_hourly_readings_unit_cagg;
-
 CREATE MATERIALIZED VIEW meter_hourly_readings_unit_cagg
 WITH (timescaledb.continuous) 
 AS

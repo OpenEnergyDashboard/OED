@@ -128,6 +128,7 @@ async function createSchema(conn) {
 
 	// Create the TimescaleDB continuous aggregate view for readings
 	await TimeScaleDBReading.createPrerequisites(conn);
+	await TimeScaleDBReading.dropReadingAggregates(conn);
 	await TimeScaleDBReading.createHourlyReadings(conn);
 	await TimeScaleDBReading.createDailyReadings(conn);
 	await TimeScaleDBReading.updateMeterLineReadings(conn);
