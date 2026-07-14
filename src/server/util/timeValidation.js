@@ -13,6 +13,9 @@ const ISO_DATETIME_WITH_TIMEZONE_REGEX = /^\d{4}-\d{2}-\d{2}T.+(?:Z|[+-]\d{2}:?\
  * @returns {boolean}
  */
 function isValidIsoDateTime(value) {
+	if (typeof value !== 'string') {
+		return false;
+	}
 	return ISO_DATETIME_WITH_TIMEZONE_REGEX.test(value) && moment.parseZone(value, moment.ISO_8601, true).isValid();
 }
 
@@ -22,6 +25,9 @@ function isValidIsoDateTime(value) {
  * @returns {boolean}
  */
 function isValidIsoDuration(value) {
+	if (typeof value !== 'string') {
+		return false;
+	}
 	const duration = moment.duration(value);
 	return ISO_DURATION_REGEX.test(value) && moment.isDuration(duration) && duration.isValid() && duration.asMilliseconds() > 0;
 }
@@ -35,6 +41,9 @@ function isValidIsoDuration(value) {
  * @returns {boolean}
  */
 function isValidTimeInterval(value, allowOneSided = false) {
+	if (typeof value !== 'string') {
+		return false;
+	}
 	// 'all' means an unbounded interval covering all available data.
 	if (value === 'all') {
 		return true;
