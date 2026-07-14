@@ -98,14 +98,13 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				expect([HTTP_CODES.OK, HTTP_CODES.BAD_REQUEST, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 			});
 
-			mocha.it('should handle XSS attempts in timeInterval', async () => {
+			mocha.it('should reject XSS attempts in timeInterval', async () => {
 				const xssAttempt = '<script>alert("xss")</script>';
 				const res = await chai.request(app)
 					.get(`${LINE_COUNT_BASE_ENDPOINT}/1`)
 					.query({ timeInterval: xssAttempt });
 
-				// XSS attempt causes moment.js warning and 500 error
-				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
+				expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 			});
 		});
 	});
@@ -174,14 +173,13 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		});
 
 		mocha.describe('Malicious Input Tests', () => {
-			mocha.it('should handle special characters in timeInterval', async () => {
+			mocha.it('should reject special characters in timeInterval', async () => {
 				const specialChars = `${READINGS_LINE_TIME_INTERVAL}&cmd=ls`;
 				const res = await chai.request(app)
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/1`)
 					.query({ timeInterval: specialChars });
 
-				// Should be handled gracefully, not crash server
-				expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
+				expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 			});
 		});
 	});
@@ -196,13 +194,12 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			expect([HTTP_CODES.OK, HTTP_CODES.NOT_FOUND]).to.include(res.status);
 		});
 
-		mocha.it('should handle malformed timeInterval format', async () => {
+		mocha.it('should reject malformed timeInterval format', async () => {
 			const res = await chai.request(app)
 				.get(`${LINE_COUNT_BASE_ENDPOINT}/1`)
 				.query({ timeInterval: 'invalid_format' });
 
-			// Should not crash - may return 400 or 500 depending on TimeInterval.fromString handling
-			expect([HTTP_CODES.BAD_REQUEST, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
+			expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 		});
 	});
 });
