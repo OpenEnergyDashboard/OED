@@ -5,7 +5,7 @@
  */
 
 const { expect } = require('chai');
-const { mocha } = require('../common');
+const mocha = require('mocha');
 const { isValidIsoDateTime, isValidIsoDuration, isValidTimeInterval } = require('../../util/timeValidation');
 
 mocha.describe('timeValidation utility', () => {
@@ -52,6 +52,19 @@ mocha.describe('timeValidation utility', () => {
 				expect(isValidIsoDateTime(v), v).to.equal(false);
 			}
 		});
+
+		mocha.it('should reject non-string values', () => {
+			const invalid = [
+				['2023-01-01T00:00:00.000Z'],
+				null,
+				undefined,
+				{},
+				123
+			];
+			for (const v of invalid) {
+				expect(isValidIsoDateTime(v), String(v)).to.equal(false);
+			}
+		});
 	});
 
 	mocha.describe('isValidIsoDuration', () => {
@@ -80,6 +93,19 @@ mocha.describe('timeValidation utility', () => {
 			];
 			for (const v of invalid) {
 				expect(isValidIsoDuration(v), v).to.equal(false);
+			}
+		});
+
+		mocha.it('should reject non-string values', () => {
+			const invalid = [
+				['P1D'],
+				null,
+				undefined,
+				{},
+				123
+			];
+			for (const v of invalid) {
+				expect(isValidIsoDuration(v), String(v)).to.equal(false);
 			}
 		});
 	});
@@ -128,6 +154,21 @@ mocha.describe('timeValidation utility', () => {
 
 		mocha.it('should reject empty underscore with no timestamps', () => {
 			expect(isValidTimeInterval('_')).to.equal(false);
+		});
+
+		mocha.it('should reject non-string values', () => {
+			const validInterval = '2023-01-01T00:00:00.000Z_2023-12-31T23:59:59.999Z';
+			const invalid = [
+				[validInterval],
+				['all'],
+				null,
+				undefined,
+				{},
+				123
+			];
+			for (const v of invalid) {
+				expect(isValidTimeInterval(v), String(v)).to.equal(false);
+			}
 		});
 	});
 });

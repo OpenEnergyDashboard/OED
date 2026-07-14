@@ -79,6 +79,9 @@ function validateQueryParams(queryParams) {
 }
 
 function isValidCompareDateTime(value) {
+	if (typeof value !== 'string') {
+		return false;
+	}
 	return DATE_TIME_WITH_TIME_REGEX.test(value) && moment.parseZone(value, [moment.ISO_8601, 'YYYY-MM-DD HH:mm:ss'], true).isValid();
 }
 
