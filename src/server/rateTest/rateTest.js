@@ -10,7 +10,6 @@
 
 const { HTTP_CODE } = require('../util/readingsUtils');
 const { chai, mocha, expect, app } = require('../test/common');
-const { todo } = require('node:test');
 
 mocha.describe('Login Rate Limit', () => {
 	mocha.it('Should block repeated login attempts with 429', async () => {

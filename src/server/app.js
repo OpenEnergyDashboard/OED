@@ -152,7 +152,7 @@ app.use('/api/users', users);
 app.use('/api/meters', meters);
 app.use('/api/readings', readings);
 app.use('/api/preferences', preferences);
-app.use('api/login', login);
+app.use('/api/login', login);
 app.use('/api/groups', groups);
 app.use('/api/verification', verification);
 app.use('/api/version', version);
