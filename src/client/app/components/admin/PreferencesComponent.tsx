@@ -350,11 +350,11 @@ export default function PreferencesComponent() {
 						/>
 					) : (
 						<FormattedMessage
-						id="error.bounds"
-						values={{
-							min: 0,
-							max: Number(localAdminPref.defaultFileSizeLimit)
-						}}
+							id="error.bounds"
+							values={{
+								min: 0,
+								max: Number(localAdminPref.defaultFileSizeLimit)
+							}}
 						/>
 					)}
 				</FormFeedback>
@@ -375,12 +375,12 @@ export default function PreferencesComponent() {
 					{Number(localAdminPref.defaultFileSizeLimit) < 0 ? (
 						<FormattedMessage
 							id="error.greater"
-      						values={{ min: 0 }}
+							values={{ min: 0 }}
 						/>
 					) : (
 						<FormattedMessage
 							id="error.greater"
-      						values={{ min: Number(localAdminPref.defaultWarningFileSize) }}
+							values={{ min: Number(localAdminPref.defaultWarningFileSize) }}
 						/>
 					)}
 				</FormFeedback>
