@@ -13,26 +13,15 @@ const moment = require('moment');
 
 const ETERNITY = TimeInterval.unbounded();
 // Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions
+// TODO The ToEqual functions now allow for overriding this value. This is needed when the values are larger because the
+// number of digits of accuracy need fewer places past the decimal point. A better fix would be to use a relative error and
+// a custom assertion in chai. This has only happened in one test so far so not bothering to do that.
 const DELTA = 0.0000001;
 // Meter and group IDs when inserting into DB. The actual value should not matter.
 const METER_ID = 100;
 const GROUP_ID = 200;
 // Some common HTTP status response codes
-const HTTP_CODE = {
-	OK: 200,
-	FOUND: 302,
-	NOT_MODIFIED: 304,
-	BAD_REQUEST: 400,
-	UNAUTHORIZED: 401,
-	FORBIDDEN: 403,
-	NOT_FOUND: 404,
-	METHOD_NOT_ALLOWED: 405,
-	NOT_ACCEPTABLE: 406,
-	UNPROCESSABLE_ENTITY: 422,
-	TOO_MANY_REQUESTS: 429,
-	INTERNAL_SERVER_ERROR: 500,
-	SERVICE_UNAVAILABLE: 503
-};
+const { HTTP_CODES } = require('./httpCodes');
 
 /**
  * Initialize test database, call the functions to insert data into the database,
@@ -68,16 +57,18 @@ async function parseExpectedCsv(fileName) {
  * Compares readings from api call against the expected readings csv
  * @param {request.Response} res the response to the HTTP GET request from Chai
  * @param {array} expected the returned array from parseExpectedCsv
+ * @param {integer} id the meter id which defaults to the standard one of METER_ID.
+ * @param {number} tolerance allowed difference of two values specified in absolute terms. Default is the standard DELTA. This value should rarely be set and not used when a test fails to simply avoid the error. It is only necessary for large values so it mimics a relative error.
  */
-function expectReadingToEqualExpected(res, expected, id = METER_ID) {
+function expectReadingToEqualExpected(res, expected, id = METER_ID, tolerance = DELTA) {
 	expect(res).to.be.json;
-	expect(res).to.have.status(HTTP_CODE.OK);
+	expect(res).to.have.status(HTTP_CODES.OK);
 	// Did the response have the correct number of readings.
 	expect(res.body).to.have.property(`${id}`).to.have.lengthOf(expected.length);
 	// Loop over each reading
 	for (let i = 0; i < expected.length; i++) {
-		// Check that the reading's value is within the expected tolerance (DELTA).
-		expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(Number(expected[i][0]), DELTA);
+		// Check that the reading's value is within the expected tolerance.
+		expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('reading').to.be.closeTo(Number(expected[i][0]), tolerance);
 		// Reading has correct start/end date and time.
 		expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][1]));
 		expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][2]));
@@ -88,44 +79,48 @@ function expectReadingToEqualExpected(res, expected, id = METER_ID) {
  * Compares readings from api call against the expected readings csv
  * @param {request.Response} res the response to the HTTP GET request from Chai
  * @param {array} expected the returned array from parseExpectedCsv
+ * @param {integer} id the meter id which defaults to the standard one of METER_ID.
+ * @param {number} tolerance allowed difference of two values specified in absolute terms. Default is the standard DELTA. This value should rarely be set and not used when a test fails to simply avoid the error. It is only necessary for large values so it mimics a relative error.
  */
-function expectRangeToEqualExpected(res, expected, id = METER_ID) {
-    expect(res).to.be.json;
-    expect(res).to.have.status(HTTP_CODE.OK);
-    // Did the response have the correct number of readings.
-    expect(res.body).to.have.property(`${id}`).to.have.lengthOf(expected.length);
-    // Loop over each reading
-    for (let i = 0; i < expected.length; i++) {
-        // The parsing of the expected CSV file returns a string which will be null if no min/max
-        if (expected[i][0] === 'null' || expected[i][1] === 'null') {
-            // This is a case where raw/meter readings are being returned so min/max is null.
-            // Both expected values should always be null if one is so require one to be null to be safe.
-            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.equal(null);
-            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.equal(null);
-        } else {
-            // Check that the reading's min/max is within the expected tolerance (DELTA).
-            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.be.closeTo(Number(expected[i][0]), DELTA);
-            expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.be.closeTo(Number(expected[i][1]), DELTA);
-        }
-        // Reading has correct start/end date and time.
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][2]));
-        expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][3]));
-    }
+function expectRangeToEqualExpected(res, expected, id = METER_ID, tolerance = DELTA) {
+	expect(res).to.be.json;
+	expect(res).to.have.status(HTTP_CODES.OK);
+	// Did the response have the correct number of readings.
+	expect(res.body).to.have.property(`${id}`).to.have.lengthOf(expected.length);
+	// Loop over each reading
+	for (let i = 0; i < expected.length; i++) {
+		// The parsing of the expected CSV file returns a string which will be null if no min/max
+		if (expected[i][0] === 'null' || expected[i][1] === 'null') {
+			// This is a case where raw/meter readings are being returned so min/max is null.
+			// Both expected values should always be null if one is so require one to be null to be safe.
+			expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.equal(null);
+			expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.equal(null);
+		} else {
+			// Check that the reading's min/max is within the expected tolerance.
+			expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('min').to.be.closeTo(Number(expected[i][0]), tolerance);
+			expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('max').to.be.closeTo(Number(expected[i][1]), tolerance);
+		}
+		// Reading has correct start/end date and time.
+		expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('startTimestamp').to.equal(Date.parse(expected[i][2]));
+		expect(res.body).to.have.property(`${id}`).to.have.property(`${i}`).to.have.property('endTimestamp').to.equal(Date.parse(expected[i][3]));
+	}
 }
 
 /**
  * Compares readings from compare api call against the expected readings
  * @param {request.Response} res the response to the HTTP GET request from Chai
  * @param {array} expected the returned array from parseExpectedCsv
+ * @param {integer} id the meter id which defaults to the standard one of METER_ID.
+ * @param {number} tolerance allowed difference of two values specified in absolute terms. Default is the standard DELTA. This value should rarely be set and not used when a test fails to simply avoid the error. It is only necessary for large values so it mimics a relative error.
  */
-function expectCompareToEqualExpected(res, expected, id = METER_ID) {
+function expectCompareToEqualExpected(res, expected, id = METER_ID, tolerance = DELTA) {
 	expect(res).to.be.json;
-	expect(res).to.have.status(HTTP_CODE.OK);
+	expect(res).to.have.status(HTTP_CODES.OK);
 	// Did the response have the correct meter
 	expect(res.body).to.have.property(`${id}`);
-	// Check that the reading's values (previous value and current value) is within the expected tolerance (DELTA).
-	expect(res.body).to.have.property(`${id}`).to.have.property('curr_use').to.be.closeTo(Number(expected[0]), DELTA);
-	expect(res.body).to.have.property(`${id}`).to.have.property('prev_use').to.be.closeTo(Number(expected[1]), DELTA);
+	// Check that the reading's values (previous value and current value) is within the expected tolerance.
+	expect(res.body).to.have.property(`${id}`).to.have.property('curr_use').to.be.closeTo(Number(expected[0]), tolerance);
+	expect(res.body).to.have.property(`${id}`).to.have.property('prev_use').to.be.closeTo(Number(expected[1]), tolerance);
 }
 
 /**
@@ -134,13 +129,14 @@ function expectCompareToEqualExpected(res, expected, id = METER_ID) {
  * @param {array} expected the returned array from parseExpectedCsv of expected values
  * @param {integer} timePerReading hours each reading covers
  * @param {boolean} noData true if 3D request cannot return data so special values, false by default
+ * @param {number} tolerance allowed difference of two values specified in absolute terms. Default is the standard DELTA. This value should rarely be set and not used when a test fails to simply avoid the error. It is only necessary for large values so it mimics a relative error.
  */
-function expectThreeDReadingToEqualExpected(res, expected, timePerReading, noData = false) {
+function expectThreeDReadingToEqualExpected(res, expected, timePerReading, noData = false, tolerance = DELTA) {
 	let readingsPerDay = 24 / timePerReading;
 	// Number of days expected to be returned. Special of only 1 value if 3D cannot return data so special value.
 	let days = noData ? 1 : expected.length / readingsPerDay;
 	expect(res).to.be.json;
-	expect(res).to.have.status(HTTP_CODE.OK);
+	expect(res).to.have.status(HTTP_CODES.OK);
 	// Did the response have the correct type of properties.
 	expect(res.body).to.have.property('xData');
 	expect(res.body).to.have.property('yData');
@@ -176,7 +172,7 @@ function expectThreeDReadingToEqualExpected(res, expected, timePerReading, noDat
 			if (expected[expectedIndex][0] === 'null') {
 				expect(res.body.zData[dayIndex][hourIndex]).to.equal(null);
 			} else {
-				expect(res.body.zData[dayIndex][hourIndex]).to.be.closeTo(Number(expected[expectedIndex][0]), DELTA);
+				expect(res.body.zData[dayIndex][hourIndex]).to.be.closeTo(Number(expected[expectedIndex][0]), tolerance);
 			}
 			expectedIndex++;
 		}
@@ -305,7 +301,6 @@ module.exports = {
 	DELTA,
 	METER_ID,
 	GROUP_ID,
-	HTTP_CODE,
 	unitDatakWh,
 	conversionDatakWh,
 	meterDatakWh,

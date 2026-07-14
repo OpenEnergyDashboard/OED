@@ -297,7 +297,8 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			// Since only output this is okay.
 			errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading,
 				new Reading(meterID, 'unknown', startTimestamp, endTimestamp), timeSort, readingRepetition,
-				isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
+				isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime,
+				honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) + '<br>';
 			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 			// This empties the result array. Should be fast and okay with const.
 			result.splice(0, result.length);
@@ -525,7 +526,8 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				errMsg = 'For meter ' + meterName + ': ' + errMsg;
 				log.error(errMsg);
 				errMsg += logStatus(meterName, negRow, prevReading, logReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
-					resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
+					resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime, honorDst, relaxedParsing, useMeterZone,
+					warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) + '<br>';
 				({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 				// This empties the result array. Should be fast and okay with const.
 				result.splice(0, result.length);
@@ -555,7 +557,8 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 						' is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.<br>');
 					log.error(errMsg);
 					errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading, logReading, timeSort, readingRepetition,
-						isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
+						isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime, honorDst,
+						relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) + '<br>';
 					({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 					// This empties the result array. Should be fast and okay with const.
 					result.splice(0, result.length);
@@ -683,7 +686,8 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 					meterReading + ' with warning message:<br>' + errMsg;
 				log.warn(errMsg);
 				errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition,
-					isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
+					isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime, honorDst,
+					relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) + '<br>';
 				({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 			}
 		} else {
@@ -709,7 +713,8 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				'. Reading value gives ' + meterReading + ' with error message:<br>' + errMsg;
 			log.error(errMsg);
 			errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition,
-				isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime) + '<br>';
+				isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime, honorDst,
+				relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) + '<br>';
 			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
 			// This will let the calling functions know that some reading(s) were not used.
 			isAllReadingsOk = false;
@@ -837,13 +842,17 @@ function row(index, isAscending, length) {
  * @returns {string} The message just logged.
  */
 function logStatus(meterName, rowNum, prevReading, currentReading, timeSort, readingRepetition, isCumulative,
-	cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, onlyEndTime) {
+	cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, onlyEndTime, honorDst,
+	relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) {
 	let message = 'For reading #' + rowNum + ' on meter ' + meterName + ' in pipeline: ' + 'previous reading has value ' + prevReading.reading + ' start time '
 		+ prevReading.startTimestamp.format() + ' end time ' + prevReading.endTimestamp.format() + ' and current reading has value '
 		+ currentReading.reading + ' start time ' + currentReading.startTimestamp.format() + ' end time ' + currentReading.endTimestamp.format()
 		+ ' with timeSort ' + timeSort + '; duplications ' + readingRepetition + '; cumulative ' +
 		isCumulative + '; cumulativeReset ' + cumulativeReset + '; cumulativeResetStart ' + resetStart + '; cumulativeResetEnd ' + resetEnd +
-		'; lengthGap ' + readingGap + '; lengthVariation ' + readingLengthVariation + '; onlyEndTime ' + onlyEndTime;
+		'; lengthGap ' + readingGap + '; lengthVariation ' + readingLengthVariation + '; onlyEndTime ' + onlyEndTime +
+		'; honorDst ' + honorDst + '; relaxedParsing ' + relaxedParsing + '; useMeterZone ' + useMeterZone +
+		'; warnOnCumulativeReset ' + warnOnCumulativeReset + '; useMeterFrequency ' + useMeterFrequency +
+		'; useMeterFrequencyVariation ' + useMeterFrequencyVariation;
 	log.info(message);
 	return message;
 }
