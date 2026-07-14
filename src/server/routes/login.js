@@ -12,8 +12,10 @@ const { log } = require('../log');
 const { getConnection } = require('../db');
 const { credentialsRequestValidationMiddleware } = require('./authenticator');
 const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } = require('../util/validationConstants');
+const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
+const DUMMY_PASSWORD_HASH = '$2a$10$7EqJtq98hPqEX7fNZaFWoOHIoQStbSNRaCbkWa3vgKwK3/q5YLhKa';
 
 /**
  * Authenticate users and return a JSON Web Token with their user ID.
@@ -40,19 +42,20 @@ router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
 	};
 
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(400);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
 			const user = await User.getByUsername(req.body.username, conn);
-			let isValid;
-			if (user === null) {
-				// call the bcrypt.compare() without assigning it valid user to eliminate time differation
-				await bcrypt.compare(req.body.password, user.passwordHash);
-				isValid = false;
-			} else {
-				isValid = await bcrypt.compare(req.body.password, user.passwordHash);
-			}
+
+// User did not exist so return false.
+//
+// Use a fixed bcrypt hash when the user does not exist. This keeps the
+// password comparison path similar for existing and non-existing users,
+// reducing the timing difference that could reveal valid usernames.
+const passwordHash = user === null ? DUMMY_PASSWORD_HASH : user.passwordHash;
+const passwordMatches = await bcrypt.compare(req.body.password, passwordHash);
+const isValid = user !== null && passwordMatches;
 			if (isValid) {
 				const token = jwt.sign({ data: user.id }, secretToken, { expiresIn: 86400 });
 				res.json({ token: token, username: user.username, role: user.role });
@@ -61,10 +64,10 @@ router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
 			}
 		} catch (err) {
 			if (err.message === 'Unauthorized password' || err.message === 'No data returned from the query.') {
-				res.status(401).send({ text: 'Not authorized' });
+				res.status(HTTP_CODES.UNAUTHORIZED).send({ text: 'Not authorized' });
 			} else {
 				log.error(`Unable to check user password for ${req.body.username}`, err);
-				res.status(500).send({ text: 'Internal Server Error' });
+				res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send({ text: 'Internal Server Error' });
 			}
 		}
 	}
