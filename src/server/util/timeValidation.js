@@ -5,7 +5,6 @@
 const moment = require('moment');
 
 const ISO_DURATION_REGEX = /^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$/;
-const ISO_DATETIME_WITH_TIMEZONE_REGEX = /^\d{4}-\d{2}-\d{2}T.+(?:Z|[+-]\d{2}:?\d{2})$/;
 
 /**
  * Returns true if value is a strictly valid ISO 8601 datetime string (with timezone).
@@ -13,10 +12,7 @@ const ISO_DATETIME_WITH_TIMEZONE_REGEX = /^\d{4}-\d{2}-\d{2}T.+(?:Z|[+-]\d{2}:?\
  * @returns {boolean}
  */
 function isValidIsoDateTime(value) {
-	if (typeof value !== 'string') {
-		return false;
-	}
-	return ISO_DATETIME_WITH_TIMEZONE_REGEX.test(value) && moment.parseZone(value, moment.ISO_8601, true).isValid();
+	return moment.parseZone(value, moment.ISO_8601, true).isValid();
 }
 
 /**
@@ -25,51 +21,26 @@ function isValidIsoDateTime(value) {
  * @returns {boolean}
  */
 function isValidIsoDuration(value) {
-	if (typeof value !== 'string') {
-		return false;
-	}
-	const duration = moment.duration(value);
-	return ISO_DURATION_REGEX.test(value) && moment.isDuration(duration) && duration.isValid() && duration.asMilliseconds() > 0;
+	return ISO_DURATION_REGEX.test(value);
 }
 
 /**
  * Returns true if value is a valid timeInterval string as used by OED's TimeInterval class.
- * Accepted forms: 'all', 'ISO_ISO', and optionally 'ISO_' (right unbounded) or '_ISO' (left unbounded).
+ * Accepted forms: 'all', 'ISO_ISO', 'ISO_' (right unbounded), '_ISO' (left unbounded).
  * Each non-empty timestamp component must be a valid ISO 8601 datetime.
  * @param {string} value
- * @param {boolean} allowOneSided true if 'ISO_' and '_ISO' should be accepted
  * @returns {boolean}
  */
-function isValidTimeInterval(value, allowOneSided = false) {
-	if (typeof value !== 'string') {
-		return false;
-	}
-	// 'all' means an unbounded interval covering all available data.
-	if (value === 'all') {
-		return true;
-	}
-	// A time interval needs an underscore between the start and end times.
+function isValidTimeInterval(value) {
+	if (value === 'all') return true;
 	const underscoreIndex = value.indexOf('_');
-	if (underscoreIndex === -1) {
-		return false;
-	}
+	if (underscoreIndex === -1) return false;
 	const start = value.substring(0, underscoreIndex);
 	const end = value.substring(underscoreIndex + 1);
-	// Empty start or end times are allowed only when the route supports them.
-	if ((!start || !end) && !allowOneSided) {
-		return false;
-	}
-	// Reject '_' because it has no start or end time.
-	if (!start && !end) {
-		return false;
-	}
-	// Check the start and end times only if they were provided.
-	if (start && !isValidIsoDateTime(start)) {
-		return false;
-	}
-	if (end && !isValidIsoDateTime(end)) {
-		return false;
-	}
+	// At least one side must be present, and any present side must be a valid ISO datetime.
+	if (!start && !end) return false;
+	if (start && !isValidIsoDateTime(start)) return false;
+	if (end && !isValidIsoDateTime(end)) return false;
 	return true;
 }
 

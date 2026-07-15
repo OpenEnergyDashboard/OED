@@ -15,6 +15,7 @@ const moment = require('moment');
 const { STRING_GENERAL_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidTimeInterval } = require('../util/timeValidation');
+const { isValidTimeInterval } = require('../util/timeValidation');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -407,7 +408,7 @@ function createRouter() {
 	router.get('/line/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -422,7 +423,7 @@ function createRouter() {
 	router.get('/line/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
@@ -437,7 +438,7 @@ function createRouter() {
 	router.get('/bar/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -453,7 +454,7 @@ function createRouter() {
 	router.get('/bar/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
@@ -469,7 +470,7 @@ function createRouter() {
 	router.get('/radar/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
@@ -484,7 +485,7 @@ function createRouter() {
 	router.get('/radar/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
-		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
+		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
@@ -498,6 +499,8 @@ function createRouter() {
 	// Route for fetching 3D readings by meter IDs
 	router.get('/threeD/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
@@ -528,6 +531,8 @@ function createRouter() {
 	// Route for fetching 3D readings by group ID
 	router.get('/threeD/groups/:group_id', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
