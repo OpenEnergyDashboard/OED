@@ -72,12 +72,14 @@ export default function PreferencesComponent() {
 
 		warningFileSize: (): boolean => {
 			return Number(localAdminPref.defaultWarningFileSize) < 0
-				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit);
+				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit)
+				|| Number(localAdminPref.defaultWarningFileSize) > Number.MAX_SAFE_INTEGER;
 		},
 
 		fileSizeLimit: (): boolean => {
 			return Number(localAdminPref.defaultFileSizeLimit) < 0
-				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit);
+				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit)
+				|| Number(localAdminPref.defaultFileSizeLimit) > Number.MAX_SAFE_INTEGER;
 		}
 	};
 
