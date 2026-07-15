@@ -47,15 +47,14 @@ router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
 		const conn = getConnection();
 		try {
 			const user = await User.getByUsername(req.body.username, conn);
-const user = await User.getByUsername(req.body.username, conn);
 
-// This hash is used only when the username does not exist. It keeps
-// the bcrypt comparison path similar for existing and non-existing
-// users without allowing a missing user to log in.
-const dummyPasswordHash = '$2a$10$N6cWKczGlZaT2ReVzJ48pu8t87bpatdCnpI50fXQ7SnHO23LL7Nfe';
-const passwordHash = user === null ? dummyPasswordHash : user.passwordHash;
-const passwordMatches = await bcrypt.compare(req.body.password, passwordHash);
-const isValid = user !== null && passwordMatches;
+			// This hash is used only when the username does not exist. It keeps
+			// the bcrypt comparison path similar for existing and non-existing
+			// users without allowing a missing user to log in.
+			const dummyPasswordHash = '$2a$10$N6cWKczGlZaT2ReVzJ48pu8t87bpatdCnpI50fXQ7SnHO23LL7Nfe';
+			const passwordHash = user === null ? dummyPasswordHash : user.passwordHash;
+			const passwordMatches = await bcrypt.compare(req.body.password, passwordHash);
+			const isValid = user !== null && passwordMatches;
 			if (isValid) {
 				const token = jwt.sign({ data: user.id }, secretToken, { expiresIn: 86400 });
 				res.json({ token: token, username: user.username, role: user.role });
