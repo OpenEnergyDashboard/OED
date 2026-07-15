@@ -58,6 +58,7 @@ export default function HeaderButtonsComponent() {
 		shouldAdminButtonDisabled: true,
 		shouldUsersButtonDisabled: true,
 		shouldGroupsButtonDisabled: true,
+		shouldHolidayInstanceGroupsButtonDisabled: true,
 		shouldMetersButtonDisabled: true,
 		shouldMapsButtonDisabled: true,
 		shouldCSVMetersButtonDisabled: true,
@@ -96,6 +97,7 @@ export default function HeaderButtonsComponent() {
 			shouldAdminButtonDisabled: pathname === '/admin',
 			shouldUsersButtonDisabled: pathname === '/users',
 			shouldGroupsButtonDisabled: pathname === '/groups',
+			shouldHolidayInstanceGroupsButtonDisabled: pathname === '/holiday-instance-groups',
 			shouldMetersButtonDisabled: pathname === '/meters',
 			shouldMapsButtonDisabled: pathname === '/maps',
 			shouldCSVMetersButtonDisabled: pathname === '/csvMeters',
@@ -210,6 +212,13 @@ export default function HeaderButtonsComponent() {
 								tag={Link}
 								to="/groups">
 								<FormattedMessage id='groups' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldHolidayInstanceGroupsButtonDisabled}
+								tag={Link}
+								to="/holiday-instance-groups">
+								<FormattedMessage id='holiday.instance.groups' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}
