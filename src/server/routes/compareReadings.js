@@ -128,7 +128,6 @@ function createRouter() {
 		const shiftRaw = req.query.shift;
 
 		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
-		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			return;
 		}
@@ -151,7 +150,6 @@ function createRouter() {
 		const currEndRaw = req.query.curr_end;
 		const shiftRaw = req.query.shift;
 
-		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
 		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			return;
