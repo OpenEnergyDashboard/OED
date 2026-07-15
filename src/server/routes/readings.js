@@ -99,7 +99,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			}
 		}
 	};
-	
+
 	//convert a parameter to int
 	req.params.meter_id = Number(req.params.meter_id);
 	//if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
@@ -138,23 +138,22 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			decoded: req.decoded
 		});
 
-		//check if the file size estimate is over 25% the file size limit
+		//check if the file size estimate is over the file size limit
 		//if so, reject any export attempt
 		//this can happen if the data in the DB differs from the expected frequency stored on the meter. 
-		if (fileSize > preferences.defaultFileSizeLimit * 1.25) {
-			res.status(HTTP_CODES.REQUEST_ENTITY_TOO_LARGE).json({
-				message: `Raw readings export is too large. Estimated response size is ${fileSize.toFixed(2)} MB, which exceeds the limit of 125% of ${preferences.defaultFileSizeLimit} MB.`
+		if (fileSize > preferences.defaultFileSizeLimit) {
+			res.status(413).json({
+				message: `Raw readings export is too large. Estimated response size is ${fileSize.toFixed(2)} MB, which exceeds the limit of ${preferences.defaultFileSizeLimit} MB.`
 			});
 			return;
 		} else if (fileSize <= preferences.defaultFileSizeLimit) {
-		//} else if (fileSize <= 0.01) {
+			//} else if (fileSize <= 0.01) {
 			//file size within limit, anyone can download
 			shouldDownload = true;
 		} else if (req.hasValidAuthToken) {
 			//file size above limit, only users with the role EXPORT or ADMIN can download
-			const user = await User.getByID(req.decoded.data, conn);
-
-			if (user.role == User.role.EXPORT || user.role == User.role.ADMIN) {
+			const token = req.headers.token || req.body.token || req.query.token;
+			if ((await isTokenAuthorized(token, User.role.EXPORT)) || (await isTokenAuthorized(token, User.role.ADMIN))) {
 				shouldDownload = true;
 			}
 		}
