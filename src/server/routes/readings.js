@@ -9,13 +9,13 @@ const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
-const { STRING_GENERAL_MAX_LENGTH: GENERAL_STRING_MAX_LENGTH } = require('../util/validationConstants');
+const { STRING_GENERAL_MAX_LENGTH: GENERAL_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidTimeInterval } = require('../util/timeValidation');
 
-//import to get file size limits
 const Preferences = require('../models/Preferences');
 const User = require('../models/User');
+const { success, failure } = require('./response');
 
 const router = express.Router();
 
@@ -82,9 +82,9 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		required: ['meter_id'],
 		properties: {
 			meter_id: {
-				type: 'integer',
-				minimum: 1,
-				maximum: 2147483647
+				type: 'string',
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -100,8 +100,6 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		}
 	};
 
-	//convert a parameter to int
-	req.params.meter_id = Number(req.params.meter_id);
 	//if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 	//	res.sendStatus(HTTP_CODES.BAD_REQUEST);
 
@@ -114,7 +112,8 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 	console.log('query validation:', queryValidation);
 
 	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid || !isValidTimeInterval(req.query.timeInterval, true)) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		//res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
 		let meterID;
 		let timeInterval;
@@ -123,6 +122,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		let shouldDownload = false;
 
 		//estimate file size
+		//this estimate is also present in src/client/app/components/ExportComponent.tsx and must be kept consistent between files
 		const count = await Reading.getCountByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 		const fileSize = (count * 0.082 / 1000);
 
@@ -142,9 +142,10 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		//if so, reject any export attempt
 		//this can happen if the data in the DB differs from the expected frequency stored on the meter. 
 		if (fileSize > preferences.defaultFileSizeLimit) {
-			res.status(413).json({
-				message: `Raw readings export is too large. Estimated response size is ${fileSize.toFixed(2)} MB, which exceeds the limit of ${preferences.defaultFileSizeLimit} MB.`
-			});
+			//res.status(413).json({
+			//	message: `Raw readings export is too large. Estimated response size is ${fileSize.toFixed(2)} MB, which exceeds the limit of ${preferences.defaultFileSizeLimit} MB.`
+			//});
+			failure(res, 413, `Raw readings export is too large. Estimated response size is ${fileSize.toFixed(2)} MB, which exceeds the limit of ${preferences.defaultFileSizeLimit} MB.`);
 			return;
 		} else if (fileSize <= preferences.defaultFileSizeLimit) {
 			//} else if (fileSize <= 0.01) {
@@ -173,10 +174,12 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 			// They are ready to go back.
 			// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
-			res.send(rawReadings);
+			//res.send(rawReadings);
+			success(res);
 		} catch (err) {
 			log.error(`Error while performing GET raw readings for line with meter ${meterID} with time interval ${timeInterval}: ${err}`, err);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			//res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });
