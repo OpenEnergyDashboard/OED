@@ -61,6 +61,7 @@ mocha.describe('Session Invalidation Security', () => {
 
 			expect(beforeVerify).to.have.status(HTTP_CODES.OK);
 			expect(beforeVerify.body).to.have.property('success', true);
+			expect(beforeVerify.body).to.not.have.property('message');
 
 			const logoutRes = await chai.request(app)
 				.post(LOGOUT_ENDPOINT)
@@ -85,6 +86,7 @@ mocha.describe('Session Invalidation Security', () => {
 
 			expect(firstLogoutRes).to.have.status(HTTP_CODES.OK);
 			expect(firstLogoutRes.body).to.have.property('success', true);
+			expect(firstLogoutRes.body).to.have.property('message', 'Logout successful.');
 
 			const secondLogoutRes = await chai.request(app)
 				.post(LOGOUT_ENDPOINT)
