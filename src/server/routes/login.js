@@ -15,7 +15,7 @@ const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, USERNAME_MIN_LENGTH, USERNAME_
 const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
-const DUMMY_PASSWORD_HASH = '$2a$10$7EqJtq98hPqEX7fNZaFWoOHIoQStbSNRaCbkWa3vgKwK3/q5YLhKa';
+const DUMMY_PASSWORD_HASH = '$2a$10$N6cWKczGlZaT2ReVzJ48pu8t87bpatdCnpI50fXQ7SnHO23LL7Nfe';
 
 /**
  * Authenticate users and return a JSON Web Token with their user ID.
@@ -47,13 +47,13 @@ router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
 		const conn = getConnection();
 		try {
 			const user = await User.getByUsername(req.body.username, conn);
+const user = await User.getByUsername(req.body.username, conn);
 
-// User did not exist so return false.
-//
-// Use a fixed bcrypt hash when the user does not exist. This keeps the
-// password comparison path similar for existing and non-existing users,
-// reducing the timing difference that could reveal valid usernames.
-const passwordHash = user === null ? DUMMY_PASSWORD_HASH : user.passwordHash;
+// This hash is used only when the username does not exist. It keeps
+// the bcrypt comparison path similar for existing and non-existing
+// users without allowing a missing user to log in.
+const dummyPasswordHash = '$2a$10$N6cWKczGlZaT2ReVzJ48pu8t87bpatdCnpI50fXQ7SnHO23LL7Nfe';
+const passwordHash = user === null ? dummyPasswordHash : user.passwordHash;
 const passwordMatches = await bcrypt.compare(req.body.password, passwordHash);
 const isValid = user !== null && passwordMatches;
 			if (isValid) {
