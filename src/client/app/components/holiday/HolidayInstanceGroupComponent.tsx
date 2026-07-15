@@ -15,9 +15,10 @@ import { testHolidayInstances } from './holidayInstanceTestData'; // For testing
 interface HolidayInstanceGroupComponentProps {
 	holidayInstances?: HolidayInstance[];
 	holidayInstanceGroups?: HolidayInstanceGroupData[];
-	handleCreateHolidayInstanceGroup?: (holidayInstanceIds: number[], note: string) => void;
+	handleCreateHolidayInstanceGroup?: (name: string, holidayInstanceIds: number[], note: string) => void;
 	handleUpdateHolidayInstanceGroup?: (
 		holidayInstanceGroupId: number,
+		name: string,
 		holidayInstanceIds: number[],
 		note: string
 	) => void;
@@ -35,8 +36,8 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 	const holidayInstanceGroups = props.holidayInstanceGroups ?? createdHolidayInstanceGroups;
 	const usingLocalHolidayInstanceGroups = props.holidayInstanceGroups === undefined;
 
-	const handleCreateHolidayInstanceGroup = (holidayInstanceIds: number[], note: string) => {
-		props.handleCreateHolidayInstanceGroup?.(holidayInstanceIds, note);
+	const handleCreateHolidayInstanceGroup = (name: string, holidayInstanceIds: number[], note: string) => {
+		props.handleCreateHolidayInstanceGroup?.(name, holidayInstanceIds, note);
 
 		if (usingLocalHolidayInstanceGroups) {
 			setCreatedHolidayInstanceGroups(currentGroups => {
@@ -46,6 +47,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 					...currentGroups,
 					{
 						id: nextId,
+						name,
 						holidayInstanceIds,
 						note
 					}
@@ -56,11 +58,13 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 
 	const handleUpdateHolidayInstanceGroup = (
 		holidayInstanceGroupId: number,
+		name: string,
 		holidayInstanceIds: number[],
 		note: string
 	) => {
 		props.handleUpdateHolidayInstanceGroup?.(
 			holidayInstanceGroupId,
+			name,
 			holidayInstanceIds,
 			note
 		);
@@ -68,7 +72,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 		if (usingLocalHolidayInstanceGroups) {
 			setCreatedHolidayInstanceGroups(currentGroups => currentGroups.map(group =>
 				group.id === holidayInstanceGroupId
-					? { ...group, holidayInstanceIds, note }
+					? { ...group, name, holidayInstanceIds, note }
 					: group
 			));
 		}

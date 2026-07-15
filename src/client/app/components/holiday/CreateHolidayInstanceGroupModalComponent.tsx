@@ -25,7 +25,7 @@ import { HolidayInstance } from '../../types/redux/holiday';
 
 interface CreateHolidayInstanceGroupModalComponentProps {
 	holidayInstances: HolidayInstance[];
-	onCreateHolidayInstanceGroup: (holidayInstanceIds: number[], note: string) => void;
+	onCreateHolidayInstanceGroup: (name: string, holidayInstanceIds: number[], note: string) => void;
 }
 
 /**
@@ -37,6 +37,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 	props: CreateHolidayInstanceGroupModalComponentProps
 ) {
 	const [showModal, setShowModal] = useState(false);
+	const [name, setName] = useState('');
 	const [holidayInstanceIds, setHolidayInstanceIds] = useState<number[]>([]);
 	const [note, setNote] = useState('');
 
@@ -54,6 +55,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 	);
 
 	const resetState = () => {
+		setName('');
 		setHolidayInstanceIds([]);
 		setNote('');
 	};
@@ -70,12 +72,13 @@ export default function CreateHolidayInstanceGroupModalComponent(
 			return;
 		}
 
-		props.onCreateHolidayInstanceGroup(holidayInstanceIds, note);
+		props.onCreateHolidayInstanceGroup(name.trim(), holidayInstanceIds, note);
 		setShowModal(false);
 		resetState();
 	};
 
-	const validHolidayInstanceGroup = holidayInstanceIds.length > 0;
+	const validName = name.trim() !== '';
+	const validHolidayInstanceGroup = validName && holidayInstanceIds.length > 0;
 
 	return (
 		<>
@@ -95,6 +98,24 @@ export default function CreateHolidayInstanceGroupModalComponent(
 				</ModalHeader>
 				<ModalBody>
 					<Container>
+						<FormGroup>
+							<Label for='name'>
+								<FormattedMessage id='name' defaultMessage='Name' />
+							</Label>
+							<Input
+								id='name'
+								name='name'
+								type='text'
+								value={name}
+								onChange={e => setName(e.target.value)}
+								required
+								invalid={!validName}
+							/>
+							<FormFeedback>
+								<FormattedMessage id='error.required' defaultMessage='Required' />
+							</FormFeedback>
+						</FormGroup>
+
 						<Row xs='1' lg='2'>
 							<Col>
 								{/* The holiday instances in this group */}
@@ -116,7 +137,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 											setHolidayInstanceIds(updatedHolidayInstanceIds);
 										}}
 									/>
-									{!validHolidayInstanceGroup && (
+									{holidayInstanceIds.length === 0 && (
 										<FormFeedback className='d-block'>
 											<FormattedMessage id='error.required' defaultMessage='Required' />
 										</FormFeedback>

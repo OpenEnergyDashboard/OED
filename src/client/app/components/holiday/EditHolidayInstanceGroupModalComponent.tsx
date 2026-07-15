@@ -26,6 +26,7 @@ import { HolidayInstance } from '../../types/redux/holiday';
 
 export interface HolidayInstanceGroupData {
 	id: number;
+	name: string;
 	holidayInstanceIds: number[];
 	note: string;
 }
@@ -38,6 +39,7 @@ interface EditHolidayInstanceGroupModalComponentProps {
 	handleClose: () => void;
 	onEditHolidayInstanceGroup: (
 		holidayInstanceGroupId: number,
+		name: string,
 		holidayInstanceIds: number[],
 		note: string
 	) => void;
@@ -52,6 +54,7 @@ interface EditHolidayInstanceGroupModalComponentProps {
 export default function EditHolidayInstanceGroupModalComponent(
 	props: EditHolidayInstanceGroupModalComponentProps
 ) {
+	const [name, setName] = useState(props.holidayInstanceGroup.name ?? '');
 	const [holidayInstanceIds, setHolidayInstanceIds] = useState<number[]>(
 		props.holidayInstanceGroup.holidayInstanceIds
 	);
@@ -70,9 +73,11 @@ export default function EditHolidayInstanceGroupModalComponent(
 	const selectedHolidayInstanceOptions = holidayInstanceOptions.filter(option =>
 		holidayInstanceIds.includes(option.value)
 	);
-	const validHolidayInstanceGroup = holidayInstanceIds.length > 0;
+	const validName = name.trim() !== '';
+	const validHolidayInstanceGroup = validName && holidayInstanceIds.length > 0;
 
 	const resetState = React.useCallback(() => {
+		setName(props.holidayInstanceGroup.name ?? '');
 		setHolidayInstanceIds(props.holidayInstanceGroup.holidayInstanceIds);
 		setNote(props.holidayInstanceGroup.note);
 	}, [props.holidayInstanceGroup]);
@@ -96,6 +101,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 		props.handleClose();
 		props.onEditHolidayInstanceGroup(
 			props.holidayInstanceGroup.id,
+			name.trim(),
 			holidayInstanceIds,
 			note
 		);
@@ -136,6 +142,24 @@ export default function EditHolidayInstanceGroupModalComponent(
 				</ModalHeader>
 				<ModalBody>
 					<Container>
+						<FormGroup>
+							<Label for='name'>
+								<FormattedMessage id='name' defaultMessage='Name' />
+							</Label>
+							<Input
+								id='name'
+								name='name'
+								type='text'
+								value={name}
+								onChange={e => setName(e.target.value)}
+								required
+								invalid={!validName}
+							/>
+							<FormFeedback>
+								<FormattedMessage id='error.required' defaultMessage='Required' />
+							</FormFeedback>
+						</FormGroup>
+
 						<Row xs='1' lg='2'>
 							<Col>
 								{/* The holiday instances in this group */}
@@ -157,7 +181,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 											setHolidayInstanceIds(updatedHolidayInstanceIds);
 										}}
 									/>
-									{!validHolidayInstanceGroup && (
+									{holidayInstanceIds.length === 0 && (
 										<FormFeedback className='d-block'>
 											<FormattedMessage id='error.required' defaultMessage='Required' />
 										</FormFeedback>
