@@ -14,6 +14,7 @@ const User = require('../models/User');
 const { DEFAULT_CIRCLE_SIZE } = require('../models/Map');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
+const { isValidIsoDateTime } = require('../util/timeValidation');
 
 const router = express.Router();
 
@@ -153,7 +154,7 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 		}
 	};
 	const validationResult = validate(req.body, validMap);
-	if (!validationResult.valid) {
+	if (!validationResult.valid || !isValidIsoDateTime(req.body.modifiedDate)) {
 		log.error(`Invalid input for mapAPI. ${validationResult.errors}`);
 		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
@@ -271,9 +272,9 @@ router.post('/edit', adminAuthMiddleware('edit maps'), async (req, res) => {
 		}
 	};
 	const validatorResult = validate(req.body, validMap);
-	if (!validatorResult.valid) {
+	if (!validatorResult.valid || !isValidIsoDateTime(req.body.modifiedDate)) {
 		log.error(`Invalid map data supplied, err: ${validatorResult.errors}`);
-		res.status(HTTP_CODES.BAD_REQUEST);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
