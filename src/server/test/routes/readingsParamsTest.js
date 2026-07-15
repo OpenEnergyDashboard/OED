@@ -15,6 +15,11 @@ const {
 	validateNumericIdInPath
 } = require('../util/validationHelpers');
 
+//import preferences for file size limits
+const Preferences = require('../../models/Preferences');
+//import getConnection() to be able to update preferences
+const { getConnection } = require('../../db');
+
 /** Shared valid timeInterval for line reading routes (used in multiple tests in this file). */
 const READINGS_LINE_TIME_INTERVAL = '2020-01-01T00:00:00.000Z_2020-01-02T00:00:00.000Z';
 const INT32_MAX = 2147483647;
@@ -182,6 +187,61 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				expect(res).to.have.status(HTTP_CODES.BAD_REQUEST);
 			});
 		});
+	});
+
+
+	mocha.describe('Raw Export File Size and User Role Authorization', () => {
+		//use meter Cos 23 kWh with time interval from March 1 2020 to November 1 2020
+		//which has estimated file size of 1.262882 MB
+		const RAW_EXPORT_METER_ID = 20;
+		const RAW_EXPORT_LARGE_TIME_INTERVAL = '2020-03-01T00:00:00Z_2020-11-02T00:00:00Z';
+
+		//helper to change and restore preferences per test
+		async function setDefaultFileSizeLimit(limit, testFn) {
+			const conn = getConnection();
+			const originalPrefs = await Preferences.get(conn);
+
+			try {
+				await Preferences.update({defaultFileSizeLimit: limit}, conn);
+				await testFn();
+			} finally {
+				await Preferences.update({defaultFileSizeLimit: originalPrefs.defaultFileSizeLimit}, conn);
+			}
+		}
+
+		mocha.it('Allow Unauthenticated Raw Export When Estimated Size is Within File Size Limit', async () => {
+			//1.26 < 1.3
+			await setDefaultFileSizeLimit(1.3, async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${RAW_EXPORT_METER_ID}`)
+					.query({timeInterval: RAW_EXPORT_LARGE_TIME_INTERVAL});
+
+				expect(res).to.have.status(HTTP_CODES.OK);
+			});
+		});
+
+		//1.26 > 1.1
+		mocha.it('Reject Unauthenticated Raw Export When Estimated Size Exceeds File Size Limit', async () => {
+			await setDefaultFileSizeLimit(1.1, async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${RAW_EXPORT_METER_ID}`)
+					.query({timeInterval: RAW_EXPORT_LARGE_TIME_INTERVAL});
+
+				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+			});
+		});
+
+		//1.26 > 1.0 * 1.25 = 1.25
+		mocha.it('Reject Unauthenticated Raw Export When Estimated Size Exceeds 125 Percent of File Size Limit', async () => {
+			await setDefaultFileSizeLimit(1.0, async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${RAW_EXPORT_METER_ID}`)
+					.query({timeInterval: RAW_EXPORT_LARGE_TIME_INTERVAL});
+
+				expect(res).to.have.status(HTTP_CODES.REQUEST_ENTITY_TOO_LARGE);
+			});
+		});
+
 	});
 
 	mocha.describe('Edge Cases and Error Handling', () => {

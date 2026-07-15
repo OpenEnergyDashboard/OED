@@ -13,6 +13,10 @@ const { STRING_GENERAL_MAX_LENGTH: GENERAL_STRING_MAX_LENGTH } = require('../uti
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidTimeInterval } = require('../util/timeValidation');
 
+//import to get file size limits
+const Preferences = require('../models/Preferences');
+const User = require('../models/User');
+
 const router = express.Router();
 
 /**
@@ -95,11 +99,71 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			}
 		}
 	};
+	
+	//convert a parameter to int
+	req.params.meter_id = Number(req.params.meter_id);
+	//if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
+	//	res.sendStatus(HTTP_CODES.BAD_REQUEST);
+
+	const paramValidation = validate(req.params, validParams);
+	const queryValidation = validate(req.query, validQueries);
+
+	console.log('params:', req.params);
+	console.log('typeof meter_id:', typeof req.params.meter_id);
+	console.log('param validation:', paramValidation);
+	console.log('query validation:', queryValidation);
+
 	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid || !isValidTimeInterval(req.query.timeInterval, true)) {
 		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		let meterID;
 		let timeInterval;
+
+		//check if user is allowed to export
+		let shouldDownload = false;
+
+		//estimate file size
+		const count = await Reading.getCountByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+		const fileSize = (count * 0.082 / 1000);
+
+		const preferences = await Preferences.get(conn);
+
+		console.log('raw export size test:', {
+			meterID,
+			count,
+			fileSize,
+			defaultFileSizeLimit: preferences.defaultFileSizeLimit,
+			defaultWarningFileSize: preferences.defaultWarningFileSize,
+			hasValidAuthToken: req.hasValidAuthToken,
+			decoded: req.decoded
+		});
+
+		//check if the file size estimate is over 25% the file size limit
+		//if so, reject any export attempt
+		//this can happen if the data in the DB differs from the expected frequency stored on the meter. 
+		if (fileSize > preferences.defaultFileSizeLimit * 1.25) {
+			res.status(HTTP_CODES.REQUEST_ENTITY_TOO_LARGE).json({
+				message: `Raw readings export is too large. Estimated response size is ${fileSize.toFixed(2)} MB, which exceeds the limit of 125% of ${preferences.defaultFileSizeLimit} MB.`
+			});
+			return;
+		} else if (fileSize <= preferences.defaultFileSizeLimit) {
+		//} else if (fileSize <= 0.01) {
+			//file size within limit, anyone can download
+			shouldDownload = true;
+		} else if (req.hasValidAuthToken) {
+			//file size above limit, only users with the role EXPORT or ADMIN can download
+			const user = await User.getByID(req.decoded.data, conn);
+
+			if (user.role == User.role.EXPORT || user.role == User.role.ADMIN) {
+				shouldDownload = true;
+			}
+		}
+
+		if (shouldDownload == false) {
+			res.sendStatus(HTTP_CODES.FORBIDDEN);
+			return;
+		}
+
 		try {
 			const conn = getConnection();
 			// Get the routed meter id and time for the desired readings.

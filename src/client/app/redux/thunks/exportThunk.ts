@@ -136,13 +136,20 @@ export const exportRawReadings = createAppThunk(
 		const count = await dispatch(metersApi.endpoints.lineReadingsCount.initiate({ meterIDs, timeInterval })).unwrap();
 		// Estimated file size in MB. Note that changing the language effects the size about +/- 8%.
 		// This is just a decent estimate for larger files.
+		console.log('[exportThunk] raw count value', count, typeof count);
 		const fileSize = (count * 0.082 / 1000);
+		console.log('[exportThunk] file size in MB', fileSize, typeof fileSize);
+		console.log('[exportThunk] start', { meterIDs, timeInterval: timeInterval?.toString() });
+		console.log('[exportThunk] count', { count, estimatedMB: fileSize });
 		// Decides if the readings should be exported, true if should.
 		let shouldDownload = false;
-		if (fileSize <= adminState.defaultWarningFileSize) {
+		//if (fileSize <= adminState.defaultWarningFileSize) {
+		if (fileSize <= 0) {
 			// File sizes that anyone can download without prompting so fine
 			shouldDownload = true;
 		} else if (fileSize > adminState.defaultFileSizeLimit) {
+		//} else if (fileSize > adminState.defaultFileSizeLimit) {
+		} else if (fileSize > 0.01) {
 
 			// Exceeds the size allowed unless admin or export role and must verify want to continue.
 			if (selectHasRolePermissions(state, UserRole.EXPORT)) {
@@ -169,6 +176,12 @@ export const exportRawReadings = createAppThunk(
 			}
 		}
 
+		console.log('[exportThunk] decision', {
+			shouldDownload,
+			hasExportRole: selectHasRolePermissions(state, UserRole.EXPORT),
+			defaultWarningFileSize: adminState.defaultWarningFileSize,
+			defaultFileSizeLimit: adminState.defaultFileSizeLimit
+		});
 		if (shouldDownload) {
 			// Loop over each selected meter in graphic. Does nothing if no meters selected.
 			for (const meterID of compatibleEntities) {
@@ -214,7 +227,8 @@ export const exportRawReadings = createAppThunk(
 				// this code to use the unix timestamp that is returned. It is believed that the unix timestamp will be smaller than this string.
 				// The long reading work will modify how you get raw data and probably make this easier. However, it does return the meter id for
 				// each reading so that will add to the size unless we remove it as was done in how this data is gotten.
-
+				
+				console.log('[exportThunk] requesting raw readings', { meterID, timeInterval: timeInterval?.toString() });
 				// Get the raw readings.
 				const response = dispatch(metersApi.endpoints.rawLineReadings.initiate({ meterID, timeInterval }));
 				const lineReadings = await response.unwrap();

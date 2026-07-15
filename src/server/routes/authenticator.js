@@ -210,6 +210,8 @@ optionalAuthMiddleware = (req, res, next) => {
 			}
 			next();
 		});
+		console.log('hasValidAuthToken:', req.hasValidAuthToken);
+		console.log('decoded:', req.decoded);
 	} else {
 		next();
 	}
