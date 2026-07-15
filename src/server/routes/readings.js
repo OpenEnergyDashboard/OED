@@ -115,8 +115,11 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		//res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
-		let meterID;
-		let timeInterval;
+		
+		const conn = getConnection();
+		// Get the routed meter id and time for the desired readings.
+		const meterID = req.params.meter_id;
+		let timeInterval = TimeInterval.fromString(req.query.timeInterval);
 
 		//check if user is allowed to export
 		let shouldDownload = false;
@@ -138,16 +141,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			decoded: req.decoded
 		});
 
-		//check if the file size estimate is over the file size limit
-		//if so, reject any export attempt
-		//this can happen if the data in the DB differs from the expected frequency stored on the meter. 
-		if (fileSize > preferences.defaultFileSizeLimit) {
-			//res.status(413).json({
-			//	message: `Raw readings export is too large. Estimated response size is ${fileSize.toFixed(2)} MB, which exceeds the limit of ${preferences.defaultFileSizeLimit} MB.`
-			//});
-			failure(res, 413, `Raw readings export is too large. Estimated response size is ${fileSize.toFixed(2)} MB, which exceeds the limit of ${preferences.defaultFileSizeLimit} MB.`);
-			return;
-		} else if (fileSize <= preferences.defaultFileSizeLimit) {
+		if (fileSize <= preferences.defaultFileSizeLimit) {
 			//} else if (fileSize <= 0.01) {
 			//file size within limit, anyone can download
 			shouldDownload = true;
@@ -160,22 +154,19 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		}
 
 		if (shouldDownload == false) {
-			res.sendStatus(HTTP_CODES.FORBIDDEN);
+			//res.sendStatus(HTTP_CODES.FORBIDDEN);
+			failure(res, HTTP_CODES.FORBIDDEN);
 			return;
 		}
 
 		try {
-			const conn = getConnection();
-			// Get the routed meter id and time for the desired readings.
-			meterID = req.params.meter_id;
-			timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			// Get the raw readings for this meter over time range desired.
 			// Note this returns unusual identifiers to save space and does not return the meter id.
 			const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 			// They are ready to go back.
 			// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
 			//res.send(rawReadings);
-			success(res);
+			success(res, rawReadings);
 		} catch (err) {
 			log.error(`Error while performing GET raw readings for line with meter ${meterID} with time interval ${timeInterval}: ${err}`, err);
 			//res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
