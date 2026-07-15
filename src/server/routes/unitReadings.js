@@ -15,6 +15,7 @@ const moment = require('moment');
 const { STRING_GENERAL_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidTimeInterval } = require('../util/timeValidation');
+const { isValidTimeInterval } = require('../util/timeValidation');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -501,6 +502,8 @@ function createRouter() {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		} else if (!isValidTimeInterval(req.query.timeInterval)) {
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else {
 			// Get time range to validate 1 year or less.
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
@@ -528,6 +531,8 @@ function createRouter() {
 	// Route for fetching 3D readings by group ID
 	router.get('/threeD/groups/:group_id', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval)) {
 			res.sendStatus(HTTP_CODES.BAD_REQUEST);

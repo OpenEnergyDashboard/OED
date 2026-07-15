@@ -11,6 +11,7 @@ const { getConnection } = require('../db');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidIsoDateTime } = require('../util/timeValidation');
+const { isValidIsoDateTime } = require('../util/timeValidation');
 
 const router = express.Router();
 
@@ -80,6 +81,7 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 						type: 'string',
 						maxLength: SHORT_STRING_MAX_LENGTH
 					},
+					// PostgreSQL interval string; does not use moment so only length-limited here
 					// PostgreSQL interval string; does not use moment so only length-limited here
 					defaultMeterReadingFrequency: {
 						type: 'string',

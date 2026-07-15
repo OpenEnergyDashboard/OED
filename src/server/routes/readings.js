@@ -12,6 +12,7 @@ const { getConnection } = require('../db');
 const { STRING_GENERAL_MAX_LENGTH: GENERAL_STRING_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidTimeInterval } = require('../util/timeValidation');
+const { isValidTimeInterval } = require('../util/timeValidation');
 
 const router = express.Router();
 
