@@ -15,7 +15,7 @@ export const authApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		login: builder.mutation<LoginResponse, { username: string, password: string }>({
 			query: loginArgs => ({
-				url: 'api/login/login',
+				url: 'api/loginLogout/login',
 				method: 'POST',
 				body: loginArgs
 			}),
@@ -44,7 +44,7 @@ export const authApi = baseApi.injectEndpoints({
 		}),
 		logout: builder.mutation<{ success: boolean, message: string }, void>({
 			query: () => ({
-				url: 'api/login/logout',
+				url: 'api/loginLogout/logout',
 				method: 'POST',
 				body: { token: getToken() }
 			}),

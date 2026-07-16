@@ -20,7 +20,7 @@ mocha.describe('Users API', () => {
 			// To fix this, manually call  DB creation. This will also happen right after this
 			// .before finishes.
 			await recreateDB();
-			let res = await chai.request(app).post('/api/login/login')
+			let res = await chai.request(app).post('/api/loginLogout/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
@@ -114,7 +114,7 @@ mocha.describe('Users API', () => {
 					unauthorizedUser.password = password;
 
 					// login
-					let res = await chai.request(app).post('/api/login/login')
+					let res = await chai.request(app).post('/api/loginLogout/login')
 						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});

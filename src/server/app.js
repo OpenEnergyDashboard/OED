@@ -132,7 +132,7 @@ app.use('/api/users', users);
 app.use('/api/meters', meters);
 app.use('/api/readings', readings);
 app.use('/api/preferences', preferences);
-app.use('/api/login', loginLogout);
+app.use('/api/loginLogout', loginLogout);
 app.use('/api/groups', groups);
 app.use('/api/verification', verification);
 app.use('/api/version', version);
