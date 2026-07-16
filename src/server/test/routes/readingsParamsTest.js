@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { chai, mocha, expect, app } = require('../common');
+const { chai, mocha, expect, app, testDB } = require('../common');
 const { HTTP_CODES } = require('../../util/httpCodes');
 const { STRING_GENERAL_MAX_LENGTH } = require('../../util/validationConstants');
 const {
@@ -15,10 +15,11 @@ const {
 	validateNumericIdInPath
 } = require('../util/validationHelpers');
 
-//import preferences for file size limits
 const Preferences = require('../../models/Preferences');
-//import getConnection() to be able to update preferences
 const { getConnection } = require('../../db');
+const Point = require('../../models/Point');
+const Reading = require('../../models/Reading');
+const Meter = require('../../models/Meter');
 
 /** Shared valid timeInterval for line reading routes (used in multiple tests in this file). */
 const READINGS_LINE_TIME_INTERVAL = '2020-01-01T00:00:00.000Z_2020-01-02T00:00:00.000Z';
@@ -191,47 +192,72 @@ mocha.describe('Readings Route Parameter Validation', () => {
 
 
 	mocha.describe('Raw Export File Size and User Role Authorization', () => {
-		//use meter Cos 23 kWh with time interval from March 1 2020 to November 1 2020
-		//which has estimated file size of 1.262882 MB
-		const RAW_EXPORT_METER_ID = 20;
-		const RAW_EXPORT_LARGE_TIME_INTERVAL = '2020-03-01T00:00:00Z_2020-11-02T00:00:00Z';
-
-		//helper to change and restore preferences per test
-		async function setDefaultFileSizeLimit(limit, testFn) {
-			const conn = getConnection();
-			const originalPrefs = await Preferences.get(conn);
-
-			try {
-				await Preferences.update({defaultFileSizeLimit: limit}, conn);
-				await testFn();
-			} finally {
-				await Preferences.update({defaultFileSizeLimit: originalPrefs.defaultFileSizeLimit}, conn);
-			}
+		let conn;
+		let meterID;
+		let timeInterval;
+		//insert a meter with 2 readings into testdb
+		async function createRawExportTestData(conn) {
+			const gps = new Point(1, 1);
+			const start = moment.utc('2020-01-01T00:00:00Z');
+			const meterName ='Raw Export Test Meter';
+			const meter = new Meter(
+				undefined,
+				meterName,
+				null,
+				false,
+				false,
+				Meter.type.MAMAC,
+				null,
+				gps
+			);
+			await meter.insert(conn);
+			await Reading.insertAll([
+				new Reading(meter.id, 10, start.clone(), start.clone().add(1, 'hour')),
+				new Reading(meter.id, 20, start.clone().add(1, 'hour'), start.clone().add(2, 'hours'))
+			], conn);
+			return {
+				meterID: meter.id,
+				timeInterval: '2020-01-01T00:00:00Z_2020-01-01T02:00:00Z'
+			};
 		}
-
-		mocha.it('Allow Unauthenticated Raw Export When Estimated Size is Within File Size Limit', async () => {
-			//1.26 < 1.3
-			await setDefaultFileSizeLimit(1.3, async () => {
-				const res = await chai.request(app)
-					.get(`${RAW_READINGS_BASE_ENDPOINT}/${RAW_EXPORT_METER_ID}`)
-					.query({timeInterval: RAW_EXPORT_LARGE_TIME_INTERVAL});
-
-				expect(res).to.have.status(HTTP_CODES.OK);
-			});
-		});
-
-		//1.26 > 1.1
-		mocha.it('Reject Unauthenticated Raw Export When Estimated Size Exceeds File Size Limit', async () => {
-			await setDefaultFileSizeLimit(1.1, async () => {
-				const res = await chai.request(app)
-					.get(`${RAW_READINGS_BASE_ENDPOINT}/${RAW_EXPORT_METER_ID}`)
-					.query({timeInterval: RAW_EXPORT_LARGE_TIME_INTERVAL});
-
-				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
-			});
-		});
-
-
+		//used specifically to get token from testuser who is ADMIN
+		async function getTokenForUser(user) {
+			const res = await chai.request(app)
+				.post('/api/login')
+				.send({
+					username: user.username,
+					password: user.password
+				});
+			expect(res).to.have.status(HTTP_CODES.OK);
+			expect(res.body).to.have.property('token');
+			return res.body.token;
+		}
+		//used to make users for roles CSV, EXPORT, OBVIUS
+		async function createUserWithRole(role, conn) {
+			const user = new User(
+				undefined,
+				`raw-export-${role}-${Date.now()}@example.invalid`,
+				bcrypt.hashSync('password', 10),
+				role
+			);
+			user.password = 'password';
+			await user.insert(conn);
+			return user;
+		}
+		async function getTokenForRole(role, conn) {
+			const user = await createUserWithRole(role, conn);
+			return getTokenForUser(user);
+		}
+		//helper to set up file size limit and insert test meter
+		async function setUpRawExportTest(limit) {
+			conn = testDB.getConnection();
+			const testData = await createRawExportTestData(conn);
+			meterID = testData.meterID;
+			timeInterval = testData.timeInterval;
+			await Preferences.update({ defaultFileSizeLimit: limit }, conn);
+		}
+		mocha.describe('Estimataed File Size is within File Size Limit', () => {});
+		mocha.describe('Estimated File Size Exceeds File Size Limit', () => {});
 	});
 
 	mocha.describe('Edge Cases and Error Handling', () => {
