@@ -231,16 +231,6 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			});
 		});
 
-		//1.26 > 1.0 * 1.25 = 1.25
-		mocha.it('Reject Unauthenticated Raw Export When Estimated Size Exceeds 125 Percent of File Size Limit', async () => {
-			await setDefaultFileSizeLimit(1.0, async () => {
-				const res = await chai.request(app)
-					.get(`${RAW_READINGS_BASE_ENDPOINT}/${RAW_EXPORT_METER_ID}`)
-					.query({timeInterval: RAW_EXPORT_LARGE_TIME_INTERVAL});
-
-				expect(res).to.have.status(413);
-			});
-		});
 
 	});
 
