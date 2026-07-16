@@ -238,7 +238,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${RAW_EXPORT_METER_ID}`)
 					.query({timeInterval: RAW_EXPORT_LARGE_TIME_INTERVAL});
 
-				expect(res).to.have.status(HTTP_CODES.REQUEST_ENTITY_TOO_LARGE);
+				expect(res).to.have.status(413);
 			});
 		});
 
