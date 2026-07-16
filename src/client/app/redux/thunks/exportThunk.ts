@@ -140,11 +140,10 @@ export const exportRawReadings = createAppThunk(
 		const fileSize = (count * 0.082 / 1000);
 		// Decides if the readings should be exported, true if should.
 		let shouldDownload = false;
-		//if (fileSize <= adminState.defaultWarningFileSize) {
-		if (fileSize <= 0) {
+		if (fileSize <= adminState.defaultWarningFileSize) {
 			// File sizes that anyone can download without prompting so fine
 			shouldDownload = true;
-		} else if (fileSize > 0.01) {
+		} else if (fileSize > adminState.defaultFileSizeLimit) {
 			// Exceeds the size allowed unless admin or export role and must verify want to continue.
 			if (selectHasRolePermissions(state, UserRole.EXPORT)) {
 				// A user allowed to do this but need to check okay with them.
