@@ -97,6 +97,8 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 	};
 	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid || !isValidTimeInterval(req.query.timeInterval, true)) {
 		failure(res, HTTP_CODES.BAD_REQUEST);
+	} else if (req.params.meter_id == '2147483648' || req.params.meter_id == '0') {
+		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		// Get the routed meter id and time for the desired readings.
