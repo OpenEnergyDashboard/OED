@@ -19,6 +19,7 @@ const { failure, success } = require('./response');
 const { updateNonNullExpression } = require('typescript');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
+const { isValidIsoDateTime } = require('../util/timeValidation');
 
 const router = express.Router();
 
@@ -158,16 +159,9 @@ router.get('/:meter_id', optionalAuthMiddleware, async (req, res) => {
 	}
 });
 
-// This checks params for both edit and create. In principle they could differ since not all needed for create
-// but they are the same due to current routing for now.
-function validateMeterParams(params) {
-	const validParams = {
-		type: 'object',
-		additionalProperties: false,
-		// We can get rid of some of these if we defaulted more values in the meter model.
-		required: ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'],
-		properties: {
-			id: { type: 'integer', minimum: 1 },
+// This checks params for both edit and create. The id property is only validated on edit since the DB assigns it on create.
+function validateMeterParams(params, isEdit = true) {
+	const properties = {
 			name: { type: 'string', maxLength: SHORT_STRING_MAX_LENGTH },
 			url: {
 				oneOf: [
@@ -216,6 +210,7 @@ function validateMeterParams(params) {
 			area: { type: 'number', minimum: 0 },
 			cumulative: { type: 'boolean' },
 			cumulativeReset: { type: 'boolean' },
+			// Time-of-day strings (HH:MM:SS); do not use moment so only length-limited here.
 			cumulativeResetStart: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 			cumulativeResetEnd: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 			readingGap: { type: 'number' },
@@ -237,13 +232,14 @@ function validateMeterParams(params) {
 				]
 			},
 			unitId: { type: 'integer' },
-			defaultGraphicUnit: { type: 'integer' },
+			defaultGraphicUnit: {'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }]},
 			areaUnit: {
 				type: 'string',
 				minLength: 1,
 				maxLength: 50,
 				enum: Object.values(Unit.areaUnitType)
 			},
+			// PostgreSQL interval string (e.g. "00:15:00"); does not use moment so only length-limited here.
 			readingFrequency: { type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
 			minVal: { type: 'number' },
 			maxVal: { type: 'number' },
@@ -256,17 +252,43 @@ function validateMeterParams(params) {
 				maxLength: 50,
 				enum: Object.values(Unit.disableChecksType)
 			}
-		}
+	};
+
+	if (isEdit) {
+		properties.id = { type: 'integer', minimum: 1 };
 	}
+
+	// We can get rid of some of these if we defaulted more values in the meter model.
+	const required = ['name', 'url', 'enabled', 'displayable', 'meterType', 'timeZone', 'note', 'area'];
+
+	if (isEdit) {
+		required.push('id');
+	}
+
+	const validParams = {
+		type: 'object',
+		additionalProperties: false,
+		required,
+		properties
+	};
 	const paramsValidationResult = validate(params, validParams);
 	return { valid: paramsValidationResult.valid, errors: paramsValidationResult.errors };
 }
 
 router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
-	const response = validateMeterParams(req.body)
+	// isEdit=true: id is required here since the client must tell us which meter to update.
+	const response = validateMeterParams(req.body, true)
 	if (!response.valid) {
 		log.warn(`Got request to edit a meter with invalid meter data, errors: ${response.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, 'validation failed with ' + response.errors.toString());
+	} else if (
+		(req.body.startTimestamp && !isValidIsoDateTime(req.body.startTimestamp)) ||
+		(req.body.endTimestamp && !isValidIsoDateTime(req.body.endTimestamp)) ||
+		(req.body.previousEnd && !isValidIsoDateTime(req.body.previousEnd)) ||
+		(req.body.minDate && !isValidIsoDateTime(req.body.minDate)) ||
+		(req.body.maxDate && !isValidIsoDateTime(req.body.maxDate))
+	) {
+		failure(res, HTTP_CODES.BAD_REQUEST, 'invalid date/time format');
 	} else {
 		const conn = getConnection();
 		try {
@@ -327,10 +349,19 @@ router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
  * Route for POST add meter.
  */
 router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
-	const response = validateMeterParams(req.body)
+	// isEdit=false: id must not be present, since it's assigned by the DB on insert.
+	const response = validateMeterParams(req.body, false)
 	if (!response.valid) {
 		log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, 'validation failed with ' + response.errors.toString());
+	} else if (
+		(req.body.startTimestamp && !isValidIsoDateTime(req.body.startTimestamp)) ||
+		(req.body.endTimestamp && !isValidIsoDateTime(req.body.endTimestamp)) ||
+		(req.body.previousEnd && !isValidIsoDateTime(req.body.previousEnd)) ||
+		(req.body.minDate && !isValidIsoDateTime(req.body.minDate)) ||
+		(req.body.maxDate && !isValidIsoDateTime(req.body.maxDate))
+	) {
+		failure(res, HTTP_CODES.BAD_REQUEST, 'invalid date/time format');
 	} else {
 		const conn = getConnection();
 		try {

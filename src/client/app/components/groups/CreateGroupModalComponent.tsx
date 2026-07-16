@@ -239,8 +239,11 @@ export default function CreateGroupModalComponent() {
 		if (inputOk) {
 			// The input passed validation.
 			// GPS may have been updated so create updated state to submit.
-			const submitState = { ...state, gps: gps };
+			const { ...stateWithoutId } = state;
+			const submitState = { ...stateWithoutId, gps: gps };
 
+			// groupsApi.ts's createGroup mutation already strips id/deepMeters/deepGroups internally
+			// before building the request
 			createGroup(submitState)
 				.unwrap()
 				.then(() => {
