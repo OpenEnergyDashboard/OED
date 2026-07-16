@@ -99,7 +99,6 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			}
 		}
 	};
-
 	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid) {
 		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
@@ -107,27 +106,13 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		// Get the routed meter id and time for the desired readings.
 		const meterID = req.params.meter_id;
 		let timeInterval = TimeInterval.fromString(req.query.timeInterval);
-
 		//check if user is allowed to export
 		let shouldDownload = false;
-
 		//estimate file size
 		//this estimate is also present in src/client/app/components/ExportComponent.tsx and must be kept consistent between files
 		const count = await Reading.getCountByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 		const fileSize = (count * 0.082 / 1000);
-
 		const preferences = await Preferences.get(conn);
-
-		console.log('raw export size test:', {
-			meterID,
-			count,
-			fileSize,
-			defaultFileSizeLimit: preferences.defaultFileSizeLimit,
-			defaultWarningFileSize: preferences.defaultWarningFileSize,
-			hasValidAuthToken: req.hasValidAuthToken,
-			decoded: req.decoded
-		});
-
 		if (fileSize <= preferences.defaultFileSizeLimit) {
 			//file size within limit, anyone can download
 			shouldDownload = true;
@@ -138,12 +123,10 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 				shouldDownload = true;
 			}
 		}
-
 		if (shouldDownload == false) {
 			failure(res, HTTP_CODES.FORBIDDEN);
 			return;
 		}
-
 		try {
 			// Get the raw readings for this meter over time range desired.
 			// Note this returns unusual identifiers to save space and does not return the meter id.
