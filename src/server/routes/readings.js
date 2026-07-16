@@ -68,10 +68,6 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 	}
 })
 
-// TODO This route should be limiting access to large file responses to the appropriate users.
-// Currently it is done in the component but also needs to be here.
-// For now it only gets the user information and validates it but does not use it.
-
 /**
  * Route for fetching raw readings by meter ID and time interval.
  */
@@ -106,7 +102,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		const conn = getConnection();
 		// Get the routed meter id and time for the desired readings.
 		const meterID = req.params.meter_id;
-		let timeInterval = TimeInterval.fromString(req.query.timeInterval);
+		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 
 		//check if user is allowed to export
 		let shouldDownload = false;
