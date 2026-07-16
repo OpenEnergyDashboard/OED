@@ -109,10 +109,11 @@ export default function CreateUserModal() {
 	// End Modal show/close
 
 	const handleSubmit = async () => {
-		// id is not used when creating a newUser. omit() could be used to exclude id for userDetails to be consistent with the implementations
-		// on other client files, but it is not necessary at the moment. In addition, introducing omit() in the client files for User could cause
-		// unexpected issues. We are acknowledging that the codebase currently has a different implementation for handleSubmit() compared to other
-		// client files.
+		// id is not used when creating a newUser, and is one of several userDetails fields that are only used internally to this component
+		// (e.g. to track status like passwordMatch) rather than being sent to the createUser route. omit() could be used to exclude these unused
+		// fields from userDetails to be consistent with the implementations on other client files, but it is not necessary at the moment. In addition,
+		// introducing omit() in the client files for User could cause unexpected issues. We are acknowledging that the codebase currently has a different
+		// implementation for handleSubmit() compared to other client files.
 		const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
 		createUser(newUser)
 			.unwrap()

@@ -14,7 +14,6 @@ export const unitsAdapter = createEntityAdapter<UnitData>({
 export const unitsInitialState = unitsAdapter.getInitialState();
 export type UnitDataState = EntityState<UnitData, number>;
 
-
 export const unitsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		getUnitsDetails: builder.query<UnitDataState, void>({
