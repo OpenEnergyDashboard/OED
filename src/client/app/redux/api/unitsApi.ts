@@ -7,11 +7,13 @@ import { RootState } from 'store';
 import { UnitData, UnitDataById } from '../../types/redux/units';
 import { baseApi } from './baseApi';
 import { conversionsApi } from './conversionsApi';
+import { omit } from 'lodash';
 export const unitsAdapter = createEntityAdapter<UnitData>({
 	sortComparer: (unitA, unitB) => unitA.identifier?.localeCompare(unitB.identifier, undefined, { sensitivity: 'accent' })
 });
 export const unitsInitialState = unitsAdapter.getInitialState();
 export type UnitDataState = EntityState<UnitData, number>;
+
 
 export const unitsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
@@ -26,7 +28,7 @@ export const unitsApi = baseApi.injectEndpoints({
 			query: unitDataArgs => ({
 				url: 'api/units/addUnit',
 				method: 'POST',
-				body: { ...unitDataArgs }
+				body: omit(unitDataArgs, ['id'])
 			}),
 			onQueryStarted: (_arg, api) => {
 				api.queryFulfilled
