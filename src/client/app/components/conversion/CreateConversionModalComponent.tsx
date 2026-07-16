@@ -161,9 +161,10 @@ export default function CreateConversionModalComponent() {
 	};
 	/* End Warning Modal */
 
-	// The helper function will handle the omit() which separates it from the addConversionMutation.
-	// The addConversionMutation will call this helper function, so that omit() is not directly called.
-	// This helper function will also computes bidirectional based on the current source/destination selections
+	// This helper function will fix up the argument that will be used in addConversionMutation().
+	// The helper function will handle the omit() which separates it from the addConversionMutation().
+	// This helper function will also computes bidirectional based on the current source/destination selections.
+	// This helper function is introduced to allow the CreateConversion to be similar to the Create requests on other client files.
 	const buildConversionSubmitState = (state: typeof conversionState) => ({
 		...omit(state, 'sourceOptions', 'destinationOptions'),
 		bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
