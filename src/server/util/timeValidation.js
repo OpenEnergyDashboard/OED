@@ -8,15 +8,21 @@ const ISO_DURATION_REGEX = /^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+(\.\
 const ISO_DATETIME_WITH_TIMEZONE_REGEX = /^\d{4}-\d{2}-\d{2}T.+(?:Z|[+-]\d{2}:?\d{2})$/;
 
 /**
- * Returns true if value is a strictly valid ISO 8601 datetime string (with timezone).
- * @param {string} value
+ * Returns true if value is a strictly valid ISO 8601 datetime string. If hasTimezone is true then it also
+ * checks for a valid timezone.
+ * @param {string} value date/time string to validate
+ * @param {boolean} hasTimezone true (default) if check timezone and false if don't
  * @returns {boolean}
  */
-function isValidIsoDateTime(value) {
+function isValidIsoDateTime(value, hasTimezone = true) {
 	if (typeof value !== 'string') {
 		return false;
 	}
-	return ISO_DATETIME_WITH_TIMEZONE_REGEX.test(value) && moment.parseZone(value, moment.ISO_8601, true).isValid();
+	// Always check that moment thinks is it ISO.
+	let isValid = moment.parseZone(value, moment.ISO_8601, true).isValid();
+	// If requested, check if has timezone.
+	isValid = hasTimezone ? isValid && ISO_DATETIME_WITH_TIMEZONE_REGEX.test(value) : isValid;
+	return isValid;
 }
 
 /**
