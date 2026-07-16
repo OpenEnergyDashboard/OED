@@ -372,17 +372,13 @@ export default function PreferencesComponent() {
 					invalid={invalidFuncs.fileSizeLimit()}
 				/>
 				<FormFeedback>
-					{Number(localAdminPref.defaultFileSizeLimit) < 0 ? (
-						<FormattedMessage
-							id="error.greater"
-							values={{ min: 0 }}
-						/>
-					) : (
-						<FormattedMessage
-							id="error.greater"
-							values={{ min: Number(localAdminPref.defaultWarningFileSize) }}
-						/>
-					)}
+					<FormattedMessage
+						id="error.bounds"
+						values={{
+							min: Number(localAdminPref.defaultWarningFileSize),
+							max: Infinity
+						}}
+					/>
 				</FormFeedback>
 			</div>
 			<div>
