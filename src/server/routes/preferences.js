@@ -81,7 +81,6 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 						maxLength: SHORT_STRING_MAX_LENGTH
 					},
 					// PostgreSQL interval string; does not use moment so only length-limited here
-					// PostgreSQL interval string; does not use moment so only length-limited here
 					defaultMeterReadingFrequency: {
 						type: 'string',
 						maxLength: SHORT_STRING_MAX_LENGTH
