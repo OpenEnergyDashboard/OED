@@ -154,6 +154,9 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 		}
 	};
 	const validationResult = validate(req.body, validMap);
+	// TODO It is uncertain if the date has a timezone since map creation was not working when that was tested.
+	// This is a comment so if if fails someone knows to see if the second parameter should be false. If it works
+	// then this can be removed.
 	if (!validationResult.valid || !isValidIsoDateTime(req.body.modifiedDate)) {
 		log.error(`Invalid input for mapAPI. ${validationResult.errors}`);
 		res.sendStatus(HTTP_CODES.BAD_REQUEST);
