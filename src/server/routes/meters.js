@@ -282,8 +282,8 @@ router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 		log.warn(`Got request to edit a meter with invalid meter data, errors: ${response.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, 'validation failed with ' + response.errors.toString());
 	} else if (
-		(req.body.startTimestamp && !isValidIsoDateTime(req.body.startTimestamp)) ||
-		(req.body.endTimestamp && !isValidIsoDateTime(req.body.endTimestamp)) ||
+		(req.body.startTimestamp && !isValidIsoDateTime(req.body.startTimestamp, false)) ||
+		(req.body.endTimestamp && !isValidIsoDateTime(req.body.endTimestamp, false)) ||
 		(req.body.previousEnd && !isValidIsoDateTime(req.body.previousEnd)) ||
 		(req.body.minDate && !isValidIsoDateTime(req.body.minDate)) ||
 		(req.body.maxDate && !isValidIsoDateTime(req.body.maxDate))
@@ -355,8 +355,10 @@ router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 		log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, 'validation failed with ' + response.errors.toString());
 	} else if (
-		(req.body.startTimestamp && !isValidIsoDateTime(req.body.startTimestamp)) ||
-		(req.body.endTimestamp && !isValidIsoDateTime(req.body.endTimestamp)) ||
+		// The default value for start/endTimestamp does have a timezone but it is not required nor put
+		// in when OED sets the value later so not checked here.
+		(req.body.startTimestamp && !isValidIsoDateTime(req.body.startTimestamp, false)) ||
+		(req.body.endTimestamp && !isValidIsoDateTime(req.body.endTimestamp, false)) ||
 		(req.body.previousEnd && !isValidIsoDateTime(req.body.previousEnd)) ||
 		(req.body.minDate && !isValidIsoDateTime(req.body.minDate)) ||
 		(req.body.maxDate && !isValidIsoDateTime(req.body.maxDate))
