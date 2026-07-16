@@ -23,7 +23,7 @@ export default function ExportComponent() {
 			{
 				<div>
 					{/* will not dispatch if data in flight */}
-					<Button color='secondary' outline onClick={() => {dispatch(exportGraphReadingsThunk())}}>
+					<Button color='secondary' outline onClick={() => dispatch(exportGraphReadingsThunk())}>
 						<FormattedMessage id='export.graph.data' />
 					</Button>
 					<TooltipMarkerComponent page='home' helpTextId='help.home.export.graph.data' />
@@ -33,7 +33,7 @@ export default function ExportComponent() {
 				/* Only raw export if a line graph */
 				chartToRender === ChartTypes.line &&
 				<div style={{ paddingTop: '10px' }}>
-					<Button color='secondary' outline onClick={() => {dispatch(exportRawReadings())}}>
+					<Button color='secondary' outline onClick={() => dispatch(exportRawReadings())}>
 						<FormattedMessage id='export.raw.graph.data' />
 					</Button>
 				</div>
