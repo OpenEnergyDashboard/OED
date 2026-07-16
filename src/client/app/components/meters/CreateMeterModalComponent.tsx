@@ -2,7 +2,7 @@
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { range, omit } from 'lodash';
+import { range } from 'lodash';
 import * as moment from 'moment';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -179,7 +179,7 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 		if (inputOk) {
 			// The input passed validation.
 			const submitState = {
-				...omit(meterDetails, 'id'),
+				...meterDetails,
 				// GPS may have been updated so create updated state to submit.
 				gps: gps,
 				// Set default identifier as name if left blank

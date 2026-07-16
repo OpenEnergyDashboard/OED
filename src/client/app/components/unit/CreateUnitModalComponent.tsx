@@ -19,7 +19,6 @@ import { MIN_VAL, MAX_VAL } from '../../utils/input';
 import { LineGraphRates } from '../../types/redux/graph';
 import { customRateValid, isCustomRate } from '../../utils/unitInput';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
-import { omit } from 'lodash';
 
 /**
  * Defines the create unit modal form
@@ -57,10 +56,10 @@ export default function CreateUnitModalComponent() {
 		secInRate: LineGraphRates.hour * 3600,
 		suffix: '',
 		note: '',
-		// These two values are necessary but are not used.
-		// The client code makes the id for the selected unit and default graphic unit be -99
+		// The id property is necessary but not used.
+		// The client code makes the id for the selected unit
 		// so it can tell it is not yet assigned and do the correct logic for that case.
-		// The units API expects these values to be undefined on call so that the database can assign their values.
+		// The units API expects this value to be undefined on call so that the database can assign their values.
 		id: -99,
 		minVal: MIN_VAL,
 		maxVal: MAX_VAL,
@@ -207,8 +206,7 @@ export default function CreateUnitModalComponent() {
 		// Close modal first to avoid repeat clicks
 		setShowModal(false);
 		const submitState = {
-			// id is not part of create.
-			...omit(state, 'id'),
+			...state,
 			// Set default identifier as name if left blank
 			identifier: !state.identifier || state.identifier.length === 0 ? state.name : state.identifier,
 			// set displayable to none if unit is meter
