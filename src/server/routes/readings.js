@@ -102,7 +102,6 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		// Get the routed meter id and time for the desired readings.
 		const meterID = req.params.meter_id;
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-
 		//check if user is allowed to export
 		let shouldDownload = false;
 		//estimate file size
