@@ -15,8 +15,6 @@ const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, USERNAME_MIN_LENGTH, USERNAME_
 const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
-const DUMMY_PASSWORD_HASH = '$2a$10$N6cWKczGlZaT2ReVzJ48pu8t87bpatdCnpI50fXQ7SnHO23LL7Nfe';
-
 /**
  * Authenticate users and return a JSON Web Token with their user ID.
  * @param {String} username
