@@ -20,6 +20,7 @@ const { getConnection } = require('../../db');
 const Point = require('../../models/Point');
 const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
+const User = require('../../models/User');
 
 /** Shared valid timeInterval for line reading routes (used in multiple tests in this file). */
 const READINGS_LINE_TIME_INTERVAL = '2020-01-01T00:00:00.000Z_2020-01-02T00:00:00.000Z';
@@ -256,8 +257,54 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			timeInterval = testData.timeInterval;
 			await Preferences.update({ defaultFileSizeLimit: limit }, conn);
 		}
-		mocha.describe('Estimataed File Size is within File Size Limit', () => {});
-		mocha.describe('Estimated File Size Exceeds File Size Limit', () => {});
+		mocha.describe('Estimated File Size is within File Size Limit', () => {
+
+			let conn;
+			let meterID;
+			let timeInterval;
+			let csvToken;
+			let exportToken;
+			let obviusToken;
+			let adminToken;
+
+			mocha.beforeEach(async () => {
+				setUpRawExportTest(0.001);
+			});
+
+		});
+		mocha.describe('Estimated File Size Exceeds File Size Limit', () => {
+
+			let conn;
+			let meterID;
+			let timeInterval;
+			let csvToken;
+			let exportToken;
+			let obviusToken;
+			let adminToken;
+
+			mocha.beforeEach(async () => {
+				setUpRawExportTest(0.00015)
+			});
+
+			mocha.it('Rejects unauthenticated users', async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
+					.query({ timeInterval });
+
+				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+			});
+
+			mocha.it('Rejects CSV users', async () => {
+				const exportToken = await getTokenForRole(User.role.EXPORT, conn);
+
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
+					.set('token', exportToken)
+
+				expect(res).to.have.status(HTTP_CODES.OK);
+			});
+
+		});
 	});
 
 	mocha.describe('Edge Cases and Error Handling', () => {
