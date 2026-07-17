@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { chai, mocha, expect, app, testDB } = require('../common');
+const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const { HTTP_CODES } = require('../../util/httpCodes');
 const { STRING_GENERAL_MAX_LENGTH } = require('../../util/validationConstants');
 const {
@@ -274,19 +274,11 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		});
 		mocha.describe('Estimated File Size Exceeds File Size Limit', () => {
 
-			let conn;
-			let meterID;
-			let timeInterval;
-			let csvToken;
-			let exportToken;
-			let obviusToken;
-			let adminToken;
-
 			mocha.beforeEach(async () => {
-				setUpRawExportTest(0.00015)
+				await setUpRawExportTest(0.00015);
 			});
 
-			mocha.it('Rejects unauthenticated users', async () => {
+			mocha.it('rejects unauthenticated users', async () => {
 				const res = await chai.request(app)
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
 					.query({ timeInterval });
@@ -294,16 +286,49 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 			});
 
-			mocha.it('Rejects CSV users', async () => {
+			mocha.it('rejects CSV users', async () => {
+				const csvToken = await getTokenForRole(User.role.CSV, conn);
+
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
+					.set('token', csvToken)
+					.query({ timeInterval });
+
+				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+			});
+
+			mocha.it('rejects OBVIUS users', async () => {
+				const obviusToken = await getTokenForRole(User.role.OBVIUS, conn);
+
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
+					.set('token', obviusToken)
+					.query({ timeInterval });
+
+				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+			});
+
+			mocha.it('allows EXPORT users', async () => {
 				const exportToken = await getTokenForRole(User.role.EXPORT, conn);
 
 				const res = await chai.request(app)
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
 					.set('token', exportToken)
-
+					.query({ timeInterval });
+					
 				expect(res).to.have.status(HTTP_CODES.OK);
 			});
 
+			mocha.it('allows ADMIN users', async () => {
+				const adminToken = await getTokenForUser(testUser);
+
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
+					.set('token', adminToken)
+					.query({ timeInterval });
+					
+				expect(res).to.have.status(HTTP_CODES.OK);
+			});
 		});
 	});
 
