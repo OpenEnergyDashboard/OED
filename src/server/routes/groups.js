@@ -13,6 +13,7 @@ const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator
 const { log } = require('../log');
 const Point = require('../models/Point');
 const { failure, success } = require('./response');
+const { HTTP_CODES } = require('../util/httpCodes');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 
 const router = express.Router();
@@ -31,7 +32,7 @@ function formatGroupForResponse(item) {
 	return {
 		id: item.id, name: item.name, gps: item.gps, displayable: item.displayable,
 		note: item.note, area: item.area, defaultGraphicUnit: item.defaultGraphicUnit,
-		deepMeters: item.children, areaUnit: item.areaUnit
+		deepMeters: item.deepMeters, deepGroups: item.deepGroups, areaUnit: item.areaUnit
 	};
 }
 
@@ -52,11 +53,10 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Group.getAll(conn);
-		deepChildren = [];
-		promises = await rows.map(async (row) => {
-			const deepChildren = await Group.getDeepMetersByGroupID(row.id, conn);
-			return { ...row, children: deepChildren };
-		})
+		const promises = await rows.map(async (row) => {
+			const deepMeters = await Group.getDeepMetersByGroupID(row.id, conn);
+			return { ...row, deepMeters: deepMeters};
+		});
 		Promise.all(promises).then(function (values) {
 			res.json(values.map(formatGroupForResponse));
 		})
@@ -75,6 +75,26 @@ router.get('/idname', optionalAuthMiddleware, async (req, res) => {
 		res.json(rows.map(formatToOnlyNameID));
 	} catch (err) {
 		log.error(`Error while performing GET all groups query: ${err}`, err);
+	}
+});
+
+/**GET info of all deep group children for every group
+ * Will return an array where every entry is a group with deep groups property
+ * @param item group
+*/
+router.get('/deep/groups', adminAuthMiddleware('view deep groups'), async (req, res) => {
+	const conn = getConnection();
+	try{
+		const rows = await Group.getAll(conn);
+		const promises = await rows.map(async (row) => {
+			const deepGroups = await Group.getDeepGroupsByGroupID(row.id, conn);
+			return { ...row, deepGroups: deepGroups, deepMeters: [] };
+		});
+		Promise.all(promises).then(function (values) {
+			res.json(values.map(formatGroupForResponse));
+		});
+	} catch (err) {
+		log.error(`Error while performing GET deep groups for all groups query: ${err}`, err);
 	}
 });
 
@@ -132,7 +152,7 @@ router.get('/deep/groups/:group_id', optionalAuthMiddleware, async (req, res) =>
 	const validatorResult = validate(req.params, validParams);
 	if (!validatorResult.valid) {
 		log.error(`Got request group deep group children with invalid data, errors: ${validatorResult.errors}`);
-		failure(res, 400, "Got request group deep group children with invalid data. Error(s): " + validatorResult.errors.toString());
+		failure(res, HTTP_CODES.BAD_REQUEST, "Got request group deep group children with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -140,7 +160,7 @@ router.get('/deep/groups/:group_id', optionalAuthMiddleware, async (req, res) =>
 			res.json({ deepGroups });
 		} catch (err) {
 			log.error(`Error while preforming GET on all deep child groups of specific group: ${err}`, err);
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });
@@ -161,7 +181,7 @@ router.get('/deep/meters/:group_id', optionalAuthMiddleware, async (req, res) =>
 	const validatorResult = validate(req.params, validParams);
 	if (!validatorResult.valid) {
 		log.error(`Got request group deep meter children with invalid data, errors: ${validatorResult.errors}`);
-		failure(res, 400, "Got request group deep meter children with invalid data. Error(s): " + validatorResult.errors.toString());
+		failure(res, HTTP_CODES.BAD_REQUEST, "Got request group deep meter children with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -169,7 +189,7 @@ router.get('/deep/meters/:group_id', optionalAuthMiddleware, async (req, res) =>
 			res.json({ deepMeters });
 		} catch (err) {
 			log.error(`Error while preforming GET on all deep child meters of specific group: ${err}`, err);
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });
@@ -190,7 +210,7 @@ router.get('/parents/:group_id', optionalAuthMiddleware, async (req, res) => {
 	const validatorResult = validate(req.params, validParams);
 	if (!validatorResult.valid) {
 		log.error(`Got request group parents with invalid data, errors: ${validatorResult.errors}`);
-		failure(res, 400, "Got request group parents with invalid data. Error(s): " + validatorResult.errors.toString());
+		failure(res, HTTP_CODES.BAD_REQUEST, "Got request group parents with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -198,7 +218,7 @@ router.get('/parents/:group_id', optionalAuthMiddleware, async (req, res) => {
 			res.json(parentGroups);
 		} catch (err) {
 			log.error(`Error while preforming GET on all parents of specific group: ${err}`, err);
-			res.sendStatus(500);
+			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });
@@ -208,8 +228,8 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 		type: 'object',
 		additionalProperties: false,
 		required: ['name', 'childGroups', 'childMeters'],
+		maxProperties: 9,
 		properties: {
-			id: { type: 'integer', minimum: 1 },
 			name: {
 				type: 'string',
 				minLength: 1,
@@ -256,7 +276,7 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 					minimum: 1
 				}
 			},
-			defaultGraphicUnit: { type: 'integer', minimum: 1 },
+			defaultGraphicUnit: {'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }]},
 			areaUnit: {
 				type: 'string',
 				minLength: 1,
@@ -269,7 +289,7 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 	const validatorResult = validate(req.body, validGroup);
 	if (!validatorResult.valid) {
 		log.error(`Got request to create group with invalid data, errors: ${validatorResult.errors}`);
-		failure(res, 400, "Got request to creat group with invalid data. Error(s): " + validatorResult.errors.toString());
+		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to create group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
@@ -293,11 +313,12 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 			});
 			success(res);
 		} catch (err) {
+			// Group duplicate-name DB errors to a safe 400 response
 			if (err.toString() === 'error: duplicate key value violates unique constraint "groups_name_key"') {
-				failure(res, 400, err.toString() + ' with detail ' + err['detail']);
+				failure(res, HTTP_CODES.BAD_REQUEST, 'Group name already exists');
 			} else {
 				log.error(`Error while inserting new group ${err}`, err);
-				failure(res, 400, err.toString() + ' with detail ' + err['detail']);
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, err.toString() + ' with detail ' + err['detail']);
 			}
 		}
 	}
@@ -356,7 +377,7 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 					minimum: 1
 				}
 			},
-			defaultGraphicUnit: { type: 'integer', minimum: 1 },
+			defaultGraphicUnit: {'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }]},
 			areaUnit: {
 				type: 'string',
 				minLength: 1,
@@ -369,7 +390,7 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 	const validatorResult = validate(req.body, validGroup);
 	if (!validatorResult.valid) {
 		log.error(`Got request to edit group with invalid data, errors: ${validatorResult.errors}`);
-		failure(res, 400, "Got request to edit group with invalid data. Error(s): " + validatorResult.errors.toString());
+		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to edit group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		try {
 			const conn = getConnection();
@@ -407,13 +428,13 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 
 				return t.batch(flatten([adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
 			});
-			res.sendStatus(200);
+			res.sendStatus(HTTP_CODES.OK);
 		} catch (err) {
 			if (err.message && err.message === 'Cyclic group detected') {
-				res.status(400).send({ message: err.message });
+				res.status(HTTP_CODES.BAD_REQUEST).send({ message: err.message });
 			} else {
 				log.error(`Error while editing existing group ${err}`, err);
-				res.sendStatus(500);
+				res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 			}
 		}
 	}
@@ -432,15 +453,15 @@ router.post('/delete', adminAuthMiddleware('delete groups'), async (req, res) =>
 	const validatorResult = validate(req.body, validParams);
 	if (!validatorResult.valid) {
 		log.error(`Got request to delete group with invalid data, errors: ${validatorResult.errors}`);
-		failure(res, 400, "Got request to delete group with invalid data. Error(s): " + validatorResult.errors.toString());
+		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to delete group with invalid data. Error(s): " + validatorResult.errors.toString());
 	} else {
 		const conn = getConnection();
 		try {
 			await Group.delete(req.body.id, conn);
-			res.sendStatus(200);
+			res.sendStatus(HTTP_CODES.OK);
 		} catch (err) {
 			log.error(`Error while deleting group ${err}`, err);
-			res.sendStatus(500);
+			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });

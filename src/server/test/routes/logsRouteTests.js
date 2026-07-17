@@ -7,7 +7,7 @@
 const { chai, mocha, expect, app, testUser } = require('../common');
 const moment = require('moment');
 const { log } = require('../../log');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Log Routes', () => {
 	let token, currentLogToDb;
@@ -36,7 +36,7 @@ mocha.describe('Log Routes', () => {
 				.post('/api/logs/info')
 				.set('token', token)
 				.send({ message: 'Valid info message' });
-			expect(response.status).to.equal(HTTP_CODE.OK);
+			expect(response.status).to.equal(HTTP_CODES.OK);
 		});
 
 		mocha.it('should return 400 for invalid info message', async () => {
@@ -44,7 +44,7 @@ mocha.describe('Log Routes', () => {
 				.post('/api/logs/info')
 				.set('token', token)
 				.send({ message: '' });
-			expect(response.status).to.equal(HTTP_CODE.BAD_REQUEST);
+			expect(response.status).to.equal(HTTP_CODES.BAD_REQUEST);
 		});
 
 		mocha.it('should return 200 for valid warn message', async () => {
@@ -52,7 +52,7 @@ mocha.describe('Log Routes', () => {
 				.post('/api/logs/warn')
 				.set('token', token)
 				.send({ message: 'Valid warn message' });
-			expect(response.status).to.equal(HTTP_CODE.OK);
+			expect(response.status).to.equal(HTTP_CODES.OK);
 		});
 
 		mocha.it('should return 400 for invalid warn message', async () => {
@@ -60,7 +60,7 @@ mocha.describe('Log Routes', () => {
 				.post('/api/logs/warn')
 				.set('token', token)
 				.send({ message: '' });
-			expect(response.status).to.equal(HTTP_CODE.BAD_REQUEST);
+			expect(response.status).to.equal(HTTP_CODES.BAD_REQUEST);
 		});
 
 		mocha.it('should return 200 for valid error message', async () => {
@@ -68,7 +68,7 @@ mocha.describe('Log Routes', () => {
 				.post('/api/logs/error')
 				.set('token', token)
 				.send({ message: 'Valid error message' });
-			expect(response.status).to.equal(HTTP_CODE.OK);
+			expect(response.status).to.equal(HTTP_CODES.OK);
 		});
 
 		mocha.it('should return 400 for invalid error message', async () => {
@@ -76,7 +76,7 @@ mocha.describe('Log Routes', () => {
 				.post('/api/logs/error')
 				.set('token', token)
 				.send({ message: '' });
-			expect(response.status).to.equal(HTTP_CODE.BAD_REQUEST);
+			expect(response.status).to.equal(HTTP_CODES.BAD_REQUEST);
 		});
 
 		mocha.it('should return logs for valid date range and type', async () => {
@@ -84,7 +84,7 @@ mocha.describe('Log Routes', () => {
 				.get('/api/logs/logsmsg/getLogsByDateRangeAndType')
 				.set('token', token)
 				.query({ timeInterval: '2023-01-01T00:00:00Z_2023-12-31T23:59:59Z', logTypes: 'INFO', logLimit: '10' });
-			expect(response.status).to.equal(HTTP_CODE.OK);
+			expect(response.status).to.equal(HTTP_CODES.OK);
 			expect(response.body).to.be.an('array');
 		});
 
@@ -93,7 +93,21 @@ mocha.describe('Log Routes', () => {
 				.get('/api/logs/logsmsg/getLogsByDateRangeAndType')
 				.set('token', token)
 				.query({ timeInterval: 'invalid', logTypes: 'INVALID', logLimit: 'invalid' });
-			expect(response.status).to.equal(HTTP_CODE.BAD_REQUEST);
+			expect(response.status).to.equal(HTTP_CODES.BAD_REQUEST);
+		});
+
+		mocha.it('should return 400 for malformed time intervals', async () => {
+			const invalidTimeIntervals = [
+				'2023-01-01_2023-12-31',
+				'2023-01-01T00:00:00Z_'
+			];
+			for (const timeInterval of invalidTimeIntervals) {
+				const response = await chai.request(app)
+					.get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+					.set('token', token)
+					.query({ timeInterval, logTypes: 'INFO', logLimit: '10' });
+				expect(response.status).to.equal(HTTP_CODES.BAD_REQUEST);
+			}
 		});
 	});
 
@@ -107,7 +121,7 @@ mocha.describe('Log Routes', () => {
 				.post('/api/logs/info')
 				.set('token', token)
 				.send({ message: testMessage });
-			expect(insertResponse.status).to.equal(HTTP_CODE.OK);
+			expect(insertResponse.status).to.equal(HTTP_CODES.OK);
 
 			// Retrieve and verify the log appears in results
 			const retrieveResponse = await chai.request(app)
@@ -119,7 +133,7 @@ mocha.describe('Log Routes', () => {
 					logLimit: '100'
 				});
 
-			expect(retrieveResponse.status).to.equal(HTTP_CODE.OK);
+			expect(retrieveResponse.status).to.equal(HTTP_CODES.OK);
 			expect(retrieveResponse.body).to.be.an('array');
 
 			// Find our test message in the results
@@ -160,7 +174,7 @@ mocha.describe('Log Routes', () => {
 					logLimit: '100'
 				});
 
-			expect(infoResponse.status).to.equal(HTTP_CODE.OK);
+			expect(infoResponse.status).to.equal(HTTP_CODES.OK);
 			// Should only contain one INFO log
 			const infoBody = infoResponse.body;
 			expect(infoBody.length).to.equal(1);
@@ -178,7 +192,7 @@ mocha.describe('Log Routes', () => {
 					logLimit: '100'
 				});
 
-			expect(warnResponse.status).to.equal(HTTP_CODE.OK);
+			expect(warnResponse.status).to.equal(HTTP_CODES.OK);
 			// Should only contain one WARN log
 			const warnBody = warnResponse.body;
 			expect(warnBody.length).to.equal(1);
@@ -196,7 +210,7 @@ mocha.describe('Log Routes', () => {
 					logLimit: '100'
 				});
 
-			expect(errorResponse.status).to.equal(HTTP_CODE.OK);
+			expect(errorResponse.status).to.equal(HTTP_CODES.OK);
 			// Should only contain one ERROR log
 			const errorBody = errorResponse.body;
 			expect(errorBody.length).to.equal(1);
@@ -236,7 +250,7 @@ mocha.describe('Log Routes', () => {
 					logLimit: '100'
 				});
 
-			expect(response.status).to.equal(HTTP_CODE.OK);
+			expect(response.status).to.equal(HTTP_CODES.OK);
 
 			// Should contain INFO and WARN logs, but not ERROR
 			const infoLog = response.body.find(log => log.logMessage === infoMessage);
@@ -276,7 +290,7 @@ mocha.describe('Log Routes', () => {
 					logLimit: '2'
 				});
 
-			expect(response.status).to.equal(HTTP_CODE.OK);
+			expect(response.status).to.equal(HTTP_CODES.OK);
 			expect(response.body).to.be.an('array');
 
 			// Should return exactly the limit
@@ -313,7 +327,7 @@ mocha.describe('Log Routes', () => {
 					logLimit: '100'
 				});
 
-			expect(response.status).to.equal(HTTP_CODE.OK);
+			expect(response.status).to.equal(HTTP_CODES.OK);
 
 			// Should only contain the recent message
 			const recentLog = response.body.find(log => log.logMessage === recentMessage);
@@ -347,7 +361,7 @@ mocha.describe('Log Routes', () => {
 					logLimit: '100'
 				});
 
-			expect(response.status).to.equal(HTTP_CODE.OK);
+			expect(response.status).to.equal(HTTP_CODES.OK);
 			expect(response.body).to.be.an('array');
 			// Should be empty despite logs existing
 			expect(response.body).to.have.lengthOf(0);

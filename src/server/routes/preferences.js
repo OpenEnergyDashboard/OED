@@ -9,6 +9,8 @@ const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH } = require('../util/validationConstants');
+const { HTTP_CODES } = require('../util/httpCodes');
+const { isValidIsoDateTime } = require('../util/timeValidation');
 
 const router = express.Router();
 
@@ -78,6 +80,7 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 						type: 'string',
 						maxLength: SHORT_STRING_MAX_LENGTH
 					},
+					// PostgreSQL interval string; does not use moment so only length-limited here
 					defaultMeterReadingFrequency: {
 						type: 'string',
 						maxLength: SHORT_STRING_MAX_LENGTH
@@ -109,16 +112,25 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 		}
 	};
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(400);
-	} else {
-		const conn = getConnection();
-		try {
-			const rows = await Preferences.update(req.body.preferences, conn);
-			res.json(rows);
-		} catch (err) {
-			log.error(`Error while performing POST update preferences: ${err}`, err);
-			res.sendStatus(500);
-		}
+		return res.sendStatus(HTTP_CODES.BAD_REQUEST);
+	}
+
+	const prefs = req.body.preferences;
+	if (
+		// preferences.js does not use moment; validate date strings directly
+		(prefs.defaultMeterMinimumDate && !isValidIsoDateTime(prefs.defaultMeterMinimumDate)) ||
+		(prefs.defaultMeterMaximumDate && !isValidIsoDateTime(prefs.defaultMeterMaximumDate))
+	) {
+		return res.sendStatus(HTTP_CODES.BAD_REQUEST);
+	}
+
+	const conn = getConnection();
+	try {
+		const rows = await Preferences.update(prefs, conn);
+		return res.json(rows);
+	} catch (err) {
+		log.error(`Error while performing POST update preferences: ${err}`, err);
+		return res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 	}
 });
 

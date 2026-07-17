@@ -11,7 +11,7 @@ const {
 	expectValidCommaSeparatedIds,
 	validateRequiredQueryParams
 } = require('../util/validationHelpers');
-const { HTTP_CODE } = require('../../util/readingsUtils');
+const { HTTP_CODES } = require('../../util/httpCodes');
 const {	STRING_GENERAL_MAX_LENGTH } = require('../../util/validationConstants');
 
 mocha.describe('Compare Readings Parameter Validation', () => {
@@ -70,7 +70,7 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get(`${BASE_METER_ENDPOINT}/${longMeterIds}`)
 					.query(validQuery);
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 		});
 
@@ -93,54 +93,64 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get(`${BASE_METER_ENDPOINT}/1`)
 					.query(queryWithExtra);
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 
-			// TODO: re-enable once compareReadings rejects invalid ISO values without hitting DB
-			mocha.it.skip('should validate curr_start parameter', async () => {
-				// Test extremely long date string (DoS prevention)
-				const dateStart = '2023-01-01T00:00:00.000Z';
-				const longDateString = dateStart + 'x'.repeat(STRING_GENERAL_MAX_LENGTH - dateStart.length + 1);
+			mocha.it('should reject invalid curr_start format', async () => {
+				const invalidDates = [
+					'not-a-date',
+					'2023-13-01T00:00:00.000Z',  // invalid month
+					'2023-01-01',                  // date-only, no time/timezone
+					'x'.repeat(STRING_GENERAL_MAX_LENGTH + 1)
+				];
 
-				const res = await chai.request(app)
-					.get(`${BASE_METER_ENDPOINT}/1`)
-					.query({
-						...validQuery,
-						curr_start: longDateString
-					});
-
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				for (const curr_start of invalidDates) {
+					const res = await chai.request(app)
+						.get(`${BASE_METER_ENDPOINT}/1`)
+						.query({ ...validQuery, curr_start });
+					expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
+				}
 			});
 
-			// TODO: re-enable once compareReadings rejects invalid ISO values without hitting DB
-			mocha.it.skip('should validate curr_end parameter', async () => {
-				// Test extremely long date string (DoS prevention)
-				const longDateString = 'x'.repeat(STRING_GENERAL_MAX_LENGTH + 1);
-
+			mocha.it('should accept legacy date-time format with a space separator', async () => {
 				const res = await chai.request(app)
 					.get(`${BASE_METER_ENDPOINT}/1`)
-					.query({
-						...validQuery,
-						curr_end: longDateString
-					});
+					.query({ ...validQuery, curr_start: '2023-01-01 00:00:00', curr_end: '2023-01-02 00:00:00' });
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.OK);
 			});
 
-			// TODO: re-enable once compareReadings rejects invalid ISO values without hitting DB
-			mocha.it.skip('should validate shift parameter', async () => {
-				// Test extremely long duration string (DoS prevention)
-				const durationStart = 'P1D';
-				const longDurationString = durationStart + 'x'.repeat(STRING_GENERAL_MAX_LENGTH - durationStart.length + 1);
+			mocha.it('should reject invalid curr_end format', async () => {
+				const invalidDates = [
+					'not-a-date',
+					'2023-01-32T00:00:00.000Z',  // invalid day
+					'2023-01-01',                  // date-only, no time/timezone
+					'x'.repeat(STRING_GENERAL_MAX_LENGTH + 1)
+				];
 
-				const res = await chai.request(app)
-					.get(`${BASE_METER_ENDPOINT}/1`)
-					.query({
-						...validQuery,
-						shift: longDurationString
-					});
+				for (const curr_end of invalidDates) {
+					const res = await chai.request(app)
+						.get(`${BASE_METER_ENDPOINT}/1`)
+						.query({ ...validQuery, curr_end });
+					expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
+				}
+			});
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+			mocha.it('should reject invalid shift format', async () => {
+				const invalidDurations = [
+					'not-a-duration',
+					'P',           // empty duration
+					'P1X',         // invalid designator
+					'1D',          // missing leading P
+					'x'.repeat(STRING_GENERAL_MAX_LENGTH + 1)
+				];
+
+				for (const shift of invalidDurations) {
+					const res = await chai.request(app)
+						.get(`${BASE_METER_ENDPOINT}/1`)
+						.query({ ...validQuery, shift });
+					expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
+				}
 			});
 
 			mocha.it('should validate graphicUnitId parameter', async () => {
@@ -160,7 +170,7 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 							graphicUnitId: invalidId
 						});
 
-					expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+					expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 				}
 			});
 		});
@@ -218,7 +228,7 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get(`${BASE_GROUP_ENDPOINT}/${longGroupIds}`)
 					.query(validQuery);
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 		});
 
@@ -241,7 +251,7 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get(`${BASE_GROUP_ENDPOINT}/1`)
 					.query(queryWithExtra);
 
-				expect(res.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			});
 
 			// Query parameter validation is identical for both endpoints, 
@@ -274,8 +284,8 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get('/api/compareReadings/groups/1')
 					.query(maliciousQuery);
 
-				expect(res1.status).to.equal(HTTP_CODE.BAD_REQUEST);
-				expect(res2.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res1.status).to.equal(HTTP_CODES.BAD_REQUEST);
+				expect(res2.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			}
 		});
 
@@ -305,8 +315,8 @@ mocha.describe('Compare Readings Parameter Validation', () => {
 					.get('/api/compareReadings/groups/1')
 					.query(test.query);
 
-				expect(res1.status).to.equal(HTTP_CODE.BAD_REQUEST);
-				expect(res2.status).to.equal(HTTP_CODE.BAD_REQUEST);
+				expect(res1.status).to.equal(HTTP_CODES.BAD_REQUEST);
+				expect(res2.status).to.equal(HTTP_CODES.BAD_REQUEST);
 			}
 		});
 	});

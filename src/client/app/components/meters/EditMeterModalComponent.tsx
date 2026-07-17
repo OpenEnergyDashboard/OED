@@ -238,15 +238,22 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							&& unitDataById[localMeterEdits.unitId].unitRepresent != UnitRepresentType.quantity) ||
 						(unitDataById[props.meter.unitId].unitRepresent != UnitRepresentType.quantity
 							&& unitDataById[localMeterEdits.unitId].unitRepresent == UnitRepresentType.quantity));
+
 				// Submit new meter if checks where ok.
 				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews })
 					.unwrap()
 					.then(() => {
-						showSuccessNotification(translate('meter.successfully.edited.meter'));
+						showSuccessNotification(
+							translate('meter.successfully.edited.meter') + '"' + submitState.name + '"' +
+							translate('meter.successfully.create.meter.identifier') + submitState.identifier +
+							translate('meter.successfully.create.meter.type') + submitState.meterType + ')'
+						);
 					})
 					.catch(err => {
 						showErrorNotification(
-							translate('meter.failed.to.edit.meter') + '"' + err.data + '"'
+							translate('meter.failed.to.edit.meter') + '"' + localMeterEdits.name + '"' +
+							translate('meter.successfully.create.meter.identifier') + localMeterEdits.identifier +
+							translate('meter.successfully.create.meter.type') + localMeterEdits.meterType + ') ' + err.data
 						);
 					});
 			} else if (error_message) {

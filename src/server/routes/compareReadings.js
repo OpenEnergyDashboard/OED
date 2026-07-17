@@ -10,16 +10,10 @@ const moment = require('moment');
 const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const { STRING_GENERAL_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
+const { HTTP_CODES } = require('../util/httpCodes');
+const { isValidIsoDuration } = require('../util/timeValidation');
 
-const ISO_DURATION_REGEX = /^P(?!$)(\d+Y)?(\d+M)?(\d+D)?(T(\d+H)?(\d+M)?(\d+(\.\d+)?S)?)?$/;
-
-function isValidIsoDateTime(value) {
-	return moment.parseZone(value, moment.ISO_8601, true).isValid();
-}
-
-function isValidIsoDuration(value) {
-	return ISO_DURATION_REGEX.test(value);
-}
+const DATE_TIME_WITH_TIME_REGEX = /^\d{4}-\d{2}-\d{2}(?:T| )\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?$/;
 
 function validateMeterCompareReadingsParams(params) {
 	const validParams = {
@@ -84,6 +78,13 @@ function validateQueryParams(queryParams) {
 	return paramsValidationResult.valid;
 }
 
+function isValidCompareDateTime(value) {
+	if (typeof value !== 'string') {
+		return false;
+	}
+	return DATE_TIME_WITH_TIME_REGEX.test(value) && moment.parseZone(value, [moment.ISO_8601, 'YYYY-MM-DD HH:mm:ss'], true).isValid();
+}
+
 /**
  * Gets compare readings for meters for the given current time range and a shift for previous time range
  * @param meterIDs The meter IDs to get readings for
@@ -117,7 +118,7 @@ function createRouter() {
 
 	router.get('/meters/:meter_ids', async (req, res) => {
 		if (!(validateMeterCompareReadingsParams(req.params) && validateQueryParams(req.query))) {
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			return;
 		}
 		const meterIDs = req.params.meter_ids.split(',').map(id => parseInt(id));
@@ -126,8 +127,8 @@ function createRouter() {
 		const currEndRaw = req.query.curr_end;
 		const shiftRaw = req.query.shift;
 
-		if (!isValidIsoDateTime(currStartRaw) || !isValidIsoDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
-			res.sendStatus(400);
+		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			return;
 		}
 
@@ -140,7 +141,7 @@ function createRouter() {
 
 	router.get('/groups/:group_ids', async (req, res) => {
 		if (!(validateGroupCompareReadingsParams(req.params) && validateQueryParams(req.query))) {
-			res.sendStatus(400);
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			return;
 		}
 		const groupIDs = req.params.group_ids.split(',').map(id => parseInt(id));
@@ -149,8 +150,8 @@ function createRouter() {
 		const currEndRaw = req.query.curr_end;
 		const shiftRaw = req.query.shift;
 
-		if (!isValidIsoDateTime(currStartRaw) || !isValidIsoDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
-			res.sendStatus(400);
+		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
+			res.sendStatus(HTTP_CODES.BAD_REQUEST);
 			return;
 		}
 

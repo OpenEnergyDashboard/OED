@@ -370,16 +370,16 @@ export default function PreferencesComponent() {
 				</Button>
 				<Button
 					type='submit'
-					onClick={() =>
+					onClick={() => {
 						submitPreferences(localAdminPref)
 							.unwrap()
 							.then(() => {
 								showSuccessNotification(translate('updated.preferences'));
 							})
-							.catch(() => {
-								showErrorNotification(translate('failed.to.submit.changes'));
-							})
-					}
+							.catch(err => {
+								showErrorNotification(translate('failed.to.submit.changes') + err.data);
+							});
+					}}
 					disabled={!hasChanges || Object.values(invalidFuncs).some(check => check())}
 					color='primary'
 				>

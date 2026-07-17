@@ -10,7 +10,7 @@ const dotenv = require('dotenv');
 const envPath = path.join(__dirname, '..', '..', '.env');
 try {
 	fs.accessSync(envPath);
-	dotenv.config({ path: envPath });
+	dotenv.config({ path: envPath, override: true });
 } catch (err) {
 	// TODO: Check if valid env variables are actually loaded despite the lack of a file, only log if they are not
 	// console.log("Couldn't load a .env file");
