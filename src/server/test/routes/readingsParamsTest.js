@@ -15,6 +15,8 @@ const {
 	validateNumericIdInPath
 } = require('../util/validationHelpers');
 
+const moment = require('moment');
+const bcrypt = require('bcryptjs')
 const Preferences = require('../../models/Preferences');
 const { getConnection } = require('../../db');
 const Point = require('../../models/Point');
@@ -268,7 +270,56 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			let adminToken;
 
 			mocha.beforeEach(async () => {
-				setUpRawExportTest(0.001);
+				await setUpRawExportTest(100000000) // Set a high file size limit to ensure the estimated file size is within the limit;
+
+				csvToken = await getTokenForRole(User.role.CSV, conn);
+				exportToken = await getTokenForRole(User.role.EXPORT, conn);
+				obviusToken = await getTokenForRole(User.role.OBVIUS, conn);
+				adminToken = await getTokenForRole(User.role.ADMIN, conn);
+			});
+
+			mocha.it('accepts unauthenticated users', async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
+					.query({ timeInterval });
+
+				expect(res).to.have.status(HTTP_CODES.OK);
+			});
+
+			mocha.it('accepts CSV users', async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
+					.set('token', csvToken)
+					.query({ timeInterval });
+
+				expect(res).to.have.status(HTTP_CODES.OK);
+			});
+
+			mocha.it('accepts OBVIUS users', async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
+					.set('token', obviusToken)
+					.query({ timeInterval });
+
+				expect(res).to.have.status(HTTP_CODES.OK);
+			});
+
+			mocha.it('accepts EXPORT users', async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
+					.set('token', exportToken)
+					.query({ timeInterval });
+
+				expect(res).to.have.status(HTTP_CODES.OK);
+			});
+
+			mocha.it('accepts ADMIN users', async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
+					.set('token', adminToken)
+					.query({ timeInterval });
+
+				expect(res).to.have.status(HTTP_CODES.OK);
 			});
 
 		});
@@ -276,6 +327,11 @@ mocha.describe('Readings Route Parameter Validation', () => {
 
 			mocha.beforeEach(async () => {
 				await setUpRawExportTest(0.00015);
+
+				csvToken = await getTokenForRole(User.role.CSV, conn);
+				exportToken = await getTokenForRole(User.role.EXPORT, conn);
+				obviusToken = await getTokenForRole(User.role.OBVIUS, conn);
+				adminToken = await getTokenForRole(User.role.ADMIN, conn);
 			});
 
 			mocha.it('rejects unauthenticated users', async () => {
@@ -283,34 +339,28 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
 					.query({ timeInterval });
 
-				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+				expect(res).to.have.status(413);
 			});
 
 			mocha.it('rejects CSV users', async () => {
-				const csvToken = await getTokenForRole(User.role.CSV, conn);
-
 				const res = await chai.request(app)
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
 					.set('token', csvToken)
 					.query({ timeInterval });
 
-				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+				expect(res).to.have.status(413);
 			});
 
 			mocha.it('rejects OBVIUS users', async () => {
-				const obviusToken = await getTokenForRole(User.role.OBVIUS, conn);
-
 				const res = await chai.request(app)
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
 					.set('token', obviusToken)
 					.query({ timeInterval });
 
-				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+				expect(res).to.have.status(413);
 			});
 
-			mocha.it('allows EXPORT users', async () => {
-				const exportToken = await getTokenForRole(User.role.EXPORT, conn);
-
+			mocha.it('accepts EXPORT users', async () => {
 				const res = await chai.request(app)
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
 					.set('token', exportToken)
@@ -319,7 +369,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				expect(res).to.have.status(HTTP_CODES.OK);
 			});
 
-			mocha.it('allows ADMIN users', async () => {
+			mocha.it('accepts ADMIN users', async () => {
 				const adminToken = await getTokenForUser(testUser);
 
 				const res = await chai.request(app)
