@@ -6,13 +6,16 @@
    It ensures that repeated login attempts are blocked after
    exceeding the configured rate limit. */
 
-// TODO: Create additonal rate limits tests for other OED Routes
+// TODO: Create additional rate limit tests for other OED routes, covering
+// every rate limiter defined in app.js (general, 3D graphic, raw export).
 
 const { HTTP_CODE } = require('../util/readingsUtils');
 const { chai, mocha, expect, app } = require('../test/common');
 
 mocha.describe('Login Rate Limit', () => {
 	mocha.it('Should block repeated login attempts with 429', async () => {
+			// This test assumes the login rate limit window is 1 hour and that both
+			// requests below execute fast enough to land within that same window.
 			const first = await chai.request(app)
 				.post('/api/login')
 				.send({
