@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { chai, mocha, expect, app, testDB, testUser } = require('../common');
+const { chai, mocha, expect, app, testDB } = require('../common');
 const { HTTP_CODES } = require('../../util/httpCodes');
 const { STRING_GENERAL_MAX_LENGTH } = require('../../util/validationConstants');
 const {
@@ -199,6 +199,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		let meterID;
 		let timeInterval;
 		//insert a meter with 2 readings into testdb
+		//file size should be estimated at 2 * 0.082 / 1000 = 0.000164
 		async function createRawExportTestData(conn) {
 			const gps = new Point(1, 1);
 			const start = moment.utc('2020-01-01T00:00:00Z');
@@ -223,7 +224,6 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				timeInterval: '2020-01-01T00:00:00Z_2020-01-01T02:00:00Z'
 			};
 		}
-		//used specifically to get token from testuser who is ADMIN
 		async function getTokenForUser(user) {
 			const res = await chai.request(app)
 				.post('/api/login')
@@ -260,15 +260,12 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			await Preferences.update({ defaultFileSizeLimit: limit }, conn);
 		}
 		mocha.describe('Estimated File Size is within File Size Limit', () => {
-
 			let csvToken;
 			let exportToken;
 			let obviusToken;
 			let adminToken;
-
 			mocha.beforeEach(async () => {
-				await setUpRawExportTest(100000000) // Set a high file size limit to ensure the estimated file size is within the limit;
-
+				await setUpRawExportTest(100000000); // Set a high file size limit to ensure the estimated file size is within the limit;
 				csvToken = await getTokenForRole(User.role.CSV, conn);
 				exportToken = await getTokenForRole(User.role.EXPORT, conn);
 				obviusToken = await getTokenForRole(User.role.OBVIUS, conn);
@@ -318,13 +315,11 @@ mocha.describe('Readings Route Parameter Validation', () => {
 
 				expect(res).to.have.status(HTTP_CODES.OK);
 			});
-
 		});
+
 		mocha.describe('Estimated File Size Exceeds File Size Limit', () => {
-
 			mocha.beforeEach(async () => {
-				await setUpRawExportTest(0.00015);
-
+				await setUpRawExportTest(0.00015); // Set a high low size limit to ensure the estimated file size is within the limit;
 				csvToken = await getTokenForRole(User.role.CSV, conn);
 				exportToken = await getTokenForRole(User.role.EXPORT, conn);
 				obviusToken = await getTokenForRole(User.role.OBVIUS, conn);
@@ -344,7 +339,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
 					.set('token', csvToken)
 					.query({ timeInterval });
-
+					
 				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 			});
 
@@ -362,18 +357,16 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
 					.set('token', exportToken)
 					.query({ timeInterval });
-					
+
 				expect(res).to.have.status(HTTP_CODES.OK);
 			});
 
 			mocha.it('accepts ADMIN users', async () => {
-				const adminToken = await getTokenForUser(testUser);
-
 				const res = await chai.request(app)
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
 					.set('token', adminToken)
 					.query({ timeInterval });
-					
+
 				expect(res).to.have.status(HTTP_CODES.OK);
 			});
 		});
