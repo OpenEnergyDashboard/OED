@@ -31,6 +31,7 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 		const rows = await Conversion.getAll(conn);
 		res.json(rows.map(formatConversionForResponse));
 	} catch (err) {
+		res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
 		log.error(`Error while performing GET conversions details query: ${err}`);
 	}
 });
