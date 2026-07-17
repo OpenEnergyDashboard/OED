@@ -261,9 +261,6 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		}
 		mocha.describe('Estimated File Size is within File Size Limit', () => {
 
-			let conn;
-			let meterID;
-			let timeInterval;
 			let csvToken;
 			let exportToken;
 			let obviusToken;
@@ -339,7 +336,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
 					.query({ timeInterval });
 
-				expect(res).to.have.status(413);
+				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 			});
 
 			mocha.it('rejects CSV users', async () => {
@@ -348,7 +345,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.set('token', csvToken)
 					.query({ timeInterval });
 
-				expect(res).to.have.status(413);
+				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 			});
 
 			mocha.it('rejects OBVIUS users', async () => {
@@ -357,7 +354,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.set('token', obviusToken)
 					.query({ timeInterval });
 
-				expect(res).to.have.status(413);
+				expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 			});
 
 			mocha.it('accepts EXPORT users', async () => {
