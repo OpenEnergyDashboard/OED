@@ -407,7 +407,7 @@ export default function PreferencesComponent() {
 						const invalidFieldNames = getInvalidFieldNames();
 						if (invalidFieldNames) {
 							showErrorNotification(
-								translate('failed.to.submit.changes') + '(' + invalidFieldNames + translate('failed.to.submit.changes.fields')
+								translate('failed.to.submit.changes.saved') + '(' + invalidFieldNames + translate('failed.to.submit.changes.fields')
 							);
 							return;
 						}
@@ -418,11 +418,9 @@ export default function PreferencesComponent() {
 								showSuccessNotification(translate('updated.preferences'));
 							})
 							.catch(err => {
-								showErrorNotification(translate('failed.to.submit.changes') + err.data);
+								showErrorNotification(translate('failed.to.submit.changes.saved') + err.data);
 							});
 					}}
-					/* TODO DEBUG: removed the invalidFuncs check so that we can test the new error messages that display specific reasons */
-					/*disabled={!hasChanges}*/
 					disabled={!hasChanges || Object.values(invalidFuncs).some(check => check())}
 					color='primary'
 				>
