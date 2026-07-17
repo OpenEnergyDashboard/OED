@@ -161,11 +161,19 @@ export default function CreateConversionModalComponent() {
 	};
 	/* End Warning Modal */
 
+	// This helper function will fix up the argument that will be used in addConversionMutation().
+	// The helper function will handle the omit() which separates it from the addConversionMutation().
+	// This helper function will also computes bidirectional based on the current source/destination selections.
+	// This helper function is introduced to allow the CreateConversion to be similar to the Create requests on other client files.
+	const buildConversionSubmitState = (state: typeof conversionState) => ({
+		...omit(state, 'sourceOptions', 'destinationOptions'),
+		bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
+	});
+
 	// Submit
 	const handleSubmit = () => {
 		// Used for the ShowErrorNotification
-		const pending = {...omit(conversionState, 'sourceOptions', 'destinationOptions'),
-			bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional};
+		const pending = buildConversionSubmitState(conversionState);
 		setPendingConversion(pending);
 
 		// Show warning modal if slope and intercept are both 0
@@ -180,8 +188,7 @@ export default function CreateConversionModalComponent() {
 			// Omit the source options , do not need to send in request so remove here.
 			// If source is a meter, make bidirectional false
 			// If source or destination is a suffix unit, make bidirectional false
-			addConversionMutation({...omit(conversionState, 'sourceOptions', 'destinationOptions'),
-				bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional})
+			addConversionMutation(buildConversionSubmitState(conversionState))
 				.unwrap()
 				.then(() => {
 					// Show source/destination identifiers (not numeric IDs)
@@ -248,17 +255,14 @@ export default function CreateConversionModalComponent() {
 						setShowUnsavedWarning(false);
 						setHasUnsavedChanges(false);
 						if (conversionState.slope === 0 && conversionState.intercept === 0) {
-							setPendingConversion({...omit(conversionState, 'sourceOptions', 'destinationOptions'),
-								bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional});
+							setPendingConversion(buildConversionSubmitState(conversionState));
 							setWarningMessage(translate('conversion.slope.intercept.zero'));
 							setShowWarningModal(true);
 						}
 						else if (validConversion) {
 							setShowModal(false);
 
-							addConversionMutation({...omit(conversionState, 'sourceOptions', 'destinationOptions'),
-								bidirectional: (isMeterSource() || isSuffixUsed()) ? false : conversionState.bidirectional
-							})
+							addConversionMutation(buildConversionSubmitState(conversionState))
 								.unwrap()
 								.then(() => {
 									// Show source/destination identifiers (not numeric IDs)
