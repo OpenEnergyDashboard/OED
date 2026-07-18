@@ -62,12 +62,12 @@ export const groupsApi = baseApi.injectEndpoints({
 			query: groupData => ({
 				url: 'api/groups/create',
 				method: 'POST',
-				// omit the 'id' property of the groupData or api errors/fails
-				body: omit(groupData, 'id')
+				// omit properties not accepted by the server schema
+				body: omit(groupData, ['id', 'deepMeters', 'deepGroups'])
 			}),
 			invalidatesTags: ['GroupData', 'GroupChildrenData']
 		}),
-		editGroup: builder.mutation<void, Omit<GroupData, 'deepMeters'>>({
+		editGroup: builder.mutation<void, Omit<GroupData, 'deepMeters' | 'deepGroups'>>({
 			query: group => ({
 				url: 'api/groups/edit',
 				method: 'PUT',
@@ -85,6 +85,10 @@ export const groupsApi = baseApi.injectEndpoints({
 		}),
 		getParentIDs: builder.query<number[], number>({
 			query: groupId => `api/groups/parents/${groupId}`
+		}),
+		getAllGroupsDeepGroups: builder.query<GroupData[], void>({
+			query: () => 'api/groups/deep/groups',
+			providesTags: ['GroupData']
 		})
 	})
 });
@@ -98,7 +102,6 @@ export const {
 	selectIds: selectGroupIds,
 	selectEntities: selectGroupDataById
 } = groupsAdapter.getSelectors((state: RootState) => selectGroupDataResult(state).data ?? groupsInitialState);
-
 
 export const selectGroupNameWithID = (state: RootState, groupId: number) => {
 	const groupInfo = selectGroupById(state, groupId);

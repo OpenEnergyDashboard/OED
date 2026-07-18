@@ -188,13 +188,18 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 				// See below for usage of timeZoneValue.
 				timeZone: (meterDetails.timeZone == '' ? null : meterDetails.timeZone)
 			};
+
 			// Submit new meter if checks where ok.
 			// Attempt to add meter to database
-			submitAddMeter(submitState)
+			submitAddMeter(submitState as unknown as MeterData)
 				.unwrap()
 				.then(() => {
 					// if successful, the mutation will invalidate existing cache causing all meter details to be retrieved
-					showSuccessNotification(translate('meter.successfully.create.meter'));
+					showSuccessNotification(
+						translate('meter.successfully.create.meter') + '"' + submitState.name + '"' +
+						translate('meter.successfully.create.meter.identifier') + submitState.identifier +
+						translate('meter.successfully.create.meter.type') + submitState.meterType + ')'
+					);
 					resetState();
 					// if props exist, then return the identifier
 					//  or return the name if identifier is not set because the identifier will be set from the name
@@ -207,7 +212,11 @@ export default function CreateMeterModalComponent(props: CreateMeterModalProps):
 					}
 				})
 				.catch(err => {
-					showErrorNotification(translate('meter.failed.to.create.meter') + '"' + err.data + '"');
+					showErrorNotification(
+						translate('meter.failed.to.create.meter') + '"' + meterDetails.name + '"' +
+						translate('meter.successfully.create.meter.identifier') + meterDetails.identifier +
+						translate('meter.successfully.create.meter.type') + meterDetails.meterType + ') ' + err.data
+					);
 				});
 		} else {
 			// Tell user that not going to update due to input issues.

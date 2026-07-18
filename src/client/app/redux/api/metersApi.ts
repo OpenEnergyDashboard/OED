@@ -11,6 +11,7 @@ import { MeterData } from '../../types/redux/meters';
 import { durationFormat } from '../../utils/durationFormat';
 import { baseApi } from './baseApi';
 import { conversionsApi } from './conversionsApi';
+import { omit } from 'lodash';
 
 export const meterAdapter = createEntityAdapter<MeterData>({
 	sortComparer: (meterA, meterB) => meterA.identifier?.localeCompare(meterB.identifier, undefined, { sensitivity: 'accent' })
@@ -54,7 +55,7 @@ export const metersApi = baseApi.injectEndpoints({
 			query: meter => ({
 				url: 'api/meters/addMeter',
 				method: 'POST',
-				body: { ...meter }
+				body: omit(meter, ['id'])
 			}),
 			transformResponse: (data: MeterData) => ({ ...data, readingFrequency: durationFormat(data.readingFrequency) }),
 			onQueryStarted: (_arg, { dispatch, queryFulfilled }) => {

@@ -47,6 +47,7 @@ export default function CreateUserModal() {
 
 	// user api
 	const [createUser] = userApi.useCreateUserMutation();
+
 	const userRoleIsSelected = userDetails.role !== UserRole.INVALID;
 
 	// check if passwords match
@@ -108,16 +109,28 @@ export default function CreateUserModal() {
 	// End Modal show/close
 
 	const handleSubmit = async () => {
+		// id is not used when creating a newUser. Several userDetails fields that are only used internally to this component
+		// (e.g. to track status like passwordMatch) should not be sent to the createUser route. omit() could be used to exclude these unused
+		// fields from userDetails to be consistent with the implementations on other client files, but it is not necessary at the moment. In addition,
+		// introducing omit() in the client files for User could cause unexpected issues. We are acknowledging that the codebase currently has a different
+		// implementation for handleSubmit() compared to other client files.
 		const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
 		createUser(newUser)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('users.successfully.create.user') + userDetails.username);
+				showSuccessNotification(
+					translate('users.successfully.create.user') +
+					translate('users.successfully.edit.user.username') + userDetails.username + ')' +
+					translate('users.successfully.edit.user.role') + userDetails.role + ')'
+				);
 				resetForm();
 				handleCloseModal();
 			})
 			.catch(error => {
-				showErrorNotification(translate('users.failed.to.create.user') + userDetails.username + ' ' + error.data.message);
+				showErrorNotification(
+					translate('users.failed.to.create.user') +
+					translate('users.successfully.edit.user.username') + userDetails.username + ') ' +
+					error.data.message);
 				resetPasswordFields();
 			});
 	};
