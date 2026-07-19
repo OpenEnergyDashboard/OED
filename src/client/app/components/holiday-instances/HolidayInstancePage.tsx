@@ -19,6 +19,7 @@ import {
 	useGetHolidayInstancesQuery
 } from '../../redux/api/holidayInstancesApi';
 import { stableEmptyHolidays, useGetHolidaysQuery } from '../../redux/api/holidaysApi';
+import { useTranslate } from '../../redux/componentHooks';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 
 /*
@@ -49,11 +50,10 @@ import { showErrorNotification, showSuccessNotification } from '../../utils/noti
  *  mirrors the Units page: "Holiday Rates" / "Create a Holiday Rate" /
  *  "Details/Edit Holiday Rate".
  *
- *  I18N (deferred on purpose): strings are hardcoded English for now so the
- *  page works without touching translations/data.ts. Before merging upstream,
- *  swap the STRINGS object values for translate('...') calls — every
- *  user-facing string routes through STRINGS below, so the refactor is
- *  confined to that one block.
+ *  I18N (done 7/18): all user-facing strings go through translate('...') with
+ *  keys in translations/data.ts. Generic keys (cancel, note, discard.changes,
+ *  unsaved.warning) are reused per Steve's guidance; new keys live under
+ *  holiday.* / day.pattern.* with lightning-bolt placeholders in fr/es.
  * -------------------------------------------------------------------------
  */
 
@@ -114,9 +114,9 @@ const useDayPatterns = (): { data: DayPatternOption[]; isFetching: boolean } => 
  * Instances + mutations. Each mutation invalidates the HolidayInstances cache
  * tag, so the list refetches from the server — global state is never written
  * from the local copy (Steve's state model, meeting 4).
- * TODO(i18n): notification strings move to translate('...') with the rest.
  */
 const useHolidayInstances = () => {
+	const translate = useTranslate();
 	const { data = stableEmptyHolidayInstances } = useGetHolidayInstancesQuery();
 	const [addMutation] = useAddHolidayInstanceMutation();
 	const [editMutation] = useEditHolidayInstanceMutation();
@@ -140,8 +140,8 @@ const useHolidayInstances = () => {
 			dayPatternId: draft.patternId,
 			note: draft.note
 		}).unwrap()
-			.then(() => showSuccessNotification(STRINGS.createSuccess))
-			.catch(error => showErrorNotification(STRINGS.createFailure + error));
+			.then(() => showSuccessNotification(translate('holiday.rate.create.success')))
+			.catch(error => showErrorNotification(translate('holiday.rate.create.failure') + error));
 	};
 
 	const editInstance = (patch: HolidayInstancePatch) => {
@@ -149,7 +149,7 @@ const useHolidayInstances = () => {
 		// holiday after create — resend the stored (unchanged) value.
 		const existing = data.find(i => i.id === patch.id);
 		if (existing === undefined) {
-			showErrorNotification(STRINGS.editFailure);
+			showErrorNotification(translate('holiday.rate.edit.failure'));
 			return;
 		}
 		editMutation({
@@ -159,8 +159,8 @@ const useHolidayInstances = () => {
 			dayPatternId: patch.patternId,
 			note: patch.note
 		}).unwrap()
-			.then(() => showSuccessNotification(STRINGS.editSuccess))
-			.catch(error => showErrorNotification(STRINGS.editFailure + error));
+			.then(() => showSuccessNotification(translate('holiday.rate.edit.success')))
+			.catch(error => showErrorNotification(translate('holiday.rate.edit.failure') + error));
 	};
 
 	// TODO(meeting 5): interlock — before deleting, sweep Redux state to check
@@ -168,8 +168,8 @@ const useHolidayInstances = () => {
 	// makes the server return a database error.
 	const deleteInstance = (id: number) => {
 		deleteMutation({ id }).unwrap()
-			.then(() => showSuccessNotification(STRINGS.deleteSuccess))
-			.catch(error => showErrorNotification(STRINGS.deleteFailure + error));
+			.then(() => showSuccessNotification(translate('holiday.rate.delete.success')))
+			.catch(error => showErrorNotification(translate('holiday.rate.delete.failure') + error));
 	};
 
 	return { data: instances, addInstance, editInstance, deleteInstance };
@@ -177,51 +177,20 @@ const useHolidayInstances = () => {
 
 /* End data seam */
 
-/*
- * All user-facing text, in one place. TODO(i18n): replace each value with the
- * matching translate('...') call and add the keys to translations/data.ts —
- * nothing outside this object needs to change.
- */
-const STRINGS = {
-	pageTitle: 'Holiday Rates',
-	createButton: 'Create a Holiday Rate',
-	detailsButton: 'Details/Edit Holiday Rate',
-	noRates: 'No holiday rates have been created yet.',
-	loading: 'Loading holidays...',
-	baseHoliday: 'Base Holiday:',
-	baseHolidaySelect: 'Select or search for a holiday...',
-	baseHolidayRequired: 'Base holiday is required',
-	baseHolidayUnknown: '(unknown holiday)',
-	rateName: 'Holiday Rate Name:',
-	nameRequired: 'Name is required',
-	dayPattern: 'Day Pattern:',
-	dayPatternSelect: 'Select a day pattern',
-	dayPatternRequired: 'Day pattern is required',
-	note: 'Note:',
-	deleteButton: 'Delete Holiday Rate',
-	discardButton: 'Discard Changes',
-	createSaveButton: 'Create Holiday Rate',
-	saveButton: 'Save Holiday Rate',
-	cancel: 'Cancel',
-	unsavedWarning: 'You have unsaved changes. Are you sure you want to discard them?',
-	deleteWarning: 'Are you sure you want to delete this holiday rate? This cannot be undone.',
-	createSuccess: 'Holiday rate created',
-	createFailure: 'Failed to create holiday rate: ',
-	editSuccess: 'Holiday rate saved',
-	editFailure: 'Failed to save holiday rate: ',
-	deleteSuccess: 'Holiday rate deleted',
-	deleteFailure: 'Failed to delete holiday rate: '
-};
-
 // Sentinel values for "nothing selected yet" dropdown state, mirroring the
 // -999 placeholder convention used in the conversion modals.
 const NO_HOLIDAY = -999;
 const NO_PATTERN = -999;
 
-// Cards truncate long names at 30 chars, matching the conversion note/log convention.
-const MAX_NAME_LENGTH = 30;
-const truncate = (text: string) =>
-	text.length > MAX_NAME_LENGTH ? `${text.slice(0, MAX_NAME_LENGTH)} ...` : text;
+/*
+ * Card clipping (meeting 6): names clip at 15 chars (Steve: put the critical
+ * information in the first characters); notes keep the conversion note/log
+ * convention of 30.
+ */
+const MAX_NAME_LENGTH = 15;
+const MAX_NOTE_LENGTH = 30;
+const clip = (text: string, max: number) =>
+	text.length > max ? `${text.slice(0, max)} ...` : text;
 
 // Default (empty) create draft. Discard / open-create resets to this.
 const EMPTY_DRAFT: HolidayInstanceData = {
@@ -248,13 +217,18 @@ interface ConfirmModalProps {
 	onCancel: () => void;
 }
 
+/**
+ * @param props Message, confirm button text/color, and confirm/cancel callbacks
+ * @returns A small yes/no confirmation modal
+ */
 function ConfirmModal(props: ConfirmModalProps) {
+	const translate = useTranslate();
 	return (
 		<Modal isOpen={props.isOpen} toggle={props.onCancel} centered>
 			<ModalBody>{props.message}</ModalBody>
 			<ModalFooter>
 				<Button color='secondary' onClick={props.onCancel}>
-					{STRINGS.cancel}
+					{translate('cancel')}
 				</Button>
 				<Button color={props.confirmColor} onClick={props.onConfirm}>
 					{props.confirmText}
@@ -271,6 +245,7 @@ function ConfirmModal(props: ConfirmModalProps) {
  * @returns Holiday Instance page element
  */
 export default function HolidayInstancePage() {
+	const translate = useTranslate();
 	/* Data (real backend via the adapter hooks in the seam above) */
 	const { data: holidaysData, isFetching: holidaysFetching } = useHolidays();
 	const { data: dayPatterns, isFetching: patternsFetching } = useDayPatterns();
@@ -302,6 +277,9 @@ export default function HolidayInstancePage() {
 	// Confirmation sub-modals: unsaved-changes warning and delete guard.
 	const [showCloseConfirm, setShowCloseConfirm] = useState<boolean>(false);
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
+	// Meeting 5 to-do: warn (non-blocking) when the base holiday changes after
+	// a name was already entered, since the name may no longer match.
+	const [showBaseChangeWarning, setShowBaseChangeWarning] = useState<boolean>(false);
 
 	/* ---- Lookups (names are derived; IDs stay internal) ---- */
 	// TODO(region): once holidays are region-filtered, an instance whose base
@@ -310,7 +288,7 @@ export default function HolidayInstancePage() {
 	// fetched by id) — until then, fall back to a visible placeholder rather
 	// than rendering blank.
 	const holidayName = (id: number) =>
-		availableHolidays.find(h => h.id === id)?.name ?? STRINGS.baseHolidayUnknown;
+		availableHolidays.find(h => h.id === id)?.name ?? translate('holiday.base.unknown');
 	const patternName = (id: number) =>
 		dayPatterns.find(p => p.id === id)?.name ?? '';
 
@@ -373,6 +351,7 @@ export default function HolidayInstancePage() {
 	// confirms they want to lose their changes.
 	const doClose = () => {
 		setShowModal(false);
+		setShowBaseChangeWarning(false);
 		setShowCloseConfirm(false);
 		setShowDeleteConfirm(false);
 		setEditingId(null);
@@ -426,7 +405,7 @@ export default function HolidayInstancePage() {
 		return (
 			<div className='flexGrowOne'>
 				<div className='text-center'>
-					<p>{STRINGS.loading}</p>
+					<p>{translate('holiday.rate.loading')}</p>
 				</div>
 			</div>
 		);
@@ -438,12 +417,12 @@ export default function HolidayInstancePage() {
 				{/* ---------- Page title (mirrors "Units") ----------
 				    TODO(repo): Units renders a TooltipMarkerComponent help icon next
 				    to the title — add it once this lives in the OED repo. */}
-				<h2 style={titleStyle}>{STRINGS.pageTitle}</h2>
+				<h2 style={titleStyle}>{translate('holiday.rates')}</h2>
 
 				{/* ---------- Create button (mirrors "Create a Unit") ---------- */}
 				<div className='text-center' style={createRowStyle}>
 					<Button color='secondary' onClick={openCreate}>
-						{STRINGS.createButton}
+						{translate('holiday.rate.create')}
 					</Button>
 				</div>
 
@@ -452,30 +431,30 @@ export default function HolidayInstancePage() {
 					{instances.map(instance => (
 						<div key={instance.id} className='card' title={instance.instanceName}>
 							<div className='identifier-container'>
-								{truncate(instance.instanceName)}
+								{clip(instance.instanceName, MAX_NAME_LENGTH)}
 							</div>
 							{/* Bold "Label:" + value lines, like the Units cards. */}
 							<div className='item-container'>
-								<b>{STRINGS.baseHoliday}</b> {holidayName(instance.baseHolidayId)}
+								<b>{translate('holiday.base')}</b> {holidayName(instance.baseHolidayId)}
 							</div>
 							<div className='item-container'>
-								<b>{STRINGS.dayPattern}</b> {patternName(instance.patternId)}
+								<b>{translate('day.pattern')}</b> {patternName(instance.patternId)}
 							</div>
 							{instance.note.trim().length > 0 && (
 								<div className='item-container'>
-									<b>{STRINGS.note}</b> {truncate(instance.note)}
+									<b>{translate('note')}</b> {clip(instance.note, MAX_NOTE_LENGTH)}
 								</div>
 							)}
 							{/* Mirrors the Units card's "Details/Edit Unit" button. */}
 							<div className='edit-btn'>
 								<Button color='secondary' onClick={() => openEdit(instance)}>
-									{STRINGS.detailsButton}
+									{translate('holiday.rate.edit')}
 								</Button>
 							</div>
 						</div>
 					))}
 					{instances.length === 0 && (
-						<p style={subtitleStyle}>{STRINGS.noRates}</p>
+						<p style={subtitleStyle}>{translate('holiday.rate.none')}</p>
 					)}
 				</div>
 			</Container>
@@ -484,7 +463,7 @@ export default function HolidayInstancePage() {
 			<Modal isOpen={showModal} toggle={attemptClose} size='lg'>
 				{/* Headers mirror Units: "Create a Holiday Rate" / "Details/Edit Holiday Rate". */}
 				<ModalHeader>
-					{modalMode === 'create' ? STRINGS.createButton : STRINGS.detailsButton}
+					{modalMode === 'create' ? translate('holiday.rate.create') : translate('holiday.rate.edit')}
 				</ModalHeader>
 				<ModalBody>
 					<Container>
@@ -498,7 +477,7 @@ export default function HolidayInstancePage() {
 								    holiday effectively invalidates the instance, so it can't be
 								    edited in place; delete + create a new one instead. */}
 								<FormGroup>
-									<Label for='baseHoliday'>{STRINGS.baseHoliday}</Label>
+									<Label for='baseHoliday'>{translate('holiday.base')}</Label>
 									{modalMode === 'create' ? (
 										<>
 											<Select
@@ -506,13 +485,17 @@ export default function HolidayInstancePage() {
 												name='baseHoliday'
 												options={holidayOptions}
 												value={selectedHolidayOption}
-												onChange={option =>
-													setDraft(d => ({
-														...d,
-														baseHolidayId: option ? option.value : NO_HOLIDAY
-													}))
-												}
-												placeholder={STRINGS.baseHolidaySelect}
+												onChange={option => {
+													const newId = option ? option.value : NO_HOLIDAY;
+													// Warn if a real selection changes while a name is set.
+													setShowBaseChangeWarning(
+														draft.baseHolidayId !== NO_HOLIDAY &&
+														newId !== draft.baseHolidayId &&
+														draft.instanceName.trim().length > 0
+													);
+													setDraft(d => ({ ...d, baseHolidayId: newId }));
+												}}
+												placeholder={translate('holiday.base.select')}
 												isClearable
 												// Red-outline the control while invalid, matching the
 												// reactstrap `invalid` look on the other fields.
@@ -522,7 +505,12 @@ export default function HolidayInstancePage() {
 											    needs d-block to render next to it. */}
 											{isHolidayInvalid && (
 												<FormFeedback className='d-block'>
-													{STRINGS.baseHolidayRequired}
+													{translate('holiday.base.required')}
+												</FormFeedback>
+											)}
+											{showBaseChangeWarning && !isHolidayInvalid && (
+												<FormFeedback className='d-block text-warning'>
+													{translate('holiday.base.changed.warning')}
 												</FormFeedback>
 											)}
 										</>
@@ -540,7 +528,7 @@ export default function HolidayInstancePage() {
 							<Col>
 								{/* Instance name — required */}
 								<FormGroup>
-									<Label for='instanceName'>{STRINGS.rateName}</Label>
+									<Label for='instanceName'>{translate('holiday.day.name')}</Label>
 									<Input
 										id='instanceName'
 										name='instanceName'
@@ -551,7 +539,7 @@ export default function HolidayInstancePage() {
 										}
 										invalid={isNameInvalid}
 									/>
-									<FormFeedback>{STRINGS.nameRequired}</FormFeedback>
+									<FormFeedback>{translate('holiday.rate.name.required')}</FormFeedback>
 								</FormGroup>
 							</Col>
 						</Row>
@@ -559,7 +547,7 @@ export default function HolidayInstancePage() {
 						{/* Day pattern — required. Placeholder option mirrors the conversion
 						    modal's hidden/disabled -999 sentinel option. */}
 						<FormGroup>
-							<Label for='dayPattern'>{STRINGS.dayPattern}</Label>
+							<Label for='dayPattern'>{translate('day.pattern')}</Label>
 							<Input
 								id='dayPattern'
 								name='dayPattern'
@@ -575,18 +563,18 @@ export default function HolidayInstancePage() {
 									hidden={draft.patternId !== NO_PATTERN}
 									disabled
 								>
-									{STRINGS.dayPatternSelect}
+									{translate('day.pattern.select')}
 								</option>
 								{dayPatterns.map(pattern => (
 									<option value={pattern.id} key={pattern.id}>{pattern.name}</option>
 								))}
 							</Input>
-							<FormFeedback>{STRINGS.dayPatternRequired}</FormFeedback>
+							<FormFeedback>{translate('day.pattern.required')}</FormFeedback>
 						</FormGroup>
 
 						{/* Note — optional */}
 						<FormGroup>
-							<Label for='note'>{STRINGS.note}</Label>
+							<Label for='note'>{translate('note')}</Label>
 							<Input
 								id='note'
 								name='note'
@@ -611,14 +599,14 @@ export default function HolidayInstancePage() {
 							onClick={() => setShowDeleteConfirm(true)}
 							style={{ marginRight: 'auto' }}
 						>
-							{STRINGS.deleteButton}
+							{translate('holiday.rate.delete')}
 						</Button>
 					)}
 					<Button color='secondary' onClick={attemptClose}>
-						{STRINGS.discardButton}
+						{translate('discard.changes')}
 					</Button>
 					<Button color='primary' onClick={handleSave} disabled={!canSave}>
-						{modalMode === 'create' ? STRINGS.createSaveButton : STRINGS.saveButton}
+						{modalMode === 'create' ? translate('holiday.rate.create.save') : translate('holiday.rate.save')}
 					</Button>
 				</ModalFooter>
 			</Modal>
@@ -626,8 +614,8 @@ export default function HolidayInstancePage() {
 			{/* Unsaved-changes warning (meeting 4: "you're about to lose your work"). */}
 			<ConfirmModal
 				isOpen={showCloseConfirm}
-				message={STRINGS.unsavedWarning}
-				confirmText={STRINGS.discardButton}
+				message={translate('unsaved.warning')}
+				confirmText={translate('discard.changes')}
 				confirmColor='danger'
 				onConfirm={doClose}
 				onCancel={() => setShowCloseConfirm(false)}
@@ -636,8 +624,8 @@ export default function HolidayInstancePage() {
 			{/* Delete guard. */}
 			<ConfirmModal
 				isOpen={showDeleteConfirm}
-				message={STRINGS.deleteWarning}
-				confirmText={STRINGS.deleteButton}
+				message={translate('holiday.rate.delete.confirm')}
+				confirmText={translate('holiday.rate.delete')}
 				confirmColor='danger'
 				onConfirm={handleDeleteConfirmed}
 				onCancel={() => setShowDeleteConfirm(false)}
