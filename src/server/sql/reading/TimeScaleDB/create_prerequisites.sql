@@ -1,6 +1,15 @@
 /*
  * create_prerequisites.sql
  *
+ * Prefrace:
+ * 	 This script continues the work introduced in PR#1546, which established the
+ * 	 benchmark for migrating hourly meter reading queries from PostgreSQL
+ * 	 materialized views to TimescaleDB hypertables and continuous aggregates.
+ *
+ * 	 Only the database objects required from PR#1546 were carried forward and
+ * 	 adapted to integrate TimescaleDB continuous aggregates with the existing
+ * 	 hourly meter reading workflow in the timeVary branch.
+ *
  * Purpose:
  *
  *   Create the TimescaleDB infrastructure required by the hourly and daily
