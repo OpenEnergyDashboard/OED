@@ -3,30 +3,34 @@
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import Select from 'react-select';
 import {
 	Button, Col, Container, FormFeedback, FormGroup, Input, Label,
 	Modal, ModalBody, ModalFooter, ModalHeader, Row
 } from 'reactstrap';
 import { titleStyle } from '../../styles/modalStyle';
+import { stableEmptyDays, useGetDaysQuery } from '../../redux/api/daysApi';
+import {
+	stableEmptyHolidayInstances,
+	useAddHolidayInstanceMutation,
+	useDeleteHolidayInstanceMutation,
+	useEditHolidayInstanceMutation,
+	useGetHolidayInstancesQuery
+} from '../../redux/api/holidayInstancesApi';
+import { stableEmptyHolidays, useGetHolidaysQuery } from '../../redux/api/holidaysApi';
+import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 
 /*
  * -------------------------------------------------------------------------
- *  DATA SEAM  (temporary — replace with real RTK Query hooks when the
- *  backend routes / API slices exist)
+ *  DATA SEAM  (wired 7/18 — real RTK Query hooks)
  *
- *  When the backend is ready, delete the mock hooks below and swap in:
- *    - holidaysApi.useGetHolidaysQuery()                   -> base holidays for the create dropdown
- *    - dayPatternsApi.useGetDayPatternsQuery()             -> day pattern options
- *    - holidayInstancesApi.useGetHolidayInstancesQuery()   -> existing instances (the cards)
- *    - holidayInstancesApi.useAddHolidayInstanceMutation() -> create (POST, no id)
- *    - holidayInstancesApi.useEditHolidayInstanceMutation()-> edit  (PATCH, id required)
- *    - holidayInstancesApi.useDeleteHolidayInstanceMutation()
- *
- *  The instances store AND its mutations live inside this seam
- *  (useHolidayInstancesMock), so the component body only consumes the hook
- *  return values — the RTK Query swap really is confined to this block.
+ *  The adapter hooks below consume the real API slices (holidaysApi, daysApi,
+ *  holidayInstancesApi) and expose the same shape the component consumed from
+ *  the old mocks, translating between this file's internal field names and the
+ *  server's wire names (instanceName <-> name, baseHolidayId <-> holidayId,
+ *  patternId <-> dayPatternId). The component body consumes only the hook
+ *  return values, so it did not change in the swap.
  *
  *  REGION (meeting 4 / 7-2): Steve wants a region selector that auto-populates
  *  the base-holiday dropdown from the selected region's holidays. That is
@@ -89,75 +93,86 @@ interface HolidayInstance extends HolidayInstanceData {
  */
 type HolidayInstancePatch = Omit<HolidayInstanceData, 'baseHolidayId'> & { id: number };
 
-// Mock: stands in for holidaysApi.useGetHolidaysQuery()
-// Returns the raw holidays Rose's page will eventually save to the `holidays` table.
-const useHolidaysMock = () => {
-	const [data, setData] = useState<BaseHoliday[]>([]);
-	const [isFetching, setIsFetching] = useState<boolean>(true);
+// Base holidays from the `holidays` table (populated via Rose's page).
+const useHolidays = () => {
+	const { data = stableEmptyHolidays, isFetching } = useGetHolidaysQuery();
+	const mapped = useMemo<BaseHoliday[]>(
+		() => data.map(h => ({ id: h.id, name: h.name, date: h.startDate })),
+		[data]
+	);
+	return { data: mapped, isFetching };
+};
 
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setData([
-				{ id: 1, name: "New Year's Day 2026", date: 'Jan 1, 2026' },
-				{ id: 2, name: 'Thanksgiving 2026', date: 'Nov 26, 2026' },
-				{ id: 3, name: 'Independence Day 2026', date: 'Jul 4, 2026' },
-				{ id: 4, name: 'Labor Day 2026', date: 'Sep 7, 2026' }
-			]);
-			setIsFetching(false);
-		}, 500);
-		return () => clearTimeout(timer);
-	}, []);
-
+// Day patterns: OED's existing days slice (`day_patterns` table). Day
+// ({ id, name, note }) structurally satisfies DayPatternOption.
+const useDayPatterns = (): { data: DayPatternOption[]; isFetching: boolean } => {
+	const { data = stableEmptyDays, isFetching } = useGetDaysQuery();
 	return { data, isFetching };
 };
 
-// Mock: stands in for dayPatternsApi.useGetDayPatternsQuery()
-// Day patterns already exist in the schema and do NOT depend on Rose's page.
-// Exposes isFetching like the real query will, so the page's loading gate
-// covers both fetches.
-const useDayPatternsMock = () => {
-	const [data, setData] = useState<DayPatternOption[]>([]);
-	const [isFetching, setIsFetching] = useState<boolean>(true);
+/*
+ * Instances + mutations. Each mutation invalidates the HolidayInstances cache
+ * tag, so the list refetches from the server — global state is never written
+ * from the local copy (Steve's state model, meeting 4).
+ * TODO(i18n): notification strings move to translate('...') with the rest.
+ */
+const useHolidayInstances = () => {
+	const { data = stableEmptyHolidayInstances } = useGetHolidayInstancesQuery();
+	const [addMutation] = useAddHolidayInstanceMutation();
+	const [editMutation] = useEditHolidayInstanceMutation();
+	const [deleteMutation] = useDeleteHolidayInstanceMutation();
 
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setData([
-				{ id: 101, name: 'Winter Rate' },
-				{ id: 102, name: 'Summer Rate' },
-				{ id: 103, name: 'Standard Rate' }
-			]);
-			setIsFetching(false);
-		}, 300);
-		return () => clearTimeout(timer);
-	}, []);
+	const instances = useMemo<HolidayInstance[]>(
+		() => data.map(i => ({
+			id: i.id,
+			instanceName: i.name,
+			baseHolidayId: i.holidayId,
+			patternId: i.dayPatternId,
+			note: i.note ?? ''
+		})),
+		[data]
+	);
 
-	return { data, isFetching };
-};
-
-// Mock: stands in for useGetHolidayInstancesQuery() + the three mutations.
-// In production each mutation POSTs/PATCHes/DELETEs, then INVALIDATES the
-// instances cache tag so the list refetches from the server — global state is
-// never written from the local copy (Steve's state model, meeting 4).
-const useHolidayInstancesMock = () => {
-	const [data, setData] = useState<HolidayInstance[]>([]);
-
-	// PRODUCTION: useAddHolidayInstanceMutation()(draft) — payload has NO id.
 	const addInstance = (draft: HolidayInstanceData) => {
-		// Date.now() is a mock-only id; the real id comes back from the server.
-		setData(prev => [...prev, { ...draft, id: Date.now() }]);
+		addMutation({
+			name: draft.instanceName,
+			holidayId: draft.baseHolidayId,
+			dayPatternId: draft.patternId,
+			note: draft.note
+		}).unwrap()
+			.then(() => showSuccessNotification(STRINGS.createSuccess))
+			.catch(error => showErrorNotification(STRINGS.createFailure + error));
 	};
 
-	// PRODUCTION: useEditHolidayInstanceMutation()(patch).
 	const editInstance = (patch: HolidayInstancePatch) => {
-		setData(prev => prev.map(i => (i.id === patch.id ? { ...i, ...patch } : i)));
+		// The edit route REQUIRES holidayId even though the UI locks the base
+		// holiday after create — resend the stored (unchanged) value.
+		const existing = data.find(i => i.id === patch.id);
+		if (existing === undefined) {
+			showErrorNotification(STRINGS.editFailure);
+			return;
+		}
+		editMutation({
+			id: patch.id,
+			name: patch.instanceName,
+			holidayId: existing.holidayId,
+			dayPatternId: patch.patternId,
+			note: patch.note
+		}).unwrap()
+			.then(() => showSuccessNotification(STRINGS.editSuccess))
+			.catch(error => showErrorNotification(STRINGS.editFailure + error));
 	};
 
-	// PRODUCTION: useDeleteHolidayInstanceMutation()(id).
+	// TODO(meeting 5): interlock — before deleting, sweep Redux state to check
+	// the instance is not used in a holiday group; otherwise the foreign key
+	// makes the server return a database error.
 	const deleteInstance = (id: number) => {
-		setData(prev => prev.filter(i => i.id !== id));
+		deleteMutation({ id }).unwrap()
+			.then(() => showSuccessNotification(STRINGS.deleteSuccess))
+			.catch(error => showErrorNotification(STRINGS.deleteFailure + error));
 	};
 
-	return { data, addInstance, editInstance, deleteInstance };
+	return { data: instances, addInstance, editInstance, deleteInstance };
 };
 
 /* End data seam */
@@ -189,7 +204,13 @@ const STRINGS = {
 	saveButton: 'Save Holiday Rate',
 	cancel: 'Cancel',
 	unsavedWarning: 'You have unsaved changes. Are you sure you want to discard them?',
-	deleteWarning: 'Are you sure you want to delete this holiday rate? This cannot be undone.'
+	deleteWarning: 'Are you sure you want to delete this holiday rate? This cannot be undone.',
+	createSuccess: 'Holiday rate created',
+	createFailure: 'Failed to create holiday rate: ',
+	editSuccess: 'Holiday rate saved',
+	editFailure: 'Failed to save holiday rate: ',
+	deleteSuccess: 'Holiday rate deleted',
+	deleteFailure: 'Failed to delete holiday rate: '
 };
 
 // Sentinel values for "nothing selected yet" dropdown state, mirroring the
@@ -250,10 +271,10 @@ function ConfirmModal(props: ConfirmModalProps) {
  * @returns Holiday Instance page element
  */
 export default function HolidayInstancePage() {
-	/* Data (mock seam) */
-	const { data: holidaysData, isFetching: holidaysFetching } = useHolidaysMock();
-	const { data: dayPatterns, isFetching: patternsFetching } = useDayPatternsMock();
-	const { data: instances, addInstance, editInstance, deleteInstance } = useHolidayInstancesMock();
+	/* Data (real backend via the adapter hooks in the seam above) */
+	const { data: holidaysData, isFetching: holidaysFetching } = useHolidays();
+	const { data: dayPatterns, isFetching: patternsFetching } = useDayPatterns();
+	const { data: instances, addInstance, editInstance, deleteInstance } = useHolidayInstances();
 
 	/*
 	 * REGION STUB (meeting 4): when the region selector lands, `availableHolidays`
