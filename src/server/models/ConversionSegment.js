@@ -165,10 +165,6 @@ class ConversionSegment {
 				originalEndTime: originalSegment.end_time
 			});
 
-			// earlier segment - insert new
-			const earlierSegment = this;
-			await t.none(sqlFile('conversionSegment/insert_new_conversion_segment.sql'), earlierSegment);
-
 		});
 	}
 
