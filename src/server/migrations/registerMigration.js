@@ -13,7 +13,8 @@ const migrations = [
 	require('./0.6.0-0.7.0'),
 	require('./0.7.0-0.8.0'),
 	require('./0.8.0-1.0.0'),
-	require('./1.0.0-1.1.0')
+	require('./1.0.0-2.0.0'),
+	require('./2.0.0-2.1.0')
 	/* eslint-enable global-require */
 ];
 

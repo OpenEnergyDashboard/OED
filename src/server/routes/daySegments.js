@@ -27,7 +27,7 @@ function formatDaySegmentForResponse(item) {
 /**
  * GET day segment by id
  */
-router.get('/:id', adminAuthMiddleware('get day segment by id'), async(req, res) => {
+router.get('/:id', adminAuthMiddleware('get day segment by id'), async (req, res) => {
 	const validParams = {
 		type: 'object',
 		maxProperties: 1,
@@ -60,7 +60,7 @@ router.get('/:id', adminAuthMiddleware('get day segment by id'), async(req, res)
  * POST get all day segments by dayId
  * @param {integer} dayId The id for the day.
  */
-router.post('/dayId', adminAuthMiddleware('get day segments by day id'), async(req, res) => {
+router.post('/dayId', adminAuthMiddleware('get day segments by day id'), async (req, res) => {
 	const validDaySegment = {
 		type: 'object',
 		maxProperties: 1,
@@ -295,6 +295,7 @@ router.post('/splitLater', adminAuthMiddleware('split later day segment'), async
 
 /**
  * POST edit day segment.
+	 * Note: This function only supports updates where the new start and/or end hour extends into the immediately adjacent segments.
  * @param {integer} dayId The id for the day.
  * @param {number} startHour The new hour the day segment starts.
  * @param {number} endHour The new hour the day segment ends.
@@ -510,12 +511,12 @@ router.post('/deleteLater', adminAuthMiddleware('delete later day segment'), asy
 				type: 'integer',
 				minimum: 0
 			},
-			startHour : {
+			startHour: {
 				type: 'number',
 				minimum: 0,
 				maximum: 23
 			},
-			endHour : {
+			endHour: {
 				type: 'number',
 				minimum: 1,
 				// if it was 24, there would be no following segment

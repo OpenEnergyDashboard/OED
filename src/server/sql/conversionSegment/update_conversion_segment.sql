@@ -12,5 +12,5 @@ UPDATE conversion_segments
 		note = ${note}
 	WHERE source_id = ${sourceId}
 		AND destination_id = ${destinationId}
-		AND start_time = ${originalStartTime}::TIMESTAMP
-		AND end_time = ${originalEndTime}::TIMESTAMP;
+		AND start_time = ${originalStartTime}
+		AND end_time = ${originalEndTime};

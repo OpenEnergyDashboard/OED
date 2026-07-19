@@ -197,7 +197,6 @@ router.post('/edit', adminAuthMiddleware('edit week'), async (req, res) => {
 			sunday: {
 				type: 'integer',
 				minimum: 0
-				
 			},
 			monday: {
 				type: 'integer',

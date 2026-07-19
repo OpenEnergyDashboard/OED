@@ -97,7 +97,7 @@ class DaySegment {
 		// check it doesn't exist in the database
 		const row = await conn.any(sqlFile('daySegment/get_by_dayId.sql'), daySegment);
 		if (row.length > 0) {
-			const errMsg = `Segment(s) exist for this day.`;
+			const errMsg = `Segment exists for this day.`;
 			log.error(errMsg);
 			throw new Error(errMsg);
 		}
@@ -138,13 +138,11 @@ class DaySegment {
 				intercept: newIntercept,
 				note: newNote
 			};
-
-			// console.log(earlierSegment);
 			await t.none(sqlFile('daySegment/insert_new_day_segment.sql'), earlierSegment);
 
 			// later segment - update start time
 			await t.none(sqlFile('daySegment/update_day_segment.sql'), {
-				id: id,
+				id: originalSegment.id,
 				dayId: originalSegment.day_id,
 				startHour: splitTime,
 				endHour: originalSegment.end_hour,
@@ -188,13 +186,11 @@ class DaySegment {
 				intercept: newIntercept,
 				note: newNote
 			};
-
-			// console.log(earlierSegment);
 			await t.none(sqlFile('daySegment/insert_new_day_segment.sql'), laterSegment);
 
 			// earlier segment - update end time
 			await t.none(sqlFile('daySegment/update_day_segment.sql'), {
-				id: id,
+				id: originalSegment.id,
 				dayId: originalSegment.day_id,
 				startHour: originalSegment.start_hour,
 				endHour: splitTime,
@@ -207,6 +203,7 @@ class DaySegment {
 
 	/**
 	 * Returns a promise to update a daySegment in the database.
+	 * Note: This function only supports updates where the new start and/or end hour extends into the immediately adjacent segments.
 	 * @param {*} originalStartHour The original start hour of the segment being updated
 	 * @param {*} originalEndHour The original end hour of the segment being updated
 	 * @param {*} conn the connection to use.

@@ -97,10 +97,10 @@ class TimeInterval {
 	 * @returns {boolean}
 	 */
 	getIsHalfBounded() {
-    return (
-        (this.startTimestamp !== undefined && this.endTimestamp === undefined) ||
-        (this.startTimestamp === undefined && this.endTimestamp !== undefined)
-    );
+	return (
+		(this.startTimestamp !== undefined && this.endTimestamp === undefined) ||
+		(this.startTimestamp === undefined && this.endTimestamp !== undefined)
+	);
 }
 	/**
 	 * Creates a new unbounded time interval

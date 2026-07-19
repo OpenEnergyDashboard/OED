@@ -66,7 +66,7 @@ class Cik {
 
 		// Loop over all conversions in cik array and insert each in DB.
 		cik.forEach(async (conversion) => {
-			await conn.none(sqlFile('cik/insert_new_conversion.sql'), {
+			await conn.none(sqlFile('cik/insert_new_cik.sql'), {
 				sourceId: conversion.source,
 				destinationId: conversion.destination,
 				slope: conversion.slope,

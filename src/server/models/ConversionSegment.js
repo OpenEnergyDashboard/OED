@@ -106,7 +106,7 @@ class ConversionSegment {
 		// check it doesn't exist in the database
 		const row = await conn.any(sqlFile('conversionSegment/get_by_source_destination.sql'), conversionSegment);
 		if (row.length > 0) {
-			const errMsg = `Segment(s) exist for this conversion.`;
+			const errMsg = `Segment exists for this conversion.`;
 			log.error(errMsg);
 			throw new Error(errMsg);
 		}
@@ -116,34 +116,53 @@ class ConversionSegment {
 
 	/**
 	 * Split a segment in two, the earlier segment uses the new slope/intercept/pattern/note
+	 * @param {*} sourceId The source meter's id.
+	 * @param {*} destinationId The destination meter's id.
+	 * @param {*} newWeekPatternsId The week patterns id for the new segment.
+	 * @param {*} newSlope The slope for the new segment.
+	 * @param {*} newIntercept The intercept for the new segment.
+	 * @param {*} newNote The note for the new segment.
 	 * @param {*} startTime When the current segment starts.
 	 * @param {*} endTime When the current segment ends.
 	 * @param {*} splitTime The time to split the segment at.
 	 * @param {*} conn The connection to use
 	 * @returns {Promise.<void>}
 	 */
-	async splitEarlier(startTime, endTime, splitTime, conn) {
+	static async splitEarlier(sourceId, destinationId, newWeekPatternsId, newSlope, newIntercept, newNote, startTime, endTime, splitTime, conn) {
 		return conn.tx(async t => {
 			// get all original values of the segment being split
 			const originalSegment = await t.one(sqlFile('conversionSegment/get_by_source_destination_start_end.sql'), {
-				sourceId: this.sourceId,
-				destinationId: this.destinationId,
+				sourceId: sourceId,
+				destinationId: destinationId,
 				startTime: startTime,
 				endTime: endTime
 			});
 
+			// earlier segment - insert new
+			const earlierSegment = {
+				sourceId: originalSegment.source_id,
+				destinationId: originalSegment.destination_id,
+				weekPatternsId: newWeekPatternsId,
+				slope: newSlope,
+				intercept: newIntercept,
+				startTime: originalSegment.start_time,
+				endTime: splitTime,
+				note: newNote
+			}
+			await t.none(sqlFile('conversionSegment/insert_new_conversion_segment.sql'), earlierSegment);
+
 			// later segment - update start time
 			await t.none(sqlFile('conversionSegment/update_conversion_segment.sql'), {
-				sourceId: this.sourceId,
-				destinationId: this.destinationId,
-				weekPatternsId: originalSegment.weekPatternsId,
+				sourceId: originalSegment.source_id,
+				destinationId: originalSegment.destination_id,
+				weekPatternsId: originalSegment.week_patterns_id,
 				slope: originalSegment.slope,
 				intercept: originalSegment.intercept,
 				startTime: splitTime,
-				endTime: endTime,
+				endTime: originalSegment.end_time,
 				note: originalSegment.note,
-				originalStartTime: startTime,
-				originalEndTime: endTime
+				originalStartTime: originalSegment.start_time,
+				originalEndTime: originalSegment.end_time
 			});
 
 			// earlier segment - insert new
@@ -155,44 +174,60 @@ class ConversionSegment {
 
 	/**
 	 * Split a segment in two, the later segment uses the new slope/intercept/pattern/note
+	 * @param {*} sourceId The source meter's id.
+	 * @param {*} destinationId The destination meter's id.
+	 * @param {*} newWeekPatternsId The week patterns id for the new segment.
+	 * @param {*} newSlope The slope for the new segment.
+	 * @param {*} newIntercept The intercept for the new segment.
+	 * @param {*} newNote The note for the new segment.
 	 * @param {*} startTime When the current segment starts.
 	 * @param {*} endTime When the current segment ends.
 	 * @param {*} splitTime The time to split the segment at.
 	 * @param {*} conn The connection to use
 	 * @returns {Promise.<void>}
 	 */
-	async splitLater(startTime, endTime, splitTime, conn) {
+	static async splitLater(sourceId, destinationId, newWeekPatternsId, newSlope, newIntercept, newNote, startTime, endTime, splitTime, conn) {
 		return conn.tx(async t => {
-			// get all original values of the segment being split
+			// get all data for the original segment
 			const originalSegment = await t.one(sqlFile('conversionSegment/get_by_source_destination_start_end.sql'), {
-				sourceId: this.sourceId,
-				destinationId: this.destinationId,
+				sourceId: sourceId,
+				destinationId: destinationId,
 				startTime: startTime,
 				endTime: endTime
 			});
 
 			// earlier segment - update end time
 			await t.none(sqlFile('conversionSegment/update_conversion_segment.sql'), {
-				sourceId: this.sourceId,
-				destinationId: this.destinationId,
-				weekPatternsId: originalSegment.weekPatternsId,
+				sourceId: originalSegment.source_id,
+				destinationId: originalSegment.destination_id,
+				weekPatternsId: originalSegment.week_patterns_id,
 				slope: originalSegment.slope,
 				intercept: originalSegment.intercept,
-				startTime: startTime,
+				startTime: originalSegment.start_time,
 				endTime: splitTime,
 				note: originalSegment.note,
-				originalStartTime: startTime,
-				originalEndTime: endTime
+				originalStartTime: originalSegment.start_time,
+				originalEndTime: originalSegment.end_time
 			});
 
 			// later segment - insert new
-			const earlierSegment = this;
+			const earlierSegment = {
+				sourceId: originalSegment.source_id,
+				destinationId: originalSegment.destination_id,
+				weekPatternsId: newWeekPatternsId,
+				slope: newSlope,
+				intercept: newIntercept,
+				startTime: splitTime,
+				endTime: originalSegment.end_time,
+				note: newNote
+			}
 			await t.none(sqlFile('conversionSegment/insert_new_conversion_segment.sql'), earlierSegment);
 		});
 	}
 
 	/**
 	 * Updates an existed conversion segment in the database.
+	 * Note: This function only supports updates where the new start and/or end time extends into the immediately adjacent segments.
 	 * @param {*} originalStartTime The original start time of the segment being updated.
 	 * @param {*} originalEndTime The original end time of the segment being updated.
 	 * @param {*} conn The connection to use.
@@ -227,24 +262,7 @@ class ConversionSegment {
 			// Update the current segment
 			await t.none(sqlFile('conversionSegment/update_conversion_segment.sql'), conversionSegment);
 		});
-}
-
-	/**
-	 * Deletes the conversion associated with the source, destination, start time, and end time from the database.
-	 * @param {*} sourceId The source meter's id.
-	 * @param {*} destinationId The destination meter's id.
-	 * @param {*} startTime The start time of the conversion segment.
-	 * @param {*} endTime The end time of the conversion segment.
-	 * @param {*} conn The connection to use.
-	 */
-	static async delete(sourceId, destinationId, startTime, endTime, conn) {
-		await conn.none(sqlFile('conversionSegment/delete_conversion_segment.sql'), {
-			sourceId: sourceId,
-			destinationId: destinationId,
-			startTime: startTime,
-			endTime: endTime
-		});
-	}
+	}	
 
 	/**
 	 * Delete conversion segment after updating the end time of the previous segment to the end time of the deleted segment.
@@ -312,6 +330,8 @@ class ConversionSegment {
 			});
 		});
 	}
+
+	
 }
 
 module.exports = ConversionSegment;
