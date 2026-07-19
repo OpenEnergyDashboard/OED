@@ -54,11 +54,11 @@ const router = createBrowserRouter([
 			{ path: 'groups', element: <GroupsDetailComponent /> },
 			{ path: 'meters', element: <MetersDetailComponent /> },
 			{ path: 'graph', element: <GraphLink /> },
-			{ path: 'holiday-instances', element: <HolidayInstancePage /> },
 			{
 				element: <AdminOutlet />,
 				children: [
 					{ path: 'admin', element: <AdminComponent /> },
+					{ path: 'holiday-instances', element: <HolidayInstancePage /> },
 					{ path: 'calibration', element: <MapCalibrationContainer /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },
 					{ path: 'days', element: <DaysDetailComponent /> },
