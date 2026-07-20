@@ -218,11 +218,16 @@ export const exportRawReadings = createAppThunk(
 
 				// Get the raw readings.
 				const response = dispatch(metersApi.endpoints.rawLineReadings.initiate({ meterID, timeInterval }));
-				const lineReadings = await response.unwrap();
-				// unsub from query after a minute.
-				setTimeout(() => { response.unsubscribe(); }, 60000);
-				// Get the CSV to to user.
-				downloadRawCSV(lineReadings, currentMeterIdentifier, unitIdentifier);
+				try {
+					const lineReadings = await response.unwrap();
+					// Get the CSV to to user.
+					downloadRawCSV(lineReadings, currentMeterIdentifier, unitIdentifier);
+				} catch (err) {
+					showErrorNotification('Error: Server Rejection of Export');
+				} finally {
+					// unsub from query after a minute.
+					setTimeout(() => { response.unsubscribe(); }, 60000);
+				}
 			}
 		}
 
