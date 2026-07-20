@@ -102,11 +102,13 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 	} else if (req.params.meter_id == '2147483648' || req.params.meter_id == '0') {
 		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
+		let meterID;
+		let timeInterval;
 		try {
 			const conn = getConnection();
 			// Get the routed meter id and time for the desired readings.
-			const meterID = req.params.meter_id;
-			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			meterID = req.params.meter_id;
+			timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			// Check if user is allowed to export.
 			let shouldDownload = false;
 			// Estimated file size. The full explanation of the estimate used can be found in the client.
