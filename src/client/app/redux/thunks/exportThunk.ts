@@ -144,6 +144,7 @@ export const exportRawReadings = createAppThunk(
 			// File sizes that anyone can download without prompting so fine
 			shouldDownload = true;
 		} else if (fileSize > adminState.defaultFileSizeLimit) {
+
 			// Exceeds the size allowed unless admin or export role and must verify want to continue.
 			if (selectHasRolePermissions(state, UserRole.EXPORT)) {
 				// A user allowed to do this but need to check okay with them.
@@ -214,6 +215,7 @@ export const exportRawReadings = createAppThunk(
 				// this code to use the unix timestamp that is returned. It is believed that the unix timestamp will be smaller than this string.
 				// The long reading work will modify how you get raw data and probably make this easier. However, it does return the meter id for
 				// each reading so that will add to the size unless we remove it as was done in how this data is gotten.
+				
 				// Get the raw readings.
 				const response = dispatch(metersApi.endpoints.rawLineReadings.initiate({ meterID, timeInterval }));
 				const lineReadings = await response.unwrap();

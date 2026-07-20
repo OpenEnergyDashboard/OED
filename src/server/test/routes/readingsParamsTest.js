@@ -198,8 +198,8 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		let conn;
 		let meterID;
 		let timeInterval;
-		//insert a meter with 2 readings into testdb
-		//file size should be estimated at 2 * 0.082 / 1000 = 0.000164
+		// Insert a meter with 2 readings into testdb
+		// File size should be estimated at 2 * 0.082 / 1000 = 0.000164
 		async function createRawExportTestData(conn) {
 			const gps = new Point(1, 1);
 			const start = moment.utc('2020-01-01T00:00:00Z');
@@ -235,7 +235,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			expect(res.body).to.have.property('token');
 			return res.body.token;
 		}
-		//used to make users for roles CSV, EXPORT, OBVIUS
+		// Used to make users for roles CSV, EXPORT, OBVIUS
 		async function createUserWithRole(role, conn) {
 			const user = new User(
 				undefined,
@@ -251,7 +251,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			const user = await createUserWithRole(role, conn);
 			return getTokenForUser(user);
 		}
-		//helper to set up file size limit and insert test meter
+		// Helper to set up file size limit and insert test meter
 		async function setUpRawExportTest(limit) {
 			conn = testDB.getConnection();
 			const testData = await createRawExportTestData(conn);
@@ -265,7 +265,9 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			let obviusToken;
 			let adminToken;
 			mocha.beforeEach(async () => {
-				await setUpRawExportTest(100000000); // Set a high file size limit to ensure the estimated file size is within the limit;
+				// Set a high file size limit to ensure the estimated file size is within the limit;
+				await setUpRawExportTest(100000000);
+
 				csvToken = await getTokenForRole(User.role.CSV, conn);
 				exportToken = await getTokenForRole(User.role.EXPORT, conn);
 				obviusToken = await getTokenForRole(User.role.OBVIUS, conn);
@@ -319,7 +321,9 @@ mocha.describe('Readings Route Parameter Validation', () => {
 
 		mocha.describe('Estimated File Size Exceeds File Size Limit', () => {
 			mocha.beforeEach(async () => {
-				await setUpRawExportTest(0.00015); // Set a high low size limit to ensure the estimated file size is within the limit;
+				// Set a low file size limit to ensure the estimated file size exceeds the limit;
+				await setUpRawExportTest(0.00015);
+
 				csvToken = await getTokenForRole(User.role.CSV, conn);
 				exportToken = await getTokenForRole(User.role.EXPORT, conn);
 				obviusToken = await getTokenForRole(User.role.OBVIUS, conn);
