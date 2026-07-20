@@ -97,26 +97,25 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 	};
 	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid || !isValidTimeInterval(req.query.timeInterval, true)) {
 		failure(res, HTTP_CODES.BAD_REQUEST);
-	} else if (req.params.meter_id == '2147483648' || req.params.meter_id == '0') {
-		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
-		const conn = getConnection();
-		// Get the routed meter id and time for the desired readings.
-		const meterID = req.params.meter_id;
-		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		try {
-			//check if user is allowed to export
+			const conn = getConnection();
+			// Get the routed meter id and time for the desired readings.
+			const meterID = req.params.meter_id;
+			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			// Check if user is allowed to export.
 			let shouldDownload = false;
-			//estimate file size
-			//this estimate is also present in src/client/app/redux/thunks/exportThunk.ts and must be kept consistent between files
+			// Estimated file size. The full explanation of the estimate used can be found in the client.
+			// This estimate is also present in src/client/app/redux/thunks/exportThunk.ts and must be kept consistent between files.
+			// This count only checks a single meterID, while server testing checks multiple meterIDs, so the estimate is slightly different.
 			const count = await Reading.getCountByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 			const fileSize = (count * 0.082 / 1000);
 			const preferences = await Preferences.get(conn);
 			if (fileSize <= preferences.defaultFileSizeLimit) {
-				//file size within limit, anyone can download
+				// File size within limit, anyone can download.
 				shouldDownload = true;
 			} else if (req.hasValidAuthToken) {
-				//file size above limit, only users with the role EXPORT or ADMIN can download
+				// File size above limit, only users with the role EXPORT or ADMIN can download.
 				const token = req.headers.token || req.body.token || req.query.token;
 				if (await isTokenAuthorized(token, User.role.EXPORT)) {
 					shouldDownload = true;
@@ -124,14 +123,14 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			}
 			if (shouldDownload == false) {
 				failure(res, HTTP_CODES.FORBIDDEN);
-				return;
+			} else {
+				// Get the raw readings for this meter over time range desired.
+				// Note this returns unusual identifiers to save space and does not return the meter id.
+				const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+				// They are ready to go back.
+				// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
+				success(res, rawReadings);
 			}
-			// Get the raw readings for this meter over time range desired.
-			// Note this returns unusual identifiers to save space and does not return the meter id.
-			const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-			// They are ready to go back.
-			// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
-			success(res, rawReadings);
 		} catch (err) {
 			log.error(`Error while performing GET raw readings for line with meter ${meterID} with time interval ${timeInterval}: ${err}`, err);
 			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR);
