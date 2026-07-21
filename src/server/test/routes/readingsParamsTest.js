@@ -258,14 +258,15 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		 * @returns The inserted user with its plain-text password available for login. 
 		 */
 		async function createUserWithRole(role, conn) {
+			const password = `${role}password`;
 			const user = new User(
 				undefined,
 				`raw-export-${role}-${Date.now()}@example.invalid`,
-				bcrypt.hashSync('password', 10),
+				bcrypt.hashSync(password, 10),
 				role
 			);
-			user.password = 'password';
 			await user.insert(conn);
+			user.password = password;
 			return user;
 		}
 

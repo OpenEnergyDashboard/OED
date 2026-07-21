@@ -19,7 +19,6 @@ services:
         ports:
             - "5432:5432"
     web:
-        user: root
         environment:
             # Set this value to yes or no, other values wil result in a configuration error.
             # Unless you are testing a production setup, this is normally no.
