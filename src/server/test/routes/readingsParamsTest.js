@@ -196,8 +196,10 @@ mocha.describe('Readings Route Parameter Validation', () => {
 
 	mocha.describe('Raw Export File Size and User Role Authorization', () => {
 		let conn;
-		let meterID;
-		let timeInterval;
+		// Shared test state populated by setUpRawExportTest before each test case
+		// These values identify the meter and time range inserted by createRawExportTestData
+		let testMeterID;
+		let testTimeInterval;
 		/**
 		 * Inserts a test meter with two readings into the database
 		 * which are used to produce a predictable estimataed file size.
@@ -224,8 +226,8 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				new Reading(meter.id, 20, start.clone().add(1, 'hour'), start.clone().add(2, 'hours'))
 			], conn);
 			return {
-				meterID: meter.id,
-				timeInterval: '2020-01-01T00:00:00Z_2020-01-01T02:00:00Z'
+				insertedMeterID: meter.id,
+				rawExportTimeInterval: '2020-01-01T00:00:00Z_2020-01-01T02:00:00Z'
 			};
 		}
 
@@ -287,8 +289,8 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		async function setUpRawExportTest(limit) {
 			conn = testDB.getConnection();
 			const testData = await createRawExportTestData(conn);
-			meterID = testData.meterID;
-			timeInterval = testData.timeInterval;
+			testMeterID = testData.insertedMeterID;
+			testTimeInterval = testData.rawExportTimeInterval;
 			await Preferences.update({ defaultFileSizeLimit: limit }, conn);
 		}
 
@@ -300,8 +302,8 @@ mocha.describe('Readings Route Parameter Validation', () => {
 	 	*/
 		async function expectRawExportStatus(role, expectedStatus) {
 			let req = chai.request(app)
-				.get(`${RAW_READINGS_BASE_ENDPOINT}/${meterID}`)
-				.query({ timeInterval });
+				.get(`${RAW_READINGS_BASE_ENDPOINT}/${testMeterID}`)
+				.query({ timeInterval: testTimeInterval });
 
 			if (role !== null) {
 				const token = await getTokenForRole(role, conn);
