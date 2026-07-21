@@ -209,7 +209,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		async function createRawExportTestData(conn) {
 			const gps = new Point(1, 1);
 			const start = moment.utc('2020-01-01T00:00:00Z');
-			const meterName ='Raw Export Test Meter';
+			const meterName = 'Raw Export Test Meter';
 			const meter = new Meter(
 				undefined,
 				meterName,
@@ -271,22 +271,22 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		}
 
 		/**
-	 	* Creates a test user with the given role, logs in as that user,
-	 	* and returns the generated auth token.
-	 	* @param role The role to assign to the created user.
-	 	* @param conn The database connection to use.
-	 	* @returns The auth token for the created user.
-	 	*/
+		* Creates a test user with the given role, logs in as that user,
+		* and returns the generated auth token.
+		* @param role The role to assign to the created user.
+		* @param conn The database connection to use.
+		* @returns The auth token for the created user.
+		*/
 		async function getTokenForRole(role, conn) {
 			const user = await createUserWithRole(role, conn);
 			return getTokenForUser(user);
 		}
-		
+
 		/**
-	 	* Sets up the raw export test data and updates the default file size limit.
-	 	* The inserted meter ID and time interval are stored for use by the test cases.
-	 	* @param limit The default file size limit to set in preferences.
-	 	*/
+		* Sets up the raw export test data and updates the default file size limit.
+		* The inserted meter ID and time interval are stored for use by the test cases.
+		* @param limit The default file size limit to set in preferences.
+		*/
 		async function setUpRawExportTest(limit) {
 			conn = testDB.getConnection();
 			const testData = await createRawExportTestData(conn);
@@ -296,23 +296,32 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		}
 
 		/**
-	 	* Sends a raw export request as either an unauthenticated user or a user
-	 	* with the given role, then verifies the response status.
-	 	* @param role The role to log in as, or null for an unauthenticated request.
-	 	* @param expectedStatus The expected HTTP response status.
-	 	*/
+		* Sends a raw export request as either an unauthenticated user or a user
+		* with the given role, then verifies the response status.
+		* @param role The role to log in as, or null for an unauthenticated request.
+		* @param expectedStatus The expected HTTP response status.
+		*/
 		async function expectRawExportStatus(role, expectedStatus) {
-			let req = chai.request(app)
-				.get(`${RAW_READINGS_BASE_ENDPOINT}/${testMeterID}`)
-				.query({ timeInterval: testTimeInterval });
+			let token;
+			try {
+				let req = chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${testMeterID}`)
+					.query({ timeInterval: testTimeInterval });
 
-			if (role !== null) {
-				const token = await getTokenForRole(role, conn);
-				req = req.set('token', token);
+				if (role !== null) {
+					token = await getTokenForRole(role, conn);
+					req = req.set('token', token);
+				}
+
+				const res = await req;
+				expect(res).to.have.status(expectedStatus);
+			} finally {
+				if (token) {
+					await chai.request(app)
+						.post('/api/logout')
+						.set('token', token);
+				}
 			}
-
-			const res = await req;
-			expect(res).to.have.status(expectedStatus);
 		}
 		mocha.describe('Estimated File Size is within File Size Limit', () => {
 			mocha.beforeEach(async () => {
