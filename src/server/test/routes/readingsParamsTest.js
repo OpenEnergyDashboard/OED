@@ -329,7 +329,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			];
 
 			for (const testCase of cases) {
-				mocha.it(`accepts ${testCase.label}`, async () => {
+				mocha.it(`should accept ${testCase.label}`, async () => {
 					await expectRawExportStatus(testCase.role, testCase.expectedStatus);
 				});
 			}
@@ -350,9 +350,9 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			];
 
 			for (const testCase of cases) {
-				const action = testCase.expectedStatus === HTTP_CODES.OK ? 'accepts' : 'rejects';
+				const action = testCase.expectedStatus === HTTP_CODES.OK ? 'accept' : 'reject';
 
-				mocha.it(`${action} ${testCase.label}`, async () => {
+				mocha.it(`should ${action} ${testCase.label}`, async () => {
 					await expectRawExportStatus(testCase.role, testCase.expectedStatus);
 				});
 			}
