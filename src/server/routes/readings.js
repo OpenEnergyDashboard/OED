@@ -97,7 +97,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 	};
 	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid || !isValidTimeInterval(req.query.timeInterval, true)) {
 		failure(res, HTTP_CODES.BAD_REQUEST);
-	// meter_id is currently passed as a string, which makes this checks necessary to avoid invalid IDs,
+	// TODO meter_id is currently passed as a string, which makes this checks necessary to avoid invalid IDs,
 	// and it should be removed once meter_id is changed to be passed as Number
 	} else if (req.params.meter_id == '2147483648' || req.params.meter_id == '0') {
 		failure(res, HTTP_CODES.BAD_REQUEST);
@@ -113,7 +113,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			let shouldDownload = false;
 			// Estimated file size. The full explanation of the estimate used can be found in the client.
 			// This estimate is also present in src/client/app/redux/thunks/exportThunk.ts and must be kept consistent between files.
-			// This count only checks a single meterID, while server testing checks multiple meterIDs, so the estimate is slightly different.
+			// This count only checks a single meterID, while client testing checks multiple meterIDs, so the estimate is slightly different.
 			const count = await Reading.getCountByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 			const fileSize = (count * 0.082 / 1000);
 			const preferences = await Preferences.get(conn);
