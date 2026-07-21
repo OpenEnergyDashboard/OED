@@ -250,28 +250,21 @@ BEGIN
 		c.intercept,
 		c.destination_id AS graphic_unit_id
 
-	FROM meters m
-		
-	INNER JOIN units u
-		ON m.unit_id = u.id
-
-	INNER JOIN cik_vary c
-		ON c.source_id = m.unit_id
-	   AND tsrange(c.start_time, c.end_time, '()')
-		   &&
-		   tsrange(NEW.start_timestamp, NEW.end_timestamp, '[]')
-
+	FROM meters m INNER JOIN 
+		 units u
+			ON m.unit_id = u.id INNER JOIN 
+		 cik_vary c
+			ON c.source_id = m.unit_id AND 
+			   tsrange(c.start_time, c.end_time, '()') && tsrange(NEW.start_timestamp, NEW.end_timestamp, '[]')
 	/*
 	 * Split readings spanning multiple hours into one row per hour.
 	 */
-	CROSS JOIN LATERAL generate_series(
-		date_trunc('hour', NEW.start_timestamp),
-		date_trunc_up('hour', NEW.end_timestamp) - INTERVAL '1 hour',
-		INTERVAL '1 hour'
-	) gen(interval_start)
-
+		 CROSS JOIN LATERAL generate_series(
+			 date_trunc('hour', NEW.start_timestamp),
+			 date_trunc_up('hour', NEW.end_timestamp) - INTERVAL '1 hour',
+			 INTERVAL '1 hour'
+		) gen(interval_start)
 	WHERE m.id = NEW.meter_id;
-
     RETURN NEW;
 
 END;

@@ -53,78 +53,34 @@
  * The lower bound is the start of the day and the upper bound is the start
  * of the following day.
  */
-CREATE MATERIALIZED VIEW meter_daily_readings_unit_cagg
+CREATE MATERIALIZED VIEW IF NOT EXISTS meter_daily_readings_unit_cagg
 WITH (timescaledb.continuous)
 AS
 SELECT
-
-    /*
-     * Meter being aggregated.
-     */
     meter_id,
-
-
-    /*
-     * Average hourly reading rate across the day.
-     */
     AVG(reading_rate) AS reading_rate,
-
-
-    /*
-     * Lowest hourly reading rate observed during the day.
-     */
     MIN(min_rate) AS min_rate,
-
-
-    /*
-     * Highest hourly reading rate observed during the day.
-     */
     MAX(max_rate) AS max_rate,
-
-
-    /*
-     * Represent the daily bucket as a PostgreSQL timestamp range.
-     *
-     * The interval begins at the start of the day and ends at the start of
-     * the following day.
-     */
     tsrange(
         time_bucket('1 day', bucket),
         time_bucket('1 day', bucket) + INTERVAL '1 day',
         '()'
     ) AS time_interval,
-
-
-    /*
-     * Preserve the destination graphic unit so values remain grouped by the
-     * converted reporting unit.
-     */
     graphic_unit_id
-
-
 FROM meter_hourly_readings_unit_cagg
-
-
-/*
- * Roll hourly aggregates into daily buckets.
- */
 GROUP BY
     meter_id,
     time_bucket('1 day', bucket),
     graphic_unit_id
-
-
-/*
- * Order output for deterministic results when querying the materialized view.
- */
 ORDER BY
     meter_id,
     graphic_unit_id,
     time_interval
-
 WITH NO DATA;
 
-
+/*
+ * Allow queries to include recent data that has not yet been materialized.
+ */
 ALTER MATERIALIZED VIEW meter_daily_readings_unit_cagg
 SET (
     timescaledb.materialized_only = false

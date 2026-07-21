@@ -77,27 +77,16 @@
  * This reproduces the calculation performed by the original
  * meter_hourly_readings_unit materialized view.
  */
-CREATE MATERIALIZED VIEW meter_hourly_readings_unit_cagg
+CREATE MATERIALIZED VIEW IF NOT EXISTS meter_hourly_readings_unit_cagg
 WITH (timescaledb.continuous) 
 AS
 SELECT
     meter_id,
     graphic_unit_id,
-
-    /*
-     * Group hourly slices into TimescaleDB continuous aggregate buckets.
-     */
     time_bucket(
         '1 hour',
         start_timestamp
     ) AS bucket,
-
-
-    /*
-     * Weighted average reading rate with cik_vary conversion applied.
-     *
-     * Each slice contributes based on its duration within the hour.
-     */
     sum(
         (
             reading
@@ -119,11 +108,6 @@ SELECT
             EPOCH FROM (end_timestamp - start_timestamp)
         )
     ) AS reading_rate,
-
-
-    /*
-     * Maximum converted reading rate observed within the hour.
-     */
     max(
         reading
         /
@@ -133,11 +117,6 @@ SELECT
         * slope
         + intercept
     ) AS max_rate,
-
-
-    /*
-     * Minimum converted reading rate observed within the hour.
-     */
     min(
         reading
         /
@@ -147,19 +126,9 @@ SELECT
         * slope
         + intercept
     ) AS min_rate,
-
-
-    /*
-     * Unit metadata is preserved so consumers can interpret the aggregate
-     * values correctly.
-     */
     unit_represent,
     sec_in_rate
-
-
 FROM hypertable_hourly_split
-
-
 GROUP BY
     meter_id,
     graphic_unit_id,
@@ -168,6 +137,9 @@ GROUP BY
     sec_in_rate
 WITH NO DATA;
 
+/*
+ * Allow queries to include recent data that has not yet been materialized.
+ */
 ALTER MATERIALIZED VIEW meter_hourly_readings_unit_cagg
 SET (
     timescaledb.materialized_only = false
