@@ -10,6 +10,54 @@ const Unit = require('../models/Unit');
 const { createConversionGraph, createConversionGraphFromArray } = require('./graph/createConversionGraph');
 const { intersectSets, compatibleUnitsForMeter } = require('../util/compatibleUnits');
 
+/**
+ * Simulates what conversions and units would be removed when deleting a conversion involving suffix units.
+ * This mirrors the logic in removeAdditionalConversionsAndUnits but without actually deleting.
+ * @param {*} suffixUnit The suffix unit to check
+ * @param {*} allConversions All conversions in the system
+ * @param {*} allUnits All units in the system
+ * @returns {Object} Object with arrays of conversionIds and unitIds that would be removed
+ */
+function simulateSuffixUnitCleanup(suffixUnit, allConversions, allUnits) {
+	const conversionsToRemove = [];
+	const unitsToHide = [];
+	
+	// Find all conversions involving this suffix unit
+	const relatedConversions = allConversions.filter((conversion) => 
+		conversion.sourceId === suffixUnit.id || 
+		conversion.destinationId === suffixUnit.id ||
+		(conversion.bidirectional && (conversion.sourceId === suffixUnit.id || conversion.destinationId === suffixUnit.id))
+	);
+	
+	// Process each related conversion
+	for (const conversion of relatedConversions) {
+		const isSource = conversion.sourceId === suffixUnit.id;
+		const otherUnitId = isSource ? conversion.destinationId : conversion.sourceId;
+		const otherUnit = allUnits.find(u => u.id === otherUnitId);
+		
+		// If the other unit is also a suffix unit (created by OED), it would be hidden
+		if (otherUnit && otherUnit.typeOfUnit === Unit.unitType.SUFFIX) {
+			conversionsToRemove.push({
+				sourceId: conversion.sourceId,
+				destinationId: conversion.destinationId
+			});
+			
+			// If bidirectional, also mark reverse for removal
+			if (conversion.bidirectional) {
+				conversionsToRemove.push({
+					sourceId: conversion.destinationId,
+					destinationId: conversion.sourceId
+				});
+			}
+			
+			if (!unitsToHide.includes(otherUnitId)) {
+				unitsToHide.push(otherUnitId);
+			}
+		}
+	}
+	
+	return { conversionsToRemove, unitsToHide };
+}
 async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 
 	// 1. Load all data
@@ -20,20 +68,46 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 		Group.getAll(conn)
 	]);
 
-	// 2. Remove the conversion to be deleted
-	const newConversions = allConversions.filter(c =>
-		!(c.sourceId === sourceId && c.destinationId === destinationId)
+	// 2. Get source and destination units to check for suffix units
+	const sourceUnit = allUnits.find(u => u.id === sourceId);
+	const destUnit = allUnits.find(u => u.id === destinationId);
+	
+	// 3. Simulate suffix unit cleanup if applicable
+	let conversionsToRemove = [
+		{ sourceId, destinationId } // The conversion being deleted
+	];
+	
+	if (sourceUnit && sourceUnit.typeOfUnit === 'suffix') {
+		const cleanup = simulateSuffixUnitCleanup(sourceUnit, allConversions, allUnits);
+		conversionsToRemove.push(...cleanup.conversionsToRemove);
+	}
+	
+	if (destUnit && destUnit.typeOfUnit === 'suffix') {
+		const cleanup = simulateSuffixUnitCleanup(destUnit, allConversions, allUnits);
+		conversionsToRemove.push(...cleanup.conversionsToRemove);
+	}
+	
+	// Remove duplicates (in case both source and dest are suffix units and share conversions)
+	const uniqueConversionsToRemove = Array.from(
+		new Map(conversionsToRemove.map(c => [`${c.sourceId}-${c.destinationId}`, c])).values()
 	);
+	
+	// 4. Remove all affected conversions from the simulation
+	const newConversions = allConversions.filter(c => {
+		return !uniqueConversionsToRemove.some(toRemove =>
+			c.sourceId === toRemove.sourceId && c.destinationId === toRemove.destinationId
+		);
+	});
 
-	// 3. Build simulated graph and Cik array
+	// 5. Build simulated graph and Cik array
 	const simulatedGraph = createConversionGraphFromArray(allUnits, newConversions);
 	const simulatedCik = await createCikArray(simulatedGraph, conn);
 
-	// 4. Get the current Cik array
+	// 6. Get the current Cik array
 	const currentGraph = await createConversionGraph(conn);
 	const currentCik = await createCikArray(currentGraph, conn);
 
-	// 5. Precompute compatible units for each meter (current and simulated)
+	// 7. Precompute compatible units for each meter (current and simulated)
 	const meterIdToUnitsCurrent = {};
 	const meterIdToUnitsSim = {};
 	for (const meter of allMeters) {
@@ -41,13 +115,13 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 		meterIdToUnitsSim[meter.id] = compatibleUnitsForMeter(meter.unitId, simulatedCik);
 	}
 
-	// 6. Batch load all group-to-meter relationships
+	// 8. Batch load all group-to-meter relationships
 	const groupIdToMeterIds = {};
 	await Promise.all(allGroups.map(async group => {
 		groupIdToMeterIds[group.id] = await Group.getDeepMetersByGroupID(group.id, conn);
 	}));
 
-	// 7. For each meter, compare compatible units before/after
+	// 9. For each meter, compare compatible units before/after
 	const affectedMeters = [];
 	for (const meter of allMeters) {
 		const before = meterIdToUnitsCurrent[meter.id] || new Set();
@@ -62,7 +136,7 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 		}
 	}
 
-	// 8. For each group, intersect the sets (using cached meter compatible units)
+	// 10. For each group, intersect the sets (using cached meter compatible units)
 	const affectedGroups = [];
 	for (const group of allGroups) {
 		const meterIds = groupIdToMeterIds[group.id];
