@@ -239,7 +239,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 		 */
 		async function getTokenForUser(user) {
 			const res = await chai.request(app)
-				.post('/api/login')
+				.post('/api/loginLogout/login')
 				.send({
 					username: user.username,
 					password: user.password
@@ -318,7 +318,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			} finally {
 				if (token) {
 					await chai.request(app)
-						.post('/api/logout')
+						.post('/api/loginLogout/logout')
 						.set('token', token);
 				}
 			}
