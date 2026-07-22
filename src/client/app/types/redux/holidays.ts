@@ -55,3 +55,31 @@ export interface HolidayInstanceDetails extends HolidayInstance {
 	location: string;
 	dayPatternName: string;
 }
+
+/**
+ * A holiday instance group together with the IDs stored in
+ * `holiday_group_members` for that group.
+ */
+export interface HolidayInstanceGroup {
+	id: number;
+	name: string;
+	holidayInstanceIds: number[];
+	note: string;
+}
+
+export type CreateHolidayInstanceGroupPayload = Omit<HolidayInstanceGroup, 'id'>;
+
+export type UpdateHolidayInstanceGroupPayload = HolidayInstanceGroup;
+
+/** Joined member response from GET /api/holidayGroupMembers/group/:groupId. */
+export interface HolidayGroupMember {
+	holidayInstanceGroupId: number;
+	holidayInstanceId: number;
+	holidayInstanceName: string;
+	holidayId: number;
+	dayPatternId: number;
+	holidayName: string;
+	startDate: string;
+	location: string;
+	dayPatternName: string;
+}

@@ -21,7 +21,7 @@ import {
 } from 'reactstrap';
 import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
-import { HolidayInstance } from '../../types/redux/holiday';
+import { HolidayInstance } from '../../types/redux/holidays';
 
 interface CreateHolidayInstanceGroupModalComponentProps {
 	holidayInstances: HolidayInstance[];

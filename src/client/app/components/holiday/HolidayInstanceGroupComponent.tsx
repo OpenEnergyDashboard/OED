@@ -5,88 +5,84 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
+import {
+	stableEmptyHolidayInstances,
+	useGetHolidayInstancesQuery
+} from '../../redux/api/holidayInstancesApi';
+import {
+	stableEmptyHolidayInstanceGroups,
+	useAddHolidayInstanceGroupMutation,
+	useDeleteHolidayInstanceGroupMutation,
+	useEditHolidayInstanceGroupMutation,
+	useGetHolidayInstanceGroupsQuery
+} from '../../redux/api/holidayInstanceGroupsApi';
 import { titleStyle } from '../../styles/modalStyle';
-import { HolidayInstance } from '../../types/redux/holiday';
 import CreateHolidayInstanceGroupModalComponent from './CreateHolidayInstanceGroupModalComponent';
-import { HolidayInstanceGroupData } from './EditHolidayInstanceGroupModalComponent';
 import HolidayInstanceGroupViewComponent from './HolidayInstanceGroupViewComponent';
-import { testHolidayInstances } from './holidayInstanceTestData'; // For testing purposes, remove in production.
-
-interface HolidayInstanceGroupComponentProps {
-	holidayInstances?: HolidayInstance[];
-	holidayInstanceGroups?: HolidayInstanceGroupData[];
-	handleCreateHolidayInstanceGroup?: (name: string, holidayInstanceIds: number[], note: string) => void;
-	handleUpdateHolidayInstanceGroup?: (
-		holidayInstanceGroupId: number,
-		name: string,
-		holidayInstanceIds: number[],
-		note: string
-	) => void;
-	handleDeleteHolidayInstanceGroup?: (holidayInstanceGroupId: number) => void;
-}
 
 /**
  * Defines the holiday instance group card page.
- * @param props Holiday instance data, group data, and optional action handlers.
  * @returns Holiday instance group page element.
  */
-export default function HolidayInstanceGroupComponent(props: HolidayInstanceGroupComponentProps) {
-	const holidayInstances = props.holidayInstances ?? testHolidayInstances;
-	const [createdHolidayInstanceGroups, setCreatedHolidayInstanceGroups] = useState<HolidayInstanceGroupData[]>([]);
-	const holidayInstanceGroups = props.holidayInstanceGroups ?? createdHolidayInstanceGroups;
-	const usingLocalHolidayInstanceGroups = props.holidayInstanceGroups === undefined;
+export default function HolidayInstanceGroupComponent() {
+	const [mutationError, setMutationError] = useState('');
+	const {
+		data: holidayInstances = stableEmptyHolidayInstances,
+		isLoading: holidayInstancesLoading,
+		error: holidayInstancesError
+	} = useGetHolidayInstancesQuery();
+	const {
+		data: holidayInstanceGroups = stableEmptyHolidayInstanceGroups,
+		isLoading: holidayInstanceGroupsLoading,
+		error: holidayInstanceGroupsError
+	} = useGetHolidayInstanceGroupsQuery();
+	const [addHolidayInstanceGroup] = useAddHolidayInstanceGroupMutation();
+	const [editHolidayInstanceGroup] = useEditHolidayInstanceGroupMutation();
+	const [deleteHolidayInstanceGroup] = useDeleteHolidayInstanceGroupMutation();
 
-	const handleCreateHolidayInstanceGroup = (name: string, holidayInstanceIds: number[], note: string) => {
-		props.handleCreateHolidayInstanceGroup?.(name, holidayInstanceIds, note);
-
-		if (usingLocalHolidayInstanceGroups) {
-			setCreatedHolidayInstanceGroups(currentGroups => {
-				const nextId = Math.max(0, ...currentGroups.map(group => group.id)) + 1;
-
-				return [
-					...currentGroups,
-					{
-						id: nextId,
-						name,
-						holidayInstanceIds,
-						note
-					}
-				];
-			});
+	const handleCreateHolidayInstanceGroup = async (
+		name: string,
+		holidayInstanceIds: number[],
+		note: string
+	) => {
+		setMutationError('');
+		try {
+			await addHolidayInstanceGroup({ name, holidayInstanceIds, note }).unwrap();
+		} catch (error) {
+			setMutationError(`Unable to create the holiday instance group: ${JSON.stringify(error)}`);
 		}
 	};
 
-	const handleUpdateHolidayInstanceGroup = (
+	const handleUpdateHolidayInstanceGroup = async (
 		holidayInstanceGroupId: number,
 		name: string,
 		holidayInstanceIds: number[],
 		note: string
 	) => {
-		props.handleUpdateHolidayInstanceGroup?.(
-			holidayInstanceGroupId,
-			name,
-			holidayInstanceIds,
-			note
-		);
-
-		if (usingLocalHolidayInstanceGroups) {
-			setCreatedHolidayInstanceGroups(currentGroups => currentGroups.map(group =>
-				group.id === holidayInstanceGroupId
-					? { ...group, name, holidayInstanceIds, note }
-					: group
-			));
+		setMutationError('');
+		try {
+			await editHolidayInstanceGroup({
+				id: holidayInstanceGroupId,
+				name,
+				holidayInstanceIds,
+				note
+			}).unwrap();
+		} catch (error) {
+			setMutationError(`Unable to update the holiday instance group: ${JSON.stringify(error)}`);
 		}
 	};
 
-	const handleDeleteHolidayInstanceGroup = (holidayInstanceGroupId: number) => {
-		props.handleDeleteHolidayInstanceGroup?.(holidayInstanceGroupId);
-
-		if (usingLocalHolidayInstanceGroups) {
-			setCreatedHolidayInstanceGroups(currentGroups =>
-				currentGroups.filter(group => group.id !== holidayInstanceGroupId)
-			);
+	const handleDeleteHolidayInstanceGroup = async (holidayInstanceGroupId: number) => {
+		setMutationError('');
+		try {
+			await deleteHolidayInstanceGroup({ id: holidayInstanceGroupId }).unwrap();
+		} catch (error) {
+			setMutationError(`Unable to delete the holiday instance group: ${JSON.stringify(error)}`);
 		}
 	};
+
+	const isLoading = holidayInstancesLoading || holidayInstanceGroupsLoading;
+	const loadError = holidayInstancesError || holidayInstanceGroupsError;
 
 	return (
 		<div className='flexGrowOne'>
@@ -96,6 +92,14 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 						id='holiday.instance.groups'
 					/>
 				</h2>
+				{loadError && (
+					<div className='alert alert-danger' role='alert'>
+						Unable to load holiday instance group data from the database.
+					</div>
+				)}
+				{mutationError && (
+					<div className='alert alert-danger' role='alert'>{mutationError}</div>
+				)}
 				<div className='edit-btn'>
 					<CreateHolidayInstanceGroupModalComponent
 						holidayInstances={holidayInstances}
@@ -103,7 +107,9 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 					/>
 				</div>
 				<div className='card-container'>
-					{[...holidayInstanceGroups]
+					{isLoading ? (
+						<div>Loading holiday instance groups...</div>
+					) : [...holidayInstanceGroups]
 						.sort((firstGroup, secondGroup) => firstGroup.id - secondGroup.id)
 						.map(holidayInstanceGroup => (
 							<HolidayInstanceGroupViewComponent

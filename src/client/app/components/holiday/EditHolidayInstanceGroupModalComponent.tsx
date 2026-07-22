@@ -22,18 +22,11 @@ import {
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
-import { HolidayInstance } from '../../types/redux/holiday';
-
-export interface HolidayInstanceGroupData {
-	id: number;
-	name: string;
-	holidayInstanceIds: number[];
-	note: string;
-}
+import { HolidayInstance, HolidayInstanceGroup } from '../../types/redux/holidays';
 
 interface EditHolidayInstanceGroupModalComponentProps {
 	show: boolean;
-	holidayInstanceGroup: HolidayInstanceGroupData;
+	holidayInstanceGroup: HolidayInstanceGroup;
 	holidayInstances: HolidayInstance[];
 	handleShow: () => void;
 	handleClose: () => void;
