@@ -4,30 +4,33 @@
 import * as React from 'react';
 import { IntlProvider } from 'react-intl';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import ReadingsCSVUploadComponent from '../components/csv/ReadingsCSVUploadComponent';
 import MetersCSVUploadComponent from '../components/csv/MetersCSVUploadComponent';
+import ReadingsCSVUploadComponent from '../components/csv/ReadingsCSVUploadComponent';
 import MapCalibrationContainer from '../containers/maps/MapCalibrationContainer';
 import MapsDetailContainer from '../containers/maps/MapsDetailContainer';
 import { useAppSelector } from '../redux/reduxHooks';
+import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
 import LocaleTranslationData from '../translations/data';
 import { UserRole } from '../types/items';
 import AppLayout from './AppLayout';
 import HomeComponent from './HomeComponent';
 import AdminComponent from './admin/AdminComponent';
+import LogMsgComponent from './admin/LogMsgComponent';
 import UsersDetailComponent from './admin/users/UsersDetailComponent';
 import ConversionsDetailComponent from './conversion/ConversionsDetailComponent';
+import DaysDetailComponent from './days/DaysDetailComponent';
 import GroupsDetailComponent from './groups/GroupsDetailComponent';
 import MetersDetailComponent from './meters/MetersDetailComponent';
 import AdminOutlet from './router/AdminOutlet';
+import ErrorComponent from './router/ErrorComponent';
 import { GraphLink } from './router/GraphLinkComponent';
 import NotFound from './router/NotFoundOutlet';
 import RoleOutlet from './router/RoleOutlet';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
-import ErrorComponent from './router/ErrorComponent';
-import { selectSelectedLanguage } from '../redux/slices/appStateSlice';
-import LogMsgComponent from './admin/LogMsgComponent';
 import VisualUnitDetailComponent from './visual-unit/VisualUnitDetailComponent';
 import HolidayInstanceGroupComponent from './holiday/HolidayInstanceGroupComponent';
+import WeeksDetailComponent from './weeks/WeeksDetailComponent';
+import HolidayInstancePage from './holiday-instances/HolidayInstancePage';
 
 /**
  * @returns the router component Responsible for client side routing.
@@ -56,8 +59,11 @@ const router = createBrowserRouter([
 				element: <AdminOutlet />,
 				children: [
 					{ path: 'admin', element: <AdminComponent /> },
+					{ path: 'holiday-instances', element: <HolidayInstancePage /> },
 					{ path: 'calibration', element: <MapCalibrationContainer /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },
+					{ path: 'days', element: <DaysDetailComponent /> },
+					{ path: 'weeks', element: <WeeksDetailComponent /> },
 					{ path: 'csvMeters', element: <MetersCSVUploadComponent /> },
 					{ path: 'maps', element: <MapsDetailContainer /> },
 					{ path: 'units', element: <UnitsDetailComponent /> },

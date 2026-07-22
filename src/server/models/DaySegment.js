@@ -20,7 +20,7 @@ class DaySegment {
 	constructor(id, dayId, startHour, endHour, slope, intercept, note) {
 		this.id = id;
 		this.dayId = dayId;
-		this.startHour = startHour; 
+		this.startHour = startHour;
 		this.endHour = endHour;
 		this.slope = slope;
 		this.intercept = intercept;
@@ -52,8 +52,8 @@ class DaySegment {
 		);
 	}
 
-	/** 
-	 * Returns the day segment associated the id. 
+	/**
+	 * Returns the day segment associated the id.
 	 * If the day segment doesn't exist then return null.
 	 * @param {*} id The day segment id.
 	 * @param {*} conn The connection to use.
@@ -66,7 +66,7 @@ class DaySegment {
 		return DaySegment.mapRow(row);
 	}
 
-	/** 
+	/**
 	 * Returns all day segments associated with the day id.
 	 * @param {*} dayId The day pattern id.
 	 * @param {*} conn The connection to use.
@@ -200,7 +200,7 @@ class DaySegment {
 			});
 		});
 	}
-	
+
 	/**
 	 * Returns a promise to update a daySegment in the database.
 	 * Note: This function only supports updates where the new start and/or end hour extends into the immediately adjacent segments.
@@ -239,6 +239,24 @@ class DaySegment {
 
 			// update the current segment
 			await t.none(sqlFile('daySegment/update_day_segment.sql'), daySegment);
+		});
+	}
+
+	/**
+	 * Delete the day segment associated with the dayId, startHour, and endHour.
+	 * This method does not update the previous or next segments.
+	 * @param {*} dayId The dayId of the segment.
+	 * @param {*} startHour The start hour of the segment to delete.
+	 * @param {*} endHour The end hour of the segment to delete.
+	 * @param {*} conn The connection to use.
+	 * @param {*} startHour The start hour of the segment to be deleted.
+	 * @param {*} endHour The end hour of the segment to be deleted.
+	 */
+	static async delete(dayId, startHour, endHour, conn) {
+		await conn.none(sqlFile('daySegment/delete_day_segment.sql'), {
+			dayId: dayId,
+			startHour: startHour,
+			endHour: endHour
 		});
 	}
 

@@ -20,9 +20,10 @@ import { TimeInterval } from '../../../../common/TimeInterval';
 import { dateRangeToTimeInterval, timeIntervalToDateRange } from '../../utils/dateRangeCompatibility';
 import { titleStyle } from '../../styles/modalStyle';
 import { useTranslate } from '../../redux/componentHooks';
+import { ROWS_PER_TABLE } from '../../utils/pagination';
 
 // number of log messages to display per page
-const PER_PAGE = 20;
+const PER_PAGE = ROWS_PER_TABLE;
 
 enum LogTypes {
 	ERROR = 'ERROR',

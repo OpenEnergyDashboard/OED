@@ -144,7 +144,7 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
 					req.body.note
 				);
 				await newConversion.insert(
-					req.body.weekPatternsId,
+					req.body.weekPatternsId === -99 ? null : req.body.weekPatternsId,
 					req.body.slope,
 					req.body.intercept,
 					req.body.segmentNote,

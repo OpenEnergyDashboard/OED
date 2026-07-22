@@ -6,8 +6,6 @@ export interface ConversionData {
 	sourceId: number;
 	destinationId: number;
 	bidirectional: boolean;
-	slope: number;
-	intercept: number;
 	note: string;
 }
 
