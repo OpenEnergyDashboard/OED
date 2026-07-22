@@ -85,6 +85,18 @@ class Holiday{
 		const resp = await conn.one(sqlFile('holiday/insert_new_holiday.sql'), holiday);
 		this.id = resp.id;
 	}
+	/**
+	 * Returns a promise to insert this holiday into the database,
+	 * or update it if it already exists.
+	 * @param conn is the connection to use.
+	 * @returns {Promise.<>}
+	 */
+	insertOrUpdate(conn) {
+		return conn.none(
+			sqlFile('holiday/insert_or_update_holiday.sql'),
+			this
+		);
+	}
 
     /**
 	 * Returns a promise to update a holiday
