@@ -48,15 +48,14 @@ export default function HolidayInstanceGroupViewComponent(props) {
 				<b>
 					<FormattedMessage
 						id='holiday.instances'
-						defaultMessage='Holiday Instances'
 					/>
 				</b>
 				{selectedHolidayInstances.length > 0 ? (
-					<ul style={holidayInstanceListStyle}>
-						{selectedHolidayInstances.map(holidayInstance => (
-							<li key={holidayInstance.id}>{holidayInstance.name}</li>
-						))}
-					</ul>
+					<span>
+						{selectedHolidayInstances[0].name}
+						{selectedHolidayInstances.length > 1 &&
+							`...(${selectedHolidayInstances.length})`}
+					</span>
 				) : (
 					<span> None</span>
 				)}
@@ -64,24 +63,22 @@ export default function HolidayInstanceGroupViewComponent(props) {
 
 			<div className='item-container'>
 				<b>
-					<FormattedMessage id='holiday.region' defaultMessage='Holiday Region' />
+					<FormattedMessage id='holiday.region' />
 				</b>{' '}
 				<FormattedMessage
 					id='holiday.region.unavailable'
-					defaultMessage='Unavailable'
 				/>
 			</div>
 
 			<div className='item-container' title={note}>
-				<b><FormattedMessage id='note' defaultMessage='Note' /></b>{' '}
+				<b><FormattedMessage id='note' /></b>{' '}
 				{displayedNote}
 			</div>
 
 			<div className='edit-btn'>
 				<Button color='secondary' onClick={handleShow}>
 					<FormattedMessage
-						id='holiday.instance.group.edit'
-						defaultMessage='Edit Holiday Instance Group'
+						id='holiday.instance.group.details'
 					/>
 				</Button>
 				<EditHolidayInstanceGroupModalComponent
@@ -97,10 +94,3 @@ export default function HolidayInstanceGroupViewComponent(props) {
 		</div>
 	);
 }
-
-const holidayInstanceListStyle = {
-	margin: '0.5rem 0 0',
-	maxHeight: '8rem',
-	overflowY: 'auto',
-	paddingLeft: '1.25rem'
-};

@@ -137,14 +137,13 @@ export default function EditHolidayInstanceGroupModalComponent(
 				<ModalHeader toggle={handleClose}>
 					<FormattedMessage
 						id='holiday.instance.group.edit'
-						defaultMessage='Edit Holiday Instance Group'
 					/>
 				</ModalHeader>
 				<ModalBody>
 					<Container>
 						<FormGroup>
 							<Label for='name'>
-								<FormattedMessage id='name' defaultMessage='Name' />
+								<FormattedMessage id='name'/>
 							</Label>
 							<Input
 								id='name'
@@ -156,7 +155,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 								invalid={!validName}
 							/>
 							<FormFeedback>
-								<FormattedMessage id='error.required' defaultMessage='Required' />
+								<FormattedMessage id='error.required'/>
 							</FormFeedback>
 						</FormGroup>
 
@@ -167,7 +166,6 @@ export default function EditHolidayInstanceGroupModalComponent(
 									<Label>
 										<FormattedMessage
 											id='holiday.instances'
-											defaultMessage='Holiday Instances'
 										/>
 									</Label>
 									<MultiSelectComponent
@@ -183,7 +181,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 									/>
 									{holidayInstanceIds.length === 0 && (
 										<FormFeedback className='d-block'>
-											<FormattedMessage id='error.required' defaultMessage='Required' />
+											<FormattedMessage id='error.required' />
 										</FormFeedback>
 									)}
 								</FormGroup>
@@ -193,7 +191,6 @@ export default function EditHolidayInstanceGroupModalComponent(
 									<Label for='holidayRegionId'>
 										<FormattedMessage
 											id='holiday.region'
-											defaultMessage='Holiday Region'
 										/>
 									</Label>
 									<Input
@@ -206,7 +203,6 @@ export default function EditHolidayInstanceGroupModalComponent(
 										<option value=''>
 											<FormattedMessage
 												id='holiday.region.unavailable'
-												defaultMessage='Unavailable'
 											/>
 										</option>
 									</Input>
@@ -216,7 +212,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 
 						<FormGroup>
 							<Label for='note'>
-								<FormattedMessage id='note' defaultMessage='Note' />
+								<FormattedMessage id='note'/>
 							</Label>
 							<Input
 								id='note'
@@ -233,19 +229,18 @@ export default function EditHolidayInstanceGroupModalComponent(
 						<Button color='danger' onClick={handleDeleteConfirmationModalOpen}>
 							<FormattedMessage
 								id='holiday.instance.group.delete'
-								defaultMessage='Delete Holiday Instance Group'
 							/>
 						</Button>
 					)}
 					<Button color='secondary' onClick={handleClose}>
-						<FormattedMessage id='discard.changes' defaultMessage='Discard Changes' />
+						<FormattedMessage id='discard.changes' />
 					</Button>
 					<Button
 						color='primary'
 						onClick={handleSaveChanges}
 						disabled={!validHolidayInstanceGroup}
 					>
-						<FormattedMessage id='save.all' defaultMessage='Save All' />
+						<FormattedMessage id='save.all' />
 					</Button>
 				</ModalFooter>
 			</Modal>

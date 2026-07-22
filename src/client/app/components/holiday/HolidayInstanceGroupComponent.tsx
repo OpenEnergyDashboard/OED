@@ -93,8 +93,7 @@ export default function HolidayInstanceGroupComponent(props: HolidayInstanceGrou
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
 					<FormattedMessage
-						id='holiday.instance.group'
-						defaultMessage='Holiday Instance Group'
+						id='holiday.instance.groups'
 					/>
 				</h2>
 				<div className='edit-btn'>

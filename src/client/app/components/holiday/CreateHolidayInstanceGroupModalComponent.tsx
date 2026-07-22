@@ -85,7 +85,6 @@ export default function CreateHolidayInstanceGroupModalComponent(
 			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage
 					id='holiday.instance.group.create'
-					defaultMessage='Create Holiday Instance Group'
 				/>
 			</Button>
 
@@ -93,14 +92,13 @@ export default function CreateHolidayInstanceGroupModalComponent(
 				<ModalHeader toggle={handleClose}>
 					<FormattedMessage
 						id='holiday.instance.group.create'
-						defaultMessage='Create Holiday Instance Group'
 					/>
 				</ModalHeader>
 				<ModalBody>
 					<Container>
 						<FormGroup>
 							<Label for='name'>
-								<FormattedMessage id='name' defaultMessage='Name' />
+								<FormattedMessage id='name' />
 							</Label>
 							<Input
 								id='name'
@@ -112,7 +110,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 								invalid={!validName}
 							/>
 							<FormFeedback>
-								<FormattedMessage id='error.required' defaultMessage='Required' />
+								<FormattedMessage id='error.required' />
 							</FormFeedback>
 						</FormGroup>
 
@@ -123,7 +121,6 @@ export default function CreateHolidayInstanceGroupModalComponent(
 									<Label>
 										<FormattedMessage
 											id='holiday.instances'
-											defaultMessage='Holiday Instances'
 										/>
 									</Label>
 									<MultiSelectComponent
@@ -139,7 +136,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 									/>
 									{holidayInstanceIds.length === 0 && (
 										<FormFeedback className='d-block'>
-											<FormattedMessage id='error.required' defaultMessage='Required' />
+											<FormattedMessage id='error.required' />
 										</FormFeedback>
 									)}
 								</FormGroup>
@@ -149,7 +146,6 @@ export default function CreateHolidayInstanceGroupModalComponent(
 									<Label for='holidayRegionId'>
 										<FormattedMessage
 											id='holiday.region'
-											defaultMessage='Holiday Region'
 										/>
 									</Label>
 									<Input
@@ -162,7 +158,6 @@ export default function CreateHolidayInstanceGroupModalComponent(
 										<option value=''>
 											<FormattedMessage
 												id='holiday.region.unavailable'
-												defaultMessage='Unavailable'
 											/>
 										</option>
 									</Input>
@@ -172,7 +167,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 
 						<FormGroup>
 							<Label for='note'>
-								<FormattedMessage id='note' defaultMessage='Note' />
+								<FormattedMessage id='note' />
 							</Label>
 							<Input
 								id='note'
@@ -186,14 +181,14 @@ export default function CreateHolidayInstanceGroupModalComponent(
 				</ModalBody>
 				<ModalFooter>
 					<Button color='secondary' onClick={handleClose}>
-						<FormattedMessage id='discard.changes' defaultMessage='Discard Changes' />
+						<FormattedMessage id='discard.changes' />
 					</Button>
 					<Button
 						color='primary'
 						onClick={handleSubmit}
 						disabled={!validHolidayInstanceGroup}
 					>
-						<FormattedMessage id='save.all' defaultMessage='Save All' />
+						<FormattedMessage id='save.all' />
 					</Button>
 				</ModalFooter>
 			</Modal>
