@@ -9,8 +9,9 @@ const { getConnection } = require('../db');
 const Reading = require('../models/Reading');
 const TimeScaleDBReading = require('../models/TimeScaleDB/Reading');
 
-// Prevent concurrent imports or maintenance jobs from rebuilding and
-// refreshing dependent reading aggregates at the same time.
+// Arbitrary, stable application namespace key for a session-level PostgreSQL
+// advisory lock. Every aggregate refresher must use this same key; the numeric
+// value has no transaction ID or database-object meaning.
 const REFRESH_ADVISORY_LOCK_ID = 724536221;
 
 async function timedRefresh(label, operation) {

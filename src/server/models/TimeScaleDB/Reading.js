@@ -28,17 +28,6 @@ class Reading {
     }
 
     /**
-     * Drops the TimescaleDB reading continuous aggregates in reverse
-     * dependency order so they can be recreated safely.
-     *
-     * @param conn the database connection to use
-     * @returns {Promise<void>}
-     */
-    static dropReadingAggregates(conn) {
-        return conn.none(sqlFile('reading/TimeScaleDB/drop_reading_aggregates.sql'));
-    }
-
-    /**
      * Creates the TimescaleDB continuous aggregate used for hourly meter
      * readings.
      *

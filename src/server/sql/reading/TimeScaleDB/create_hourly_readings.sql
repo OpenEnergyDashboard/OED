@@ -1,6 +1,15 @@
 /*
  * create_hourly_readings.sql
  *
+ * Prefrace:
+ * 	 This script continues the work introduced in PR#1546, which established the
+ * 	 benchmark for migrating hourly meter reading queries from PostgreSQL
+ * 	 materialized views to TimescaleDB hypertables and continuous aggregates.
+ *
+ * 	 Only the database objects required from PR#1546 were carried forward and
+ * 	 adapted to integrate TimescaleDB continuous aggregates with the existing
+ * 	 hourly meter reading workflow in the timeVary branch.
+ *
  * Purpose:
  *
  *   Create the TimescaleDB continuous aggregate used for hourly meter
@@ -68,89 +77,19 @@
  * This reproduces the calculation performed by the original
  * meter_hourly_readings_unit materialized view.
  */
-CREATE MATERIALIZED VIEW meter_hourly_readings_unit_cagg
+CREATE MATERIALIZED VIEW IF NOT EXISTS meter_hourly_readings_unit_cagg
 WITH (timescaledb.continuous) 
 AS
 SELECT
     meter_id,
     graphic_unit_id,
-
-    /*
-     * Group hourly slices into TimescaleDB continuous aggregate buckets.
-     */
-    time_bucket(
-        '1 hour',
-        start_timestamp
-    ) AS bucket,
-
-
-    /*
-     * Weighted average reading rate with cik_vary conversion applied.
-     *
-     * Each slice contributes based on its duration within the hour.
-     */
-    sum(
-        (
-            reading
-            /
-            extract(
-                EPOCH FROM (end_timestamp - start_timestamp)
-            )
-            * slope
-            + intercept
-        )
-        *
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-    )
-    /
-    sum(
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-    ) AS reading_rate,
-
-
-    /*
-     * Maximum converted reading rate observed within the hour.
-     */
-    max(
-        reading
-        /
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-        * slope
-        + intercept
-    ) AS max_rate,
-
-
-    /*
-     * Minimum converted reading rate observed within the hour.
-     */
-    min(
-        reading
-        /
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-        * slope
-        + intercept
-    ) AS min_rate,
-
-
-    /*
-     * Unit metadata is preserved so consumers can interpret the aggregate
-     * values correctly.
-     */
+    time_bucket('1 hour', start_timestamp) AS bucket,
+    sum(( reading / extract( EPOCH FROM (end_timestamp - start_timestamp) ) * slope + intercept ) * extract(EPOCH FROM (end_timestamp - start_timestamp))) / sum(extract(EPOCH FROM (end_timestamp - start_timestamp))) AS reading_rate,
+    max(reading / extract(EPOCH FROM (end_timestamp - start_timestamp)) * slope + intercept) AS max_rate,
+    min(reading / extract(EPOCH FROM (end_timestamp - start_timestamp)) * slope + intercept) AS min_rate,
     unit_represent,
     sec_in_rate
-
-
 FROM hypertable_hourly_split
-
-
 GROUP BY
     meter_id,
     graphic_unit_id,
@@ -159,6 +98,9 @@ GROUP BY
     sec_in_rate
 WITH NO DATA;
 
+/*
+ * Allow queries to include recent data that has not yet been materialized.
+ */
 ALTER MATERIALIZED VIEW meter_hourly_readings_unit_cagg
 SET (
     timescaledb.materialized_only = false
