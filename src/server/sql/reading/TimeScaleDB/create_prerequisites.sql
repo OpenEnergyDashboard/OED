@@ -126,7 +126,6 @@ ON hypertable_hourly_split
  */
 CREATE OR REPLACE FUNCTION update_hourly_hypertable()
 RETURNS trigger
-LANGUAGE plpgsql
 AS $$
 BEGIN
 
@@ -159,116 +158,31 @@ BEGIN
 
     END IF;
 
-    INSERT INTO hypertable_hourly_split
-	(
-		meter_id,
-		reading,
-		start_timestamp,
-		end_timestamp,
-		unit_represent,
-		sec_in_rate,
-		slope,
-		intercept,
-		graphic_unit_id
-	)
-	/*
-	 * Expand the reading into hourly intervals and apply the appropriate
-	 * unit conversion metadata.
-	 */
+    INSERT INTO hypertable_hourly_split(meter_id, reading, start_timestamp, end_timestamp, unit_represent, sec_in_rate, slope, intercept, graphic_unit_id)
 	SELECT
 		NEW.meter_id,
 		CASE
 			WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-
-				(
-					NEW.reading * 3600 /
-					extract(
-						EPOCH FROM
-						(NEW.end_timestamp - NEW.start_timestamp)
-					)
-				)
-				*
-				extract(
-					EPOCH FROM
-					(
-						least(
-							NEW.end_timestamp,
-							gen.interval_start + INTERVAL '1 hour'
-						)
-						-
-						greatest(
-							NEW.start_timestamp,
-							gen.interval_start
-						)
-					)
-				)
-
-			WHEN u.unit_represent IN
-				(
-					'flow'::unit_represent_type,
-					'raw'::unit_represent_type
-				) THEN
-
-				(
-					NEW.reading * 3600 / u.sec_in_rate
-				)
-				*
-				extract(
-					EPOCH FROM
-					(
-						least(
-							NEW.end_timestamp,
-							gen.interval_start + INTERVAL '1 hour'
-						)
-						-
-						greatest(
-							NEW.start_timestamp,
-							gen.interval_start
-						)
-					)
-				)
-
-		END AS reading,
-
-		/*
-		 * Clamp each generated interval to the actual overlap between the
-		 * reading and the hourly bucket.
-		 */
-		greatest(
-			NEW.start_timestamp,
-			gen.interval_start
-		) AS start_timestamp,
-
-		least(
-			NEW.end_timestamp,
-			gen.interval_start + INTERVAL '1 hour'
-		) AS end_timestamp,
-
+				(NEW.reading * 3600 / extract(EPOCH FROM (NEW.end_timestamp - NEW.start_timestamp))) * extract(EPOCH FROM (least(NEW.end_timestamp, gen.interval_start + INTERVAL '1 hour') - greatest(NEW.start_timestamp, gen.interval_start)))
+			WHEN u.unit_represent IN ('flow'::unit_represent_type, 'raw'::unit_represent_type ) THEN 
+				(NEW.reading * 3600 / u.sec_in_rate) * extract(EPOCH FROM(least(NEW.end_timestamp, gen.interval_start + INTERVAL '1 hour') - greatest(NEW.start_timestamp,gen.interval_start))
+		) END AS reading,
+		greatest(NEW.start_timestamp, gen.interval_start) AS start_timestamp,
+		least(NEW.end_timestamp, gen.interval_start + INTERVAL '1 hour') AS end_timestamp,
 		u.unit_represent,
 		u.sec_in_rate,
 		c.slope,
 		c.intercept,
 		c.destination_id AS graphic_unit_id
-
 	FROM meters m INNER JOIN 
-		 units u
-			ON m.unit_id = u.id INNER JOIN 
-		 cik_vary c
-			ON c.source_id = m.unit_id AND 
-			   tsrange(c.start_time, c.end_time, '()') && tsrange(NEW.start_timestamp, NEW.end_timestamp, '[]')
-	/*
-	 * Split readings spanning multiple hours into one row per hour.
-	 */
-		 CROSS JOIN LATERAL generate_series(
-			 date_trunc('hour', NEW.start_timestamp),
-			 date_trunc_up('hour', NEW.end_timestamp) - INTERVAL '1 hour',
-			 INTERVAL '1 hour'
-		) gen(interval_start)
+		 units u ON m.unit_id = u.id INNER JOIN 
+		 cik_vary c ON c.source_id = m.unit_id AND tsrange(c.start_time, c.end_time, '()') && tsrange(NEW.start_timestamp, NEW.end_timestamp, '[]') CROSS JOIN 
+		 LATERAL generate_series(date_trunc('hour', NEW.start_timestamp), date_trunc_up('hour', NEW.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start)
 	WHERE m.id = NEW.meter_id;
     RETURN NEW;
 
 END;
-$$;
+$$ LANGUAGE plpgsql;
 
 /*
  * 5. Recreate the readings trigger.
@@ -277,7 +191,7 @@ $$;
  * trigger is removed first to make this script safe to rerun during development
  * and deployment.
  */
-DROP TRIGGER IF EXISTS trg_readings_update_hourly_hypertable
+DROP TRIGGER IF EXISTS trigger_readings_update_hourly_hypertable
 ON readings;
 
 
@@ -310,7 +224,7 @@ ON readings;
  *   DELETE:
  *       Removes hourly split records generated from the deleted reading.
  */
-CREATE TRIGGER trg_readings_update_hourly_hypertable
+CREATE TRIGGER trigger_readings_update_hourly_hypertable
 AFTER INSERT OR UPDATE OR DELETE
 ON readings
 FOR EACH ROW
@@ -328,106 +242,30 @@ EXECUTE FUNCTION update_hourly_hypertable();
  */
 CREATE OR REPLACE FUNCTION rebuild_hourly_hypertable_split()
 RETURNS void
-LANGUAGE plpgsql
 AS $$
 BEGIN
 	DELETE FROM hypertable_hourly_split;
 
-	INSERT INTO hypertable_hourly_split
-	(
-		meter_id,
-		reading,
-		start_timestamp,
-		end_timestamp,
-		unit_represent,
-		sec_in_rate,
-		slope,
-		intercept,
-		graphic_unit_id
-	)
+	INSERT INTO hypertable_hourly_split(meter_id, reading, start_timestamp, end_timestamp, unit_represent, sec_in_rate, slope, intercept, graphic_unit_id)
 	SELECT
 		r.meter_id,
 		CASE
 			WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-				(
-					r.reading * 3600 /
-					extract(
-						EPOCH FROM
-						(r.end_timestamp - r.start_timestamp)
-					)
-				)
-				*
-				extract(
-					EPOCH FROM
-					(
-						least(
-							r.end_timestamp,
-							gen.interval_start + INTERVAL '1 hour'
-						)
-						-
-						greatest(
-							r.start_timestamp,
-							gen.interval_start
-						)
-					)
-				)
-
-			WHEN u.unit_represent IN
-				(
-					'flow'::unit_represent_type,
-					'raw'::unit_represent_type
-				) THEN
-				(
-					r.reading * 3600 / u.sec_in_rate
-				)
-				*
-				extract(
-					EPOCH FROM
-					(
-						least(
-							r.end_timestamp,
-							gen.interval_start + INTERVAL '1 hour'
-						)
-						-
-						greatest(
-							r.start_timestamp,
-							gen.interval_start
-						)
-					)
-				)
+				(r.reading * 3600 / extract(EPOCH FROM(r.end_timestamp - r.start_timestamp))) * extract(EPOCH FROM (least(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') - greatest(r.start_timestamp, gen.interval_start)))
+			WHEN u.unit_represent IN('flow'::unit_represent_type, 'raw'::unit_represent_type) THEN 
+				(r.reading * 3600 / u.sec_in_rate) * extract(EPOCH FROM(least(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') - greatest(r.start_timestamp, gen.interval_start))) 
 		END AS reading,
-		greatest(
-			r.start_timestamp,
-			gen.interval_start
-		) AS start_timestamp,
-		least(
-			r.end_timestamp,
-			gen.interval_start + INTERVAL '1 hour'
-		) AS end_timestamp,
+		greatest(r.start_timestamp, gen.interval_start) AS start_timestamp,
+		least(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') AS end_timestamp,
 		u.unit_represent,
 		u.sec_in_rate,
 		c.slope,
 		c.intercept,
 		c.destination_id AS graphic_unit_id
-
-	FROM readings r
-
-	INNER JOIN meters m
-		ON r.meter_id = m.id
-
-	INNER JOIN units u
-		ON m.unit_id = u.id
-
-	INNER JOIN cik_vary c
-		ON c.source_id = m.unit_id
-	   AND tsrange(c.start_time, c.end_time, '()')
-		   &&
-		   tsrange(r.start_timestamp, r.end_timestamp, '[]')
-
-	CROSS JOIN LATERAL generate_series(
-		date_trunc('hour', r.start_timestamp),
-		date_trunc_up('hour', r.end_timestamp) - INTERVAL '1 hour',
-		INTERVAL '1 hour'
-	) gen(interval_start);
+	FROM readings r INNER JOIN 
+		 meters m ON r.meter_id = m.id INNER JOIN 
+		 units u ON m.unit_id = u.id INNER JOIN 
+		 cik_vary c ON c.source_id = m.unit_id AND tsrange(c.start_time, c.end_time, '()') && tsrange(r.start_timestamp, r.end_timestamp, '[]') CROSS JOIN 
+		 LATERAL generate_series(date_trunc('hour', r.start_timestamp), date_trunc_up('hour', r.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start);
 END;
-$$;
+$$ LANGUAGE plpgsql;

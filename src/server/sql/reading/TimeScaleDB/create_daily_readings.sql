@@ -58,24 +58,25 @@ WITH (timescaledb.continuous)
 AS
 SELECT
     meter_id,
-    AVG(reading_rate) AS reading_rate,
-    MIN(min_rate) AS min_rate,
-    MAX(max_rate) AS max_rate,
-    tsrange(
-        time_bucket('1 day', bucket),
-        time_bucket('1 day', bucket) + INTERVAL '1 day',
+    sum((reading / extract(EPOCH FROM (end_timestamp - start_timestamp)) * slope + intercept) * extract(EPOCH FROM (end_timestamp - start_timestamp))) / sum(extract(EPOCH FROM (end_timestamp - start_timestamp))) AS reading_rate,
+    max(reading / extract(EPOCH FROM (end_timestamp - start_timestamp)) * slope + intercept) AS max_rate,
+    min(reading / extract(EPOCH FROM (end_timestamp - start_timestamp)) * slope + intercept) AS min_rate,
+	tsrange(
+        time_bucket('1 day', start_timestamp),
+        time_bucket('1 day', start_timestamp) + INTERVAL '1 day',
         '()'
     ) AS time_interval,
-    graphic_unit_id
-FROM meter_hourly_readings_unit_cagg
+    graphic_unit_id,
+	time_bucket('1 day', start_timestamp) AS bucket
+FROM hypertable_hourly_split
 GROUP BY
     meter_id,
-    time_bucket('1 day', bucket),
+    time_bucket('1 day', start_timestamp),
     graphic_unit_id
 ORDER BY
     meter_id,
     graphic_unit_id,
-    time_interval
+    bucket
 WITH NO DATA;
 
 /*

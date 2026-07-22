@@ -83,49 +83,10 @@ AS
 SELECT
     meter_id,
     graphic_unit_id,
-    time_bucket(
-        '1 hour',
-        start_timestamp
-    ) AS bucket,
-    sum(
-        (
-            reading
-            /
-            extract(
-                EPOCH FROM (end_timestamp - start_timestamp)
-            )
-            * slope
-            + intercept
-        )
-        *
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-    )
-    /
-    sum(
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-    ) AS reading_rate,
-    max(
-        reading
-        /
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-        * slope
-        + intercept
-    ) AS max_rate,
-    min(
-        reading
-        /
-        extract(
-            EPOCH FROM (end_timestamp - start_timestamp)
-        )
-        * slope
-        + intercept
-    ) AS min_rate,
+    time_bucket('1 hour', start_timestamp) AS bucket,
+    sum(( reading / extract( EPOCH FROM (end_timestamp - start_timestamp) ) * slope + intercept ) * extract(EPOCH FROM (end_timestamp - start_timestamp))) / sum(extract(EPOCH FROM (end_timestamp - start_timestamp))) AS reading_rate,
+    max(reading / extract(EPOCH FROM (end_timestamp - start_timestamp)) * slope + intercept) AS max_rate,
+    min(reading / extract(EPOCH FROM (end_timestamp - start_timestamp)) * slope + intercept) AS min_rate,
     unit_represent,
     sec_in_rate
 FROM hypertable_hourly_split
