@@ -6,13 +6,16 @@ INSERT INTO holidays (
   name,
   start_date,
   location,
+  type,
   note
 ) VALUES (
   ${name},
   ${startDate},
   ${location},
+  ${type},
   ${note}
 )
 ON CONFLICT (name, location, start_date)
   DO UPDATE SET
+    type = EXCLUDED.type,
     note = COALESCE(EXCLUDED.note, holidays.note);

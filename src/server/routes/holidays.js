@@ -35,7 +35,7 @@ function buildLocationCode(country, state = '', region = ''){
 function formatLocationOptions(locations) {
 	return Object.entries(locations || {})
 		.map(([code, name]) => ({ code, name }))
-		.sort((first, second) => first.code.localeCompare(second.code));
+		.sort((first, second) => first.name.localeCompare(second.name));
 }
 
 /**
@@ -50,25 +50,31 @@ function mapImportedHoliday(item,country,state='',region=''){
 	const name = String(item.name).trim();
 	const startDate = String(item.date).slice(0,10);
 	const location = buildLocationCode(country,state,region);
+	const type = String(item.type).trim();
 
-	//TODO: may be good to implement some checks here ie date format or if data came back empty
-	//TODO: remove comments which start with Rose:
-	//Rose: undefined is id, and null is the note.
 	return new Holiday(
 		undefined,
 		name,
 		startDate,
 		location,
-		null
+		null,
+		type
 	);
 }
 
 function formatHolidayForResponse(item) {
+	let startDate = item.startDate;
+
+	if (startDate instanceof Date) {
+		startDate = startDate.toISOString();
+	}
+
 	return {
 		id: item.id,
 		name: item.name,
-		startDate: item.startDate,
+		startDate: String(startDate).slice(0, 10),
 		location: item.location,
+		type: item.type,
 		note: item.note
 	};
 }

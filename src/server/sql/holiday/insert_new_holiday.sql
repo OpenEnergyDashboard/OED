@@ -6,11 +6,13 @@ INSERT INTO holidays (
 	name,
 	start_date,
 	location,
+	type,
 	note
 ) VALUES (
 	${name},
 	${startDate},
 	${location},
+	${type},
 	${note}
 )
 RETURNING id;

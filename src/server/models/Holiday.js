@@ -12,13 +12,15 @@ class Holiday{
 	 * @param startDate The day that a holiday takes place on. If a holiday extends into another day, only this day is used
 	 * @param location location set by user
 	 * @param note The holiday note
+	 * @param type The holiday type
 	 */
-    constructor(id, name, startDate, location, note = '') {
+    constructor(id, name, startDate, location, note = '', type = 'custom') {
 		this.id = id;
 		this.name = name;
 		this.startDate = startDate;
 		this.location = location;
 		this.note = note;
+		this.type = type;
 	}
 
     /**
@@ -47,7 +49,7 @@ class Holiday{
 	 */
 	static async getAll(conn) {
 		const rows = await conn.any(sqlFile('holiday/get_all.sql'));
-		return rows.map(row => new Holiday(row.id, row.name, row.start_date, row.location, row.note));
+		return rows.map(row => new Holiday(row.id, row.name, row.start_date, row.location, row.note, row.type));
 	}
 
     /**
@@ -58,7 +60,7 @@ class Holiday{
 	 */
 	static async getById(id, conn) {
 		const row = await conn.one(sqlFile('holiday/get_by_id.sql'), { id: id });
-		return new Holiday(row.id, row.name, row.start_date, row.location, row.note);
+		return new Holiday(row.id, row.name, row.start_date, row.location, row.note, row.type);
 	}
     
     /**
@@ -69,7 +71,7 @@ class Holiday{
 	 */
 	static async getByLocation(location, conn) {
 		const rows = await conn.any(sqlFile('holiday/get_by_location.sql'), { location: location });
-		return rows.map(row => new Holiday(row.id, row.name, row.start_date, row.location, row.note));
+		return rows.map(row => new Holiday(row.id, row.name, row.start_date, row.location, row.note, row.type));
 	}
 
     /**

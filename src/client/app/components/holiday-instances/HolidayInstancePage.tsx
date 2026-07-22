@@ -60,7 +60,7 @@ import { showErrorNotification, showSuccessNotification } from '../../utils/noti
 interface BaseHoliday {
 	id: number;
 	name: string;
-	date: string;
+	location: string;
 }
 
 interface DayPatternOption {
@@ -97,7 +97,11 @@ type HolidayInstancePatch = Omit<HolidayInstanceData, 'baseHolidayId'> & { id: n
 const useHolidays = () => {
 	const { data = stableEmptyHolidays, isFetching } = useGetHolidaysQuery();
 	const mapped = useMemo<BaseHoliday[]>(
-		() => data.map(h => ({ id: h.id, name: h.name, date: h.startDate })),
+		() => data.map(holiday => ({
+			id: holiday.id,
+			name: holiday.name,
+			location: holiday.location
+		})),
 		[data]
 	);
 	return { data: mapped, isFetching };
@@ -265,6 +269,10 @@ export default function HolidayInstancePage() {
 		[holidaysData]
 	);
 
+	const holidayLabel = (holiday: BaseHoliday) => {
+		return `${holiday.name} (${holiday.location})`;
+	};
+
 	/* ---- Local (modal) state — untied to global state until Save ---- */
 	const [showModal, setShowModal] = useState<boolean>(false);
 	const [modalMode, setModalMode] = useState<ModalMode>('create');
@@ -287,8 +295,15 @@ export default function HolidayInstancePage() {
 	// instances query should return the joined holiday name (or names should be
 	// fetched by id) — until then, fall back to a visible placeholder rather
 	// than rendering blank.
-	const holidayName = (id: number) =>
-		availableHolidays.find(h => h.id === id)?.name ?? translate('holiday.base.unknown');
+	const holidayName = (id: number) => {
+		const holiday = availableHolidays.find(item => item.id === id);
+
+		if (holiday === undefined) {
+			return translate('holiday.base.unknown');
+		}
+
+		return holidayLabel(holiday);
+	};
 	const patternName = (id: number) =>
 		dayPatterns.find(p => p.id === id)?.name ?? '';
 
@@ -300,7 +315,10 @@ export default function HolidayInstancePage() {
 	 * TODO(repo): if OED's shared SingleSelectComponent fits, swap to it.
 	 */
 	const holidayOptions = useMemo(
-		() => availableHolidays.map(h => ({ value: h.id, label: h.name })),
+		() => availableHolidays.map(holiday => ({
+			value: holiday.id,
+			label: holidayLabel(holiday)
+		})),
 		[availableHolidays]
 	);
 	const selectedHolidayOption =
