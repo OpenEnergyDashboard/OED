@@ -80,7 +80,7 @@ mocha.describe('maps API', () => {
 		// Since this .before is in the middle of tests, it should not have issues as
 		// documented in usersTest.js.
 		mocha.before(async () => {
-			let res = await chai.request(app).post('/api/login')
+			let res = await chai.request(app).post('/api/loginLogout/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
@@ -115,7 +115,7 @@ mocha.describe('maps API', () => {
 					unauthorizedUser.password = password;
 
 					// login
-					let res = await chai.request(app).post('/api/login')
+					let res = await chai.request(app).post('/api/loginLogout/login')
 						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});

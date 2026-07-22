@@ -10,8 +10,8 @@ const secretToken = require('../config').secretToken;
 const validate = require('jsonschema').validate;
 const { log } = require('../log');
 const { getConnection } = require('../db');
-const { credentialsRequestValidationMiddleware } = require('./authenticator');
-const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } = require('../util/validationConstants');
+const { credentialsRequestValidationMiddleware, verifyActiveTokenAndGetUser } = require('./authenticator');
+const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
@@ -20,7 +20,7 @@ const router = express.Router();
  * @param {String} username
  * @param {String} Password
  */
-router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
+router.post('/login', credentialsRequestValidationMiddleware, async (req, res) => {
 	const validParams = {
 		type: 'object',
 		additionalProperties: false,
@@ -66,6 +66,55 @@ router.post('/', credentialsRequestValidationMiddleware, async (req, res) => {
 				log.error(`Unable to check user password for ${req.body.username}`, err);
 				res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send({ text: 'Internal Server Error' });
 			}
+		}
+	}
+});
+
+/**
+ * Logs out the authenticated user by invalidating previously issued tokens.
+ *
+ * Note: This route intentionally does not use auth middleware.
+ * Authentication is handled by verifyActiveTokenAndGetUser, which verifies
+ * the JWT, ensures the user exists, and checks token validity.
+ *
+ * The user ID is derived from the verified token (not request input),
+ * preventing a user from logging out another user.
+ */
+router.post('/logout', async (req, res) => {
+	const validParams = {
+		type: 'object',
+		maxProperties: 1,
+		required: ['token'],
+		properties: {
+			token: {
+				type: 'string',
+				maxLength: TOKEN_MAX_LENGTH
+			}
+		}
+	};
+
+	if (!validate(req.body, validParams).valid) {
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		return;
+	}
+
+	try {
+		// This route does not trust a user id from the request body.
+		// It authenticates the provided token, ensures the referenced user
+		// still exists, and then uses that verified user record to determine
+		// which user's tokens should be invalidated.
+		const { user } = await verifyActiveTokenAndGetUser(req.body.token);
+		const conn = getConnection();
+		await User.invalidateTokensBeforeNow(user.id, conn);
+		res.status(HTTP_CODES.OK).json({ success: true, message: 'Logout successful.' });
+	} catch (error) {
+		if (error.code === 'TOKEN_INVALIDATED') {
+			res.status(HTTP_CODES.OK).json({ success: true, message: 'Logout successful.' });
+		} else if (error.message === 'No data returned from the query.') {
+			res.status(HTTP_CODES.UNAUTHORIZED).json({ success: false, message: 'Logout failed.' });
+		} else {
+			log.error('Logout failed while invalidating user tokens.', error);
+			res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Logout failed.' });
 		}
 	}
 });

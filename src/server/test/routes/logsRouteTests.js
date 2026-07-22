@@ -14,7 +14,7 @@ mocha.describe('Log Routes', () => {
 
 	mocha.before(async () => {
 		// Login to get authentication token
-		const res = await chai.request(app).post('/api/login')
+		const res = await chai.request(app).post('/api/loginLogout/login')
 			.send({ username: testUser.username, password: testUser.password });
 		token = res.body.token;
 

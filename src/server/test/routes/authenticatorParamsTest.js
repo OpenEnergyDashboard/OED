@@ -21,11 +21,12 @@ mocha.describe('Authenticator Parameter Validation', () => {
 	// malicious inputs, and field length limits). Consider consolidating shared test data (malicious username
 	// patterns, SQL injection strings, etc.) into a shared fixture file in src/server/test/util/ in the future.
 
+	const LOGIN_ENDPOINT = '/api/loginLogout/login';
+
 	// Test the credentials validation used by login and obvius endpoints
 	mocha.describe('Credentials Validation (username/password)', () => {
 		// Since authenticator.js doesn't export direct endpoints, we test through routes that use it
 		// The login route uses credentialsRequestValidationMiddleware
-		const LOGIN_ENDPOINT = '/api/login';
 
 		const baseCredentials = {
 			username: 'validuser',
@@ -213,7 +214,6 @@ mocha.describe('Authenticator Parameter Validation', () => {
 
 	mocha.describe('Security Edge Cases', () => {
 		mocha.it('should handle concurrent authentication attempts', async () => {
-			const LOGIN_ENDPOINT = '/api/login';
 			const invalidCredentials = {
 				username: 'nonexistent',
 				password: 'wrongpass'
@@ -235,8 +235,6 @@ mocha.describe('Authenticator Parameter Validation', () => {
 		});
 
 		mocha.it('should prevent username enumeration attacks', async () => {
-			const LOGIN_ENDPOINT = '/api/login';
-
 			// Test with non-existent user vs invalid password for existing user
 			// Both should return similar error responses (timing-safe)
 			const nonExistentUser = {
