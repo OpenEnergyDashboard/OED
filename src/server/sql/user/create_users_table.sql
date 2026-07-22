@@ -7,5 +7,6 @@ CREATE TABLE IF NOT EXISTS users(
   username VARCHAR(254) UNIQUE,
   password_hash CHAR(60) NOT NULL,
   role user_type NOT NULL,
-  note TEXT DEFAULT ''
+  note TEXT DEFAULT '',
+  token_invalid_before TIMESTAMP NOT NULL DEFAULT TIMESTAMP 'epoch'
 )
