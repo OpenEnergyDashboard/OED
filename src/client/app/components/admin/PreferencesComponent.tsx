@@ -83,18 +83,6 @@ export default function PreferencesComponent() {
 		}
 	};
 
-	const getInvalidFieldNames = (): string => {
-		let invalidFieldNames = '';
-		if (invalidFuncs.readingFreq()) invalidFieldNames += translate('default.meter.reading.frequency') + ', ';
-		if (invalidFuncs.minDate()) invalidFieldNames += translate('default.meter.minimum.date') + ', ';
-		if (invalidFuncs.maxDate()) invalidFieldNames += translate('default.meter.maximum.date') + ', ';
-		if (invalidFuncs.readingGap()) invalidFieldNames += translate('default.meter.reading.gap') + ', ';
-		if (invalidFuncs.meterErrors()) invalidFieldNames += translate('default.meter.maximum.errors') + ', ';
-		if (invalidFuncs.warningFileSize()) invalidFieldNames += translate('default.warning.file.size') + ', ';
-		if (invalidFuncs.fileSizeLimit()) invalidFieldNames += translate('default.file.size.limit') + ', ';
-		return invalidFieldNames.slice(0, -2);
-	};
-
 	return (
 		<div className='d-flex flex-column '>
 			<UnsavedWarningComponent
@@ -404,21 +392,13 @@ export default function PreferencesComponent() {
 				<Button
 					type='submit'
 					onClick={() => {
-						const invalidFieldNames = getInvalidFieldNames();
-						if (invalidFieldNames) {
-							showErrorNotification(
-								translate('failed.to.submit.changes.saved') + '(' + invalidFieldNames + translate('failed.to.submit.changes.fields')
-							);
-							return;
-						}
-
 						submitPreferences(localAdminPref)
 							.unwrap()
 							.then(() => {
 								showSuccessNotification(translate('updated.preferences'));
 							})
 							.catch(err => {
-								showErrorNotification(translate('failed.to.submit.changes.saved') + err.data);
+								showErrorNotification(translate('failed.to.submit.changes') + err.data);
 							});
 					}}
 					disabled={!hasChanges || Object.values(invalidFuncs).some(check => check())}
