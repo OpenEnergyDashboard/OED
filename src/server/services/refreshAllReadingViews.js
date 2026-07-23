@@ -12,6 +12,7 @@ const TimeScaleDBReading = require('../models/TimeScaleDB/Reading');
 // Arbitrary, stable application namespace key for a session-level PostgreSQL
 // advisory lock. Every aggregate refresher must use this same key; the numeric
 // value has no transaction ID or database-object meaning.
+// Introduced because meter_hourly_readings was initially encountering deadlocks.
 const REFRESH_ADVISORY_LOCK_ID = 724536221;
 
 async function timedRefresh(label, operation) {

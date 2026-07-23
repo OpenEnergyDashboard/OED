@@ -179,6 +179,11 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 		({ isAllReadingsOk, msgTotal, startTimestamp, endTimestamp } = await uploadReadings(req, res, csvFilepath, conn));
 		if (isRefreshReadings) {
 			// Refresh readings so show when daily data is used.
+			// can also not provide the startTimestamp and endTimestamp to refresh all readings.
+			// The idea of including the startTimestamp and endTimestamp is to refresh only the readings 
+			// that were just inserted or updated. However, if the user does not provide these timestamps, 
+			// then the refresh will take longer to complete for dataset that contains large number of buckets
+			// as all the bucket will be checked for update bit.
 			await refreshAllReadingViews(startTimestamp && endTimestamp
 				? { startTimestamp, endTimestamp, rebuild: false }
 				: undefined);

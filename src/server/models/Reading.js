@@ -118,7 +118,9 @@ class Reading {
 		// It is safe to refresh the hourly and daily group views in parallel since they
 		// do not depend one each other unlike meters.
 		return Promise.all([conn.none('REFRESH MATERIALIZED VIEW group_hourly_readings_unit'),
-			conn.none('REFRESH MATERIALIZED VIEW group_daily_readings_unit')]);
+			conn.none('REFRESH MATERIALIZED VIEW group_daily_readings_unit'),
+			conn.none('REFRESH MATERIALIZED VIEW group_hourly_readings_unit_cagg'),
+			conn.none('REFRESH MATERIALIZED VIEW group_daily_readings_unit_cagg')]);
 	}
 
 	/**

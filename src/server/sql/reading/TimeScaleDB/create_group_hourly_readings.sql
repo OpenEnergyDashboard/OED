@@ -1,90 +1,67 @@
 /*
- * create_group_hourly_readings.sql
+ * group_hourly_readings_unit_cagg.sql
  *
  * Purpose:
  *
- *   Create the TimescaleDB continuous aggregate used for hourly group
+ *   This materialized view rolls up hourly meter readings into hourly group
  *   readings.
+ *
  *
  * Data flow:
  *
+ *   readings
+ *       |
+ *       v
+ *   hypertable_hourly_split
+ *       |
+ *       v
  *   meter_hourly_readings_unit_cagg
- *               │
- *               ▼
- *      groups_deep_meters
- *               │
- *               ▼
+ *       |
+ *       v
  *   group_hourly_readings_unit_cagg
  *
- * Notes:
  *
- *   - The continuous aggregate is built from
- *     meter_hourly_readings_unit_cagg.
+ * The aggregate combines meter-level hourly readings into group-level hourly
+ * readings by summing all meters belonging to the group.
  *
- *   - Meter hourly readings have already been split into hourly buckets
- *     and converted into the requested graphic units.
  *
- *   - Group readings are created by summing the hourly readings of all
- *     meters that belong to each group.
- *
- *   - Refreshing the aggregate is performed separately using
- *     refresh_continuous_aggregate() or a refresh policy.
+ * The group hourly aggregate applies group membership and graphic unit
+ * filtering while preserving the hourly reporting interval format used by the
+ * existing reporting layer.
  */
 
 /*
- * 1. Create continuous aggregate for hourly group readings.
+ * Create the group materialized view over the TimescaleDB meter aggregate.
  *
- * This continuous aggregate replaces the existing
- * group_hourly_readings_unit materialized view using
- * TimescaleDB's incremental aggregation engine.
+ * Source:
  *
- * Data flow:
+ *     meter_hourly_readings_unit_cagg
  *
- *   meter_hourly_readings_unit_cagg
- *               │
- *               ▼
- *      groups_deep_meters
- *               │
- *               ▼
- *   group_hourly_readings_unit_cagg
+ * The meter-level hourly aggregate already contains:
  *
- * The meter hourly continuous aggregate already contains:
+ *     - Hourly time bucketing
+ *     - Unit conversion
+ *     - Time-varying conversion handling
  *
- *   - hourly reading buckets
- *   - converted reading rates
- *   - graphic unit identifiers
- *
- * Therefore, this continuous aggregate only needs to:
- *
- *   1. Map each meter to its groups.
- *   2. Sum the hourly readings for every group.
- *   3. Group the results by hour and graphic unit.
- *
- * No additional joins to cik_vary or unit conversion tables are
- * required because all conversions have already been applied by
- * meter_hourly_readings_unit_cagg.
+ * This aggregate only performs the group-level rollup.
  */
- 
-CREATE MATERIALIZED VIEW group_hourly_readings_unit_cagg
-WITH (timescaledb.continuous)
-AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS group_hourly_readings_unit_cagg AS
 SELECT
     gdm.group_id,
-    mh.graphic_unit_id,
-    time_bucket('1 hour', mh.bucket) AS bucket,
-    SUM(mh.reading_rate) AS reading_rate
-FROM meter_hourly_readings_unit_cagg mh
-INNER JOIN groups_deep_meters gdm
-    ON mh.meter_id = gdm.meter_id
-INNER JOIN unnest(get_graphic_unit(gdm.group_id)) AS gu(graphic_unit_id)
-    ON mh.graphic_unit_id = gu.graphic_unit_id
+    SUM(hr.reading_rate) AS reading_rate,
+    tsrange(
+        time_bucket('1 hour', hr.bucket),
+        time_bucket('1 hour', hr.bucket) + INTERVAL '1 hour',
+        '()'
+    ) AS time_interval,
+    time_bucket('1 hour', hr.bucket) AS bucket,
+    hr.graphic_unit_id
+FROM meter_hourly_readings_unit_cagg hr INNER JOIN
+	 groups_deep_meters gdm
+		ON hr.meter_id = gdm.meter_id INNER JOIN LATERAL unnest(get_graphic_unit(gdm.group_id)) AS gu(graphic_unit_id)
+		ON hr.graphic_unit_id = gu.graphic_unit_id
 GROUP BY
     gdm.group_id,
-    mh.graphic_unit_id,
-    time_bucket('1 hour', mh.bucket)
+    time_bucket('1 hour', hr.bucket),
+    hr.graphic_unit_id
 WITH NO DATA;
-
-ALTER MATERIALIZED VIEW group_hourly_readings_unit_cagg
-SET (
-    timescaledb.materialized_only = false
-);

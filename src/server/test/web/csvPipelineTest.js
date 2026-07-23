@@ -584,7 +584,7 @@ for (let fileKey in testCases) {
 						Meter.type.OTHER, // type
 						null, // timezone
 					)
-					meter.insert(conn);
+					await meter.insert(conn);
 				}
 				let inputFile = testCases[fileKey]['fileName'][index];
 				let inputPath = `${__dirname}/csvPipeline/${inputFile}`;

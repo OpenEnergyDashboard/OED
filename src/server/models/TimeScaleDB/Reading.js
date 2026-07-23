@@ -39,6 +39,28 @@ class Reading {
     }
 
     /**
+     * Creates the group hourly materialized view over the TimescaleDB meter
+     * aggregate.
+     *
+     * @param conn the database connection to use
+     * @returns {Promise<void>}
+     */
+    static createGroupHourlyReadings(conn) {
+        return conn.none(sqlFile('reading/TimeScaleDB/create_group_hourly_readings.sql'));
+    }
+
+    /**
+     * Creates the group daily materialized view over the TimescaleDB meter
+     * aggregate.
+     *
+     * @param conn the database connection to use
+     * @returns {Promise<void>}
+     */
+    static createGroupDailyReadings(conn) {
+        return conn.none(sqlFile('reading/TimeScaleDB/create_group_daily_readings.sql'));
+    }
+
+    /**
      * Creates the TimescaleDB continuous aggregate used for daily meter
      * readings.
      *
@@ -58,6 +80,17 @@ class Reading {
      */
     static updateMeterLineReadings(conn) {
         return conn.none(sqlFile('reading/TimeScaleDB/update_meter_line_readings_unit.sql'));
+    }
+
+    /**
+     * Updates group_line_readings_unit() to use the group materialized views
+     * backed by TimescaleDB meter aggregates for hourly and daily queries.
+     *
+     * @param conn the database connection to use
+     * @returns {Promise<void>}
+     */
+    static updateGroupLineReadings(conn) {
+        return conn.none(sqlFile('reading/TimeScaleDB/update_group_line_readings_unit.sql'));
     }
 
     /**
