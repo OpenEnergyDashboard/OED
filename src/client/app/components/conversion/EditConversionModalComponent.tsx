@@ -420,7 +420,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					translate('conversion.delete.failure') +
 					' (' + translate('conversion.source') + ' "' + unitDataById[payload.sourceId]?.identifier + '"' +
 					', ' + translate('conversion.destination') + ' "' + unitDataById[payload.destinationId]?.identifier + '") ' +
-					error.data.message
+					error.data
 				);
 			});
 	};

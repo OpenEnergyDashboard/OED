@@ -164,6 +164,8 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
  * Route for POST, delete conversion.
  */
 router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, res) => {
+	// TODO DEBUG: to force the showErrorNotification to pass in EditConversionsModalComponent.tsx
+	//req.body.meterIds.push(0);
 	// Accept sourceId, destinationId, meterIds, groupIds
 	const validConversion = {
 		type: 'object',
