@@ -35,6 +35,106 @@ function formatMapForResponse(map) {
 	return formattedMap;
 }
 
+/**
+ * Validates the body of a map create/edit request.
+ * isEdit=true includes the required 'id' property, along with 'displayable', 'note', 'origin', and
+ * 'opposite' as required (edit); isEdit=false excludes them (create), since id is assigned by the DB
+ * on insert and the others are not needed to create the initial map entry.
+ * @param params req.body for a map create or edit request
+ * @param isEdit whether this is validating an edit (true) or create (false) request
+ * @returns {{valid: boolean, errors: array}}
+ */
+function validateMapsParams(params, isEdit = true) {
+	const properties = {
+		name: {
+			type: 'string',
+			minLength: 1,
+			maxLength: SHORT_STRING_MAX_LENGTH
+		},
+		filename: {
+			type: 'string',
+			maxLength: 500
+		},
+		modifiedDate: {
+			type: 'string',
+			minLength: 1,
+			maxLength: STRING_GENERAL_MAX_LENGTH
+		},
+		mapSource: {
+			type: 'string',
+			minLength: 1,
+			maxLength: STRING_GENERAL_MAX_LENGTH
+		},
+		note: {
+			oneOf: [
+				{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
+				{ type: 'null' }
+			]
+		},
+		displayable: {
+			type: 'boolean'
+		},
+		northAngle: {
+			type: 'number',
+			minimum: 0,
+			maximum: 360
+		},
+		circleSize: {
+			type: 'number',
+			minimum: 1,
+			maximum: 1000
+		},
+		origin: {
+			oneOf: [
+				{
+					type: 'object',
+					additionalProperties: false,
+					required: ['latitude', 'longitude'],
+					properties: {
+						latitude: { type: 'number', minimum: -90, maximum: 90 },
+						longitude: { type: 'number', minimum: -180, maximum: 180 }
+					}
+				},
+				{ type: 'null' }
+			]
+		},
+		opposite: {
+			oneOf: [
+				{
+					type: 'object',
+					additionalProperties: false,
+					required: ['latitude', 'longitude'],
+					properties: {
+						latitude: { type: 'number', minimum: -90, maximum: 90 },
+						longitude: { type: 'number', minimum: -180, maximum: 180 }
+					}
+				},
+				{ type: 'null' }
+			]
+		}
+	};
+ 
+	const required = ['name', 'modifiedDate', 'filename', 'mapSource'];
+ 
+	if (isEdit) {
+		properties.id = {
+			type: 'integer',
+			minimum: 1,
+			maximum: 2147483647
+		};
+		required.push('id', 'displayable', 'note', 'origin', 'opposite');
+	}
+ 
+	const validMap = {
+		type: 'object',
+		additionalProperties: false,
+		required,
+		properties
+	};
+	const validatorResult = validate(params, validMap);
+	return { valid: validatorResult.valid, errors: validatorResult.errors };
+}
+
 router.get('/', optionalAuthMiddleware, async (req, res) => {
 	try {
 		const conn = getConnection();
@@ -80,80 +180,8 @@ router.get('/:map_id', optionalAuthMiddleware, async (req, res) => {
 });
 
 router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
-	const validMap = {
-		type: 'object',
-		additionalProperties: false,
-		required: ['name', 'modifiedDate', 'filename', 'mapSource'],
-		properties: {
-			name: {
-				type: 'string',
-				minLength: 1,
-				maxLength: SHORT_STRING_MAX_LENGTH
-			},
-			filename: {
-				type: 'string',
-				maxLength: 500
-			},
-			modifiedDate: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_GENERAL_MAX_LENGTH
-			},
-			mapSource: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_GENERAL_MAX_LENGTH
-			},
-			note: {
-				oneOf: [
-					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
-					{ type: 'null' }
-				]
-			},
-			displayable: {
-				type: 'boolean'
-			},
-			northAngle: {
-				type: 'number',
-				minimum: 0,
-				maximum: 360
-			},
-			circleSize: {
-				type: 'number',
-				minimum: 1,
-				maximum: 1000
-			},
-			origin: {
-				oneOf: [
-					{
-						type: 'object',
-						additionalProperties: false,
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: -90, maximum: 90 },
-							longitude: { type: 'number', minimum: -180, maximum: 180 }
-						}
-					},
-					{ type: 'null' }
-				]
-			},
-			opposite: {
-				oneOf: [
-					{
-						type: 'object',
-						additionalProperties: false,
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: -90, maximum: 90 },
-							longitude: { type: 'number', minimum: -180, maximum: 180 }
-						}
-					},
-					{ type: 'null' }
-				]
-			}
-		}
-	};
-	const validationResult = validate(req.body, validMap);
+	// isEdit=false: id must not be present, since it's assigned by the DB on insert.
+	const validationResult = validateMapsParams(req.body, false);
 	// TODO It is uncertain if the date has a timezone since map creation was not working when that was tested.
 	// This is a comment so if if fails someone knows to see if the second parameter should be false. If it works
 	// then this can be removed.
@@ -196,85 +224,9 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 });
 
 router.post('/edit', adminAuthMiddleware('edit maps'), async (req, res) => {
-	const validMap = {
-		type: 'object',
-		additionalProperties: false,
-		required: ['id', 'name', 'modifiedDate', 'filename', 'mapSource', 'displayable', 'note', 'origin', 'opposite'],
-		properties: {
-			id: {
-				type: 'integer',
-				minimum: 1,
-				maximum: 2147483647
-			},
-			name: {
-				type: 'string',
-				minLength: 1,
-				maxLength: SHORT_STRING_MAX_LENGTH
-			},
-			filename: {
-				type: 'string',
-				maxLength: 500
-			},
-			modifiedDate: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_GENERAL_MAX_LENGTH
-			},
-			mapSource: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_GENERAL_MAX_LENGTH
-			},
-			note: {
-				oneOf: [
-					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
-					{ type: 'null' }
-				]
-			},
-			displayable: {
-				type: 'boolean'
-			},
-			northAngle: {
-				type: 'number',
-				minimum: 0,
-				maximum: 360
-			},
-			circleSize: {
-				type: 'number',
-				minimum: 1,
-				maximum: 1000
-			},
-			origin: {
-				oneOf: [
-					{
-						type: 'object',
-						additionalProperties: false,
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: -90, maximum: 90 },
-							longitude: { type: 'number', minimum: -180, maximum: 180 }
-						}
-					},
-					{ type: 'null' }
-				]
-			},
-			opposite: {
-				oneOf: [
-					{
-						type: 'object',
-						additionalProperties: false,
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: -90, maximum: 90 },
-							longitude: { type: 'number', minimum: -180, maximum: 180 }
-						}
-					},
-					{ type: 'null' }
-				]
-			}
-		}
-	};
-	const validatorResult = validate(req.body, validMap);
+	// isEdit=true: id is required here since the client must tell us which map to update.
+	const validatorResult = validateMapsParams(req.body, true);
+	
 	if (!validatorResult.valid || !isValidIsoDateTime(req.body.modifiedDate)) {
 		log.error(`Invalid map data supplied, err: ${validatorResult.errors}`);
 		res.sendStatus(HTTP_CODES.BAD_REQUEST);
