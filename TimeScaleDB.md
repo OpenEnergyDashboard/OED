@@ -119,9 +119,7 @@ The design follows a layered aggregation approach:
 
 ## 5.1 hypertable_hourly_split
 
-File:
-
-create_prerequisites.sql
+File: create_prerequisites.sql
 
 
 Purpose:
@@ -162,21 +160,15 @@ Data flow:
 
 ## 5.2 Meter Hourly Continuous Aggregate
 
-File:
-
-create_hourly_readings.sql
+File: create_hourly_readings.sql
 
 
-Created object:
-
-meter_hourly_readings_unit_cagg
+Created object: meter_hourly_readings_unit_cagg
 
 
 Purpose:
 
-Replacement for:
-
-meter_hourly_readings_unit
+Replacement for: meter_hourly_readings_unit
 
 
 Responsibilities:
@@ -187,9 +179,7 @@ Responsibilities:
 - Hourly statistics calculation.
 
 
-The continuous aggregate uses:
-
-hypertable_hourly_split
+The continuous aggregate uses: hypertable_hourly_split
 
 
 as its source.
@@ -205,21 +195,15 @@ This avoids recalculating:
 
 ## 5.3 Meter Daily Continuous Aggregate
 
-File:
-
-create_daily_readings.sql
+File: create_daily_readings.sql
 
 
-Created object:
-
-meter_daily_readings_unit_cagg
+Created object: meter_daily_readings_unit_cagg
 
 
 Purpose:
 
-Replacement for:
-
-meter_daily_readings_unit
+Replacement for: meter_daily_readings_unit
 
 
 Important design decision:
@@ -229,9 +213,7 @@ The daily aggregate is built from:
 meter_hourly_readings_unit_cagg
 
 
-instead of:
-
-hypertable_hourly_split
+instead of: hypertable_hourly_split
 
 
 Reason:
@@ -296,9 +278,7 @@ Implemented components:
 
 The database creation and seeding process was updated to automatically create and maintain the new TimescaleDB objects.
 
-Implemented in:
-
-TimeScaleDB/Reading.js
+Implemented in: TimeScaleDB/Reading.js
 
 
 Added functionality:
@@ -308,17 +288,17 @@ Added functionality:
 Functions added:
 
 
-createPrerequisites()
+- createPrerequisites()
 
-createGroupDependencies()
+- createGroupDependencies()
 
-createHourlyReadings()
+- createHourlyReadings()
 
-createDailyReadings()
+- createDailyReadings()
 
-createGroupHourlyReadings()
+- createGroupHourlyReadings()
 
-createGroupDailyReadings()
+- createGroupDailyReadings()
 
 
 
@@ -326,29 +306,25 @@ createGroupDailyReadings()
 
 Updated:
 
-meter_line_readings_unit()
+- meter_line_readings_unit()
 
-group_line_readings_unit()
+- group_line_readings_unit()
 
 
 The functions now use:
 
-Hourly:
-
-meter_hourly_readings_unit_cagg
+Hourly: meter_hourly_readings_unit_cagg
 
 
-Daily:
-
-meter_daily_readings_unit_cagg
+Daily: meter_daily_readings_unit_cagg
 
 
 
 Group queries use:
 
-group_hourly_readings_unit_cagg
+- group_hourly_readings_unit_cagg
 
-group_daily_readings_unit_cagg
+- group_daily_readings_unit_cagg
 
 
 
@@ -375,13 +351,13 @@ A complete benchmark suite was created to compare:
 
 ## Legacy Implementation
 
-meter_hourly_readings_unit
+- meter_hourly_readings_unit
 
-meter_daily_readings_unit
+- meter_daily_readings_unit
 
-group_hourly_readings_unit
+- group_hourly_readings_unit
 
-group_daily_readings_unit
+- group_daily_readings_unit
 
 
 Against:
@@ -389,13 +365,13 @@ Against:
 
 ## TimescaleDB Implementation
 
-meter_hourly_readings_unit_cagg
+- meter_hourly_readings_unit_cagg
 
-meter_daily_readings_unit_cagg
+- meter_daily_readings_unit_cagg
 
-group_hourly_readings_unit_cagg
+- group_hourly_readings_unit_cagg
 
-group_daily_readings_unit_cagg
+- group_daily_readings_unit_cagg
 
 
 
@@ -445,20 +421,14 @@ Validated:
 
 ## Hourly Refresh
 
-Legacy:
-
-~8.4 seconds
+Legacy: ~8.4 seconds
 
 
-TimescaleDB:
-
-~33 milliseconds
+TimescaleDB: ~33 milliseconds
 
 
 
-Improvement:
-
-Approximately 250x faster
+Improvement: Approximately 250x faster
 
 
 
@@ -466,20 +436,14 @@ Approximately 250x faster
 
 ## Daily Refresh
 
-Legacy:
-
-~5.1 seconds
+Legacy: ~5.1 seconds
 
 
-TimescaleDB:
-
-~15 milliseconds
+TimescaleDB: ~15 milliseconds
 
 
 
-Improvement:
-
-Approximately 340x faster
+Improvement: Approximately 340x faster
 
 
 
@@ -498,9 +462,7 @@ New storage requirements:
 | daily continuous aggregate | 12 MB |
 
 
-The largest increase comes from:
-
-hypertable_hourly_split
+The largest increase comes from: hypertable_hourly_split
 
 
 This is expected because it stores precomputed hourly slices.
@@ -519,25 +481,25 @@ The storage increase provides:
 
 ## SQL
 
-TimeScaleDB/create_prerequisites.sql
+- TimeScaleDB/create_prerequisites.sql
 
-TimeScaleDB/create_group_dependencies.sql
+- TimeScaleDB/create_group_dependencies.sql
 
-TimeScaleDB/create_hourly_readings.sql
+- TimeScaleDB/create_hourly_readings.sql
 
-TimeScaleDB/create_daily_readings.sql
+- TimeScaleDB/create_daily_readings.sql
 
-TimeScaleDB/create_group_hourly_readings.sql
+- TimeScaleDB/create_group_hourly_readings.sql
 
-TimeScaleDB/create_group_daily_readings.sql
+- TimeScaleDB/create_group_daily_readings.sql
 
-TimeScaleDB/CompareHourlyReadings.sql
+- TimeScaleDB/CompareHourlyReadings.sql
 
-TimeScaleDB/CompareDailyReadings.sql
+- TimeScaleDB/CompareDailyReadings.sql
 
-TimeScaleDB/CompareGroupHourlyReadings.sql
+- TimeScaleDB/CompareGroupHourlyReadings.sql
 
-TimeScaleDB/CompareGroupDailyReadings.sql
+- TimeScaleDB/CompareGroupDailyReadings.sql
 
 
 
@@ -577,7 +539,6 @@ Integrate:
 
 Find out why:
 - The issue of why TSD PG17+ fails needs to be figured out. The desire is to understand the underlying reason and come up with appropriate fixes.
-- 
 
 
 ## Storage Optimization
