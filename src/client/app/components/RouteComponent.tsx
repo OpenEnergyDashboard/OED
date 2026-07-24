@@ -28,7 +28,7 @@ import NotFound from './router/NotFoundOutlet';
 import RoleOutlet from './router/RoleOutlet';
 import UnitsDetailComponent from './unit/UnitsDetailComponent';
 import VisualUnitDetailComponent from './visual-unit/VisualUnitDetailComponent';
-import HolidayInstanceGroupComponent from './holiday/HolidayInstanceGroupComponent';
+import HolidayInstanceGroupComponent from './holidayInstanceGroup/HolidayInstanceGroupComponent';
 import WeeksDetailComponent from './weeks/WeeksDetailComponent';
 import HolidayInstancePage from './holiday-instances/HolidayInstancePage';
 import HolidayPage from './holiday/HolidayPage';
