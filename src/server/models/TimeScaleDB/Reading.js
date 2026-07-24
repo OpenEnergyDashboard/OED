@@ -28,6 +28,29 @@ class Reading {
     }
 
     /**
+     * Creates the group-level dependency objects required by the group hourly
+     * and daily continuous aggregates.
+     *
+     * This creates:
+     *   - groups_deep_meters cache table
+     *   - get_graphic_unit cache table
+     *   - supporting indexes
+     *
+     * The group continuous aggregates cannot depend on dynamic joins to:
+     *   - groups_deep_meters view logic
+     *   - get_graphic_unit() PL/pgSQL function
+     *
+     * Therefore, these objects are maintained as physical tables that can be
+     * refreshed before refreshing the group continuous aggregates.
+     *
+     * @param conn the database connection to use
+     * @returns {Promise<void>}
+     */
+    static createGroupDependencies(conn) {
+        return conn.none(sqlFile('reading/TimeScaleDB/create_group_dependencies.sql'));
+    }
+
+    /**
      * Creates the TimescaleDB continuous aggregate used for hourly meter
      * readings.
      *
@@ -144,6 +167,26 @@ class Reading {
 
         await conn.none(
             "CALL refresh_continuous_aggregate('meter_daily_readings_unit_cagg', ${startTimestamp}, ${endTimestamp})",
+            { startTimestamp: refreshStart, endTimestamp: refreshEnd }
+        );
+
+        // update the group materialized views that depend on the meter aggregates
+        await conn.none(`
+            DO $$
+            BEGIN
+                PERFORM update_groups_deep_meters_cache();
+                PERFORM update_group_graphic_units_cache();
+            END
+            $$;
+        `);
+
+        await conn.none(
+            "CALL refresh_continuous_aggregate('group_hourly_readings_unit_cagg', ${startTimestamp}, ${endTimestamp})",
+            { startTimestamp: refreshStart, endTimestamp: refreshEnd }
+        );
+
+        await conn.none(
+            "CALL refresh_continuous_aggregate('group_daily_readings_unit_cagg', ${startTimestamp}, ${endTimestamp})",
             { startTimestamp: refreshStart, endTimestamp: refreshEnd }
         );
     }

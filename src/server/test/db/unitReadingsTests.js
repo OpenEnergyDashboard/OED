@@ -17,7 +17,7 @@ const { insertUnits, insertConversions } = require('../../util/insertData');
 const { redoCikVary } = require('../../services/graph/redoCik');
 const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
 const { getUnitId, unitDatakWh, conversionDatakWh } = require('../../util/readingsUtils');
-const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
+const refreshAllReadingViews = require('../../services/refreshAllReadingViews');
 // Readings should be accurate to many decimal places, but allow some wiggle room for database and javascript conversions
 const { DELTA } = require('../../util/readingsUtils.js');
 

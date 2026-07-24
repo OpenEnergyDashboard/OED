@@ -9,7 +9,7 @@ const updateMeters = require('../updateMeters');
 const { log } = require('../../log');
 const { getConnection } = require('../../db');
 const readEgaugeData = require('./readEgaugeData');
-const { refreshAllReadingViews } = require('../refreshAllReadingViews');
+const refreshAllReadingViews = require('../refreshAllReadingViews');
 
 /**
  * For every enabled eGauge meter, update the readings in the database.

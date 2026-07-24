@@ -45,7 +45,9 @@
  *
  * This aggregate only performs the group-level rollup.
  */
-CREATE MATERIALIZED VIEW IF NOT EXISTS group_hourly_readings_unit_cagg AS
+CREATE MATERIALIZED VIEW IF NOT EXISTS group_hourly_readings_unit_cagg
+WITH (timescaledb.continuous)
+AS
 SELECT
     gdm.group_id,
     SUM(hr.reading_rate) AS reading_rate,
@@ -56,12 +58,25 @@ SELECT
     ) AS time_interval,
     time_bucket('1 hour', hr.bucket) AS bucket,
     hr.graphic_unit_id
-FROM meter_hourly_readings_unit_cagg hr INNER JOIN
-	 groups_deep_meters gdm
-		ON hr.meter_id = gdm.meter_id INNER JOIN LATERAL unnest(get_graphic_unit(gdm.group_id)) AS gu(graphic_unit_id)
-		ON hr.graphic_unit_id = gu.graphic_unit_id
+FROM meter_hourly_readings_unit_cagg hr INNER JOIN 
+     groups_deep_meters_cache gdm ON hr.meter_id = gdm.meter_id INNER JOIN 
+     group_graphic_units_cache gu ON gu.group_id = gdm.group_id AND hr.graphic_unit_id = gu.graphic_unit_id
 GROUP BY
     gdm.group_id,
     time_bucket('1 hour', hr.bucket),
     hr.graphic_unit_id
 WITH NO DATA;
+
+/*
+ * Allow queries to include recent data that has not yet been materialized.
+ */
+ALTER MATERIALIZED VIEW group_hourly_readings_unit_cagg
+SET (
+    timescaledb.materialized_only = false
+);
+
+/*
+ * Preserve existing database ownership.
+ */
+ALTER TABLE group_hourly_readings_unit_cagg
+OWNER TO oed;

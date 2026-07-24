@@ -5,7 +5,7 @@
 const express = require('express');
 const { getConnection } = require('../db');
 const { redoCikVary } = require('../services/graph/redoCik');
-const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const refreshAllReadingViews = require('../services/refreshAllReadingViews');
 const { adminAuthMiddleware } = require('./authenticator');
 
 const router = express.Router();

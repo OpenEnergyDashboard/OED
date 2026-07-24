@@ -12,7 +12,7 @@
 const Unit = require('../models/Unit');
 const Group = require('../models/Group');
 const { redoCikVary } = require('../services/graph/redoCik');
-const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const refreshAllReadingViews = require('../services/refreshAllReadingViews');
 const { getConnection } = require('../db');
 const { insertUnits, insertStandardUnits, insertConversions, insertStandardConversions, insertMeters, insertGroups } = require('../util/insertData');
 const { shiftReadings } = require('../util/developer');

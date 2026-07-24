@@ -53,6 +53,4 @@ async function refreshAllReadingViews(options = {}) {
 	log.info('All reading aggregates synchronized');
 }
 
-const synchronizeReadingAggregates = refreshAllReadingViews;
-
-module.exports = { refreshAllReadingViews, synchronizeReadingAggregates };
+module.exports = refreshAllReadingViews;

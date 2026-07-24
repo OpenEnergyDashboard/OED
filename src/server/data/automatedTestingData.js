@@ -12,7 +12,7 @@ const Group = require('../models/Group');
 const { insertUnits, insertStandardUnits, insertConversions, insertStandardConversions, insertMeters, insertGroups } = require('../util/insertData');
 const { getConnection } = require('../db');
 const { redoCikVary } = require('../services/graph/redoCik');
-const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const refreshAllReadingViews = require('../services/refreshAllReadingViews');
 
 // Define the start and end date for data generation.
 const DEFAULT_OPTIONS = {

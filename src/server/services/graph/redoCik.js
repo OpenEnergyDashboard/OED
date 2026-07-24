@@ -7,7 +7,7 @@ const { createCikVaryArray } = require('./createConversionArrays');
 const CikVary = require('../../models/CikVary');
 const { handleSuffixUnits } = require('./handleSuffixUnits');
 const { getConnection } = require('../../db');
-const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
+const refreshAllReadingViews = require('../../services/refreshAllReadingViews');
 
 /**
  * Creates CikVary based on units and conversion segments and then inserts these values

@@ -21,7 +21,7 @@ const saveCsv = require('../services/csvPipeline/saveCsv');
 const uploadMeters = require('../services/csvPipeline/uploadMeters');
 const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
-const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const refreshAllReadingViews = require('../services/refreshAllReadingViews');
 const { success, failure } = require('../services/csvPipeline/success');
 
 /** Middleware validation */

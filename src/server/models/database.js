@@ -124,20 +124,21 @@ async function createSchema(conn) {
 	await LogMsg.createTable(conn);
 	await Reading.createReadingsMaterializedViews(conn);
 	await Reading.createCompareReadingsFunction(conn);
-	// Create the TimescaleDB continuous aggregate view for readings
-	await TimeScaleDBReading.createPrerequisites(conn);
-	await TimeScaleDBReading.createHourlyReadings(conn);
-	await TimeScaleDBReading.createDailyReadings(conn);
-	await TimeScaleDBReading.createGroupHourlyReadings(conn);
-	await TimeScaleDBReading.createGroupDailyReadings(conn);
-	await TimeScaleDBReading.updateMeterLineReadings(conn);
-	await TimeScaleDBReading.updateGroupLineReadings(conn);
 	// For 3D reading
 	await Reading.create3DReadingsFunction(conn);
 	await Baseline.createTable(conn);
 	await Map.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
 	await Configfile.createTable(conn);
+	// Create the TimescaleDB continuous aggregate view for readings
+	await TimeScaleDBReading.createPrerequisites(conn);
+	await TimeScaleDBReading.createGroupDependencies(conn);
+	await TimeScaleDBReading.createHourlyReadings(conn);
+	await TimeScaleDBReading.createDailyReadings(conn);
+	await TimeScaleDBReading.createGroupHourlyReadings(conn);
+	await TimeScaleDBReading.createGroupDailyReadings(conn);
+	await TimeScaleDBReading.updateMeterLineReadings(conn);
+	await TimeScaleDBReading.updateGroupLineReadings(conn);
 }
 
 module.exports = {

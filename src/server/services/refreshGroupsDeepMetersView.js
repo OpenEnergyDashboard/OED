@@ -8,6 +8,7 @@ const { log } = require('../log');
 const { getConnection } = require('../db');
 const Group = require('../models/Group');
 const Reading = require('../models/Reading');
+const TimeScaleDBReading = require('../models/TimeScaleDB/Reading');
 
 async function refreshGroupsDeepMetersView() {
     const conn = getConnection();
@@ -19,6 +20,10 @@ async function refreshGroupsDeepMetersView() {
 	log.info('Refreshing Group Reading Views');
 	await Reading.refreshGroupReadingsViews(conn);
 	log.info('...Group Views Refreshed!');
+    // Refresh TimeScaleDB group readings views
+	log.info('Refreshing TimeScaleDB Group Reading Views');
+	await TimeScaleDBReading.refreshReadings(conn);
+	log.info('...TimeScaleDB Group Views Refreshed!');
 }
 
 module.exports = { refreshGroupsDeepMetersView };
