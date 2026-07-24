@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS holidays (
 	name VARCHAR(50) NOT NULL CHECK (char_length(name) >= 1),
 	start_date DATE NOT NULL,
 	location TEXT NOT NULL CHECK (char_length(location) >= 1),
+	type TEXT NOT NULL DEFAULT 'custom' CHECK (char_length(type) >= 1),
 	note TEXT,
 	UNIQUE (name, location, start_date)
 );

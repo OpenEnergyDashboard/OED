@@ -31,6 +31,8 @@ import VisualUnitDetailComponent from './visual-unit/VisualUnitDetailComponent';
 import HolidayInstanceGroupComponent from './holiday/HolidayInstanceGroupComponent';
 import WeeksDetailComponent from './weeks/WeeksDetailComponent';
 import HolidayInstancePage from './holiday-instances/HolidayInstancePage';
+import HolidayPage from './holiday/HolidayPage';
+
 
 /**
  * @returns the router component Responsible for client side routing.
@@ -59,6 +61,7 @@ const router = createBrowserRouter([
 				element: <AdminOutlet />,
 				children: [
 					{ path: 'admin', element: <AdminComponent /> },
+					{ path: 'holidays', element: <HolidayPage /> },
 					{ path: 'holiday-instances', element: <HolidayInstancePage /> },
 					{ path: 'calibration', element: <MapCalibrationContainer /> },
 					{ path: 'conversions', element: <ConversionsDetailComponent /> },

@@ -19,6 +19,7 @@ export interface Holiday {
 	startDate: string;
 	/** Free-text location for now; may become a region table later (meeting 5) */
 	location: string;
+	type: string;
 	note?: string | null;
 }
 
@@ -82,4 +83,46 @@ export interface HolidayGroupMember {
 	startDate: string;
 	location: string;
 	dayPatternName: string;
+}
+
+/** A location option returned by date-holidays for use in a dropdown. */
+export interface HolidayLocationOption {
+	code: string;
+	name: string;
+}
+
+/**
+ * Location options returned by GET /api/holidays/locations.
+ */
+export interface HolidayLocations {
+	countries: HolidayLocationOption[];
+	states: HolidayLocationOption[];
+	regions: HolidayLocationOption[];
+}
+
+/**
+ * Optional location selections sent to GET /api/holidays/locations.
+ */
+export interface HolidayLocationsQuery {
+	country?: string;
+	state?: string;
+}
+
+/**
+ * Location and year sent to POST /api/holidays/refresh.
+ */
+export interface RefreshHolidaysRequest {
+	country: string;
+	state?: string;
+	region?: string;
+	year: number;
+}
+
+/**
+ * Import results returned by POST /api/holidays/refresh.
+ */
+export interface RefreshHolidaysResponse {
+	location: string;
+	year: number;
+	total: number;
 }

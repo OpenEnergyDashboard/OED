@@ -66,6 +66,7 @@ export default function HeaderButtonsComponent() {
 		shouldUnitsButtonDisabled: true,
 		shouldConversionsButtonDisabled: true,
 		shouldDaysButtonDisabled: true,
+		shouldHolidaysButtonDisabled: true,
 		shouldWeeksButtonDisabled: true,
 		shouldLogMsgButtonDisabled: true,
 		shouldVisualUnitMapButtonDisabled: true,
@@ -107,6 +108,7 @@ export default function HeaderButtonsComponent() {
 			shouldUnitsButtonDisabled: pathname === '/units',
 			shouldConversionsButtonDisabled: pathname === '/conversions',
 			shouldDaysButtonDisabled: pathname === '/days',
+			shouldHolidaysButtonDisabled: pathname === '/holidays',
 			shouldWeeksButtonDisabled: pathname === '/weeks',
 			shouldLogMsgButtonDisabled: pathname === '/logmsg',
 			shouldVisualUnitMapButtonDisabled: pathname === '/visual-unit'
@@ -223,6 +225,13 @@ export default function HeaderButtonsComponent() {
 								tag={Link}
 								to="/holiday-instance-groups">
 								<FormattedMessage id='holiday.instance.groups' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldHolidaysButtonDisabled}
+								tag={Link}
+								to="/holidays">
+								<FormattedMessage id='holidays' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}
