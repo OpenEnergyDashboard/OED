@@ -22,6 +22,7 @@ import {
 import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { HolidayInstance } from '../../types/redux/holidays';
+import { useTranslate } from '../../redux/componentHooks';
 
 interface CreateHolidayInstanceGroupModalComponentProps {
 	holidayInstances: HolidayInstance[];
@@ -36,6 +37,7 @@ interface CreateHolidayInstanceGroupModalComponentProps {
 export default function CreateHolidayInstanceGroupModalComponent(
 	props: CreateHolidayInstanceGroupModalComponentProps
 ) {
+	const translate = useTranslate();
 	const [showModal, setShowModal] = useState(false);
 	const [name, setName] = useState('');
 	const [holidayInstanceIds, setHolidayInstanceIds] = useState<number[]>([]);
@@ -126,7 +128,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 									<MultiSelectComponent
 										options={holidayInstanceOptions}
 										selectedOptions={selectedHolidayInstanceOptions}
-										placeholder='Select holiday instances'
+										placeholder={translate('select.holiday.rates')}
 										onValuesChange={(newSelectedHolidayOptions: SelectOption[]) => {
 											const updatedHolidayInstanceIds = newSelectedHolidayOptions.map(
 												holidayInstance => holidayInstance.value

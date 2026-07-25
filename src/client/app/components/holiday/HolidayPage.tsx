@@ -238,7 +238,7 @@ export default function HolidayPage() {
 								disabled={stateCode.length === 0 || regions.length === 0}
 							>
 								<option value=''>
-									<FormattedMessage id='holiday.region.select' />
+									<FormattedMessage id='holiday.region.none' />
 								</option>
 								{regions.map(region => (
 									<option key={region.code} value={region.code}>

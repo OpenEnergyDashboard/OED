@@ -16,6 +16,7 @@ import {
 	useEditHolidayInstanceGroupMutation,
 	useGetHolidayInstanceGroupsQuery
 } from '../../redux/api/holidayInstanceGroupsApi';
+import { useTranslate } from '../../redux/componentHooks';
 import { titleStyle } from '../../styles/modalStyle';
 import CreateHolidayInstanceGroupModalComponent from './CreateHolidayInstanceGroupModalComponent';
 import HolidayInstanceGroupViewComponent from './HolidayInstanceGroupViewComponent';
@@ -25,6 +26,7 @@ import HolidayInstanceGroupViewComponent from './HolidayInstanceGroupViewCompone
  * @returns Holiday instance group page element.
  */
 export default function HolidayInstanceGroupComponent() {
+	const translate = useTranslate();
 	const [mutationError, setMutationError] = useState('');
 	const {
 		data: holidayInstances = stableEmptyHolidayInstances,
@@ -49,7 +51,9 @@ export default function HolidayInstanceGroupComponent() {
 		try {
 			await addHolidayInstanceGroup({ name, holidayInstanceIds, note }).unwrap();
 		} catch (error) {
-			setMutationError(`Unable to create the holiday instance group: ${JSON.stringify(error)}`);
+			setMutationError(
+				`${translate('holiday.instance.group.create.failure')}${JSON.stringify(error)}`
+			);
 		}
 	};
 
@@ -68,7 +72,9 @@ export default function HolidayInstanceGroupComponent() {
 				note
 			}).unwrap();
 		} catch (error) {
-			setMutationError(`Unable to update the holiday instance group: ${JSON.stringify(error)}`);
+			setMutationError(
+				`${translate('holiday.instance.group.edit.failure')}${JSON.stringify(error)}`
+			);
 		}
 	};
 
@@ -77,7 +83,9 @@ export default function HolidayInstanceGroupComponent() {
 		try {
 			await deleteHolidayInstanceGroup({ id: holidayInstanceGroupId }).unwrap();
 		} catch (error) {
-			setMutationError(`Unable to delete the holiday instance group: ${JSON.stringify(error)}`);
+			setMutationError(
+				`${translate('holiday.instance.group.delete.failure')}${JSON.stringify(error)}`
+			);
 		}
 	};
 
@@ -94,7 +102,7 @@ export default function HolidayInstanceGroupComponent() {
 				</h2>
 				{loadError && (
 					<div className='alert alert-danger' role='alert'>
-						Unable to load holiday instance group data from the database.
+						<FormattedMessage id='holiday.instance.group.load.failure' />
 					</div>
 				)}
 				{mutationError && (
@@ -108,7 +116,9 @@ export default function HolidayInstanceGroupComponent() {
 				</div>
 				<div className='card-container'>
 					{isLoading ? (
-						<div>Loading holiday instance groups...</div>
+						<div>
+							<FormattedMessage id='holiday.instance.group.loading' />
+						</div>
 					) : [...holidayInstanceGroups]
 						.sort((firstGroup, secondGroup) => firstGroup.id - secondGroup.id)
 						.map(holidayInstanceGroup => (

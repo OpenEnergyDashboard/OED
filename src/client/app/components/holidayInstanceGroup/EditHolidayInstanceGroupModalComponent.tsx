@@ -23,6 +23,7 @@ import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { HolidayInstance, HolidayInstanceGroup } from '../../types/redux/holidays';
+import { useTranslate } from '../../redux/componentHooks';
 
 interface EditHolidayInstanceGroupModalComponentProps {
 	show: boolean;
@@ -47,6 +48,7 @@ interface EditHolidayInstanceGroupModalComponentProps {
 export default function EditHolidayInstanceGroupModalComponent(
 	props: EditHolidayInstanceGroupModalComponentProps
 ) {
+	const translate = useTranslate();
 	const [name, setName] = useState(props.holidayInstanceGroup.name ?? '');
 	const [holidayInstanceIds, setHolidayInstanceIds] = useState<number[]>(
 		props.holidayInstanceGroup.holidayInstanceIds
@@ -119,11 +121,11 @@ export default function EditHolidayInstanceGroupModalComponent(
 		<>
 			<ConfirmActionModalComponent
 				show={showDeleteConfirmationModal}
-				actionConfirmMessage={`Delete Holiday Instance Group ${props.holidayInstanceGroup.id}?`}
+				actionConfirmMessage={translate('holiday.instance.group.delete.confirm')}
 				handleClose={handleDeleteConfirmationModalClose}
 				actionFunction={handleDeleteHolidayInstanceGroup}
-				actionConfirmText='Delete'
-				actionRejectText='Cancel'
+				actionConfirmText={translate('holiday.instance.group.delete')}
+				actionRejectText={translate('cancel')}
 			/>
 
 			<Modal isOpen={props.show} toggle={handleClose} size='lg'>
@@ -164,7 +166,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 									<MultiSelectComponent
 										options={holidayInstanceOptions}
 										selectedOptions={selectedHolidayInstanceOptions}
-										placeholder='Select holiday instances'
+										placeholder={translate('select.holiday.rates')}
 										onValuesChange={(newSelectedHolidayOptions: SelectOption[]) => {
 											const updatedHolidayInstanceIds = newSelectedHolidayOptions.map(
 												holidayInstance => holidayInstance.value

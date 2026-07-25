@@ -11,11 +11,11 @@ import EditHolidayInstanceGroupModalComponent from './EditHolidayInstanceGroupMo
 
 /**
  * Defines a holiday instance group information card.
- * @param {object} props Component properties.
- * @param {{id: number, name: string, holidayInstanceIds: number[], note: string}} props.holidayInstanceGroup Group data.
- * @param {Array<{id: number, name: string}>} props.holidayInstances Available holiday instances.
- * @param {(id: number, name: string, holidayInstanceIds: number[], note: string) => void} props.onEditHolidayInstanceGroup Edit handler.
- * @param {(id: number) => void} [props.onDeleteHolidayInstanceGroup] Optional delete handler.
+ * @param props Component properties.
+ * @param props.holidayInstanceGroup Group data.
+ * @param props.holidayInstances Available holiday instances.
+ * @param props.onEditHolidayInstanceGroup Edit handler.
+ * @param [props.onDeleteHolidayInstanceGroup] Optional delete handler.
  * @returns Holiday instance group card element.
  */
 export default function HolidayInstanceGroupViewComponent(props) {
@@ -57,7 +57,9 @@ export default function HolidayInstanceGroupViewComponent(props) {
 							`...(${selectedHolidayInstances.length})`}
 					</span>
 				) : (
-					<span> None</span>
+					<span>
+						<FormattedMessage id='holiday.instance.group.empty' />
+					</span>
 				)}
 			</div>
 
