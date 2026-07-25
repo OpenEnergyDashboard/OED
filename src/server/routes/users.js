@@ -240,13 +240,13 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 		properties: {
 			username: {
 				type: 'string',
-				minLength: 5,
-				maxLength: 254
+				minLength: USERNAME_MIN_LENGTH,
+				maxLength: USERNAME_MAX_LENGTH
 			}
 		}
 	};
 	if (!validate(req.body, validParams).valid) {
-		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params!' });
+		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
 	} else {
 		try {
 			const conn = getConnection();
