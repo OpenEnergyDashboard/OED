@@ -1,6 +1,4 @@
 /*
- * group_daily_readings_unit_cagg.sql
- *
  * Purpose:
  *
  *   This materialized view rolls up daily meter readings into daily group
@@ -9,7 +7,9 @@
  *
  * Data flow:
  *
- *   readings
+ *    readings
+ *       |
+ *     trigger
  *       |
  *       v
  *   hypertable_hourly_split

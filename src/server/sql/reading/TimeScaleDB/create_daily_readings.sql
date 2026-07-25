@@ -1,36 +1,25 @@
 /*
- * create_daily_readings.sql
- *
- * This continuous aggregate rolls up the hourly continuous aggregate into
- * daily summaries. Rather than aggregating directly from
- * hypertable_hourly_split, it reuses the pre-computed hourly values produced
- * by meter_hourly_readings_unit_cagg.
+ * Aggregating directly from hypertable_hourly_split, it will be used by by group_daily_readings_unit_cagg.
+ * Therefore  it is necessaary to retain the bucket to allow for proper grouping in the next level of 
+ * aggregation.
  *
  * Data flow:
  *
- *   readings
+ *    readings
+ *       |
+ *     trigger
  *       |
  *       v
  *   hypertable_hourly_split
  *       |
  *       v
- *   meter_hourly_readings_unit_cagg
- *       |
- *       v
  *   meter_daily_readings_unit_cagg
- *
- *
- * Building the daily aggregate on top of the hourly aggregate allows
- * TimescaleDB to reuse previously computed hourly results instead of
- * recalculating daily values from the raw split data. This significantly
- * reduces the amount of data processed during refreshes and mirrors the
- * hierarchical aggregation strategy commonly used in time-series workloads.
  *
  *
  * Daily aggregation:
  *
- * Each row in meter_hourly_readings_unit_cagg represents the aggregated
- * statistics for a single meter, graphic unit, and hour.
+ * Each row in hypertable_hourly_split represents the aggregated a single 
+ * meter, graphic unit, and hour.
  *
  * The daily continuous aggregate groups those hourly rows into one-day
  * buckets and computes:
@@ -42,16 +31,8 @@
  *
  * Time interval:
  *
- * Rather than exposing the bucket timestamp directly, the daily aggregate
- * returns a PostgreSQL tsrange representing the entire day. This matches the
- * interval representation used throughout the reporting layer.
+ * Exposes the bucket timestamp directly
  *
- * Example:
- *
- *     ("2021-06-01 00:00:00","2021-06-02 00:00:00")
- *
- * The lower bound is the start of the day and the upper bound is the start
- * of the following day.
  */
 CREATE MATERIALIZED VIEW IF NOT EXISTS meter_daily_readings_unit_cagg
 WITH (timescaledb.continuous)
@@ -69,14 +50,8 @@ SELECT
     graphic_unit_id,
 	time_bucket('1 day', start_timestamp) AS bucket
 FROM hypertable_hourly_split
-GROUP BY
-    meter_id,
-    time_bucket('1 day', start_timestamp),
-    graphic_unit_id
-ORDER BY
-    meter_id,
-    graphic_unit_id,
-    bucket
+GROUP BY meter_id, time_bucket('1 day', start_timestamp), graphic_unit_id
+ORDER BY meter_id, graphic_unit_id, bucket
 WITH NO DATA;
 
 /*

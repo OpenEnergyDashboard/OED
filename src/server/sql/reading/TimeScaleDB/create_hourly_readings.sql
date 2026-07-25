@@ -1,6 +1,4 @@
 /*
- * create_hourly_readings.sql
- *
  * Prefrace:
  * 	 This script continues the work introduced in PR#1546, which established the
  * 	 benchmark for migrating hourly meter reading queries from PostgreSQL
@@ -17,7 +15,9 @@
  *
  * Data flow:
  *
- *   readings
+ *    readings
+ *       |
+ *     trigger
  *       │
  *       ▼
  *   hypertable_hourly_split

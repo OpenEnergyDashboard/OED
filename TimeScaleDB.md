@@ -92,6 +92,8 @@ The implemented data flow is:
 
                     readings
                        |
+                    Trigger
+                       |
                        v
              hypertable_hourly_split
                        |
@@ -151,6 +153,8 @@ Benefits:
 Data flow:
 
     readings
+       |
+     Trigger
        |
        v
     hypertable_hourly_split

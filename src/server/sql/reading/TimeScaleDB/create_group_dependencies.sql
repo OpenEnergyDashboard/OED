@@ -1,6 +1,4 @@
 /*
- * create_group_dependencies.sql
- *
  * Purpose:
  *
  *   Create and maintain the non-time-series cache tables required by the

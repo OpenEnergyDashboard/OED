@@ -1,6 +1,4 @@
 /*
- * group_hourly_readings_unit_cagg.sql
- *
  * Purpose:
  *
  *   This materialized view rolls up hourly meter readings into hourly group
@@ -9,7 +7,9 @@
  *
  * Data flow:
  *
- *   readings
+ *    readings
+ *       |
+ *     trigger
  *       |
  *       v
  *   hypertable_hourly_split
