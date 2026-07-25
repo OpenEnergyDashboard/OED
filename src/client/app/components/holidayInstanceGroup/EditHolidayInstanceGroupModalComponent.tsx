@@ -23,6 +23,7 @@ import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
 import { HolidayInstanceDetails, HolidayInstanceGroup } from '../../types/redux/holidays';
+import { useTranslate } from '../../redux/componentHooks';
 
 interface EditHolidayInstanceGroupModalComponentProps {
 	show: boolean;
@@ -51,6 +52,7 @@ interface LocationOption extends SelectOption {
 export default function EditHolidayInstanceGroupModalComponent(
 	props: EditHolidayInstanceGroupModalComponentProps
 ) {
+	const translate = useTranslate();
 	const [name, setName] = useState(props.holidayInstanceGroup.name ?? '');
 	const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
 	const [holidayInstanceIds, setHolidayInstanceIds] = useState<number[]>(
