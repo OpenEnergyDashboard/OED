@@ -58,6 +58,8 @@ export default function HeaderButtonsComponent() {
 		shouldAdminButtonDisabled: true,
 		shouldUsersButtonDisabled: true,
 		shouldGroupsButtonDisabled: true,
+		shouldHolidaysButtonDisabled: true,
+		shouldHolidayInstancesButtonDisabled: true,
 		shouldHolidayInstanceGroupsButtonDisabled: true,
 		shouldMetersButtonDisabled: true,
 		shouldMapsButtonDisabled: true,
@@ -66,7 +68,6 @@ export default function HeaderButtonsComponent() {
 		shouldUnitsButtonDisabled: true,
 		shouldConversionsButtonDisabled: true,
 		shouldDaysButtonDisabled: true,
-		shouldHolidaysButtonDisabled: true,
 		shouldWeeksButtonDisabled: true,
 		shouldLogMsgButtonDisabled: true,
 		shouldVisualUnitMapButtonDisabled: true,
@@ -100,6 +101,8 @@ export default function HeaderButtonsComponent() {
 			shouldAdminButtonDisabled: pathname === '/admin',
 			shouldUsersButtonDisabled: pathname === '/users',
 			shouldGroupsButtonDisabled: pathname === '/groups',
+			shouldHolidaysButtonDisabled: pathname === '/holidays',
+			shouldHolidayInstancesButtonDisabled: pathname === '/holiday-instances',
 			shouldHolidayInstanceGroupsButtonDisabled: pathname === '/holiday-instance-groups',
 			shouldMetersButtonDisabled: pathname === '/meters',
 			shouldMapsButtonDisabled: pathname === '/maps',
@@ -108,7 +111,6 @@ export default function HeaderButtonsComponent() {
 			shouldUnitsButtonDisabled: pathname === '/units',
 			shouldConversionsButtonDisabled: pathname === '/conversions',
 			shouldDaysButtonDisabled: pathname === '/days',
-			shouldHolidaysButtonDisabled: pathname === '/holidays',
 			shouldWeeksButtonDisabled: pathname === '/weeks',
 			shouldLogMsgButtonDisabled: pathname === '/logmsg',
 			shouldVisualUnitMapButtonDisabled: pathname === '/visual-unit'
@@ -221,17 +223,24 @@ export default function HeaderButtonsComponent() {
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}
-								disabled={state.shouldHolidayInstanceGroupsButtonDisabled}
-								tag={Link}
-								to="/holiday-instance-groups">
-								<FormattedMessage id='holiday.instance.groups' />
-							</DropdownItem>
-							<DropdownItem
-								style={state.adminViewableLinkStyle}
 								disabled={state.shouldHolidaysButtonDisabled}
 								tag={Link}
 								to="/holidays">
 								<FormattedMessage id='holidays' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldHolidayInstancesButtonDisabled}
+								tag={Link}
+								to="/holiday-instances">
+								<FormattedMessage id='holiday.rates' />
+							</DropdownItem>
+							<DropdownItem
+								style={state.adminViewableLinkStyle}
+								disabled={state.shouldHolidayInstanceGroupsButtonDisabled}
+								tag={Link}
+								to="/holiday-instance-groups">
+								<FormattedMessage id='holiday.instance.groups' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}
