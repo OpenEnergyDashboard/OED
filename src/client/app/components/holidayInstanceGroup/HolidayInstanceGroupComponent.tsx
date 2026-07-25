@@ -6,8 +6,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
-	stableEmptyHolidayInstances,
-	useGetHolidayInstancesQuery
+	useGetHolidayInstancesWithDetailsQuery
 } from '../../redux/api/holidayInstancesApi';
 import {
 	stableEmptyHolidayInstanceGroups,
@@ -20,6 +19,9 @@ import { useTranslate } from '../../redux/componentHooks';
 import { titleStyle } from '../../styles/modalStyle';
 import CreateHolidayInstanceGroupModalComponent from './CreateHolidayInstanceGroupModalComponent';
 import HolidayInstanceGroupViewComponent from './HolidayInstanceGroupViewComponent';
+import { HolidayInstanceDetails } from '../../types/redux/holidays';
+
+const stableEmptyHolidayInstanceDetails: HolidayInstanceDetails[] = [];
 
 /**
  * Defines the holiday instance group card page.
@@ -29,10 +31,10 @@ export default function HolidayInstanceGroupComponent() {
 	const translate = useTranslate();
 	const [mutationError, setMutationError] = useState('');
 	const {
-		data: holidayInstances = stableEmptyHolidayInstances,
+		data: holidayInstances = stableEmptyHolidayInstanceDetails,
 		isLoading: holidayInstancesLoading,
 		error: holidayInstancesError
-	} = useGetHolidayInstancesQuery();
+	} = useGetHolidayInstancesWithDetailsQuery();
 	const {
 		data: holidayInstanceGroups = stableEmptyHolidayInstanceGroups,
 		isLoading: holidayInstanceGroupsLoading,

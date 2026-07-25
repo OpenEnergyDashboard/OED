@@ -22,13 +22,12 @@ import {
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import { SelectOption } from '../../types/items';
-import { HolidayInstance, HolidayInstanceGroup } from '../../types/redux/holidays';
-import { useTranslate } from '../../redux/componentHooks';
+import { HolidayInstanceDetails, HolidayInstanceGroup } from '../../types/redux/holidays';
 
 interface EditHolidayInstanceGroupModalComponentProps {
 	show: boolean;
 	holidayInstanceGroup: HolidayInstanceGroup;
-	holidayInstances: HolidayInstance[];
+	holidayInstances: HolidayInstanceDetails[];
 	handleShow: () => void;
 	handleClose: () => void;
 	onEditHolidayInstanceGroup: (
@@ -40,6 +39,10 @@ interface EditHolidayInstanceGroupModalComponentProps {
 	onDeleteHolidayInstanceGroup?: (holidayInstanceGroupId: number) => void;
 }
 
+interface LocationOption extends SelectOption {
+	location: string;
+}
+
 /**
  * Defines the edit holiday instance group modal form.
  * @param props Existing group data, available holiday instances, and action handlers.
@@ -48,18 +51,38 @@ interface EditHolidayInstanceGroupModalComponentProps {
 export default function EditHolidayInstanceGroupModalComponent(
 	props: EditHolidayInstanceGroupModalComponentProps
 ) {
-	const translate = useTranslate();
 	const [name, setName] = useState(props.holidayInstanceGroup.name ?? '');
+	const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
 	const [holidayInstanceIds, setHolidayInstanceIds] = useState<number[]>(
 		props.holidayInstanceGroup.holidayInstanceIds
 	);
 	const [note, setNote] = useState(props.holidayInstanceGroup.note);
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
 
-	const sortedHolidayInstances = React.useMemo(
-		() => [...props.holidayInstances].sort((first, second) =>
-			first.name.localeCompare(second.name, undefined, { sensitivity: 'base' })),
+	const locations = React.useMemo(
+		() => Array.from(new Set(
+			props.holidayInstances
+				.map(holidayInstance => holidayInstance.location.trim())
+				.filter(location => location !== '')
+		)).sort((first, second) =>
+			first.localeCompare(second, undefined, { sensitivity: 'base' })),
 		[props.holidayInstances]
+	);
+	const locationOptions: LocationOption[] = locations.map((location, index) => ({
+		label: location,
+		value: index,
+		location
+	}));
+	const selectedLocationOptions = locationOptions.filter(option =>
+		selectedLocations.includes(option.location)
+	);
+	const filteredHolidayInstances = props.holidayInstances.filter(holidayInstance =>
+		selectedLocations.includes(holidayInstance.location.trim())
+	);
+	const sortedHolidayInstances = React.useMemo(
+		() => [...filteredHolidayInstances].sort((first, second) =>
+			first.name.localeCompare(second.name, undefined, { sensitivity: 'base' })),
+		[filteredHolidayInstances]
 	);
 	const holidayInstanceOptions: SelectOption[] = sortedHolidayInstances.map(holidayInstance => ({
 		label: holidayInstance.name,
@@ -72,10 +95,16 @@ export default function EditHolidayInstanceGroupModalComponent(
 	const validHolidayInstanceGroup = validName && holidayInstanceIds.length > 0;
 
 	const resetState = React.useCallback(() => {
+		const groupLocations = Array.from(new Set(
+			props.holidayInstanceGroup.holidayInstanceIds
+				.map(id => props.holidayInstances.find(instance => instance.id === id)?.location.trim())
+				.filter((location): location is string => Boolean(location))
+		));
 		setName(props.holidayInstanceGroup.name ?? '');
+		setSelectedLocations(locations.length === 1 ? locations : groupLocations);
 		setHolidayInstanceIds(props.holidayInstanceGroup.holidayInstanceIds);
 		setNote(props.holidayInstanceGroup.note);
-	}, [props.holidayInstanceGroup]);
+	}, [locations, props.holidayInstanceGroup, props.holidayInstances]);
 
 	useEffect(() => {
 		if (props.show) {
@@ -156,6 +185,52 @@ export default function EditHolidayInstanceGroupModalComponent(
 
 						<Row xs='1' lg='2'>
 							<Col>
+								<FormGroup>
+									<Label for='holidayLocation'>
+										<FormattedMessage
+											id='holiday.location'
+										/>
+									</Label>
+									{locations.length > 1 ? (
+										<MultiSelectComponent<LocationOption>
+											options={locationOptions}
+											selectedOptions={selectedLocationOptions}
+											placeholder='Select locations'
+											onValuesChange={(newSelectedLocationOptions: LocationOption[]) => {
+												const updatedLocations = newSelectedLocationOptions.map(
+													option => option.location
+												);
+												setSelectedLocations(updatedLocations);
+												setHolidayInstanceIds(currentIds => currentIds.filter(id => {
+													const holidayInstance = props.holidayInstances.find(
+														instance => instance.id === id
+													);
+													return holidayInstance !== undefined
+														&& updatedLocations.includes(holidayInstance.location.trim());
+												}));
+											}}
+										/>
+									) : (
+										<Input
+											id='holidayLocation'
+											name='holidayLocation'
+											type='select'
+											disabled
+											value={locations[0] ?? ''}
+										>
+											<option value={locations[0] ?? ''}>
+												{locations[0] ?? (
+													<FormattedMessage
+														id='holiday.location.unavailable'
+														defaultMessage='Unavailable'
+													/>
+												)}
+											</option>
+										</Input>
+									)}
+								</FormGroup>
+							</Col>
+							<Col>
 								{/* The holiday instances in this group */}
 								<FormGroup>
 									<Label>
@@ -166,7 +241,11 @@ export default function EditHolidayInstanceGroupModalComponent(
 									<MultiSelectComponent
 										options={holidayInstanceOptions}
 										selectedOptions={selectedHolidayInstanceOptions}
-										placeholder={translate('select.holiday.rates')}
+										placeholder={
+											selectedLocations.length > 0
+												? 'Select holiday instances'
+												: 'Select a location first'
+										}
 										onValuesChange={(newSelectedHolidayOptions: SelectOption[]) => {
 											const updatedHolidayInstanceIds = newSelectedHolidayOptions.map(
 												holidayInstance => holidayInstance.value
@@ -179,28 +258,6 @@ export default function EditHolidayInstanceGroupModalComponent(
 											<FormattedMessage id='error.required' />
 										</FormFeedback>
 									)}
-								</FormGroup>
-							</Col>
-							<Col>
-								<FormGroup>
-									<Label for='holidayRegionId'>
-										<FormattedMessage
-											id='holiday.region'
-										/>
-									</Label>
-									<Input
-										id='holidayRegionId'
-										name='holidayRegionId'
-										type='select'
-										disabled
-										value=''
-									>
-										<option value=''>
-											<FormattedMessage
-												id='holiday.region.unavailable'
-											/>
-										</option>
-									</Input>
 								</FormGroup>
 							</Col>
 						</Row>
