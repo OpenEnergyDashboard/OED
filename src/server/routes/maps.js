@@ -242,9 +242,7 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 router.post('/edit', adminAuthMiddleware('edit maps'), async (req, res) => {
 	// TODO This is a temporary fix because edit is sending additional values that are not really
 	// needed: calibrationMode, image, calibrationSet, calibrationResult.
-	// The UI should let the admin set the note but dummy up here for now.
 	// It is assumed this will be fixed in the map PR 1314 or soon after that.
-	// req.body.note = '';
 	req.body = omit(req.body, 'calibrationMode', 'image', 'calibrationSet', 'calibrationResult');
 	// isEdit=true: id is required here since the client must tell us which map to update.
 	const validatorResult = validateMapsParams(req.body, true);
