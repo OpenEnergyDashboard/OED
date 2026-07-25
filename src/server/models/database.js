@@ -139,6 +139,8 @@ async function createSchema(conn) {
 	await TimeScaleDBReading.createGroupDailyReadings(conn);
 	await TimeScaleDBReading.updateMeterLineReadings(conn);
 	await TimeScaleDBReading.updateGroupLineReadings(conn);
+	await TimeScaleDBReading.updateMeterGroupBar(conn);
+	await TimeScaleDBReading.updateCompareReadings(conn);
 }
 
 module.exports = {

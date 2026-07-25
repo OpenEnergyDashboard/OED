@@ -117,6 +117,28 @@ class Reading {
     }
 
     /**
+     * Updates meter_bar_readings_unit() and group_bar_readings_unit() to use the group materialized views
+     * backed by TimescaleDB meter aggregates for group_daily_readings_unit_cagg.
+     *
+     * @param conn the database connection to use
+     * @returns {Promise<void>}
+     */
+    static updateMeterGroupBar(conn) {
+        return conn.none(sqlFile('reading/TimeScaleDB/update_meter_group_bar.sql'));
+    }
+
+    /**
+     * Updates meter_compare_readings_unit() and group_compare_readings_unit() to use the group 
+     * materialized views backed by TimescaleDB meter aggregates for group_daily_readings_unit_cagg.
+     *
+     * @param conn the database connection to use
+     * @returns {Promise<void>}
+     */
+    static updateCompareReadings(conn) {
+        return conn.none(sqlFile('reading/TimeScaleDB/update_function_get_compare_readings.sql'));
+    }
+
+    /**
      * Refreshes the TimescaleDB continuous aggregates.
      *
      * This should be called after importing or modifying readings, especially
