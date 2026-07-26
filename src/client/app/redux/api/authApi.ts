@@ -15,7 +15,7 @@ export const authApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
 		login: builder.mutation<LoginResponse, { username: string, password: string }>({
 			query: loginArgs => ({
-				url: 'api/login',
+				url: 'api/loginLogout/login',
 				method: 'POST',
 				body: loginArgs
 			}),
@@ -42,12 +42,19 @@ export const authApi = baseApi.injectEndpoints({
 				return { data: null };
 			}
 		}),
-		logout: builder.mutation<null, void>({
-			queryFn: (_, { dispatch }) => {
-				// Opt to use a RTK mutation instead of manually writing a thunk to take advantage mutation invalidations
-				deleteToken();
-				dispatch(currentUserSlice.actions.clearCurrentUser());
-				return { data: null };
+		logout: builder.mutation<{ success: boolean, message: string }, void>({
+			query: () => ({
+				url: 'api/loginLogout/logout',
+				method: 'POST',
+				body: { token: getToken() }
+			}),
+			async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+				try {
+					await queryFulfilled;
+				} finally {
+					deleteToken();
+					dispatch(currentUserSlice.actions.clearCurrentUser());
+				}
 			},
 			invalidatesTags: ['MeterData', 'GroupData']
 		})

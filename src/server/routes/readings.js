@@ -9,9 +9,13 @@ const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
-const { STRING_GENERAL_MAX_LENGTH: GENERAL_STRING_MAX_LENGTH } = require('../util/validationConstants');
+const { STRING_GENERAL_MAX_LENGTH: GENERAL_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidTimeInterval } = require('../util/timeValidation');
+const { isTokenAuthorized } = require('../util/userRoles');
+const Preferences = require('../models/Preferences');
+const User = require('../models/User');
+const { success, failure } = require('./response');
 
 const router = express.Router();
 
@@ -64,10 +68,6 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 	}
 })
 
-// TODO This route should be limiting access to large file responses to the appropriate users.
-// Currently it is done in the component but also needs to be here.
-// For now it only gets the user information and validates it but does not use it.
-
 /**
  * Route for fetching raw readings by meter ID and time interval.
  */
@@ -78,9 +78,9 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		required: ['meter_id'],
 		properties: {
 			meter_id: {
-				type: 'integer',
-				minimum: 1,
-				maximum: 2147483647
+				type: 'string',
+				pattern: '^\\d+$',
+				maxLength: NUMERIC_ID_MAX_LENGTH
 			}
 		}
 	};
@@ -96,7 +96,11 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 		}
 	};
 	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid || !isValidTimeInterval(req.query.timeInterval, true)) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
+	// TODO meter_id is currently passed as a string, which makes this checks necessary to avoid invalid IDs,
+	// and it should be removed once meter_id is changed to be passed as Number
+	} else if (req.params.meter_id == '2147483648' || req.params.meter_id == '0') {
+		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
 		let meterID;
 		let timeInterval;
@@ -105,15 +109,37 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			// Get the routed meter id and time for the desired readings.
 			meterID = req.params.meter_id;
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			// Get the raw readings for this meter over time range desired.
-			// Note this returns unusual identifiers to save space and does not return the meter id.
-			const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-			// They are ready to go back.
-			// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
-			res.send(rawReadings);
+			// Check if user is allowed to export.
+			let shouldDownload = false;
+			// Estimated file size. The full explanation of the estimate used can be found in the client.
+			// This estimate is also present in src/client/app/redux/thunks/exportThunk.ts and must be kept consistent between files.
+			// This count only checks a single meterID, while client testing checks multiple meterIDs, so the estimate is slightly different.
+			const count = await Reading.getCountByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+			const fileSize = (count * 0.082 / 1000);
+			const preferences = await Preferences.get(conn);
+			if (fileSize <= preferences.defaultFileSizeLimit) {
+				// File size within limit, anyone can download.
+				shouldDownload = true;
+			} else if (req.hasValidAuthToken) {
+				// File size above limit, only users with the role EXPORT or ADMIN can download.
+				const token = req.headers.token || req.body.token || req.query.token;
+				if (await isTokenAuthorized(token, User.role.EXPORT)) {
+					shouldDownload = true;
+				}
+			}
+			if (shouldDownload == false) {
+				failure(res, HTTP_CODES.FORBIDDEN);
+			} else {
+				// Get the raw readings for this meter over time range desired.
+				// Note this returns unusual identifiers to save space and does not return the meter id.
+				const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+				// They are ready to go back.
+				// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
+				success(res, rawReadings);
+			}
 		} catch (err) {
 			log.error(`Error while performing GET raw readings for line with meter ${meterID} with time interval ${timeInterval}: ${err}`, err);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR);
 		}
 	}
 });
