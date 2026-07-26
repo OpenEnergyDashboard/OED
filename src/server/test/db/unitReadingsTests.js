@@ -50,6 +50,31 @@ mocha.describe('Line & bar Readings', () => {
 			unitId = await getUnitId('kWh');
 		});
 
+		mocha.it('Does not create legacy materialized reading views or graphic-unit function', async () => {
+			const { count } = await conn.one(`
+				SELECT count(*)::INTEGER AS count
+				FROM pg_matviews
+				WHERE matviewname = ANY(\${legacy_view_names})
+			`, {
+				legacy_view_names: [
+					'meter_hourly_readings_unit',
+					'meter_daily_readings_unit',
+					'group_hourly_readings_unit',
+					'group_daily_readings_unit',
+					'groups_deep_meters'
+				]
+			});
+			expect(count).to.equal(0);
+
+			const { function_count } = await conn.one(`
+				SELECT count(*)::INTEGER AS function_count
+				FROM pg_proc
+				WHERE pronamespace = current_schema()::regnamespace
+					AND proname = 'get_graphic_unit'
+			`);
+			expect(function_count).to.equal(0);
+		});
+
 		mocha.it('Hourly readings when readings line up with hour', async () => {
 			await Reading.insertAll([
 				new Reading(meter.id, 100, timestamp1, timestamp2),
@@ -59,7 +84,7 @@ mocha.describe('Line & bar Readings', () => {
 			], conn);
 			// Refresh the hourly readings view because it is materialized.
 			await Reading.refreshHourlyReadings(conn);
-			const { meter_id, reading_rate } = await conn.one('SELECT * FROM meter_hourly_readings_unit WHERE lower(time_interval)=${start_timestamp} and graphic_unit_id = ${graphic_unit};',
+			const { meter_id, reading_rate } = await conn.one('SELECT * FROM meter_hourly_readings_unit_cagg WHERE bucket=${start_timestamp} and graphic_unit_id = ${graphic_unit};',
 				{ start_timestamp: timestamp1, graphic_unit: unitId });
 			expect(meter_id).to.equal(meter.id);
 			expect(reading_rate).to.equal(100);
@@ -76,7 +101,7 @@ mocha.describe('Line & bar Readings', () => {
 			await Reading.refreshMeterReadingsViews(conn);
 
 			const { meter_id, reading_rate } = await conn.one(
-				'SELECT * FROM meter_daily_readings_unit WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp}) and graphic_unit_id = ${graphic_unit};',
+				'SELECT * FROM meter_daily_readings_unit_cagg WHERE time_interval && tsrange(${start_timestamp}, ${end_timestamp}) and graphic_unit_id = ${graphic_unit};',
 				{ start_timestamp: timestamp1, end_timestamp: timestamp2, graphic_unit: unitId });
 			expect(meter_id).to.equal(meter.id);
 			expect(reading_rate).to.equal((100 + 200 + 300 + 400) / 4);
@@ -92,7 +117,7 @@ mocha.describe('Line & bar Readings', () => {
 
 			await Reading.refreshMeterReadingsViews(conn);
 
-			const rows = await conn.many('SELECT * FROM meter_daily_readings_unit;');
+			const rows = await conn.many('SELECT * FROM meter_daily_readings_unit_cagg;');
 			expect(rows).to.have.length(2);
 			expect(rows[0].meter_id).to.equal(meter.id);
 			expect(rows[1].meter_id).to.equal(meter.id);
@@ -118,7 +143,7 @@ mocha.describe('Line & bar Readings', () => {
 
 			await Reading.refreshMeterReadingsViews(conn);
 
-			const { meter_id, reading_rate } = await conn.one('SELECT * FROM meter_daily_readings_unit WHERE lower(time_interval) = ${start_timestamp} and graphic_unit_id = ${graphic_unit};',
+			const { meter_id, reading_rate } = await conn.one('SELECT * FROM meter_daily_readings_unit_cagg WHERE bucket = ${start_timestamp} and graphic_unit_id = ${graphic_unit};',
 				{ start_timestamp: day1Start, graphic_unit: unitId });
 
 			expect(meter_id).to.equal(meter.id);
@@ -149,7 +174,7 @@ mocha.describe('Line & bar Readings', () => {
 
 		// TODO This test no longer does what is desired because so few readings will return the 1 raw point.
 		// Until we have an interface to allow setting the frequency desired this test is commented out.
-		mocha.it('Correctly shrinks infinite intervals', async () => {
+		mocha.it('Correctly shrinks infinite intervals', async function () {
 			// TODO: Test infinite range with bounded timestamp to ensure proper shrink
 			const yearStart = moment.utc('2018-01-01');
 			const yearEnd = yearStart.clone().add(1, 'year');
@@ -157,9 +182,8 @@ mocha.describe('Line & bar Readings', () => {
 			await Reading.insertAll([
 				new Reading(meter.id, 100, yearStart, yearEnd)
 			], conn);
-			// Refresh reading views.
-			await Reading.refreshHourlyReadings(conn);
-			await Reading.refreshDailyReadings(conn);
+			// Refresh both meter aggregates once. Group aggregates are not used by this test.
+			await Reading.refreshMeterReadingsViews(conn);
 			const allReadings = await Reading.getMeterLineReadings([meter.id], graphicUnitId, null, null, conn);
 			const meterReadings = allReadings[meter.id];
 			expect(meterReadings.length).to.equal(365); // 365 days in a year
@@ -179,9 +203,6 @@ mocha.describe('Line & bar Readings', () => {
 		const endDate = '2020-03-02 00:00:00';
 
 		mocha.beforeEach(async function () {
-			// Extend timeout because a longer time with more data being created. The value is somewhat
-			// arbitrary and can be made larger if you get timeouts.
-			this.timeout(20000);
 			conn = testDB.getConnection();
 			// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
 			await insertStandardUnits(conn);
@@ -247,9 +268,6 @@ mocha.describe('Line & bar Readings', () => {
 		const endDate = '2020-03-02 00:00:00';
 
 		mocha.beforeEach(async function () {
-			// Extend timeout because a longer time with more data being created. The value is somewhat
-			// arbitrary and can be made larger if you get timeouts.
-			this.timeout(20000);
 			conn = testDB.getConnection();
 			// Insert the standard and special units and conversions. Really only need 1-2 but this is easy.
 			await insertStandardUnits(conn);

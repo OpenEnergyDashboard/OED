@@ -10,6 +10,17 @@ const sqlFile = database.sqlFile;
 class Reading {
 
     /**
+     * Creates shared reading functions required by the TimescaleDB schema and
+     * graphing functions.
+     *
+     * @param conn the database connection to use
+     * @returns {Promise<void>}
+     */
+    static createReadingHelpers(conn) {
+        return conn.none(sqlFile('reading/TimeScaleDB/update_reading_views.sql'));
+    }
+
+    /**
      * Creates the TimescaleDB prerequisite objects required by the hourly and
      * daily continuous aggregates.
      *
@@ -32,13 +43,13 @@ class Reading {
      * and daily continuous aggregates.
      *
      * This creates:
-     *   - groups_deep_meters cache table
-     *   - get_graphic_unit cache table
+     *   - groups_deep_meters_cache table
+     *   - group_graphic_units_cache table
      *   - supporting indexes
      *
      * The group continuous aggregates cannot depend on dynamic joins to:
-     *   - groups_deep_meters view logic
-     *   - get_graphic_unit() PL/pgSQL function
+     *   - groups_deep_meters_cache maintenance logic
+     *   - legacy graphic-unit compatibility function
      *
      * Therefore, these objects are maintained as physical tables that can be
      * refreshed before refreshing the group continuous aggregates.
@@ -128,7 +139,7 @@ class Reading {
     }
 
     /**
-     * Updates meter_compare_readings_unit() and group_compare_readings_unit() to use the group 
+     * Updates meter_compare_readings_unit() and group_compare_readings_unit() to use the group
      * materialized views backed by TimescaleDB meter aggregates for group_daily_readings_unit_cagg.
      *
      * @param conn the database connection to use
@@ -136,6 +147,29 @@ class Reading {
      */
     static updateCompareReadings(conn) {
         return conn.none(sqlFile('reading/TimeScaleDB/update_function_get_compare_readings.sql'));
+    }
+
+    /**
+     * Updates the 3D reading functions to use TimescaleDB continuous
+     * aggregates.
+     *
+     * @param conn the database connection to use
+     * @returns {Promise<void>}
+     */
+    static updateFunctionGet3DReadings(conn) {
+        return conn.none(sqlFile('reading/TimeScaleDB/update_function_get_3d_readings.sql'));
+    }
+
+    /**
+     * TODO: Remove this function once the hypertable implementation is finalized.
+     * Removes legacy PostgreSQL materialized reading views after their
+     * TimescaleDB replacements and all dependent functions are installed.
+     *
+     * @param conn the database connection to use
+     * @returns {Promise<void>}
+     */
+    static dropLegacyReadingViews(conn) {
+        return conn.none(sqlFile('reading/TimeScaleDB/drop_legacy_reading_views.sql'));
     }
 
     /**
@@ -156,43 +190,62 @@ class Reading {
     }
 
     /**
-     * Refreshes the TimescaleDB continuous aggregates for an optional time
-     * range. Omitting the range refreshes all materialized data.
+     * Validates and expands an optional refresh range to UTC day boundaries.
      *
-     * Hourly must be refreshed before daily because the daily continuous
-     * aggregate depends on the hourly continuous aggregate.
-     *
-     * @param conn the database connection to use
      * @param startTimestamp inclusive start of the affected range
      * @param endTimestamp exclusive end of the affected range
-     * @returns {Promise<void>}
+     * @returns {{refreshStart: moment.Moment|null, refreshEnd: moment.Moment|null}}
      */
-    static async refreshReadings(conn, startTimestamp = null, endTimestamp = null) {
+    static getRefreshRange(startTimestamp = null, endTimestamp = null) {
         if ((startTimestamp === null) !== (endTimestamp === null)) {
             throw new Error('Both startTimestamp and endTimestamp are required for a bounded TimescaleDB refresh.');
         }
 
-        // A daily continuous aggregate only materializes complete buckets.
-        // Expand bounded imports to UTC day boundaries so both the hourly and
-        // daily aggregates cover every affected bucket.
         const refreshStart = startTimestamp === null ? null : moment.utc(startTimestamp).startOf('day');
         const refreshEnd = endTimestamp === null ? null : moment.utc(endTimestamp).startOf('day');
         if (refreshEnd !== null && !moment.utc(endTimestamp).isSame(refreshEnd)) {
             refreshEnd.add(1, 'day');
         }
 
-        // Refresh the continuous aggregates.
+        return { refreshStart, refreshEnd };
+    }
+
+    /**
+     * Refreshes only the hourly meter continuous aggregate.
+     */
+    static async refreshMeterHourlyReadings(conn, startTimestamp = null, endTimestamp = null) {
+        const { refreshStart, refreshEnd } = Reading.getRefreshRange(startTimestamp, endTimestamp);
         await conn.none(
             "CALL refresh_continuous_aggregate('meter_hourly_readings_unit_cagg', ${startTimestamp}, ${endTimestamp})",
             { startTimestamp: refreshStart, endTimestamp: refreshEnd }
         );
+    }
 
+    /**
+     * Refreshes only the daily meter continuous aggregate.
+     */
+    static async refreshMeterDailyReadings(conn, startTimestamp = null, endTimestamp = null) {
+        const { refreshStart, refreshEnd } = Reading.getRefreshRange(startTimestamp, endTimestamp);
         await conn.none(
             "CALL refresh_continuous_aggregate('meter_daily_readings_unit_cagg', ${startTimestamp}, ${endTimestamp})",
             { startTimestamp: refreshStart, endTimestamp: refreshEnd }
         );
+    }
 
-        // update the group materialized views that depend on the meter aggregates
+    /**
+     * Refreshes the hourly and daily meter continuous aggregates.
+     */
+    static async refreshMeterReadings(conn, startTimestamp = null, endTimestamp = null) {
+        await Reading.refreshMeterHourlyReadings(conn, startTimestamp, endTimestamp);
+        await Reading.refreshMeterDailyReadings(conn, startTimestamp, endTimestamp);
+    }
+
+    /**
+     * Refreshes the group caches and group continuous aggregates.
+     */
+    static async refreshGroupReadings(conn, startTimestamp = null, endTimestamp = null) {
+        const { refreshStart, refreshEnd } = Reading.getRefreshRange(startTimestamp, endTimestamp);
+
         await conn.none(`
             DO $$
             BEGIN
@@ -211,6 +264,23 @@ class Reading {
             "CALL refresh_continuous_aggregate('group_daily_readings_unit_cagg', ${startTimestamp}, ${endTimestamp})",
             { startTimestamp: refreshStart, endTimestamp: refreshEnd }
         );
+    }
+
+    /**
+     * Refreshes the TimescaleDB continuous aggregates for an optional time
+     * range. Omitting the range refreshes all materialized data.
+     *
+     * Hourly must be refreshed before daily because the daily continuous
+     * aggregate depends on the hourly continuous aggregate.
+     *
+     * @param conn the database connection to use
+     * @param startTimestamp inclusive start of the affected range
+     * @param endTimestamp exclusive end of the affected range
+     * @returns {Promise<void>}
+     */
+    static async refreshReadings(conn, startTimestamp = null, endTimestamp = null) {
+        await Reading.refreshMeterReadings(conn, startTimestamp, endTimestamp);
+        await Reading.refreshGroupReadings(conn, startTimestamp, endTimestamp);
     }
 
 }

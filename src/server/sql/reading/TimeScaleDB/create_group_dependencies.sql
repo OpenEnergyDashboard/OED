@@ -15,8 +15,8 @@
  *
  *   The previous group aggregation workflow depended on:
  *
- *       groups_deep_meters view
- *       get_graphic_unit() function
+ *       groups_deep_meters_cache table
+ *       legacy graphic-unit compatibility function
  *
  *   These objects are replaced with cache tables that are refreshed before
  *   refreshing the group continuous aggregates.
@@ -65,6 +65,10 @@ CREATE TABLE IF NOT EXISTS groups_deep_meters_cache (
     meter_id INTEGER NOT NULL REFERENCES meters(id),
     PRIMARY KEY(group_id, meter_id)
 );
+
+-- This should improve group continuous-aggregate refreshes
+CREATE INDEX groups_deep_meters_cache_meter_group_idx
+ON groups_deep_meters_cache (meter_id, group_id);
 
 
 /*
@@ -116,7 +120,7 @@ $$ LANGUAGE plpgsql;
 /*
  * 2. Cache compatible graphic units for groups.
  *
- * This replaces get_graphic_unit().
+ * This replaces the legacy graphic-unit compatibility function.
  *
  * Each row represents a graphic unit that can display all meters belonging
  * to the group.

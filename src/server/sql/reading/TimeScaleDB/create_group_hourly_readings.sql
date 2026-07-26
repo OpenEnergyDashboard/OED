@@ -67,6 +67,11 @@ GROUP BY
     hr.graphic_unit_id
 WITH NO DATA;
 
+-- This should improve group continuous-aggregate refreshes
+CREATE INDEX group_hourly_cagg_group_graphic_bucket_idx
+ON group_hourly_readings_unit_cagg
+    (group_id, graphic_unit_id, bucket);
+
 /*
  * Allow queries to include recent data that has not yet been materialized.
  */

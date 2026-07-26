@@ -98,6 +98,11 @@ GROUP BY
     sec_in_rate
 WITH NO DATA;
 
+-- This should improve meter continuous-aggregate refreshes
+CREATE INDEX meter_hourly_cagg_meter_graphic_bucket_idx
+ON meter_hourly_readings_unit_cagg
+    (meter_id, graphic_unit_id, bucket);
+
 /*
  * Allow queries to include recent data that has not yet been materialized.
  */

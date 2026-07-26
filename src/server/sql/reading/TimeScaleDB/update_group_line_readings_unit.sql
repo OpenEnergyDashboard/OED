@@ -32,7 +32,7 @@ BEGIN
 	-- First get all the meter ids that will be included in one or more groups being queried.
 	-- In case meter is repeated, make this distinct.
 	SELECT array_agg(DISTINCT gdm.meter_id) INTO meter_ids
-	FROM groups_deep_meters gdm
+	FROM groups_deep_meters_cache gdm
 	INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
 
 	-- Calculate point accuracy if request (auto) or if raw since that is not allowed for groups.

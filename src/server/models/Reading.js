@@ -34,18 +34,14 @@ class Reading {
 	}
 
 	/**
-	 * Returns a promise to create the function and materialized views that aggregate
-	 * readings by various time intervals.
-	 * @param conn the database connection to use
-	 * @returns {Promise<void>}
+	 * @deprecated Retained for the legacy PostgreSQL materialized-view schema.
 	 */
 	static createReadingsMaterializedViews(conn) {
 		return conn.none(sqlFile('reading/create_reading_views.sql'));
 	}
 
 	/**
-	 * Returns a promise to create the compare function
-	 * @param conn the database connection to use
+	 * @deprecated Retained for the legacy PostgreSQL materialized-view schema.
 	 */
 	static createCompareReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_compare_readings.sql'));
@@ -62,63 +58,56 @@ class Reading {
 	}
 
 	/**
-	 * Returns a promise to create the 3D readings function
-	 * @param conn the database connection to use
+	 * @deprecated Retained for the legacy PostgreSQL materialized-view schema.
 	 */
 	static create3DReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_3d_readings.sql'));
 	}
 
 	/**
-	 * Refreshes the hourly readings view.
-	 * Should be called at least once a day but need to do hourly if the site wants zooming in
-	 * to see hourly data as it is available. This function can take more time than refreshing
-	 * the daily readings so be sure calling it more frequently does not impact the
-	 * server response time. If only called once a day, then probably best to do so in the middle
-	 * of the night as suggested for daily refresh.
-	 * @param conn The connection to use
-	 * @returns {Promise<void>}
+	 * @deprecated Use TimeScaleDBReading.refreshReadings().
 	 */
 	static refreshHourlyReadings(conn) {
-		// This can't be a function because you can't call REFRESH inside a function
-		// TODO This will be removed once we completely transition to the unit version.
-		return conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
+		// TODO: Remove the retained legacy implementation once the hypertable implementation is finalized:
+		// return conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
+		// Required lazily to avoid a circular dependency through database.js.
+		// eslint-disable-next-line global-require
+		return require('./TimeScaleDB/Reading').refreshMeterHourlyReadings(conn);
 	}
 
 	/**
-	 * Refreshes the daily readings view.
-	 * Should be called at least once a day, preferably in the middle of the night.
-	 * @param conn The connection to use
-	 * @returns {Promise<void>}
+	 * @deprecated Use TimeScaleDBReading.refreshReadings().
 	 */
 	static refreshDailyReadings(conn) {
-		// This can't be a function because you can't call REFRESH inside a function
-		return conn.none('REFRESH MATERIALIZED VIEW meter_daily_readings_unit');
+		// TODO: Remove the retained legacy implementation once the hypertable implementation is finalized:
+		// return conn.none('REFRESH MATERIALIZED VIEW meter_daily_readings_unit');
+		// Required lazily to avoid a circular dependency through database.js.
+		// eslint-disable-next-line global-require
+		return require('./TimeScaleDB/Reading').refreshMeterDailyReadings(conn);
 	}
-	
+
 	/**
-	 * Refreshes meter readings views.
-	 * Should be called at least once a day, preferably in the middle of the night.
-	 * @param conn The connection to use
-	 * @returns {Promise<void>}
+	 * @deprecated Use TimeScaleDBReading.refreshReadings().
 	 */
-	static async refreshMeterReadingsViews(conn) {
-		await conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
-		await conn.none('REFRESH MATERIALIZED VIEW meter_daily_readings_unit');
+	static refreshMeterReadingsViews(conn) {
+		// TODO: Remove the retained legacy refreshes once the hypertable implementation is finalized:
+		// await conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
+		// await conn.none('REFRESH MATERIALIZED VIEW meter_daily_readings_unit');
+		// Required lazily to avoid a circular dependency through database.js.
+		// eslint-disable-next-line global-require
+		return require('./TimeScaleDB/Reading').refreshMeterReadings(conn);
 	}
 
-
 	/**
-	 * Refreshes group readings views.
-	 * Should be called at least once a day, preferably in the middle of the night.
-	 * @param conn The connection to use
-	 * @returns {Promise<void>}
+	 * @deprecated Use TimeScaleDBReading.refreshReadings().
 	 */
 	static refreshGroupReadingsViews(conn) {
-		// It is safe to refresh the hourly and daily group views in parallel since they
-		// do not depend one each other unlike meters.
-		return Promise.all([conn.none('REFRESH MATERIALIZED VIEW group_hourly_readings_unit'),
-			conn.none('REFRESH MATERIALIZED VIEW group_daily_readings_unit')]);
+		// TODO: Remove the retained legacy refreshes once the hypertable implementation is finalized:
+		// return Promise.all([conn.none('REFRESH MATERIALIZED VIEW group_hourly_readings_unit'),
+		// 	conn.none('REFRESH MATERIALIZED VIEW group_daily_readings_unit')]);
+		// Required lazily to avoid a circular dependency through database.js.
+		// eslint-disable-next-line global-require
+		return require('./TimeScaleDB/Reading').refreshGroupReadings(conn);
 	}
 
 	/**

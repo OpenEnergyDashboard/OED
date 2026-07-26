@@ -282,12 +282,12 @@ DECLARE
 					hourly.reading_rate AS reading_rate,
 					hourly.min_rate AS min_rate,
 					hourly.max_rate AS max_rate,
-					lower(hourly.time_interval) AS start_timestamp,
-					upper(hourly.time_interval) AS end_timestamp
+					hourly.bucket AS start_timestamp,
+					hourly.bucket + INTERVAL '1 hour' AS end_timestamp
 				FROM
-					meter_hourly_readings_unit AS hourly
+					meter_hourly_readings_unit_cagg AS hourly
 				WHERE
-					requested_range @> hourly.time_interval
+					requested_range @> tsrange(hourly.bucket, hourly.bucket + INTERVAL '1 hour', '()')
 					AND hourly.meter_id = current_meter_id
 					AND hourly.graphic_unit_id = passed_graphic_unit_id
 				ORDER BY
@@ -305,12 +305,12 @@ DECLARE
 					daily.reading_rate AS reading_rate,
 					daily.min_rate AS min_rate,
 					daily.max_rate AS max_rate,
-					lower(daily.time_interval) AS start_timestamp,
-					upper(daily.time_interval) AS end_timestamp
+					daily.bucket AS start_timestamp,
+					daily.bucket + INTERVAL '1 day' AS end_timestamp
 				FROM
 					meter_daily_readings_unit_cagg AS daily
 				WHERE
-					requested_range @> daily.time_interval
+					requested_range @> tsrange(daily.bucket, daily.bucket + INTERVAL '1 day', '()')
 					AND daily.meter_id = current_meter_id
 					AND daily.graphic_unit_id = passed_graphic_unit_id
 				ORDER BY

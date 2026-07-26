@@ -8,7 +8,7 @@ bar_width_days: The number of days to use for the bar width.
 start_timestamp: The start timestamp of the data to return.
 end_timestamp: The end timestamp of the data to return.
  */
--- New version of meter_bar_readings_unit that uses the new meter_daily_readings_unit view.
+-- New version of meter_bar_readings_unit that uses the new meter_daily_readings_unit_cagg view.
 CREATE OR REPLACE FUNCTION meter_bar_readings_unit (
 	meter_ids INTEGER[],
 	-- This is the graphic unit id, changed from graphic_unit_id to avoid confusion with the graphic unit id in the view.
@@ -72,7 +72,8 @@ BEGIN
 		INNER JOIN meters m ON m.id = meters.id
 		INNER JOIN units u ON m.unit_id = u.id AND u.unit_represent != 'raw'::unit_represent_type
 		WHERE mdr.graphic_unit_id = passed_graphic_unit_id
-		GROUP BY mdr.meter_id, bars.interval_start;
+		GROUP BY mdr.meter_id, bars.interval_start
+		ORDER BY mdr.meter_id, bars.interval_start;
 
 END;
 $$ LANGUAGE 'plpgsql';
@@ -147,6 +148,7 @@ BEGIN
 			-- Use the readings in the passed in graphic unit
 			WHERE readings.graphic_unit_id = requested_graphic_unit_id
 
-			GROUP BY readings.group_id, bars.interval_start;
+			GROUP BY readings.group_id, bars.interval_start
+			ORDER BY readings.group_id, bars.interval_start;
 END;
 $$ LANGUAGE 'plpgsql';

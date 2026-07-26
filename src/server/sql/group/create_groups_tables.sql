@@ -108,40 +108,33 @@ CREATE TABLE IF NOT EXISTS groups_immediate_meters (
   TODO: Deal with parent meters that are installed after their children. They only shadow them from a start-date onwards.
   The above to-do is probably going to require a significant reworking of some stuff.
  */
-CREATE MATERIALIZED VIEW IF NOT EXISTS groups_deep_meters AS
-	/* First we need to get all the deep child meters for each group. We just join groups_immediate_meters to
-    groups_deep_children to grab all the meters associated with a group or one of its deep children.
-  */
-
-	WITH all_deep_meters(group_id, meter_id) AS (
-		SELECT DISTINCT -- Distinct because two children might include the same meter, and we only want it once.
-			gdc.parent_id AS group_id,
-			gim.meter_id AS meter_id
-		FROM groups_immediate_meters gim
-			INNER JOIN groups_deep_children gdc ON gdc.child_id = gim.group_id
-		UNION
-		SELECT
-			gim.group_id AS group_id,
-			gim.meter_id AS meter_id
-		from groups_immediate_meters gim
-	)
-	SELECT
-		adm.group_id AS group_id,
-		adm.meter_id AS meter_id,
-		EXISTS(
-		/*
-      We want to mark meter-group relationships as shadowed if there is another relationship with the same
-      group that has a meter that is a deep parent of this meter.
-      We do this by looking for rows in the meters_deep_children (mdc) view where mdc.child_id is the id
-      of the current meter, and mdc.parent_id is the ID of some other row in all_deep_meters that has the same group ID as
-      our current group and has a meter id that is a deep parent of our current meter.
-    */
-				SELECT 1 -- It doesn't matter what the result set has, only that it has at least 1 row, so we can just use '1'.
-				FROM all_deep_meters adm2
-					INNER JOIN meters_deep_children mdc ON mdc.parent_id = adm2.meter_id AND mdc.child_id = adm.meter_id
-				WHERE adm2.group_id = adm.group_id
-		)            AS is_shadowed
-	FROM all_deep_meters adm;
+-- TODO: Remove this retained legacy materialized-view implementation once the
+-- hypertable implementation is finalized. groups_deep_meters_cache replaces it.
+-- CREATE MATERIALIZED VIEW IF NOT EXISTS groups_deep_meters AS
+-- 	WITH all_deep_meters(group_id, meter_id) AS (
+-- 		SELECT DISTINCT
+-- 			gdc.parent_id AS group_id,
+-- 			gim.meter_id AS meter_id
+-- 		FROM groups_immediate_meters gim
+-- 			INNER JOIN groups_deep_children gdc ON gdc.child_id = gim.group_id
+-- 		UNION
+-- 		SELECT
+-- 			gim.group_id AS group_id,
+-- 			gim.meter_id AS meter_id
+-- 		FROM groups_immediate_meters gim
+-- 	)
+-- 	SELECT
+-- 		adm.group_id AS group_id,
+-- 		adm.meter_id AS meter_id,
+-- 		EXISTS(
+-- 			SELECT 1
+-- 			FROM all_deep_meters adm2
+-- 				INNER JOIN meters_deep_children mdc
+-- 					ON mdc.parent_id = adm2.meter_id
+-- 					AND mdc.child_id = adm.meter_id
+-- 			WHERE adm2.group_id = adm.group_id
+-- 		) AS is_shadowed
+-- 	FROM all_deep_meters adm;
 
 CREATE OR REPLACE FUNCTION check_cyclic_groups()
 	RETURNS TRIGGER AS

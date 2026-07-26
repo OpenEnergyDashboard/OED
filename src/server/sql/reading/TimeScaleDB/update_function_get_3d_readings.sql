@@ -1,17 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
- */
-
--- By indexing both columns together, the database can efficiently handle queries that involve both meter_id and time_interval.
--- Created to support the usage of the view by 3d.
--- TODO verify helps with newer views.
-CREATE INDEX IF NOT EXISTS idx_meter_hourly_readings_unit_meter_time
-ON meter_hourly_readings_unit (meter_id, lower(time_interval));
--- TODO How does this relate to index for same view in create_reading_views? Are both needed?
-CREATE INDEX if not exists idx_two_group_hourly_readings_unit
-ON group_hourly_readings_unit (group_id, graphic_unit_id, lower(time_interval));
-
 /*
 This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
 not exceed the start/end times for the readings in the supplied meter. This can be an issue, in particular,
@@ -25,7 +11,7 @@ DECLARE
 	readings_max_tsrange TSRANGE;
 BEGIN
 	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
-	FROM meter_daily_readings_unit
+	FROM meter_daily_readings_unit_cagg
 	where meter_id = meter_id_desired;
 	RETURN tsrange_to_shrink * readings_max_tsrange;
 END;
@@ -39,43 +25,33 @@ DECLARE
 	readings_max_tsrange TSRANGE;
 BEGIN
 	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
-	FROM group_daily_readings_unit
+	FROM group_daily_readings_unit_cagg
 	where group_id = group_id_desired;
 	RETURN tsrange_to_shrink * readings_max_tsrange;
 END;
 $$ LANGUAGE 'plpgsql';
 
-
--- Determines the spacing between 3D points. It uses the lowest one for all meters passed
--- that is valid.
+-- Determines the spacing between 3D points. It uses the lowest valid spacing
+-- for all requested meters.
 CREATE OR REPLACE FUNCTION reading_interval_3d (
-	-- The desired meter ids.
 	IN meter_ids_requested INTEGER[],
-	-- The number of hours in each reading requested
 	IN reading_length_hours INTEGER,
-	-- The number of hours in each reading determined
 	OUT reading_length_hours_use INTEGER,
-	-- The number of hours in each reading determined as an interval
 	OUT reading_length_interval INTERVAL
 )
 AS $$
 DECLARE
-	-- The meter frequency from all meters.
- 	meter_frequency INTERVAL;
-	-- The meter frequency rounded up to a whole number of hours.
-   	meter_frequency_hour_up INTEGER;
-	-- The larger of the meter value and the argument sent.
+	meter_frequency INTERVAL;
+	meter_frequency_hour_up INTEGER;
 	max_frequency INTEGER;
 BEGIN
-	-- Get the smallest reading frequency for all meters requested.
 	SELECT min(reading_frequency) INTO meter_frequency
-	FROM (meters m
-	INNER JOIN unnest(meter_ids_requested) meters(id) ON m.id = meters.id);
-  	-- Get the seconds in the frequency from epoch, /3600 To get hours and then round up to a whole number of hours.
-	meter_frequency_hour_up := CEIL((SELECT * FROM EXTRACT(EPOCH FROM meter_frequency)) / 3600);
-	-- Use the hours that is the largest of the request and the meter values.
+	FROM meters m
+	INNER JOIN unnest(meter_ids_requested) meters(id) ON m.id = meters.id;
+
+	meter_frequency_hour_up := CEIL(EXTRACT(EPOCH FROM meter_frequency) / 3600);
 	max_frequency := GREATEST(meter_frequency_hour_up, reading_length_hours);
-	-- The value used must be a divisor of 24 or greater than 12.
+
 	IF (max_frequency = 5) THEN
 		reading_length_hours_use := 6;
 	ELSIF (max_frequency = 7) THEN
@@ -85,15 +61,14 @@ BEGIN
 	ELSE
 		reading_length_hours_use := max_frequency;
 	END IF;
-	-- Hours per reading determined returned as an interval.
+
 	reading_length_interval := (reading_length_hours_use::TEXT || ' hour')::INTERVAL;
 END;
 $$ LANGUAGE 'plpgsql';
 
-
 -- Gets meters graphing data for 3D graphic by returning points that span the requested
 -- length of time over the days requested.
--- New meter_3d_readings_unit function that uses new meter_hourly_readings_unit view.
+-- New meter_3d_readings_unit function that uses new meter_hourly_readings_unit_cagg view.
 CREATE OR REPLACE FUNCTION meter_3d_readings_unit (
 	-- The desired meter ids. It is normally a single value for a 3D graphic.
 	-- TODO Should the array be changed to a single value as with group? Need to be sure client never asks for multiple.
@@ -165,16 +140,16 @@ BEGIN
 					) hours(hour)
 				) hours(hour),
 				-- Also need the values in the meter hourly table.
-				meter_hourly_readings_unit mhr
+				meter_hourly_readings_unit_cagg mhr
 				-- Only want the desired meter
 				WHERE mhr.meter_id = current_meter_id
 				-- Only want the desired graphing unit
 				AND mhr.graphic_unit_id = graphic_unit_id_requested
 				-- Only want readings that lie within this slice of the desired data
-				AND lower(mhr.time_interval) >= hours.hour
-				AND upper(mhr.time_interval) <= hours.hour + reading_length_interval
+				AND mhr.bucket >= hours.hour
+				AND mhr.bucket + INTERVAL '1 hour' <= hours.hour + reading_length_interval
 				-- ensures that the start of the reading time intervals does not exceed the end of the current generated interval
-				AND lower(mhr.time_interval) <= hours.hour + reading_length_interval
+				AND mhr.bucket <= hours.hour + reading_length_interval
 				-- Group by the start time of the generated series since all points in
 				-- the desired slice have the same start time for the series.
 				-- Also group by the meter_id since Postgres wants and desired for graphing
@@ -260,7 +235,7 @@ BEGIN
 				) hours(hour)
 			) hours(hour),
 			-- Also need the values in the group hourly table.
-			group_hourly_readings_unit ghr
+			group_hourly_readings_unit_cagg ghr
 			-- Only want the desired meter
 			WHERE ghr.group_id = group_id_requested
 			-- Only want the desired graphing unit

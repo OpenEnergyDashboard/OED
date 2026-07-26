@@ -226,13 +226,20 @@ class Group {
 	}
 
 	/**
-	 * Refreshes the groups deep meters view.
+	 * Refreshes the groups deep meters and graphic-unit caches.
 	 * Should be called whenever a group's child meters or groups are edited.
 	 * @param conn The connection to use
 	 * @returns {Promise<void>}
 	 */
 	static refreshGroupsDeepMetersView(conn) {
-		return conn.none('REFRESH MATERIALIZED VIEW groups_deep_meters');
+		return conn.none(`
+			DO $$
+			BEGIN
+				PERFORM update_groups_deep_meters_cache();
+				PERFORM update_group_graphic_units_cache();
+			END
+			$$;
+		`);
 	}
 
 	/**

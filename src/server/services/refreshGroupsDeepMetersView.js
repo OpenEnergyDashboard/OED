@@ -6,23 +6,27 @@
 
 const { log } = require('../log');
 const { getConnection } = require('../db');
-const Group = require('../models/Group');
-const Reading = require('../models/Reading');
+// TODO: Remove this redundant pre-hypertable refresh path once the hypertable implementation is finalized.
+// const Group = require('../models/Group');
 const TimeScaleDBReading = require('../models/TimeScaleDB/Reading');
+// TODO: Remove this retained legacy import once the hypertable implementation is finalized.
+// const Reading = require('../models/Reading');
 
 async function refreshGroupsDeepMetersView() {
     const conn = getConnection();
-    // Refresh groups deep meters view
-    log.info('Refreshing Materialized Groups Deep Meters View');
-    await Group.refreshGroupsDeepMetersView(conn);
-    log.info('Materialized Groups Deep Meters View Refreshed');
-    // Refresh group readings views
-	log.info('Refreshing Group Reading Views');
-	await Reading.refreshGroupReadingsViews(conn);
-	log.info('...Group Views Refreshed!');
-    // Refresh TimeScaleDB group readings views
+	// TODO: Remove this retained legacy refresh block once the hypertable implementation is finalized.
+	// log.info('Refreshing Materialized Groups Deep Meters View');
+	// await Group.refreshGroupsDeepMetersView(conn);
+	// log.info('Materialized Groups Deep Meters View Refreshed');
+	// log.info('Refreshing Group Reading Views');
+	// await Reading.refreshGroupReadingsViews(conn);
+	// log.info('...Group Views Refreshed!');
+    // refreshGroupReadings updates both group caches before refreshing only
+    // the group aggregates. Meter aggregates are maintained independently.
 	log.info('Refreshing TimeScaleDB Group Reading Views');
-	await TimeScaleDBReading.refreshReadings(conn);
+	// TODO: Remove this retained broad refresh once the hypertable implementation is finalized.
+	// await TimeScaleDBReading.refreshReadings(conn);
+	await TimeScaleDBReading.refreshGroupReadings(conn);
 	log.info('...TimeScaleDB Group Views Refreshed!');
 }
 

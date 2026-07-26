@@ -4,21 +4,24 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { log } = require('../log');
+const refreshAllReadingViews = require('./refreshAllReadingViews');
 
-const { getConnection } = require('../db');
-const Reading = require('../models/Reading');
+// TODO: Remove this retained legacy implementation once the hypertable
+// implementation is finalized.
+// const { log } = require('../log');
+// const { getConnection } = require('../db');
+// const Reading = require('../models/Reading');
 
 /** 
 * @deprecated OED only supports refreshing all views so please use refreshAllReadingViews.
 * See src/server/services/refreshAllReadingViews.js
 */
 async function refreshHourlyReadingViews() {
-	const conn = getConnection();
-
-	log.info('Refreshing Materialized Hourly Reading Views');
-	await Reading.refreshHourlyReadings(conn);
-	log.info('Materialized Hourly View Refreshed');
+	// const conn = getConnection();
+	// log.info('Refreshing Materialized Hourly Reading Views');
+	// await Reading.refreshHourlyReadings(conn);
+	// log.info('Materialized Hourly View Refreshed');
+	await refreshAllReadingViews();
 }
 
 module.exports = { refreshHourlyReadingViews };

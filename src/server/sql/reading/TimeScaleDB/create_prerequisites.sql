@@ -73,6 +73,15 @@ CREATE TABLE IF NOT EXISTS hypertable_hourly_split (
     graphic_unit_id INTEGER NOT NULL
 );
 
+-- All four aggregates use materialized_only=false, meaning queries can reach unmaterialized split rows.
+CREATE INDEX hypertable_hourly_split_meter_graphic_time_idx
+ON hypertable_hourly_split
+    (meter_id, graphic_unit_id, start_timestamp DESC);
+
+-- row trigger searches cik_vary by source_id and an overlapping time range
+CREATE INDEX cik_vary_source_time_idx
+ON cik_vary (source_id, start_time, end_time);
+
 
 /*
  * 2. Convert hypertable_hourly_split into a TimescaleDB hypertable.
@@ -174,7 +183,8 @@ BEGIN
 		c.destination_id AS graphic_unit_id
 	FROM meters m INNER JOIN 
 		 units u ON m.unit_id = u.id INNER JOIN 
-		 cik_vary c ON c.source_id = m.unit_id AND tsrange(c.start_time, c.end_time, '()') && tsrange(NEW.start_timestamp, NEW.end_timestamp, '[]') CROSS JOIN 
+		 cik_vary c ON c.source_id = m.unit_id AND /*tsrange(c.start_time, c.end_time, '()') && tsrange(NEW.start_timestamp, NEW.end_timestamp, '[]')*/
+		 c.start_time < NEW.end_timestamp AND c.end_time > NEW.start_timestamp  CROSS JOIN 
 		 LATERAL generate_series(date_trunc('hour', NEW.start_timestamp), date_trunc_up('hour', NEW.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start)
 	WHERE m.id = NEW.meter_id;
     RETURN NEW;

@@ -65,54 +65,47 @@ BEGIN
 END;
 $$ LANGUAGE 'plpgsql';
 
-/*
-	The following function takes an integer for group id and return an array of all unit ids which are compatible
-	to all child meters in that group.
-*/
-CREATE OR REPLACE FUNCTION get_graphic_unit (
-	requested_group_id INTEGER
-)
-RETURNS INTEGER[] AS $$
-DECLARE
-	src_ids INTEGER[];
-	dest_ids INTEGER[];
-	child_meters_unit_ids INTEGER[];
-	unit_ids_compatible INTEGER[] := '{}';
-	unit_id INTEGER;
-BEGIN
-	-- get the units of all child meters in group
-	SELECT array_agg(DISTINCT m.unit_id) INTO child_meters_unit_ids
-	FROM groups_deep_meters gdm
-	JOIN meters m ON m.id = gdm.meter_id
-	WHERE gdm.group_id = requested_group_id;
-
-	-- get all possible destination units
-	SELECT array_agg(u.id) INTO dest_ids
-	FROM units u JOIN cik c
-	ON u.id = c.destination_id;
-
-	-- determine the compatible unit by checking if the array of all corresponding source unit
-	-- to a destination unit contains all child meters' units
-	FOREACH unit_id IN ARRAY dest_ids
-	LOOP
-		BEGIN
-			SELECT array_agg(source_id) INTO src_ids
-			FROM cik WHERE destination_id = unit_id;
-
-	 		-- append each compatible unit id once into array
-			IF src_ids @> child_meters_unit_ids
-			THEN 
-				IF NOT (unit_id = ANY (unit_ids_compatible))
-				THEN
-					unit_ids_compatible := array_append(unit_ids_compatible, unit_id);
-				END IF;
-			END IF;
-		END;
-	END LOOP;
-
-	RETURN unit_ids_compatible;
-END;
-$$ LANGUAGE 'plpgsql';
+-- TODO: Remove this retained legacy function once the hypertable
+-- implementation is finalized. group_graphic_units_cache replaces it.
+-- CREATE OR REPLACE FUNCTION get_graphic_unit (
+-- 	requested_group_id INTEGER
+-- )
+-- RETURNS INTEGER[] AS $$
+-- DECLARE
+-- 	src_ids INTEGER[];
+-- 	dest_ids INTEGER[];
+-- 	child_meters_unit_ids INTEGER[];
+-- 	unit_ids_compatible INTEGER[] := '{}';
+-- 	unit_id INTEGER;
+-- BEGIN
+-- 	SELECT array_agg(DISTINCT m.unit_id) INTO child_meters_unit_ids
+-- 	FROM groups_deep_meters_cache gdm
+-- 	JOIN meters m ON m.id = gdm.meter_id
+-- 	WHERE gdm.group_id = requested_group_id;
+--
+-- 	SELECT array_agg(u.id) INTO dest_ids
+-- 	FROM units u JOIN cik c
+-- 	ON u.id = c.destination_id;
+--
+-- 	FOREACH unit_id IN ARRAY dest_ids
+-- 	LOOP
+-- 		BEGIN
+-- 			SELECT array_agg(source_id) INTO src_ids
+-- 			FROM cik WHERE destination_id = unit_id;
+--
+-- 			IF src_ids @> child_meters_unit_ids
+-- 			THEN
+-- 				IF NOT (unit_id = ANY (unit_ids_compatible))
+-- 				THEN
+-- 					unit_ids_compatible := array_append(unit_ids_compatible, unit_id);
+-- 				END IF;
+-- 			END IF;
+-- 		END;
+-- 	END LOOP;
+--
+-- 	RETURN unit_ids_compatible;
+-- END;
+-- $$ LANGUAGE 'plpgsql';
 
 /*
 This may still apply.
@@ -292,8 +285,9 @@ group_hourly_readings_unit
 		hr.graphic_unit_id
 
 	FROM meter_hourly_readings_unit hr
-	INNER JOIN groups_deep_meters gdm ON hr.meter_id = gdm.meter_id
-	INNER JOIN unnest(get_graphic_unit(gdm.group_id)) AS gu(graphic_unit_id) ON hr.graphic_unit_id = gu.graphic_unit_id
+	INNER JOIN groups_deep_meters_cache gdm ON hr.meter_id = gdm.meter_id
+	INNER JOIN group_graphic_units_cache gu
+		ON gu.group_id = gdm.group_id AND hr.graphic_unit_id = gu.graphic_unit_id
 	-- group meter readings of each group on the the same hour, of the same graphic unit
 	GROUP BY gdm.group_id, hr.graphic_unit_id, hr.time_interval
 	ORDER BY gdm.group_id;
@@ -311,8 +305,9 @@ group_daily_readings_unit
 		dr.graphic_unit_id
 
 	FROM meter_daily_readings_unit dr
-	INNER JOIN groups_deep_meters gdm ON dr.meter_id = gdm.meter_id
-	INNER JOIN unnest(get_graphic_unit(gdm.group_id)) AS gu(graphic_unit_id) ON dr.graphic_unit_id = gu.graphic_unit_id
+	INNER JOIN groups_deep_meters_cache gdm ON dr.meter_id = gdm.meter_id
+	INNER JOIN group_graphic_units_cache gu
+		ON gu.group_id = gdm.group_id AND dr.graphic_unit_id = gu.graphic_unit_id
 	-- group meter readings of each group on the the same day, of the same graphic unit
 	GROUP BY gdm.group_id, dr.graphic_unit_id, dr.time_interval
 	-- order by time interval instead
@@ -552,7 +547,7 @@ BEGIN
 	-- First get all the meter ids that will be included in one or more groups being queried.
 	-- In case meter is repeated, make this distinct.
 	SELECT array_agg(DISTINCT gdm.meter_id) INTO meter_ids
-	FROM groups_deep_meters gdm
+	FROM groups_deep_meters_cache gdm
 	INNER JOIN unnest(group_ids) gids(id) ON gdm.group_id = gids.id;
 
 	-- Calculate point accuracy if request (auto) or if raw since that is not allowed for groups.

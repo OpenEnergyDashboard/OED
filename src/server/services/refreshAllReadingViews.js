@@ -6,8 +6,9 @@
 
 const { log } = require('../log');
 const { getConnection } = require('../db');
-const Reading = require('../models/Reading');
 const TimeScaleDBReading = require('../models/TimeScaleDB/Reading');
+// TODO: Remove this retained legacy import once the hypertable implementation is finalized.
+// const Reading = require('../models/Reading');
 
 // Arbitrary, stable application namespace key for a session-level PostgreSQL
 // advisory lock. Every aggregate refresher must use this same key; the numeric
@@ -21,11 +22,10 @@ async function timedRefresh(label, operation) {
 	log.info(`${label} completed in ${Date.now() - start} ms`);
 }
 
-/** 
- * This function is changed from refreshing hourly and daily readings
- * views in parallel using Promise.all() into one by one because
- * daily readings calculation depends on hourly readings.
-*/
+/**
+ * Refreshes the TimescaleDB reading aggregates while holding a shared
+ * advisory lock so concurrent imports cannot refresh them simultaneously.
+ */
 async function refreshAllReadingViews(options = {}) {
 	const { startTimestamp = null, endTimestamp = null, rebuild = startTimestamp === null && endTimestamp === null } = options;
 	if ((startTimestamp === null) !== (endTimestamp === null)) {
@@ -36,16 +36,15 @@ async function refreshAllReadingViews(options = {}) {
 	await conn.task(async task => {
 		await task.one('SELECT pg_advisory_lock(${lockId})', { lockId: REFRESH_ADVISORY_LOCK_ID });
 		try {
-			await timedRefresh('Legacy meter reading views refresh', () => Reading.refreshMeterReadingsViews(task));
-
+			// TODO: Remove these retained legacy refresh calls once the hypertable implementation is finalized.
+			// await timedRefresh('Legacy meter reading views refresh', () => Reading.refreshMeterReadingsViews(task));
 			if (rebuild) {
 				await timedRefresh('TimescaleDB reading aggregates rebuild', () => TimeScaleDBReading.rebuildReadings(task));
 			} else {
 				await timedRefresh('TimescaleDB reading aggregates range refresh', () =>
 					TimeScaleDBReading.refreshReadings(task, startTimestamp, endTimestamp));
 			}
-
-			await timedRefresh('Legacy group reading views refresh', () => Reading.refreshGroupReadingsViews(task));
+			// await timedRefresh('Legacy group reading views refresh', () => Reading.refreshGroupReadingsViews(task));
 		} finally {
 			await task.one('SELECT pg_advisory_unlock(${lockId})', { lockId: REFRESH_ADVISORY_LOCK_ID });
 		}
