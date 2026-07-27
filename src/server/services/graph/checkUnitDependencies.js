@@ -5,6 +5,8 @@
 const Meter = require('../../models/Meter');
 const Group = require('../../models/Group');
 const Conversion = require('../../models/Conversion');
+const Unit = require('../../models/Unit');
+const { log } = require('../../log');
 
 /**
  * Checks if a unit has dependencies that prevent safe deletion.
@@ -83,8 +85,48 @@ async function getUnitDependencyDetails(unitId, conn) {
 	};
 }
 
+/**
+ * Deletes a single unit, clearing all dependencies that would otherwise block it.
+ * If it's used as a meter's or group's default graphic unit, that reference is
+ * cleared first (cosmetic, safe to drop). If it's used as a meter's actual base
+ * unit (unit_id), that reference is also cleared (the meter is left without a
+ * defined unit) so the deletion can proceed. Any other conversions still
+ * referencing this unit are deleted as well. Also clears any stale cik rows
+ * @param {number} unitId The unit to delete.
+ * @param {*} conn The connection to use (should be a transaction).
+ */
+async function deleteUnitSafely(unitId, conn) {
+	const deps = await checkUnitDependencies(unitId, conn);
+
+	// Clear any meter using this as its base unit or default graphic unit.
+	for (const meter of deps.meters) {
+		if (meter.unit_id === unitId) {
+			log.warn(`Clearing base unit for meter "${meter.name}" (ID: ${meter.id}) to allow deletion of unit ${unitId}.`);
+			await conn.none('UPDATE meters SET unit_id = NULL WHERE id = $1', [meter.id]);
+		}
+		if (meter.default_graphic_unit === unitId) {
+			await conn.none('UPDATE meters SET default_graphic_unit = NULL WHERE id = $1', [meter.id]);
+		}
+	}
+
+	// Clear any group using this as its default graphic unit.
+	for (const group of deps.groups) {
+		await conn.none('UPDATE groups SET default_graphic_unit = NULL WHERE id = $1', [group.id]);
+	}
+
+	// Delete any other conversions still referencing this unit.
+	for (const conv of deps.conversions) {
+		log.info(`Deleting conversion ${conv.source_id}->${conv.destination_id} to allow deletion of unit ${unitId}.`);
+		await conn.none('DELETE FROM conversions WHERE source_id = $1 AND destination_id = $2', [conv.source_id, conv.destination_id]);
+	}
+
+	await conn.none('DELETE FROM cik WHERE source_id = $1 OR destination_id = $1', [unitId]);
+	await Unit.delete(unitId, conn);
+}
+
 module.exports = {
 	checkUnitDependencies,
 	canSafelyHideSuffixUnit,
-	getUnitDependencyDetails
+	getUnitDependencyDetails,
+	deleteUnitSafely
 };
