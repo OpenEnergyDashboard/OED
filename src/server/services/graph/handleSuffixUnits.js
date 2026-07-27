@@ -8,6 +8,7 @@ const Conversion = require('../../models/Conversion');
 const { getAllPaths } = require('./createConversionGraph');
 const { log } = require('../../log');
 const { canSafelyHideSuffixUnit } = require('./checkUnitDependencies');
+const { deleteUnitSafely } = require('./checkUnitDependencies');
 
 /**
  * Adds the new unit and conversions to the database and the conversion graph.
@@ -159,8 +160,8 @@ async function handleSuffixUnits(graph, conn) {
 /**
  * OED handles suffix units by adding conversions and units automatically.
  * When a unit's suffix changes, these additional conversions and units need to be removed.
- * Units are complicated to remove so we just set their displayable to NONE.
- * Since this function makes changes to conversions and units, Cik must be recalculated after calling this function.
+ * Each conversion and OED created unit is cleaned up independently.
+ * Cik must be recalculated after calling this function.
  * @param {*} suffixUnit Additional conversions/units of this suffixUnit will be removed.
  * @param {*} conn The connection to use (can be a transaction).
  * @param {number} depth Current recursion depth to prevent infinite loops (default: 0).
@@ -197,36 +198,27 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 			
 			// The units that OED adds are suffix units (typeOfUnit === SUFFIX)
 			if (otherUnit.typeOfUnit === Unit.unitType.SUFFIX) {
-				// Check if unit can be safely hidden (no meter/group dependencies)
-				const canHide = await canSafelyHideSuffixUnit(otherUnitId, conn);
-				
-			// Always delete the conversion, but only hide unit if safe
-			await Conversion.delete(conversion.sourceId, conversion.destinationId, conn);
-			
+				// Always delete the conversion
+				await Conversion.delete(conversion.sourceId, conversion.destinationId, conn);
+
 				// If bidirectional, also delete the reverse conversion if it exists separately
 				if (conversion.bidirectional) {
-					// Check if reverse conversion exists (some systems store bidirectional as two entries)
 					const reverseConversion = await Conversion.getBySourceDestination(
-						conversion.destinationId, 
-						conversion.sourceId, 
+						conversion.destinationId,
+						conversion.sourceId,
 						conn
 					);
 					if (reverseConversion) {
 						await Conversion.delete(conversion.destinationId, conversion.sourceId, conn);
 					}
 				}
-				
-				if (canHide) {
-					// Hide the destination unit (the other unit in the conversion)
-					otherUnit.displayable = Unit.displayableType.NONE;
-					await otherUnit.update(conn);
-					
-					// Recursively clean up this unit's related conversions/units
-					// This handles nested suffix chains (A -> B -> C)
-					await removeAdditionalConversionsAndUnits(otherUnit, conn, depth + 1);
-				} else {
-					log.warn(`Cannot hide suffix unit ${otherUnitId} - has dependencies (meters/groups). Conversion ${conversion.sourceId}->${conversion.destinationId} deleted but unit remains visible.`);
-				}
+
+				// Delete the auto-created unit (dependency checks + cik cleanup handled inside)
+				await deleteUnitSafely(otherUnitId, conn);
+
+				// Recursively clean up this unit's related conversions/units
+				// This handles nested suffix chains (A -> B -> C)
+				await removeAdditionalConversionsAndUnits(otherUnit, conn, depth + 1);
 			}
 		} catch (err) {
 			log.error(`Error processing conversion ${conversion.sourceId}->${conversion.destinationId} during suffix unit cleanup: ${err}`, err);
