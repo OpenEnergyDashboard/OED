@@ -1,4 +1,9 @@
-/*
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+ 
+ /*
 This takes tsrange_to_shrink which is the requested time range to plot and makes sure it does
 not exceed the start/end times for the readings in the supplied meter. This can be an issue, in particular,
 because infinity is used to indicate to graph all readings. This version does it to the nearest

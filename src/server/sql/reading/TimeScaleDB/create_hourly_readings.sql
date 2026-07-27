@@ -1,4 +1,9 @@
-/*
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+ 
+ /*
  * Prefrace:
  * 	 This script continues the work introduced in PR#1546, which established the
  * 	 benchmark for migrating hourly meter reading queries from PostgreSQL
@@ -99,7 +104,7 @@ GROUP BY
 WITH NO DATA;
 
 -- This should improve meter continuous-aggregate refreshes
-CREATE INDEX meter_hourly_cagg_meter_graphic_bucket_idx
+CREATE INDEX IF NOT EXISTS meter_hourly_cagg_meter_graphic_bucket_idx
 ON meter_hourly_readings_unit_cagg
     (meter_id, graphic_unit_id, bucket);
 

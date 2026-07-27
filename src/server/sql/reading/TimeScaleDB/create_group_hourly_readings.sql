@@ -1,4 +1,9 @@
-/*
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+ 
+ /*
  * Purpose:
  *
  *   This materialized view rolls up hourly meter readings into hourly group
@@ -68,7 +73,7 @@ GROUP BY
 WITH NO DATA;
 
 -- This should improve group continuous-aggregate refreshes
-CREATE INDEX group_hourly_cagg_group_graphic_bucket_idx
+CREATE INDEX IF NOT EXISTS group_hourly_cagg_group_graphic_bucket_idx
 ON group_hourly_readings_unit_cagg
     (group_id, graphic_unit_id, bucket);
 

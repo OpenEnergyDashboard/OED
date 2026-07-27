@@ -1,3 +1,8 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+ 
 /*
  * Purpose:
  *
@@ -67,7 +72,7 @@ CREATE TABLE IF NOT EXISTS groups_deep_meters_cache (
 );
 
 -- This should improve group continuous-aggregate refreshes
-CREATE INDEX groups_deep_meters_cache_meter_group_idx
+CREATE INDEX IF NOT EXISTS groups_deep_meters_cache_meter_group_idx
 ON groups_deep_meters_cache (meter_id, group_id);
 
 

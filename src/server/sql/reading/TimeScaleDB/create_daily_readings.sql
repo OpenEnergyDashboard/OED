@@ -1,3 +1,8 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+ 
 /*
  * Aggregating directly from hypertable_hourly_split, it will be used by by group_daily_readings_unit_cagg.
  * Therefore  it is necessaary to retain the bucket to allow for proper grouping in the next level of 
@@ -55,7 +60,7 @@ ORDER BY meter_id, graphic_unit_id, bucket
 WITH NO DATA;
 
 -- This should improve meter continuous-aggregate refreshes
-CREATE INDEX meter_daily_cagg_meter_graphic_bucket_idx
+CREATE INDEX IF NOT EXISTS meter_daily_cagg_meter_graphic_bucket_idx
 ON meter_daily_readings_unit_cagg
     (meter_id, graphic_unit_id, bucket);
 

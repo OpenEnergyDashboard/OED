@@ -1,4 +1,9 @@
-/*
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+ 
+ /*
  * Prefrace:
  * 	 This script continues the work introduced in PR#1546, which established the
  * 	 benchmark for migrating hourly meter reading queries from PostgreSQL
@@ -74,12 +79,12 @@ CREATE TABLE IF NOT EXISTS hypertable_hourly_split (
 );
 
 -- All four aggregates use materialized_only=false, meaning queries can reach unmaterialized split rows.
-CREATE INDEX hypertable_hourly_split_meter_graphic_time_idx
+CREATE INDEX IF NOT EXISTS hypertable_hourly_split_meter_graphic_time_idx
 ON hypertable_hourly_split
     (meter_id, graphic_unit_id, start_timestamp DESC);
 
 -- row trigger searches cik_vary by source_id and an overlapping time range
-CREATE INDEX cik_vary_source_time_idx
+CREATE INDEX IF NOT EXISTS cik_vary_source_time_idx
 ON cik_vary (source_id, start_time, end_time);
 
 
@@ -184,7 +189,7 @@ BEGIN
 	FROM meters m INNER JOIN 
 		 units u ON m.unit_id = u.id INNER JOIN 
 		 cik_vary c ON c.source_id = m.unit_id AND /*tsrange(c.start_time, c.end_time, '()') && tsrange(NEW.start_timestamp, NEW.end_timestamp, '[]')*/
-		 c.start_time < NEW.end_timestamp AND c.end_time > NEW.start_timestamp  CROSS JOIN 
+		 c.start_time < NEW.end_timestamp AND c.end_time > NEW.start_timestamp CROSS JOIN 
 		 LATERAL generate_series(date_trunc('hour', NEW.start_timestamp), date_trunc_up('hour', NEW.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start)
 	WHERE m.id = NEW.meter_id;
     RETURN NEW;
@@ -273,7 +278,8 @@ BEGIN
 	FROM readings r INNER JOIN 
 		 meters m ON r.meter_id = m.id INNER JOIN 
 		 units u ON m.unit_id = u.id INNER JOIN 
-		 cik_vary c ON c.source_id = m.unit_id AND tsrange(c.start_time, c.end_time, '()') && tsrange(r.start_timestamp, r.end_timestamp, '[]') CROSS JOIN 
+		 cik_vary c ON c.source_id = m.unit_id AND /*tsrange(c.start_time, c.end_time, '()') && tsrange(r.start_timestamp, r.end_timestamp, '[]')*/ 
+		 c.start_time < r.end_timestamp AND c.end_time > r.start_timestamp CROSS JOIN 
 		 LATERAL generate_series(date_trunc('hour', r.start_timestamp), date_trunc_up('hour', r.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start);
 END;
 $$ LANGUAGE plpgsql;
