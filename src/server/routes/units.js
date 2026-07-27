@@ -33,6 +33,89 @@ function formatUnitForResponse(unit) {
 }
 
 /**
+ * Validates the body of a unit create/edit request.
+ * isEdit=true includes the required 'id' property (edit, since the client must tell us which unit to
+ * update); isEdit=false excludes it (create, since id is assigned by the DB on insert).
+ * @param params req.body for a unit create or edit request
+ * @param isEdit whether this is validating an edit (true) or create (false) request
+ * @returns {{valid: boolean, errors: array}}
+ */
+function validateUnitsParams(params, isEdit = true) {
+	const properties = {
+		name: {
+			type: 'string',
+			minLength: 1,
+			maxLength: STRING_SHORT_MAX_LENGTH
+		},
+		identifier: {
+			type: 'string',
+			minLength: 1,
+			maxLength: STRING_SHORT_MAX_LENGTH
+		},
+		unitRepresent: {
+			type: 'string',
+			minLength: 1,
+			maxLength: STRING_SHORT_MAX_LENGTH,
+			enum: Object.values(Unit.unitRepresentType)
+		},
+		secInRate: { type: 'number', minimum: 0 },
+		typeOfUnit: {
+			type: 'string',
+			minLength: 1,
+			maxLength: STRING_SHORT_MAX_LENGTH,
+			enum: Object.values(Unit.unitType)
+		},
+		suffix: {
+			oneOf: [
+				{ type: 'string', maxLength: STRING_SHORT_MAX_LENGTH },
+				{ type: 'null' }
+			]
+		},
+		displayable: {
+			type: 'string',
+			minLength: 1,
+			maxLength: STRING_SHORT_MAX_LENGTH,
+			enum: Object.values(Unit.displayableType)
+		},
+		preferredDisplay: { type: 'boolean' },
+		note: {
+			oneOf: [
+				{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
+				{ type: 'null' }
+			]
+		},
+		minVal: { type: 'number' },
+		maxVal: { type: 'number' },
+		disableChecks: {
+			type: 'string',
+			minLength: 1,
+			maxLength: STRING_SHORT_MAX_LENGTH,
+			enum: Object.values(Unit.disableChecksType)
+		}
+	};
+ 
+	// TODO Consider updating once decide exactly what want.
+	// required: ['id', 'name', 'identifier', 'unitRepresent', 'secInRate', 'typeOfUnit', 'suffix'],
+	const required = ['identifier'];
+ 
+	if (isEdit) {
+		properties.id = { type: 'integer', minimum: 1 };
+		required.push('id');
+	} else {
+		required.push('name', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay', 'minVal', 'maxVal', 'disableChecks');
+	}
+ 
+	const validUnit = {
+		type: 'object',
+		additionalProperties: false,
+		required,
+		properties
+	};
+	const validatorResult = validate(params, validUnit);
+	return { valid: validatorResult.valid, errors: validatorResult.errors };
+}
+
+/**
  * Route for getting all units.
  */
 router.get('/', optionalAuthMiddleware, async (req, res) => {
@@ -50,62 +133,9 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
  * Route for editing a unit by ID.
  */
 router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
-	const validUnit = {
-		type: 'object',
-		additionalProperties: false,
-		required: ['id', 'identifier'],
-		// TODO Consider updating once decide exactly what want.
-		// required: ['id', 'name', 'identifier', 'unitRepresent', 'secInRate', 'typeOfUnit', 'suffix'],
-		properties: {
-			id: { type: 'integer', minimum: 1 },
-			name: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH
-			},
-			identifier: {
-				type: 'string',
-				maxLength: STRING_SHORT_MAX_LENGTH
-			},
-			unitRepresent: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH,
-				enum: Object.values(Unit.unitRepresentType)
-			},
-			secInRate: { type: 'number', minimum: 0 },
-			typeOfUnit: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH,
-				enum: Object.values(Unit.unitType)
-			},
-			suffix: {
-				type: 'string',
-				maxLength: STRING_SHORT_MAX_LENGTH
-			},
-			displayable: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH,
-				enum: Object.values(Unit.displayableType)
-			},
-			preferredDisplay: { type: 'boolean' },
-			note: {
-				type: 'string',
-				maxLength: STRING_GENERAL_MAX_LENGTH
-			},
-			minVal: { type: 'number' },
-			maxVal: { type: 'number' },
-			disableChecks: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH,
-				enum: Object.values(Unit.disableChecksType)
-			}
-		}
-	};
-	const validatorResult = validate(req.body, validUnit);
+	// isEdit=true: id is required here since the client must tell us which unit to update.
+	const validatorResult = validateUnitsParams(req.body, true);
+
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
@@ -137,66 +167,9 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
  * Route for creating a new unit.
  */
 router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
-	const validUnit = {
-		type: 'object',
-		additionalProperties: false,
-		required: ['name', 'identifier', 'unitRepresent', 'typeOfUnit', 'displayable', 'preferredDisplay', 'minVal', 'maxVal', 'disableChecks'],
-		properties: {
-			// TODO Probably should not be passed
-			// id: { type: 'integer' },
-			name: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH
-			},
-			identifier: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH
-			},
-			unitRepresent: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH,
-				enum: Object.values(Unit.unitRepresentType)
-			},
-			secInRate: { type: 'number', minimum: 0 },
-			typeOfUnit: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH,
-				enum: Object.values(Unit.unitType)
-			},
-			suffix: {
-				oneOf: [
-					{ type: 'string', maxLength: STRING_SHORT_MAX_LENGTH },
-					{ type: 'null' }
-				]
-			},
-			displayable: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH,
-				enum: Object.values(Unit.displayableType)
-			},
-			preferredDisplay: { type: 'boolean' },
-			note: {
-				oneOf: [
-					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
-					{ type: 'null' }
-				]
-			},
-			minVal: { type: 'number' },
-			maxVal: { type: 'number' },
-			disableChecks: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_SHORT_MAX_LENGTH,
-				enum: Object.values(Unit.disableChecksType)
-			}
-		}
-	};
-	const validationResult = validate(req.body, validUnit);
+	// isEdit=false: id must not be present, since it's assigned by the DB on insert.
+	const validationResult = validateUnitsParams(req.body, false);
+
 	if (!validationResult.valid) {
 		log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);

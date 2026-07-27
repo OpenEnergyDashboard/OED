@@ -17,6 +17,70 @@ const { HTTP_CODES } = require('../util/httpCodes');
 const router = express.Router();
 
 /**
+ * Validates the body of a user create/edit request.
+ * isEdit=true includes the required 'id' property and makes 'password' optional (edit, since a user
+ * is only sent a new password if it should change); isEdit=false excludes 'id' (assigned by the DB on
+ * insert) and requires 'password' (create).
+ * Note: /edit's body nests the user fields under a 'user' property, unlike /create's flat body, so
+ * this also builds and checks that wrapper when isEdit is true.
+ * @param params req.body for a user create or edit request
+ * @param isEdit whether this is validating an edit (true) or create (false) request
+ * @returns {{valid: boolean, errors: array}}
+ */
+function validateUsersParams(params, isEdit = true) {
+	const properties = {
+		username: {
+			type: 'string',
+			minLength: USERNAME_MIN_LENGTH,
+			maxLength: USERNAME_MAX_LENGTH
+		},
+		password: {
+			type: 'string',
+			// TODO: Optional field - if present, should be 8-1000 chars
+			minLength: PASSWORD_MIN_LENGTH,
+			maxLength: PASSWORD_MAX_LENGTH
+		},
+		role: {
+			type: 'string',
+			enum: Object.values(User.role)
+		},
+		note: {
+			type: 'string',
+			maxLength: STRING_GENERAL_MAX_LENGTH
+		}
+	};
+
+	const required = ['username', 'role', 'note'];
+
+	if (isEdit) {
+		properties.id = { type: 'integer', minimum: 1 };
+		required.push('id');
+	} else {
+		required.push('password');
+	}
+
+	const userSchema = {
+		type: 'object',
+		additionalProperties: false,
+		required,
+		properties
+	};
+
+	// /edit nests the user fields under a 'user' property; /create does not.
+	const validParams = isEdit
+		? {
+			type: 'object',
+			additionalProperties: false,
+			required: ['user'],
+			properties: { user: userSchema }
+		}
+		: userSchema;
+
+	const validatorResult = validate(params, validParams);
+	return { valid: validatorResult.valid, errors: validatorResult.errors };
+}
+
+/**
  * Route for listing all users.
  */
 router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
@@ -91,32 +155,8 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 
 // Route for creating a new user.
 router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) => {
-	const validParams = {
-		type: 'object',
-		additionalProperties: false,
-		required: ['username', 'password', 'role', 'note'],
-		properties: {
-			username: {
-				type: 'string',
-				minLength: USERNAME_MIN_LENGTH,
-				maxLength: USERNAME_MAX_LENGTH
-			},
-			password: {
-				type: 'string',
-				minLength: PASSWORD_MIN_LENGTH,
-				maxLength: PASSWORD_MAX_LENGTH
-			},
-			role: {
-				type: 'string',
-				enum: Object.values(User.role)
-			},
-			note: {
-				type: 'string',
-				maxLength: STRING_GENERAL_MAX_LENGTH
-			}
-		}
-	};
-	if (!validate(req.body, validParams).valid) {
+	// isEdit=false: id must not be present, since it's assigned by the DB on insert, and password is required.
+	if (!validateUsersParams(req.body, false).valid) {
 		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
 	} else {
 		try {
@@ -142,46 +182,9 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 
 // Route for updating an existing user.
 router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
-
-	const validParams = {
-		type: 'object',
-		additionalProperties: false,
-		required: ['user'],
-		properties: {
-			user: {
-				type: 'object',
-				additionalProperties: false,
-				required: ['id', 'username', 'role', 'note'],
-				properties: {
-					id: {
-						type: 'integer',
-						minimum: 1
-					},
-					username: {
-						type: 'string',
-						minLength: USERNAME_MIN_LENGTH,
-						maxLength: USERNAME_MAX_LENGTH
-					},
-					role: {
-						type: 'string',
-						enum: Object.values(User.role)
-					},
-					password: {
-						type: 'string',
-						// TODO: Optional field - if present, should be 8-1000 chars
-						minLength: PASSWORD_MIN_LENGTH,
-						maxLength: PASSWORD_MAX_LENGTH
-					},
-					note: {
-						type: 'string',
-						maxLength: STRING_GENERAL_MAX_LENGTH
-					}
-				}
-			}
-		}
-	};
-
-	if (!validate(req.body, validParams).valid) {
+	// isEdit=true: id is required and password remains optional, since a user is only sent a new
+	// password if it should change. The wrapper ('user' key) is validated inside the helper too.
+	if (!validateUsersParams(req.body, true).valid) {
 		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
 	} else {
 		try {
@@ -237,13 +240,13 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 		properties: {
 			username: {
 				type: 'string',
-				minLength: 5,
-				maxLength: 254
+				minLength: USERNAME_MIN_LENGTH,
+				maxLength: USERNAME_MAX_LENGTH
 			}
 		}
 	};
 	if (!validate(req.body, validParams).valid) {
-		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params!' });
+		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
 	} else {
 		try {
 			const conn = getConnection();
