@@ -193,12 +193,15 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 			}
 
 			// Check for dependencies on suffix units that will be affected
+			// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
 			// This provides better error messages before attempting deletion
+			const isSuffixRelated = (unit) => unit.typeOfUnit === 'suffix' || (unit.suffix && unit.suffix.trim() !== '');
+
 			const suffixUnitsToCheck = [];
-			if (source.typeOfUnit === 'suffix') {
+			if (isSuffixRelated(source)) {
 				suffixUnitsToCheck.push({ unit: source, role: 'source' });
 			}
-			if (dest.typeOfUnit === 'suffix') {
+			if (isSuffixRelated(dest)) {
 				suffixUnitsToCheck.push({ unit: dest, role: 'destination' });
 			}
 
@@ -234,15 +237,16 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 				await t.one('SELECT * FROM units WHERE id = $1 FOR UPDATE', [destinationId]);
 				
 				// Check if the source or the destination is a suffix unit and clean up related conversions/units
-				if (source.typeOfUnit === 'suffix') {
-					log.info(`Suffix unit ${sourceId} is used in conversion deletion as source. Cleaning up related conversions and units.`);
-					// Reload source unit within transaction to ensure consistency
+				// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
+				const isSuffixRelated = (unit) => unit.typeOfUnit === 'suffix' || (unit.suffix && unit.suffix.trim() !== '');
+
+				if (isSuffixRelated(source)) {
+					log.info(`Suffix-related unit ${sourceId} is used in conversion deletion as source. Cleaning up related conversions and units.`);
 					const sourceInTx = await Unit.getById(sourceId, t);
 					await removeAdditionalConversionsAndUnits(sourceInTx, t);
 				}
-				if (dest.typeOfUnit === 'suffix') {
-					log.info(`Suffix unit ${destinationId} is used in conversion deletion as destination. Cleaning up related conversions and units.`);
-					// Reload dest unit within transaction to ensure consistency
+				if (isSuffixRelated(dest)) {
+					log.info(`Suffix-related unit ${destinationId} is used in conversion deletion as destination. Cleaning up related conversions and units.`);
 					const destInTx = await Unit.getById(destinationId, t);
 					await removeAdditionalConversionsAndUnits(destInTx, t);
 				}

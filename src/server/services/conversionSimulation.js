@@ -77,12 +77,14 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 		{ sourceId, destinationId } // The conversion being deleted
 	];
 	
-	if (sourceUnit && sourceUnit.typeOfUnit === 'suffix') {
+	const isSuffixRelated = (unit) => unit && (unit.typeOfUnit === 'suffix' || (unit.suffix && unit.suffix.trim() !== ''));
+
+	if (isSuffixRelated(sourceUnit)) {
 		const cleanup = simulateSuffixUnitCleanup(sourceUnit, allConversions, allUnits);
 		conversionsToRemove.push(...cleanup.conversionsToRemove);
 	}
-	
-	if (destUnit && destUnit.typeOfUnit === 'suffix') {
+
+	if (isSuffixRelated(destUnit)) {
 		const cleanup = simulateSuffixUnitCleanup(destUnit, allConversions, allUnits);
 		conversionsToRemove.push(...cleanup.conversionsToRemove);
 	}

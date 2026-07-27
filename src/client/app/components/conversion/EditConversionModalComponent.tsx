@@ -224,7 +224,11 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					</div>
 				);
 			}
-		} else if (source.typeOfUnit === UnitType.suffix || dest.typeOfUnit === UnitType.suffix) {
+			// Suffix unit to Suffix Unit deletion
+		} else if (
+			source.typeOfUnit === UnitType.suffix || (source.suffix && source.suffix.trim() !== '') ||
+			dest.typeOfUnit === UnitType.suffix || (dest.suffix && dest.suffix.trim() !== '')
+		) {
 			const suffixUnit = source.typeOfUnit === UnitType.suffix ? source : dest;
 			// Find all conversions involving this suffix unit (as source or destination)
 			const suffixUnitConversions = conversionDetails.filter(c =>
@@ -232,8 +236,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				(c.bidirectional && (c.sourceId === suffixUnit.id || c.destinationId === suffixUnit.id))
 			);
 
-			// Find suffix-type units that would be hidden (OED-created suffix units)
-			const suffixTypeUnitsToHide = suffixUnitConversions
+			// Find OED-created suffix-type units that would be cascade deleted
+			const suffixTypeUnitsToDelete = suffixUnitConversions
 				.map(c => {
 					const otherId = c.sourceId === suffixUnit.id ? c.destinationId : c.sourceId;
 					return unitDataById[otherId];
@@ -248,7 +252,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			});
 
 			// Check for meters/groups using affected suffix units
-			const affectedSuffixUnitIds = new Set(suffixTypeUnitsToHide.map(u => u.id));
+			const affectedSuffixUnitIds = new Set(suffixTypeUnitsToDelete.map(u => u.id));
 			affectedSuffixUnitIds.add(suffixUnit.id); // Also check the main suffix unit
 
 			// Check meters using these units (as unitId or defaultGraphicUnit)
@@ -292,12 +296,12 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			}
 
 			// Display warnings using React elements for consistency
-			if (suffixTypeUnitsToHide.length > 0) {
+			if (suffixTypeUnitsToDelete.length > 0) {
 				msgElements.push(
 					<div key="suffix-units-to-hide">
 						<span className="bold">{translate('conversion.delete.suffix.units.to.delete')}:</span>
 						<ul>
-							{suffixTypeUnitsToHide.map(u => (
+							{suffixTypeUnitsToDelete.map(u => (
 								<li key={u.id}>"{u.name}" ({u.identifier})</li>
 							))}
 						</ul>
