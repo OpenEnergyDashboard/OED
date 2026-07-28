@@ -72,7 +72,8 @@ BEGIN
 		-- This is getting the conversion for the meter and unit to graph.
 		WHERE
 			-- The range requested must be completely within the hour so partial hours are not included.
-			curr_tsrange @> tsrange(time_bucket('1 hour', hourly.bucket), time_bucket('1 hour', hourly.bucket) + INTERVAL '1 hour','()') AND
+			hourly.bucket >= lower(curr_tsrange) AND
+			hourly.bucket <= upper(curr_tsrange) - INTERVAL '1 hour' AND
 			hourly.graphic_unit_id = passed_graphic_unit_id AND
 			hourly.meter_id = ANY(meter_ids)
 		GROUP BY hourly.meter_id
@@ -86,7 +87,8 @@ BEGIN
 		-- The slope and intercept are used above the transform the reading to the desired unit.
 		WHERE
 			-- The range requested must be completely within the hour so partial hours are not included.
-			prev_tsrange @> tsrange(time_bucket('1 hour', hourly.bucket), time_bucket('1 hour', hourly.bucket) + INTERVAL '1 hour','()') AND
+			hourly.bucket >= lower(prev_tsrange) AND
+			hourly.bucket <= upper(prev_tsrange) - INTERVAL '1 hour' AND
 			hourly.graphic_unit_id = passed_graphic_unit_id AND
 			hourly.meter_id = ANY(meter_ids)
 		GROUP BY hourly.meter_id
@@ -139,7 +141,8 @@ BEGIN
 			hourly.group_id,
 			SUM(hourly.reading_rate) AS reading
 		FROM group_hourly_readings_unit_cagg hourly
-		WHERE curr_tsrange @> tsrange(time_bucket('1 hour', hourly.bucket), time_bucket('1 hour', hourly.bucket) + INTERVAL '1 hour','()')
+		WHERE hourly.bucket >= lower(curr_tsrange)
+		AND hourly.bucket <= upper(curr_tsrange) - INTERVAL '1 hour'
 		AND requested_graphic_unit_id = hourly.graphic_unit_id
 		AND hourly.group_id = ANY(group_ids) 
 		GROUP BY hourly.group_id
@@ -149,7 +152,8 @@ BEGIN
 			hourly.group_id,
 			SUM(hourly.reading_rate) AS reading
 		FROM group_hourly_readings_unit_cagg hourly
-		WHERE prev_tsrange @> tsrange(time_bucket('1 hour', hourly.bucket), time_bucket('1 hour', hourly.bucket) + INTERVAL '1 hour','()')
+		WHERE hourly.bucket >= lower(prev_tsrange)
+		AND hourly.bucket <= upper(prev_tsrange) - INTERVAL '1 hour'
 		AND requested_graphic_unit_id = hourly.graphic_unit_id
 		AND hourly.group_id = ANY(group_ids) 
 		GROUP BY hourly.group_id

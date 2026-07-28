@@ -83,7 +83,7 @@ AS $$
 DECLARE
 	readings_max_tsrange TSRANGE;
 BEGIN
-	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
+	SELECT tsrange(min(bucket), max(bucket + INTERVAL '1 day')) INTO readings_max_tsrange
 	FROM meter_daily_readings_unit_cagg dr
 	-- Get all the meter_ids in the passed array of meters.
 	INNER JOIN unnest(meter_ids) meters(id) ON dr.meter_id = meters.id;

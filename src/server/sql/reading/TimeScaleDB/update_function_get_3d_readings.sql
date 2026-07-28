@@ -15,7 +15,7 @@ AS $$
 DECLARE
 	readings_max_tsrange TSRANGE;
 BEGIN
-	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
+	SELECT tsrange(min(bucket), max(bucket + INTERVAL '1 day')) INTO readings_max_tsrange
 	FROM meter_daily_readings_unit_cagg
 	where meter_id = meter_id_desired;
 	RETURN tsrange_to_shrink * readings_max_tsrange;
@@ -29,7 +29,7 @@ AS $$
 DECLARE
 	readings_max_tsrange TSRANGE;
 BEGIN
-	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
+	SELECT tsrange(min(bucket), max(bucket + INTERVAL '1 day')) INTO readings_max_tsrange
 	FROM group_daily_readings_unit_cagg
 	where group_id = group_id_desired;
 	RETURN tsrange_to_shrink * readings_max_tsrange;
@@ -152,9 +152,7 @@ BEGIN
 				AND mhr.graphic_unit_id = graphic_unit_id_requested
 				-- Only want readings that lie within this slice of the desired data
 				AND mhr.bucket >= hours.hour
-				AND mhr.bucket + INTERVAL '1 hour' <= hours.hour + reading_length_interval
-				-- ensures that the start of the reading time intervals does not exceed the end of the current generated interval
-				AND mhr.bucket <= hours.hour + reading_length_interval
+				AND mhr.bucket <= hours.hour + reading_length_interval - INTERVAL '1 hour'
 				-- Group by the start time of the generated series since all points in
 				-- the desired slice have the same start time for the series.
 				-- Also group by the meter_id since Postgres wants and desired for graphing
@@ -246,10 +244,8 @@ BEGIN
 			-- Only want the desired graphing unit
 			AND ghr.graphic_unit_id = graphic_unit_id_requested
 			-- Only want readings that lie within this slice of the desired data
-			AND lower(ghr.time_interval) >= hours.hour
-			AND upper(ghr.time_interval) <= hours.hour + reading_length_interval
-			-- ensures that the start of the reading time intervals does not exceed the end of the current generated interval
-			AND lower(ghr.time_interval) <= hours.hour + reading_length_interval
+			AND ghr.bucket >= hours.hour
+			AND ghr.bucket <= hours.hour + reading_length_interval - INTERVAL '1 hour'
 			-- Group by the start time of the generated series since all points in
 			-- the desired slice have the same start time for the series.
 			GROUP BY hours.hour

@@ -445,6 +445,42 @@ mocha.describe('Line & bar Readings', () => {
 			expect(meterReadings.length).to.equal(1);
 			expect(meterReadings[0].reading_rate).to.be.closeTo(100 / (15 / 60) * conversionSlope, 0.00001);
 		});
+
+		mocha.it('Selects different resolutions for multiple meters in one query', async () => {
+			const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
+			await new Meter(undefined, 'Slow Meter', null, false, true, Meter.type.OTHER, 'CST', undefined, undefined, undefined, undefined,
+				undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined,
+				undefined, undefined, undefined, undefined, undefined, meterUnitId, meterUnitId, undefined, '1 day').insert(conn);
+			const slowMeter = await Meter.getByName('Slow Meter', conn);
+			const start = moment.utc('2018-01-01');
+			const middle = start.clone().add(1, 'hour');
+			const end = middle.clone().add(1, 'hour');
+
+			await Reading.insertAll([
+				new Reading(meter.id, 100, start, middle),
+				new Reading(meter.id, 200, middle, end),
+				new Reading(slowMeter.id, 300, start, middle),
+				new Reading(slowMeter.id, 400, middle, end)
+			], conn);
+			await Reading.refreshMeterReadingsViews(conn);
+
+			const rows = await conn.func('meter_line_readings_unit', [
+				[meter.id, slowMeter.id],
+				graphicUnitId,
+				start,
+				end,
+				'auto',
+				1,
+				10
+			]);
+			const fastMeterRows = rows.filter(row => row.meter_id === meter.id);
+			const slowMeterRows = rows.filter(row => row.meter_id === slowMeter.id);
+
+			expect(fastMeterRows).to.have.length(2);
+			expect(slowMeterRows).to.have.length(2);
+			expect(Number.isNaN(fastMeterRows[0].min_rate)).to.equal(false);
+			expect(Number.isNaN(slowMeterRows[0].min_rate)).to.equal(true);
+		});
 	});
 
 	mocha.describe('Group line readings', () => {

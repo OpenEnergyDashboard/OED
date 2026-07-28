@@ -98,7 +98,10 @@ BEGIN
 		FROM group_daily_readings_unit_cagg readings
 		INNER JOIN unnest(group_ids) gids(id) ON readings.group_id = gids.id
 		WHERE readings.graphic_unit_id = requested_graphic_unit_id
-		AND tsrange(start_stamp, end_stamp, '[]') @> tsrange(readings.bucket, readings.bucket + INTERVAL '1 day', '()')
+		-- Undefined API bounds arrive as NULL. Convert them to PostgreSQL
+		-- infinities while keeping bucket directly usable by its B-tree index.
+		AND readings.bucket >= COALESCE(start_stamp, '-infinity'::TIMESTAMP)
+		AND readings.bucket <= COALESCE(end_stamp, 'infinity'::TIMESTAMP) - INTERVAL '1 day'
 		ORDER BY readings.bucket ASC;
 
     ELSIF (point_accuracy = 'hourly'::reading_line_accuracy) THEN
@@ -111,7 +114,10 @@ BEGIN
             FROM group_hourly_readings_unit_cagg readings
             INNER JOIN unnest(group_ids) gids(id) ON readings.group_id = gids.id
             WHERE readings.graphic_unit_id = requested_graphic_unit_id
-            AND tsrange(start_stamp, end_stamp, '[]') @> tsrange(readings.bucket, readings.bucket + INTERVAL '1 hour', '()')
+            -- Undefined API bounds arrive as NULL. Convert them to PostgreSQL
+            -- infinities while keeping bucket directly usable by its B-tree index.
+            AND readings.bucket >= COALESCE(start_stamp, '-infinity'::TIMESTAMP)
+            AND readings.bucket <= COALESCE(end_stamp, 'infinity'::TIMESTAMP) - INTERVAL '1 hour'
             ORDER BY readings.bucket ASC;
     END IF;
 END;

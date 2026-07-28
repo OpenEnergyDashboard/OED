@@ -72,7 +72,8 @@ BEGIN
 
 		FROM meter_daily_readings_unit_cagg mdr
 		INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
-				ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> mdr.time_interval
+				ON mdr.bucket >= bars.interval_start
+				AND mdr.bucket <= bars.interval_start + bar_width - INTERVAL '1 day'
 		INNER JOIN unnest(meter_ids) meters(id) ON mdr.meter_id = meters.id
 		INNER JOIN meters m ON m.id = meters.id
 		INNER JOIN units u ON m.unit_id = u.id AND u.unit_represent != 'raw'::unit_represent_type
@@ -113,7 +114,7 @@ DECLARE
 BEGIN
 	bar_width := INTERVAL '1 day' * bar_width_days;
 
-	SELECT tsrange(min(lower(time_interval)), max(upper(time_interval))) INTO readings_max_tsrange
+	SELECT tsrange(min(bucket), max(bucket + INTERVAL '1 day')) INTO readings_max_tsrange
 	FROM group_daily_readings_unit_cagg dr
 	-- Get all the group ids passed in.
 	INNER JOIN unnest(group_ids) gids(id) ON dr.group_id = gids.id;
@@ -146,7 +147,8 @@ BEGIN
 
 		FROM (((group_daily_readings_unit_cagg readings
 			INNER JOIN generate_series(real_start_stamp, real_end_stamp, bar_width) bars(interval_start)
-			ON tsrange(bars.interval_start, bars.interval_start + bar_width, '[]') @> readings.time_interval)
+			ON readings.bucket >= bars.interval_start
+			AND readings.bucket <= bars.interval_start + bar_width - INTERVAL '1 day')
 			-- Don't return bar data if raw since cannot sum.
 			INNER JOIN units u ON readings.graphic_unit_id = u.id AND u.unit_represent != 'raw'::unit_represent_type)
 			INNER JOIN unnest(group_ids) gids(id) ON readings.group_id = gids.id)

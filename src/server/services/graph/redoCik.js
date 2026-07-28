@@ -33,7 +33,7 @@ async function updateCikVaryAndViews() {
 	const conn = getConnection();
 	await redoCikVary(conn);
 	// We need to update views if CikVary changes.
-	await refreshAllReadingViews();
+	await refreshAllReadingViews({ rebuild: true });
 }
 
 module.exports = {

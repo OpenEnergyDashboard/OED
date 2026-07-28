@@ -120,6 +120,62 @@ ON hypertable_hourly_split
     intercept
 );
 
+/*
+ * Track source changes that require rebuilding hypertable_hourly_split.
+ *
+ * A revision counter is used instead of a boolean so a source change that
+ * commits while a rebuild is running cannot be accidentally cleared. The
+ * refresher only records the revision that it actually rebuilt.
+ */
+CREATE TABLE IF NOT EXISTS reading_aggregate_state (
+    id SMALLINT PRIMARY KEY CHECK (id = 1),
+    rebuild_revision BIGINT NOT NULL DEFAULT 0,
+    completed_rebuild_revision BIGINT NOT NULL DEFAULT 0
+);
+
+INSERT INTO reading_aggregate_state (id)
+VALUES (1)
+ON CONFLICT (id) DO NOTHING;
+
+/*
+ * Unit metadata is copied into hypertable_hourly_split. Mark existing split
+ * rows stale when a meter changes units or relevant unit metadata changes.
+ */
+CREATE OR REPLACE FUNCTION mark_reading_aggregate_rebuild_required()
+RETURNS trigger
+AS $$
+BEGIN
+    UPDATE reading_aggregate_state
+    SET rebuild_revision = rebuild_revision + 1
+    WHERE id = 1;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_meter_unit_requires_reading_rebuild
+ON meters;
+
+CREATE TRIGGER trigger_meter_unit_requires_reading_rebuild
+AFTER UPDATE OF unit_id
+ON meters
+FOR EACH ROW
+WHEN (OLD.unit_id IS DISTINCT FROM NEW.unit_id)
+EXECUTE FUNCTION mark_reading_aggregate_rebuild_required();
+
+DROP TRIGGER IF EXISTS trigger_unit_metadata_requires_reading_rebuild
+ON units;
+
+CREATE TRIGGER trigger_unit_metadata_requires_reading_rebuild
+AFTER UPDATE OF unit_represent, sec_in_rate
+ON units
+FOR EACH ROW
+WHEN (
+    OLD.unit_represent IS DISTINCT FROM NEW.unit_represent
+    OR OLD.sec_in_rate IS DISTINCT FROM NEW.sec_in_rate
+)
+EXECUTE FUNCTION mark_reading_aggregate_rebuild_required();
+
 
 /*
  * 4. Maintain hypertable_hourly_split from changes in readings.

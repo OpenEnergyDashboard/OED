@@ -10,6 +10,9 @@ const Conversion = require('../../models/Conversion');
 const Unit = require('../../models/Unit');
 const ConversionSegment = require('../../models/ConversionSegment');
 const CikVary = require('../../models/CikVary');
+const TimeScaleDBReading = require('../../models/TimeScaleDB/Reading');
+const refreshAllReadingViews = require('../../services/refreshAllReadingViews');
+const sinon = require('sinon');
 
 async function setupTestData(conn) {
 	await new Unit(undefined, 'Unit 10', 'Unit 10', Unit.unitRepresentType.QUANTITY, 1000, Unit.unitType.METER, '', Unit.displayableType.ADMIN, true, 'Note 10').insert(conn);
@@ -114,5 +117,53 @@ mocha.describe('redoCikVary integration', function () {
 		Object.entries(expectedSlopes).forEach(([key, slopes]) => {
 			expect(grouped[key]).to.deep.equal(slopes);
 		});
+	});
+
+	mocha.it('should require a reading aggregate rebuild after replacing cik_vary', async function () {
+		await redoCikVary(conn);
+
+		const state = await conn.one(`
+			SELECT rebuild_revision, completed_rebuild_revision
+			FROM reading_aggregate_state
+			WHERE id = 1
+		`);
+		expect(Number(state.rebuild_revision)).to.be.greaterThan(Number(state.completed_rebuild_revision));
+	});
+
+	mocha.it('should complete a pending rebuild during a default refresh', async function () {
+		await redoCikVary(conn);
+		await refreshAllReadingViews();
+
+		const state = await conn.one(`
+			SELECT rebuild_revision, completed_rebuild_revision
+			FROM reading_aggregate_state
+			WHERE id = 1
+		`);
+		expect(state.completed_rebuild_revision).to.equal(state.rebuild_revision);
+	});
+
+	mocha.it('should require a rebuild after changing split-row unit metadata', async function () {
+		await conn.none(`
+			UPDATE units
+			SET sec_in_rate = sec_in_rate + 1
+			WHERE id = \${unitId}
+		`, { unitId: unit10Id });
+
+		const state = await conn.one(`
+			SELECT rebuild_revision, completed_rebuild_revision
+			FROM reading_aggregate_state
+			WHERE id = 1
+		`);
+		expect(Number(state.rebuild_revision)).to.be.greaterThan(Number(state.completed_rebuild_revision));
+	});
+
+	mocha.it('should not rebuild by default when split-row sources are current', async function () {
+		const rebuildSpy = sinon.spy(TimeScaleDBReading, 'rebuildReadings');
+		try {
+			await refreshAllReadingViews();
+			expect(rebuildSpy.called).to.equal(false);
+		} finally {
+			rebuildSpy.restore();
+		}
 	});
 });

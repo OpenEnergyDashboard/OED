@@ -111,6 +111,15 @@ class CikVary {
 			// and destination. That might be a little more efficient but this way is simple and guarantees
 			// that cik_vary and cik represent the same information.
 			await t.none(sqlFile('cik/insert_unique_cik_vary_in_cik.sql'));
+
+			// Existing hourly split rows retain the conversion metadata that was
+			// current when they were created. Mark them for a rebuild in the
+			// same transaction as the cik_vary replacement.
+			await t.none(`
+				UPDATE reading_aggregate_state
+				SET rebuild_revision = rebuild_revision + 1
+				WHERE id = 1
+			`);
 		});
 	}
 }

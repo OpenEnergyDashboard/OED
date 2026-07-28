@@ -146,182 +146,215 @@ CREATE OR REPLACE FUNCTION meter_line_readings_unit (
 )
 	RETURNS TABLE(meter_id INTEGER, reading_rate FLOAT, min_rate FLOAT, max_rate FLOAT, start_timestamp TIMESTAMP, end_timestamp TIMESTAMP)
 AS $$
-DECLARE
-	requested_range TSRANGE;
-	requested_interval INTERVAL;
-	requested_interval_seconds INTEGER;
-	frequency INTERVAL;
-	frequency_seconds INTEGER;
-	-- Which index of the meter_id array you are currently working on.
-	current_meter_index INTEGER := 1;
-	-- The id of the meter index working on
-	current_meter_id INTEGER;
-	-- Holds accuracy for current meter.
-	current_point_accuracy reading_line_accuracy;
-	BEGIN
-	-- For each frequency of points, verify that you will get the minimum graphing points to use for each meter.
-	-- Start with the raw, then hourly and then daily if others will not work.
-	-- Loop over all meters.
-	WHILE current_meter_index <= cardinality(meter_ids) LOOP
-		-- Reset the point accuracy for each meter so it does what is desired.
-		current_point_accuracy := point_accuracy;
-		current_meter_id := meter_ids[current_meter_index];
-		-- Make sure the time range is within the reading values for this meter.
-		-- There may be a better way to create the array with one element as last argument.
-		requested_range := shrink_tsrange_to_real_readings(tsrange(start_stamp, end_stamp, '[]'), array_append(ARRAY[]::INTEGER[], current_meter_id));
-		IF (current_point_accuracy = 'auto'::reading_line_accuracy) THEN
-			-- The request wants automatic calculation of the points returned.
-
-			-- The request_range will still be infinity if there is no meter data. This causes the
-			-- auto calculation to fail because you cannot subtract them.
-			-- Just check the upper range since simpler.
-			IF (upper(requested_range) = 'infinity') THEN
-				-- We know there is no data but easier to just let a query happen since fast.
-				-- Do daily since that should be the fastest due to the least data in most cases.
-				current_point_accuracy := 'daily'::reading_line_accuracy;
-			ELSE
-				-- The interval of time for the requested_range.
-				requested_interval := upper(requested_range) - lower(requested_range);
-				-- Get the seconds in the interval.
-				-- Wanted to use the INTO syntax used above but could not get it to work so using the set syntax.
-				requested_interval_seconds := (SELECT * FROM EXTRACT(EPOCH FROM requested_interval));
-				-- Get the frequency that this meter reads at.
-				SELECT reading_frequency INTO frequency FROM meters WHERE id = current_meter_id;
-				-- Get the seconds in the frequency.
-				frequency_seconds := (SELECT * FROM EXTRACT(EPOCH FROM frequency));
-
-				-- The first part is making sure that there are no more than maximum raw readings to graph if use raw readings.
-				-- Divide the time being graphed by the frequency of reading for this meter to get the number of raw readings.
-				-- The second part checks if the frequency of raw readings is more than a day and use raw if this is the case
-				-- because even daily would interpolate points. 1 day is 24 hours * 60 minute/hour * 60 seconds/minute = 86400 seconds.
-				-- This can lead to too many points but do this for now since that is unlikely as you would need around 4+ years of data.
-				-- Note this overrides the max raw points if it applies.
-				IF ((requested_interval_seconds / frequency_seconds <= max_raw_points) OR (frequency_seconds >= 86400)) THEN
-					-- Return raw meter data.
-					current_point_accuracy := 'raw'::reading_line_accuracy;
-				-- The first part is making sure that the number of hour points is no more than maximum hourly readings.
-				-- Thus, check if no more than interval in seconds / (60 seconds/minute * 60 minutes/hour) = # hours in interval.
-				-- The second part is making sure that the frequency of reading is an hour or less (3600 seconds)
-				-- so you don't interpolate points by using the hourly data.
-				ELSIF ((requested_interval_seconds / 3600 <= max_hour_points) AND (frequency_seconds <= 3600)) THEN
-					-- Return hourly reading data.
-					current_point_accuracy := 'hourly'::reading_line_accuracy;
-				ELSE
-					-- Return daily reading data.
-					current_point_accuracy := 'daily'::reading_line_accuracy;
-				END IF;
-			END IF;
-		END IF;
-		-- At this point current_point_accuracy should never be 'auto'.
-
-		IF (current_point_accuracy = 'raw'::reading_line_accuracy) THEN
-			-- Gets raw meter data to graph.
-			-- Modified to allow for raw time varying conversions.
-			RETURN QUERY
-				SELECT r.meter_id as meter_id,
-				CASE WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-					-- If it is quantity readings then need to convert to rate per hour by dividing by the time length where
-					-- the 3600 is needed since EPOCH is in seconds.
-					-- Normalize to rate over reading interval
+BEGIN
+	RETURN QUERY
+	/*
+	 * Process all requested meters as one set. WITH ORDINALITY preserves the
+	 * caller's meter order in the final result.
+	 */
+	WITH requested_meters AS (
+		SELECT requested.id AS meter_id, requested.request_order
+		FROM unnest(meter_ids) WITH ORDINALITY requested(id, request_order)
+	),
+	/*
+	 * Find the available reading range once for every requested meter instead
+	 * of querying the readings table separately for each meter.
+	 */
+	reading_bounds AS (
+		SELECT
+			r.meter_id,
+			min(r.start_timestamp) AS min_start_timestamp,
+			max(r.end_timestamp) AS max_end_timestamp
+		FROM readings r
+		INNER JOIN (SELECT DISTINCT rm.meter_id FROM requested_meters rm) requested
+			ON requested.meter_id = r.meter_id
+		GROUP BY r.meter_id
+	),
+	/*
+	 * Restrict the requested range to the readings available for each meter.
+	 * An absent reading bound produces an unbounded range, preserving the
+	 * behavior of shrink_tsrange_to_real_readings().
+	 */
+	meter_ranges AS (
+		SELECT
+			rm.meter_id,
+			rm.request_order,
+			m.unit_id,
+			m.reading_frequency,
+			tsrange(start_stamp, end_stamp, '[]')
+				* tsrange(bounds.min_start_timestamp, bounds.max_end_timestamp) AS requested_range
+		FROM requested_meters rm
+		INNER JOIN meters m ON m.id = rm.meter_id
+		LEFT JOIN reading_bounds bounds ON bounds.meter_id = rm.meter_id
+	),
+	/*
+	 * Select raw, hourly, or daily resolution independently for each meter.
+	 *
+	 * Raw is selected when the estimated number of readings does not exceed
+	 * max_raw_points. A frequency of at least one day also stays raw because
+	 * hourly or daily aggregation would interpolate additional points.
+	 *
+	 * Hourly is selected when the requested number of hours does not exceed
+	 * max_hour_points and the meter frequency is no greater than one hour.
+	 * All remaining meters use daily data.
+	 */
+	meter_resolutions AS (
+		SELECT
+			mr.*,
+			CASE
+				WHEN point_accuracy <> 'auto'::reading_line_accuracy THEN point_accuracy
+				WHEN upper(mr.requested_range) = 'infinity'::TIMESTAMP THEN 'daily'::reading_line_accuracy
+				WHEN (
+					EXTRACT(EPOCH FROM (upper(mr.requested_range) - lower(mr.requested_range)))
+						/ EXTRACT(EPOCH FROM mr.reading_frequency) <= max_raw_points
+					OR EXTRACT(EPOCH FROM mr.reading_frequency) >= 86400
+				) THEN 'raw'::reading_line_accuracy
+				WHEN (
+					EXTRACT(EPOCH FROM (upper(mr.requested_range) - lower(mr.requested_range))) / 3600
+						<= max_hour_points
+					AND EXTRACT(EPOCH FROM mr.reading_frequency) <= 3600
+				) THEN 'hourly'::reading_line_accuracy
+				ELSE 'daily'::reading_line_accuracy
+			END AS selected_accuracy
+		FROM meter_ranges mr
+	),
+	/*
+	 * RAW READINGS
+	 *
+	 * Apply time-varying conversions directly to raw readings. Multiple
+	 * cik_vary segments can overlap one reading, so each converted value is
+	 * weighted by the duration of its overlap with that reading.
+	 */
+	raw_results AS (
+		SELECT
+			selected.request_order,
+			r.meter_id,
+			CASE
+				WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+					/*
+					 * Quantity readings are normalized to a per-hour rate before
+					 * applying the conversion.
+					 */
 					SUM(
-						--Wrapped in SUM to handle multiple matching cik_vary conversions
-						-- Weight by conversion duration(intersection of reading and conversion time ranges is necessary because the conversion may overlap the reading time range)
-						 (EXTRACT(EPOCH FROM (
+						(EXTRACT(EPOCH FROM (
 							upper(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
-							-
-							lower(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
-		  					)) / 3600)
+							- lower(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
+						)) / 3600)
 						* (c.slope * (r.reading / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) + c.intercept)
-	  				) / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)
-				WHEN (u.unit_represent = 'flow'::unit_represent_type OR u.unit_represent = 'raw'::unit_represent_type) THEN
-					-- If it is flow or raw readings then it is already a rate so just convert it but also need to normalize
-					-- to per hour.
+					) / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)
+				WHEN u.unit_represent IN ('flow'::unit_represent_type, 'raw'::unit_represent_type) THEN
+					/*
+					 * Flow and raw readings are already rates. Normalize them to
+					 * an hourly rate before applying the conversion.
+					 */
 					SUM(
-						--Wrapped in SUM to handle multiple matching cik_vary conversions
-						-- Weight by conversion duration (intersection of reading and conversion time ranges is necessary because the conversion may overlap the reading time range)
-						 (EXTRACT(EPOCH FROM (
+						(EXTRACT(EPOCH FROM (
 							upper(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
-							-
-							lower(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
-		  					)) / 3600)
+							- lower(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
+						)) / 3600)
 						* (c.slope * (r.reading * 3600 / u.sec_in_rate) + c.intercept)
-	  				) / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)
-				END AS reading_rate,
-				-- There is no range of values on raw/meter data so return NaN to indicate that.
-				-- The route will return this as null when it shows up in Redux state.
-				cast('NaN' AS DOUBLE PRECISION) AS min_rate,
-				cast('NaN' AS DOUBLE PRECISION) as max_rate,
-				r.start_timestamp,
-				r.end_timestamp
-
-				FROM (((readings r
-				INNER JOIN meters m ON m.id = current_meter_id)
-				INNER JOIN units u ON m.unit_id = u.id)
-				INNER JOIN cik_vary c on c.source_id = m.unit_id
-					AND c.destination_id = passed_graphic_unit_id
-					--The condition below was added for time varying conversions (allows for multiple cik_vary rows to be applied to a single reading)
-					--The cik_vary exclusive bounds '()' ensures no two conversions overlap.
-					AND tsrange(c.start_time, c.end_time, '()') && tsrange(r.start_timestamp, r.end_timestamp, '[]'))
-				WHERE lower(requested_range) <= r.start_timestamp AND r.end_timestamp <= upper(requested_range) AND r.meter_id = current_meter_id
-				-- Added GROUP BY to allow SUM to aggregate correctly across multiple rows.
-				-- TODO : postgreSQL doesn't understand unit_represent cannot change for a given meter, so it has to be in group by. Might be worth finding fix.
-				GROUP BY r.meter_id, r.start_timestamp, r.end_timestamp, u.unit_represent
-				-- This ensures the data is sorted
-				ORDER BY r.start_timestamp ASC;
-		-- The first part is making sure that the number of hour points is 1440 or less.
-		-- Thus, check if no more than 1440 hours * 60 minutes/hour * 60 seconds/hour = 5184000 seconds.
-		-- The second part is making sure that the frequency of reading is an hour or less (3600 seconds)
-		-- so you don't interpolate points by using the hourly data.
+					) / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)
+			END AS reading_rate,
+			/*
+			 * Raw meter data has no min/max range. NaN is converted to null by
+			 * the route when the result is stored in Redux state.
+			 */
+			'NaN'::DOUBLE PRECISION AS min_rate,
+			'NaN'::DOUBLE PRECISION AS max_rate,
+			r.start_timestamp,
+			r.end_timestamp
+		FROM meter_resolutions selected
+		INNER JOIN readings r ON r.meter_id = selected.meter_id
+		INNER JOIN units u ON u.id = selected.unit_id
+		INNER JOIN cik_vary c
+			ON c.source_id = selected.unit_id
+			AND c.destination_id = passed_graphic_unit_id
+			/*
+			 * Allow multiple time-varying conversion segments to contribute
+			 * when they overlap a reading.
+			 */
+			AND c.start_time < r.end_timestamp
+			AND c.end_time > r.start_timestamp
+		WHERE selected.selected_accuracy = 'raw'::reading_line_accuracy
+			AND r.start_timestamp >= lower(selected.requested_range)
+			AND r.end_timestamp <= upper(selected.requested_range)
 		/*
-         * HOURLY READINGS
-         *
-         * Uses TimescaleDB continuous aggregate.
-         */
-		ELSIF (current_point_accuracy = 'hourly'::reading_line_accuracy) THEN
-			-- Get hourly points to graph. See daily for more comments.
-			-- Now uses materialized view for hourly meter readings.
-			RETURN QUERY
-				-- Modified to Retrieve converted hourly readings from the materialized view.
-				SELECT
-					hourly.meter_id AS meter_id,
-					hourly.reading_rate AS reading_rate,
-					hourly.min_rate AS min_rate,
-					hourly.max_rate AS max_rate,
-					hourly.bucket AS start_timestamp,
-					hourly.bucket + INTERVAL '1 hour' AS end_timestamp
-				FROM
-					meter_hourly_readings_unit_cagg AS hourly
-				WHERE
-					requested_range @> tsrange(hourly.bucket, hourly.bucket + INTERVAL '1 hour', '()')
-					AND hourly.meter_id = current_meter_id
-					AND hourly.graphic_unit_id = passed_graphic_unit_id
-				ORDER BY
-					start_timestamp ASC;
-		/*
-         * DAILY READINGS
-		 *
-         * Uses TimescaleDB continuous aggregate.
-         */
-		ELSE
-			RETURN QUERY
-				-- Modified to retrieve converted daily readings from the materialized view.
-				SELECT
-					daily.meter_id AS meter_id,
-					daily.reading_rate AS reading_rate,
-					daily.min_rate AS min_rate,
-					daily.max_rate AS max_rate,
-					daily.bucket AS start_timestamp,
-					daily.bucket + INTERVAL '1 day' AS end_timestamp
-				FROM
-					meter_daily_readings_unit_cagg AS daily
-				WHERE
-					requested_range @> tsrange(daily.bucket, daily.bucket + INTERVAL '1 day', '()')
-					AND daily.meter_id = current_meter_id
-					AND daily.graphic_unit_id = passed_graphic_unit_id
-				ORDER BY
-					start_timestamp ASC;
-		END IF;
-		current_meter_index := current_meter_index + 1;
-	END LOOP;
+		 * unit_represent is stable for a meter, but PostgreSQL requires it in
+		 * the GROUP BY because it controls the CASE expression above.
+		 */
+		GROUP BY
+			selected.request_order,
+			r.meter_id,
+			r.start_timestamp,
+			r.end_timestamp,
+			u.unit_represent
+	),
+	/*
+	 * HOURLY READINGS
+	 *
+	 * Use the TimescaleDB hourly continuous aggregate. Direct bucket bounds
+	 * allow the meter/graphic-unit/bucket index to constrain the time range.
+	 */
+	hourly_results AS (
+		SELECT
+			selected.request_order,
+			hourly.meter_id,
+			hourly.reading_rate,
+			hourly.min_rate,
+			hourly.max_rate,
+			hourly.bucket AS start_timestamp,
+			hourly.bucket + INTERVAL '1 hour' AS end_timestamp
+		FROM meter_resolutions selected
+		INNER JOIN meter_hourly_readings_unit_cagg hourly
+			ON hourly.meter_id = selected.meter_id
+			AND hourly.graphic_unit_id = passed_graphic_unit_id
+			AND hourly.bucket >= lower(selected.requested_range)
+			AND hourly.bucket <= upper(selected.requested_range) - INTERVAL '1 hour'
+		WHERE selected.selected_accuracy = 'hourly'::reading_line_accuracy
+	),
+	/*
+	 * DAILY READINGS
+	 *
+	 * Use the TimescaleDB daily continuous aggregate with the same indexable
+	 * complete-bucket bounds.
+	 */
+	daily_results AS (
+		SELECT
+			selected.request_order,
+			daily.meter_id,
+			daily.reading_rate,
+			daily.min_rate,
+			daily.max_rate,
+			daily.bucket AS start_timestamp,
+			daily.bucket + INTERVAL '1 day' AS end_timestamp
+		FROM meter_resolutions selected
+		INNER JOIN meter_daily_readings_unit_cagg daily
+			ON daily.meter_id = selected.meter_id
+			AND daily.graphic_unit_id = passed_graphic_unit_id
+			AND daily.bucket >= lower(selected.requested_range)
+			AND daily.bucket <= upper(selected.requested_range) - INTERVAL '1 day'
+		WHERE selected.selected_accuracy = 'daily'::reading_line_accuracy
+	),
+	/*
+	 * Each meter appears in exactly one resolution branch. UNION ALL avoids
+	 * unnecessary duplicate elimination.
+	 */
+	results AS (
+		SELECT * FROM raw_results
+		UNION ALL
+		SELECT * FROM hourly_results
+		UNION ALL
+		SELECT * FROM daily_results
+	)
+	SELECT
+		results.meter_id,
+		results.reading_rate,
+		results.min_rate,
+		results.max_rate,
+		results.start_timestamp,
+		results.end_timestamp
+	FROM results
+	-- Preserve the original per-meter chronological result ordering.
+	ORDER BY results.request_order, results.start_timestamp;
 END;
 $$ LANGUAGE 'plpgsql';

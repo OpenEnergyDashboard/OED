@@ -25,9 +25,11 @@ async function timedRefresh(label, operation) {
 /**
  * Refreshes the TimescaleDB reading aggregates while holding a shared
  * advisory lock so concurrent imports cannot refresh them simultaneously.
+ * Refreshes are incremental by default. A full split-table rebuild runs only
+ * when explicitly requested or when denormalized source data is marked stale.
  */
 async function refreshAllReadingViews(options = {}) {
-	const { startTimestamp = null, endTimestamp = null, rebuild = startTimestamp === null && endTimestamp === null } = options;
+	const { startTimestamp = null, endTimestamp = null, rebuild = false } = options;
 	if ((startTimestamp === null) !== (endTimestamp === null)) {
 		throw new Error('Both startTimestamp and endTimestamp are required for a bounded reading refresh.');
 	}
@@ -38,8 +40,24 @@ async function refreshAllReadingViews(options = {}) {
 		try {
 			// TODO: Remove these retained legacy refresh calls once the hypertable implementation is finalized.
 			// await timedRefresh('Legacy meter reading views refresh', () => Reading.refreshMeterReadingsViews(task));
-			if (rebuild) {
+			const rebuildState = await task.one(`
+				SELECT rebuild_revision, completed_rebuild_revision
+				FROM reading_aggregate_state
+				WHERE id = 1
+			`);
+			const rebuildRequired = rebuild
+				|| BigInt(rebuildState.rebuild_revision) > BigInt(rebuildState.completed_rebuild_revision);
+
+			if (rebuildRequired) {
 				await timedRefresh('TimescaleDB reading aggregates rebuild', () => TimeScaleDBReading.rebuildReadings(task));
+				await task.none(`
+					UPDATE reading_aggregate_state
+					SET completed_rebuild_revision = GREATEST(
+						completed_rebuild_revision,
+						\${rebuiltRevision}
+					)
+					WHERE id = 1
+				`, { rebuiltRevision: rebuildState.rebuild_revision });
 			} else {
 				await timedRefresh('TimescaleDB reading aggregates range refresh', () =>
 					TimeScaleDBReading.refreshReadings(task, startTimestamp, endTimestamp));
