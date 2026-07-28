@@ -47,6 +47,91 @@ function formatToOnlyNameID(item) {
 }
 
 /**
+ * Validates the body of a group create/edit request.
+ * isEdit=true includes the required 'id' property (edit); isEdit=false excludes it (create), since
+ * id is assigned by the DB on insert.
+ * @param params req.body for a group create or edit request
+ * @param isEdit whether this is validating an edit (true) or create (false) request
+ * @returns {{valid: boolean, errors: array}}
+ */
+function validateGroupsParams(params, isEdit = true) {
+	const properties = {
+		name: {
+			type: 'string',
+			minLength: 1,
+			maxLength: SHORT_STRING_MAX_LENGTH
+		},
+		displayable: {
+			type: 'boolean'
+		},
+		gps: {
+			oneOf: [
+				{
+					type: 'object',
+					required: ['latitude', 'longitude'],
+					properties: {
+						latitude: { type: 'number', minimum: '-90', maximum: '90' },
+						longitude: { type: 'number', minimum: '-180', maximum: '180' }
+					}
+				},
+				{ type: 'null' }
+			]
+		},
+		note: {
+			oneOf: [
+				{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
+				{ type: 'null' }
+			]
+		},
+		area: { type: 'number', minimum: 0 },
+		childGroups: {
+			type: 'array',
+			uniqueItems: true,
+			maxItems: 1000,
+			items: {
+				type: 'integer',
+				minimum: 1
+			}
+		},
+		childMeters: {
+			type: 'array',
+			uniqueItems: true,
+			maxItems: 1000,
+			items: {
+				type: 'integer',
+				minimum: 1
+			}
+		},
+		defaultGraphicUnit: { 'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }] },
+		areaUnit: {
+			type: 'string',
+			minLength: 1,
+			maxLength: 50,
+			enum: Object.values(Unit.areaUnitType)
+		}
+	};
+ 
+	const required = ['name', 'childGroups', 'childMeters'];
+ 
+	if (isEdit) {
+		properties.id = { type: 'integer', minimum: 1 };
+		required.push('id');
+	}
+ 
+	const validGroup = {
+		type: 'object',
+		additionalProperties: false,
+		required,
+		// Original /edit schema had no maxProperties cap; added 10 here (9 create-mode properties + id)
+		// to keep edit's property-count check consistent with create's, since this is otherwise the same schema.
+		maxProperties: isEdit ? 10 : 9,
+		properties
+	};
+	const validatorResult = validate(params, validGroup);
+	return { valid: validatorResult.valid, errors: validatorResult.errors };
+}
+
+/**
  * GET info of all groups
  */
 router.get('/', optionalAuthMiddleware, async (req, res) => {
@@ -224,69 +309,9 @@ router.get('/parents/:group_id', optionalAuthMiddleware, async (req, res) => {
 });
 
 router.post('/create', adminAuthMiddleware('create groups'), async (req, res) => {
-	const validGroup = {
-		type: 'object',
-		additionalProperties: false,
-		required: ['name', 'childGroups', 'childMeters'],
-		maxProperties: 9,
-		properties: {
-			name: {
-				type: 'string',
-				minLength: 1,
-				maxLength: SHORT_STRING_MAX_LENGTH
-			},
-			displayable: {
-				type: 'boolean'
-			},
-			gps: {
-				oneOf: [
-					{
-						type: 'object',
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180' }
-						}
-					},
-					{ type: 'null' }
-				]
-			},
-			note: {
-				oneOf: [
-					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
-					{ type: 'null' }
-				]
-			},
-			area: { type: 'number', minimum: 0 },
-			childGroups: {
-				type: 'array',
-				uniqueItems: true,
-				maxItems: 1000,
-				items: {
-					type: 'integer',
-					minimum: 1
-				}
-			},
-			childMeters: {
-				type: 'array',
-				uniqueItems: true,
-				maxItems: 1000,
-				items: {
-					type: 'integer',
-					minimum: 1
-				}
-			},
-			defaultGraphicUnit: {'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }]},
-			areaUnit: {
-				type: 'string',
-				minLength: 1,
-				maxLength: 50,
-				enum: Object.values(Unit.areaUnitType)
-			}
-		}
-	};
+	// isEdit=false: id must not be present, since it's assigned by the DB on insert.
+	const validatorResult = validateGroupsParams(req.body, false);
 
-	const validatorResult = validate(req.body, validGroup);
 	if (!validatorResult.valid) {
 		log.error(`Got request to create group with invalid data, errors: ${validatorResult.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to create group with invalid data. Error(s): " + validatorResult.errors.toString());
@@ -325,69 +350,9 @@ router.post('/create', adminAuthMiddleware('create groups'), async (req, res) =>
 });
 
 router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
-	const validGroup = {
-		type: 'object',
-		additionalProperties: false,
-		required: ['id', 'name', 'childGroups', 'childMeters'],
-		properties: {
-			id: { type: 'integer', minimum: 1 },
-			name: {
-				type: 'string',
-				minLength: 1,
-				maxLength: SHORT_STRING_MAX_LENGTH
-			},
-			displayable: {
-				type: 'boolean'
-			},
-			gps: {
-				oneOf: [
-					{
-						type: 'object',
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: '-90', maximum: '90' },
-							longitude: { type: 'number', minimum: '-180', maximum: '180' }
-						}
-					},
-					{ type: 'null' }
-				]
-			},
-			note: {
-				oneOf: [
-					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
-					{ type: 'null' }
-				]
-			},
-			area: { type: 'number', minimum: 0 },
-			childGroups: {
-				type: 'array',
-				uniqueItems: true,
-				maxItems: 1000,
-				items: {
-					type: 'integer',
-					minimum: 1
-				}
-			},
-			childMeters: {
-				type: 'array',
-				uniqueItems: true,
-				maxItems: 1000,
-				items: {
-					type: 'integer',
-					minimum: 1
-				}
-			},
-			defaultGraphicUnit: {'anyOf': [{ type: 'integer', minimum: 1 }, { type: 'integer', 'enum': [-99] }]},
-			areaUnit: {
-				type: 'string',
-				minLength: 1,
-				maxLength: 50,
-				enum: Object.values(Unit.areaUnitType)
-			}
-		}
-	};
+	// isEdit=true: id is required here since the client must tell us which group to update.
+	const validatorResult = validateGroupsParams(req.body, true);
 
-	const validatorResult = validate(req.body, validGroup);
 	if (!validatorResult.valid) {
 		log.error(`Got request to edit group with invalid data, errors: ${validatorResult.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, "Got request to edit group with invalid data. Error(s): " + validatorResult.errors.toString());
