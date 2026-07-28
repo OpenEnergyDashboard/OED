@@ -223,10 +223,10 @@ export default function HeaderButtonsComponent() {
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}
-								disabled={state.shouldHolidaysButtonDisabled}
+								disabled={state.shouldHolidayInstanceGroupsButtonDisabled}
 								tag={Link}
-								to="/holidays">
-								<FormattedMessage id='holidays' />
+								to="/holiday-instance-groups">
+								<FormattedMessage id='holiday.instance.groups' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}
@@ -237,10 +237,10 @@ export default function HeaderButtonsComponent() {
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}
-								disabled={state.shouldHolidayInstanceGroupsButtonDisabled}
+								disabled={state.shouldHolidaysButtonDisabled}
 								tag={Link}
-								to="/holiday-instance-groups">
-								<FormattedMessage id='holiday.instance.groups' />
+								to="/holidays">
+								<FormattedMessage id='holidays' />
 							</DropdownItem>
 							<DropdownItem
 								style={state.adminViewableLinkStyle}

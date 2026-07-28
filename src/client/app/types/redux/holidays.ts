@@ -2,14 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/*
- * Wire types for the holiday backend (see src/server/routes/holidays.js and
- * src/server/routes/holidayInstances.js on the Hugo-Implementing-Holiday-Databases
- * branch). Field names match the server's response formatters exactly.
- */
-
 /**
- * A raw holiday row from the `holidays` table (populated via Rose's page).
+ * A holiday row from the `holidays` table.
  * Matches formatHolidayForResponse in routes/holidays.js.
  */
 export interface Holiday {
@@ -17,7 +11,7 @@ export interface Holiday {
 	name: string;
 	/** ISO date string from the DATE column */
 	startDate: string;
-	/** Free-text location for now; may become a region table later (meeting 5) */
+	/** Free-text location; TODO: may become a region table later */
 	location: string;
 	type: string;
 	note?: string | null;

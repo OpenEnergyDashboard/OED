@@ -8,13 +8,11 @@ import { baseApi } from './baseApi';
 
 /*
  * Endpoints for the `holiday_instance` table ("Holiday Rates" in the UI).
- * Mirrors src/server/routes/holidayInstances.js:
- * - all mutations are POST (OED convention — edit is POST /edit, not PATCH)
- * - edit REQUIRES holidayId even though the UI treats the base holiday as
- *   immutable after create: resend the unchanged value
- * - delete of an instance used in a holiday group hits a foreign key and
- *   returns a database error — the Redux-sweep interlock (meeting 5 to-do)
- *   should prevent that client-side before calling the mutation
+ * All mutations are POST per the server's route conventions; the edit route
+ * requires holidayId even when it is unchanged. Mutations invalidate the
+ * HolidayInstances tags so the list refetches from the server.
+ * TODO: before delete, check group membership in Redux state and block with
+ * a friendly message instead of surfacing the foreign-key database error.
  */
 export const holidayInstancesApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
@@ -32,10 +30,6 @@ export const holidayInstancesApi = baseApi.injectEndpoints({
 				result
 					? [...result.map(({ id }) => ({ type: 'HolidayInstances' as const, id })), { type: 'HolidayInstances', id: 'LIST' }]
 					: [{ type: 'HolidayInstances', id: 'LIST' }]
-		}),
-		getHolidayInstancesByHolidayId: builder.query<HolidayInstance[], number>({
-			query: holidayId => `api/holidayInstances/holiday/${holidayId}`,
-			providesTags: [{ type: 'HolidayInstances', id: 'LIST' }]
 		}),
 		addHolidayInstance: builder.mutation<HolidayInstance, CreateHolidayInstancePayload>({
 			query: holidayInstance => ({
@@ -80,7 +74,6 @@ export const stableEmptyHolidayInstances: HolidayInstance[] = [];
 export const {
 	useGetHolidayInstancesQuery,
 	useGetHolidayInstancesWithDetailsQuery,
-	useGetHolidayInstancesByHolidayIdQuery,
 	useAddHolidayInstanceMutation,
 	useEditHolidayInstanceMutation,
 	useDeleteHolidayInstanceMutation
