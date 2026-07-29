@@ -5,6 +5,7 @@
  */
 
 const { mocha, expect } = require('../common');
+const { HTTP_CODES } = require('../../util/httpCodes');
 const sinon = require('sinon');
 const moment = require('moment');
 const Reading = require('../../models/Reading');
@@ -21,6 +22,11 @@ const { meterLineReadings,
 	validateThreeDQueryParams,
 } = require('../../routes/unitReadings');
 
+const {
+	expectValidCommaSeparatedIds,
+	validateCommaSeparatedIdPatterns
+} = require('../util/validationHelpers');
+
 const { createTimeString } = require('../../util/readingsUtils');
 
 const { TimeInterval } = require('../../../common/TimeInterval');
@@ -35,22 +41,34 @@ function mockResponse() {
 
 mocha.describe('unit readings routes', () => {
 	mocha.describe('the line readings route', () => {
+		const LINE_METERS_ENDPOINT = '/api/unitReadings/line/meters';
+		const valid_query = { timeInterval: TimeInterval.unbounded().toString(), graphicUnitId: '99' }
 
-		mocha.describe('validation', () => {
-			mocha.it('fails to validate when the meter_ids param is wrong', () => {
-				const validationResult = validateLineReadingsParams({ meter_ids: 'not_a_number' });
-				expect(validationResult).to.equal(false);
+		mocha.describe('Meter line readings validation', () => {
+			mocha.it('fails to validate when the meter_ids param is wrong', async () => {
+				await validateCommaSeparatedIdPatterns({
+					baseEndpoint: LINE_METERS_ENDPOINT,
+					invalidValues: [
+						'abc',          
+						'1,',          
+						',1',            
+						'1,,2',          
+						'1;2',           
+						'1.5',         
+						'-1',            
+						'1 2',           
+					],
+					query: valid_query,
+					expectedStatuses: [HTTP_CODES.OK, HTTP_CODES.NOT_FOUND, HTTP_CODES.INTERNAL_SERVER_ERROR]
+				});
 			});
-			mocha.it('validates when the meter_ids param is valid', () => {
-				const validationResult = validateLineReadingsParams({ meter_ids: '1,2,3' });
-				expect(validationResult).to.equal(true);
+			mocha.it('validates when the meter_ids param is valid', async () => {
+				await expectValidCommaSeparatedIds({
+					baseEndpoint: LINE_METERS_ENDPOINT,
+					validValues: ['1', '12', '1,2,3'],
+					query: valid_query
+				})
 			});
-			mocha.it('validates when the time interval is valid', () => {
-				const validationResult = validateLineReadingsQueryParams({ timeInterval: TimeInterval.unbounded().toString(), graphicUnitId: '99' });
-				expect(validationResult).to.equal(true);
-			});
-
-			// TODO Maybe check for invalid for each value in validateLineReadingsQueryParams (also in Bar below).
 		});
 
 		// TODO The mocha documentation (https://mochajs.org/#arrow-functions) discourages lambda functions. Thus, the following used function().
