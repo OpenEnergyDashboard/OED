@@ -56,7 +56,8 @@ SELECT
 	time_bucket('1 day', start_timestamp) AS bucket
 FROM hypertable_hourly_split
 GROUP BY meter_id, time_bucket('1 day', start_timestamp), graphic_unit_id
-ORDER BY meter_id, graphic_unit_id, bucket
+-- Materialization order is not part of the view contract; query functions
+-- apply their own ordering and use the meter/graphic-unit/bucket index below.
 WITH NO DATA;
 
 -- This should improve meter continuous-aggregate refreshes

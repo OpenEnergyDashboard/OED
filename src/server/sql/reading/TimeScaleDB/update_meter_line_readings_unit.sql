@@ -157,18 +157,29 @@ BEGIN
 		FROM unnest(meter_ids) WITH ORDINALITY requested(id, request_order)
 	),
 	/*
-	 * Find the available reading range once for every requested meter instead
-	 * of querying the readings table separately for each meter.
+	 * Use the readings indexes to find the first start and last end for every
+	 * requested meter without aggregating its complete reading history.
 	 */
 	reading_bounds AS (
 		SELECT
-			r.meter_id,
-			min(r.start_timestamp) AS min_start_timestamp,
-			max(r.end_timestamp) AS max_end_timestamp
-		FROM readings r
-		INNER JOIN (SELECT DISTINCT rm.meter_id FROM requested_meters rm) requested
-			ON requested.meter_id = r.meter_id
-		GROUP BY r.meter_id
+			requested.meter_id,
+			first_reading.start_timestamp AS min_start_timestamp,
+			last_reading.end_timestamp AS max_end_timestamp
+		FROM (SELECT DISTINCT rm.meter_id FROM requested_meters rm) requested
+		LEFT JOIN LATERAL (
+			SELECT r.start_timestamp
+			FROM readings r
+			WHERE r.meter_id = requested.meter_id
+			ORDER BY r.start_timestamp
+			LIMIT 1
+		) first_reading ON TRUE
+		LEFT JOIN LATERAL (
+			SELECT r.end_timestamp
+			FROM readings r
+			WHERE r.meter_id = requested.meter_id
+			ORDER BY r.end_timestamp DESC
+			LIMIT 1
+		) last_reading ON TRUE
 	),
 	/*
 	 * Restrict the requested range to the readings available for each meter.

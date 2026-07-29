@@ -79,14 +79,17 @@ ON groups_deep_meters_cache (meter_id, group_id);
 /*
  * Refresh groups_deep_meters_cache.
  *
- * Uses MERGE so existing rows are preserved and only changes are applied.
+ * Calculates the desired rows once, removes stale rows, and inserts new rows.
  */
 CREATE OR REPLACE FUNCTION update_groups_deep_meters_cache()
 RETURNS void
 AS $$
 BEGIN
-    MERGE INTO groups_deep_meters_cache target
-    USING (
+    /*
+     * desired is referenced by both deletion and insertion. MATERIALIZED keeps
+     * the recursive group traversal from being calculated twice.
+     */
+    WITH desired AS MATERIALIZED (
         WITH all_deep_meters(group_id, meter_id) AS (
             SELECT DISTINCT gdc.parent_id AS group_id, gim.meter_id AS meter_id
             FROM groups_immediate_meters gim INNER JOIN 
@@ -97,28 +100,26 @@ BEGIN
         )
         SELECT group_id, meter_id
         FROM all_deep_meters
-
-    ) source ON (target.group_id = source.group_id AND target.meter_id = source.meter_id)
-    WHEN NOT MATCHED THEN
-        INSERT(group_id, meter_id)
-        VALUES(source.group_id, source.meter_id);
-
-    -- since not matched by source is not supported in PostgreSQL.
-    DELETE FROM groups_deep_meters_cache target
-    WHERE NOT EXISTS (
-        WITH all_deep_meters(group_id, meter_id) AS (
-            SELECT DISTINCT gdc.parent_id AS group_id, gim.meter_id AS meter_id
-            FROM groups_immediate_meters gim INNER JOIN 
-                 groups_deep_children gdc ON gdc.child_id = gim.group_id
-            UNION
-            SELECT gim.group_id, gim.meter_id
-            FROM groups_immediate_meters gim
+    ),
+    /*
+     * Data-modifying CTEs execute even when their RETURNING rows are not used.
+     * Remove stale relationships while the main statement inserts newly
+     * desired relationships.
+     */
+    removed AS (
+        DELETE FROM groups_deep_meters_cache target
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM desired
+            WHERE desired.group_id = target.group_id
+              AND desired.meter_id = target.meter_id
         )
-        SELECT 1
-        FROM all_deep_meters source
-        WHERE source.group_id = target.group_id
-          AND source.meter_id = target.meter_id
-    );
+        RETURNING target.group_id
+    )
+    INSERT INTO groups_deep_meters_cache(group_id, meter_id)
+    SELECT desired.group_id, desired.meter_id
+    FROM desired
+    ON CONFLICT (group_id, meter_id) DO NOTHING;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -148,8 +149,12 @@ RETURNS void
 AS $$
 BEGIN
 
-    MERGE INTO group_graphic_units_cache AS target
-    USING (
+    /*
+     * Calculate compatible graphic units once for both cache deletion and
+     * insertion. This is the expensive portion because it aggregates source
+     * units and checks conversion coverage for every group.
+     */
+    WITH desired AS MATERIALIZED (
         WITH group_source_units AS (
             SELECT gdm.group_id, array_agg(DISTINCT m.unit_id) AS source_units
             FROM groups_deep_meters_cache gdm INNER JOIN 
@@ -165,31 +170,22 @@ BEGIN
         )
         SELECT group_id, graphic_unit_id
         FROM compatible_units
-    ) AS source ON ( target.group_id = source.group_id AND target.graphic_unit_id = source.graphic_unit_id)
-    WHEN NOT MATCHED THEN
-        INSERT (group_id, graphic_unit_id)
-        VALUES (source.group_id, source.graphic_unit_id);
-
-    DELETE FROM group_graphic_units_cache target
-    WHERE NOT EXISTS (
-        WITH group_source_units AS (
-            SELECT gdm.group_id, array_agg(DISTINCT m.unit_id) AS source_units
-            FROM groups_deep_meters_cache gdm INNER JOIN 
-                 meters m ON m.id = gdm.meter_id
-            GROUP BY gdm.group_id
-        ),
-        compatible_units AS (
-            SELECT gsu.group_id,   c.destination_id AS graphic_unit_id
-            FROM group_source_units gsu INNER JOIN 
-                 cik c ON c.source_id = ANY(gsu.source_units)
-            GROUP BY gsu.group_id, c.destination_id, gsu.source_units
-            HAVING array_agg(DISTINCT c.source_id) @> gsu.source_units
+    ),
+    -- Remove compatibility rows that are no longer present in desired.
+    removed AS (
+        DELETE FROM group_graphic_units_cache target
+        WHERE NOT EXISTS (
+            SELECT 1
+            FROM desired
+            WHERE desired.group_id = target.group_id
+              AND desired.graphic_unit_id = target.graphic_unit_id
         )
-        SELECT 1
-        FROM compatible_units source
-        WHERE source.group_id = target.group_id
-          AND source.graphic_unit_id = target.graphic_unit_id
-    );
+        RETURNING target.group_id
+    )
+    INSERT INTO group_graphic_units_cache(group_id, graphic_unit_id)
+    SELECT desired.group_id, desired.graphic_unit_id
+    FROM desired
+    ON CONFLICT (group_id, graphic_unit_id) DO NOTHING;
 
 END;
 $$ LANGUAGE plpgsql;

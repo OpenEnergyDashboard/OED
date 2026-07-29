@@ -142,6 +142,30 @@ mocha.describe('redoCikVary integration', function () {
 		expect(state.completed_rebuild_revision).to.equal(state.rebuild_revision);
 	});
 
+	mocha.it('should complete pending group cache maintenance during a default refresh', async function () {
+		await redoCikVary(conn);
+		await refreshAllReadingViews();
+
+		const state = await conn.one(`
+			SELECT group_cache_revision, completed_group_cache_revision
+			FROM reading_aggregate_state
+			WHERE id = 1
+		`);
+		expect(state.completed_group_cache_revision).to.equal(state.group_cache_revision);
+	});
+
+	mocha.it('should align hourly and daily refreshes to their own bucket boundaries', function () {
+		const startTimestamp = '2022-08-18 10:15:00';
+		const endTimestamp = '2022-08-18 11:45:00';
+		const hourlyRange = TimeScaleDBReading.getRefreshRange(startTimestamp, endTimestamp, 'hour');
+		const dailyRange = TimeScaleDBReading.getRefreshRange(startTimestamp, endTimestamp, 'day');
+
+		expect(hourlyRange.refreshStart.toISOString()).to.equal('2022-08-18T10:00:00.000Z');
+		expect(hourlyRange.refreshEnd.toISOString()).to.equal('2022-08-18T12:00:00.000Z');
+		expect(dailyRange.refreshStart.toISOString()).to.equal('2022-08-18T00:00:00.000Z');
+		expect(dailyRange.refreshEnd.toISOString()).to.equal('2022-08-19T00:00:00.000Z');
+	});
+
 	mocha.it('should require a rebuild after changing split-row unit metadata', async function () {
 		await conn.none(`
 			UPDATE units

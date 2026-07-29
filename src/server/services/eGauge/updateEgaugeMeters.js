@@ -22,14 +22,25 @@ async function updateEgaugeMeters() {
 		const allMeters = await Meter.getEnabled(conn);
 		// We only want the eGauge meters.
 		const metersToUpdate = allMeters.filter(m => m.type === Meter.type.EGAUGE);
-		// Ignoring that loadArrayInput is called in this sequence and returns values
-		// since this is only called by an automated process at this time.
-		// Issues from the pipeline will be logged by called functions.
-		await updateMeters(readEgaugeData, metersToUpdate, conn);
-		// We refresh the readings so they can be graphed to see the new ones.
-		// TODO If the system is getting other types of meters this may cause the refresh
-		// to happen multiple times. Might want to work on this in the future.
-		await refreshAllReadingViews();
+		// Issues from the pipeline are logged by the called functions. Successful
+		// results include the accepted reading range for each meter.
+		const updateResults = await updateMeters(readEgaugeData, metersToUpdate, conn);
+		const readingRanges = updateResults.filter(result => result.startTimestamp && result.endTimestamp);
+
+		// Refresh the readings so newly imported values can be graphed. Combining
+		// all meter ranges keeps this to one refresh without checking unrelated
+		// historical buckets.
+		// TODO If the system gets other meter types in the same schedule, coordinate
+		// their ranges so aggregate refreshes are not performed multiple times.
+		if (readingRanges.length > 0) {
+			const startTimestamp = readingRanges.reduce((earliest, result) =>
+				result.startTimestamp.isBefore(earliest) ? result.startTimestamp : earliest,
+			readingRanges[0].startTimestamp);
+			const endTimestamp = readingRanges.reduce((latest, result) =>
+				result.endTimestamp.isAfter(latest) ? result.endTimestamp : latest,
+			readingRanges[0].endTimestamp);
+			await refreshAllReadingViews({ startTimestamp, endTimestamp });
+		}
 	} catch (err) {
 		log.error(`Error fetching eGauge meter data: ${err}`, err);
 	}

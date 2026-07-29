@@ -191,21 +191,24 @@ class Reading {
     }
 
     /**
-     * Validates and expands an optional refresh range to UTC day boundaries.
+     * Validates and expands an optional refresh range to UTC bucket boundaries.
+     * TimescaleDB refreshes only complete buckets, so a partial final bucket
+     * must expand to the start of the following bucket.
      *
      * @param startTimestamp inclusive start of the affected range
      * @param endTimestamp exclusive end of the affected range
+     * @param bucketPrecision moment-supported bucket precision
      * @returns {{refreshStart: moment.Moment|null, refreshEnd: moment.Moment|null}}
      */
-    static getRefreshRange(startTimestamp = null, endTimestamp = null) {
+    static getRefreshRange(startTimestamp = null, endTimestamp = null, bucketPrecision = 'day') {
         if ((startTimestamp === null) !== (endTimestamp === null)) {
             throw new Error('Both startTimestamp and endTimestamp are required for a bounded TimescaleDB refresh.');
         }
 
-        const refreshStart = startTimestamp === null ? null : moment.utc(startTimestamp).startOf('day');
-        const refreshEnd = endTimestamp === null ? null : moment.utc(endTimestamp).startOf('day');
+        const refreshStart = startTimestamp === null ? null : moment.utc(startTimestamp).startOf(bucketPrecision);
+        const refreshEnd = endTimestamp === null ? null : moment.utc(endTimestamp).startOf(bucketPrecision);
         if (refreshEnd !== null && !moment.utc(endTimestamp).isSame(refreshEnd)) {
-            refreshEnd.add(1, 'day');
+            refreshEnd.add(1, bucketPrecision);
         }
 
         return { refreshStart, refreshEnd };
@@ -215,7 +218,7 @@ class Reading {
      * Refreshes only the hourly meter continuous aggregate.
      */
     static async refreshMeterHourlyReadings(conn, startTimestamp = null, endTimestamp = null) {
-        const { refreshStart, refreshEnd } = Reading.getRefreshRange(startTimestamp, endTimestamp);
+        const { refreshStart, refreshEnd } = Reading.getRefreshRange(startTimestamp, endTimestamp, 'hour');
         await conn.none(
             "CALL refresh_continuous_aggregate('meter_hourly_readings_unit_cagg', ${startTimestamp}, ${endTimestamp})",
             { startTimestamp: refreshStart, endTimestamp: refreshEnd }
@@ -245,25 +248,48 @@ class Reading {
      * Refreshes the group caches and group continuous aggregates.
      */
     static async refreshGroupReadings(conn, startTimestamp = null, endTimestamp = null) {
-        const { refreshStart, refreshEnd } = Reading.getRefreshRange(startTimestamp, endTimestamp);
-
-        await conn.none(`
-            DO $$
-            BEGIN
-                PERFORM update_groups_deep_meters_cache();
-                PERFORM update_group_graphic_units_cache();
-            END
-            $$;
+        // Group caches depend on relatively infrequent membership, meter-unit,
+        // and conversion changes. Reading-only imports can skip this work.
+        const groupCacheState = await conn.one(`
+            SELECT group_cache_revision, completed_group_cache_revision
+            FROM reading_aggregate_state
+            WHERE id = 1
         `);
+        if (BigInt(groupCacheState.group_cache_revision)
+            > BigInt(groupCacheState.completed_group_cache_revision)) {
+            await conn.none(`
+                DO $$
+                BEGIN
+                    PERFORM update_groups_deep_meters_cache();
+                    PERFORM update_group_graphic_units_cache();
+                END
+                $$;
+            `);
+            // Record only the revision observed before the refresh. If another
+            // source change commits concurrently, its newer revision remains
+            // pending and the next refresh will update the caches again.
+            await conn.none(`
+                UPDATE reading_aggregate_state
+                SET completed_group_cache_revision = GREATEST(
+                    completed_group_cache_revision,
+                    \${refreshedRevision}
+                )
+                WHERE id = 1
+            `, { refreshedRevision: groupCacheState.group_cache_revision });
+        }
 
+        // Hourly and daily CAGGs use different bucket widths. Give each the
+        // smallest complete refresh window that covers the changed readings.
+        const hourlyRange = Reading.getRefreshRange(startTimestamp, endTimestamp, 'hour');
         await conn.none(
             "CALL refresh_continuous_aggregate('group_hourly_readings_unit_cagg', ${startTimestamp}, ${endTimestamp})",
-            { startTimestamp: refreshStart, endTimestamp: refreshEnd }
+            { startTimestamp: hourlyRange.refreshStart, endTimestamp: hourlyRange.refreshEnd }
         );
 
+        const dailyRange = Reading.getRefreshRange(startTimestamp, endTimestamp, 'day');
         await conn.none(
             "CALL refresh_continuous_aggregate('group_daily_readings_unit_cagg', ${startTimestamp}, ${endTimestamp})",
-            { startTimestamp: refreshStart, endTimestamp: refreshEnd }
+            { startTimestamp: dailyRange.refreshStart, endTimestamp: dailyRange.refreshEnd }
         );
     }
 

@@ -130,8 +130,18 @@ ON hypertable_hourly_split
 CREATE TABLE IF NOT EXISTS reading_aggregate_state (
     id SMALLINT PRIMARY KEY CHECK (id = 1),
     rebuild_revision BIGINT NOT NULL DEFAULT 0,
-    completed_rebuild_revision BIGINT NOT NULL DEFAULT 0
+    completed_rebuild_revision BIGINT NOT NULL DEFAULT 0,
+    group_cache_revision BIGINT NOT NULL DEFAULT 0,
+    completed_group_cache_revision BIGINT NOT NULL DEFAULT 0
 );
+
+-- Keep this prerequisite script rerunnable against databases that created the
+-- state table before group-cache revision tracking was added.
+ALTER TABLE reading_aggregate_state
+ADD COLUMN IF NOT EXISTS group_cache_revision BIGINT NOT NULL DEFAULT 0;
+
+ALTER TABLE reading_aggregate_state
+ADD COLUMN IF NOT EXISTS completed_group_cache_revision BIGINT NOT NULL DEFAULT 0;
 
 INSERT INTO reading_aggregate_state (id)
 VALUES (1)
@@ -162,6 +172,53 @@ ON meters
 FOR EACH ROW
 WHEN (OLD.unit_id IS DISTINCT FROM NEW.unit_id)
 EXECUTE FUNCTION mark_reading_aggregate_rebuild_required();
+
+/*
+ * Group membership, meter units, and conversion paths determine the contents
+ * of the two group dependency caches. Track those changes independently from
+ * reading imports so normal aggregate refreshes can skip cache maintenance.
+ */
+CREATE OR REPLACE FUNCTION mark_group_reading_cache_refresh_required()
+RETURNS trigger
+AS $$
+BEGIN
+    UPDATE reading_aggregate_state
+    SET group_cache_revision = group_cache_revision + 1
+    WHERE id = 1;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_meter_unit_requires_group_cache_refresh
+ON meters;
+
+CREATE TRIGGER trigger_meter_unit_requires_group_cache_refresh
+AFTER UPDATE OF unit_id
+ON meters
+FOR EACH ROW
+WHEN (OLD.unit_id IS DISTINCT FROM NEW.unit_id)
+EXECUTE FUNCTION mark_group_reading_cache_refresh_required();
+
+-- Group hierarchy changes affect inherited meter membership.
+DROP TRIGGER IF EXISTS trigger_group_children_require_group_cache_refresh
+ON groups_immediate_children;
+
+CREATE TRIGGER trigger_group_children_require_group_cache_refresh
+AFTER INSERT OR UPDATE OR DELETE
+ON groups_immediate_children
+FOR EACH STATEMENT
+EXECUTE FUNCTION mark_group_reading_cache_refresh_required();
+
+-- Direct group-meter changes affect both group dependency caches.
+DROP TRIGGER IF EXISTS trigger_group_meters_require_group_cache_refresh
+ON groups_immediate_meters;
+
+CREATE TRIGGER trigger_group_meters_require_group_cache_refresh
+AFTER INSERT OR UPDATE OR DELETE
+ON groups_immediate_meters
+FOR EACH STATEMENT
+EXECUTE FUNCTION mark_group_reading_cache_refresh_required();
 
 DROP TRIGGER IF EXISTS trigger_unit_metadata_requires_reading_rebuild
 ON units;

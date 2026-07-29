@@ -90,17 +90,43 @@ class CikVary {
 			// cik_vary
 			// Remove all the current values in the table.
 			await t.none(sqlFile('cik_vary/delete_all_cik_vary.sql'));
-			// Loop over all conversions in array and insert each in DB.
-			for (const conversion of cikVaryArr) {
-				await t.none(sqlFile('cik_vary/insert_new_cik_vary.sql'), {
-					sourceId: conversion.source,
-					destinationId: conversion.destination,
-					startTime: conversion.start_time,
-					endTime: conversion.end_time,
+			// Insert all time-varying conversions in one database statement.
+			// jsonb_to_recordset preserves the existing typed insert behavior while
+			// avoiding one application/database round trip per conversion segment.
+			await t.none(`
+				INSERT INTO cik_vary (
+					source_id,
+					destination_id,
+					start_time,
+					end_time,
+					slope,
+					intercept
+				)
+				SELECT
+					conversion.source_id,
+					conversion.destination_id,
+					conversion.start_time,
+					conversion.end_time,
+					conversion.slope,
+					conversion.intercept
+				FROM jsonb_to_recordset(\${conversions:json}::jsonb) AS conversion(
+					source_id INTEGER,
+					destination_id INTEGER,
+					start_time TIMESTAMP,
+					end_time TIMESTAMP,
+					slope FLOAT,
+					intercept FLOAT
+				)
+			`, {
+				conversions: cikVaryArr.map(conversion => ({
+					source_id: conversion.source,
+					destination_id: conversion.destination,
+					start_time: conversion.start_time,
+					end_time: conversion.end_time,
 					slope: conversion.slope,
 					intercept: conversion.intercept
-				});
-			}
+				}))
+			});
 
 			// cik
 			// Remove all the current values in the table.
@@ -113,11 +139,13 @@ class CikVary {
 			await t.none(sqlFile('cik/insert_unique_cik_vary_in_cik.sql'));
 
 			// Existing hourly split rows retain the conversion metadata that was
-			// current when they were created. Mark them for a rebuild in the
-			// same transaction as the cik_vary replacement.
+			// current when they were created. Group graphic-unit compatibility also
+			// depends on cik. Mark both derived datasets stale in the same transaction
+			// as the cik_vary and cik replacement.
 			await t.none(`
 				UPDATE reading_aggregate_state
-				SET rebuild_revision = rebuild_revision + 1
+				SET rebuild_revision = rebuild_revision + 1,
+					group_cache_revision = group_cache_revision + 1
 				WHERE id = 1
 			`);
 		});
