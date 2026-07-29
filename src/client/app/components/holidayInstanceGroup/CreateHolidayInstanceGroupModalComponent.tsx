@@ -46,6 +46,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 	const [holidayInstanceIds, setHolidayInstanceIds] = useState<number[]>([]);
 	const [note, setNote] = useState('');
 
+	// handle location
 	const locations = React.useMemo(
 		() => Array.from(new Set(
 			props.holidayInstances
@@ -63,6 +64,8 @@ export default function CreateHolidayInstanceGroupModalComponent(
 	const selectedLocationOptions = locationOptions.filter(option =>
 		selectedLocations.includes(option.location)
 	);
+
+	// filter holiday instances based on selected locations
 	const filteredHolidayInstances = props.holidayInstances.filter(holidayInstance =>
 		selectedLocations.includes(holidayInstance.location.trim())
 	);
@@ -79,6 +82,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 		holidayInstanceIds.includes(option.value)
 	);
 
+	// handle state of modal
 	const resetState = () => {
 		setName('');
 		setSelectedLocations([]);
@@ -96,6 +100,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 		resetState();
 	};
 
+	// handle submit
 	const handleSubmit = () => {
 		if (holidayInstanceIds.length === 0) {
 			return;
@@ -111,6 +116,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 
 	return (
 		<>
+			{/* show modal button */}
 			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage
 					id='holiday.instance.group.create'
@@ -125,7 +131,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 				</ModalHeader>
 				<ModalBody>
 					<Container>
-						<FormGroup>
+						<FormGroup> {/* Name input*/}
 							<Label for='name'>
 								<FormattedMessage id='name' />
 							</Label>
@@ -145,7 +151,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 
 						<Row xs='1' lg='2'>
 							<Col>
-								<FormGroup>
+								<FormGroup> {/* Location select */}
 									<Label for='holidayLocation'>
 										<FormattedMessage
 											id='holiday.location'
@@ -222,7 +228,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 							</Col>
 						</Row>
 
-						<FormGroup>
+						<FormGroup> {/* Note input */}
 							<Label for='note'>
 								<FormattedMessage id='note' />
 							</Label>
@@ -236,7 +242,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 						</FormGroup>
 					</Container>
 				</ModalBody>
-				<ModalFooter>
+				<ModalFooter> {/* Modal footer with buttons */}
 					<Button color='secondary' onClick={handleClose}>
 						<FormattedMessage id='discard.changes' />
 					</Button>
