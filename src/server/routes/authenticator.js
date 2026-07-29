@@ -16,41 +16,36 @@ const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN
 	= require('../util/validationConstants');
 
 /**
- * Middleware function to force a route to require authentication
- * Verifies the request's token against the server's secret token
- * It is used within this file but not by other parts of OED.
+ * Middleware function to require authentication on protected routes.
+ * Verifies the request's token, ensures the user exists, and checks that
+ * the token has not been invalidated.
+ * This middleware was created to only be used within this file.
  */
-authMiddleware = (req, res, next) => {
+const authMiddleware = (req, res, next) => {
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
 		type: 'string',
 		maxLength: TOKEN_MAX_LENGTH
 	};
+
 	if (!validate(token, validParams).valid) {
 		res.status(HTTP_CODES.FORBIDDEN).json({ success: false, message: 'No token provided or JSON was invalid.' });
 	} else if (token) {
-		jwt.verify(token, secretToken, async (err, decoded) => {
-			if (err) {
+		verifyActiveTokenAndGetUser(token)
+			.then(({ decoded }) => {
+				req.decoded = decoded;
+				next();
+			})
+			.catch(() => {
 				res.status(HTTP_CODES.UNAUTHORIZED).json({ success: false, message: 'Failed to authenticate token.' });
-			} else {
-				try {
-					const conn = getConnection();
-					// checks if user exists in the database in case it was deleted
-					await User.getByID(decoded.data, conn);
-					req.decoded = decoded;
-					next();
-				} catch (error) {
-					res.status(HTTP_CODES.UNAUTHORIZED).json({ success: false, message: 'User does not exist in database.' });
-				}
-			}
-		});
+			});
 	} else {
 		res.status(HTTP_CODES.FORBIDDEN).send({ success: false, message: 'No token provided.' });
 	}
 };
 
 /**
- * Middleware that checks the request body for the username and password parameters. If the body contains the username and password parameters, then next 
+ * Middleware that checks the request body for the username and password parameters. If the body contains the username and password parameters, then next
  * is executed. Otherwise, the server responds with a 400 error.
  */
 function credentialsRequestValidationMiddleware(req, res, next) {
@@ -82,9 +77,9 @@ function credentialsRequestValidationMiddleware(req, res, next) {
 
 /**
  * Verifies the username and password of a user.
- * @param {string} username 
- * @param {string} password 
- * @param {boolean} returnUser 
+ * @param {string} username
+ * @param {string} password
+ * @param {boolean} returnUser
  * @returns true if the user exists in the database. False otherwise. Returns the user itself if returnUser is set to true and user is verified.
  */
 async function verifyCredentials(username, password, returnUser = false) {
@@ -105,13 +100,59 @@ async function verifyCredentials(username, password, returnUser = false) {
 }
 
 /**
+ * Verifies a JWT, ensures the user exists, and rejects tokens that were invalidated.
+ * Returns the decoded token and matching user when successful.
+ * @param {string} token
+ * @returns {Promise<{decoded: object, user: User}>}
+ */
+async function verifyActiveTokenAndGetUser(token) {
+	const decoded = await new Promise((resolve, reject) => {
+		jwt.verify(token, secretToken, (err, payload) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(payload);
+			}
+		});
+	});
+
+	// jwt.verify confirms the token signature is valid, but it does not guarantee
+	// the referenced user still exists in the database. The user may have been
+	// deleted after the token was issued, so OED must still verify the user record.
+	const conn = getConnection();
+	const user = await User.getByID(decoded.data, conn);
+
+	// Compare timestamps at millisecond precision to avoid edge cases caused by
+	// JWT iat being stored in seconds while the database timestamp is more precise.
+	const tokenIssuedAtMs = decoded.iat * 1000;
+	let invalidBeforeMs = 0;
+
+	if (user.tokenInvalidBefore) {
+		const parsedDate = new Date(user.tokenInvalidBefore);
+		if (!isNaN(parsedDate.getTime())) {
+			invalidBeforeMs = parsedDate.getTime();
+		} else {
+			log.error(`Invalid tokenInvalidBefore value for user ${user.id}`);
+		}
+	}
+
+	if (tokenIssuedAtMs <= invalidBeforeMs) {
+		const error = new Error('Token invalidated');
+		error.code = 'TOKEN_INVALIDATED';
+		throw error;
+	}
+
+	return { decoded, user };
+}
+
+/**
  * Returns middleware that verifies the requested token and only proceeds if the requestor is a particular user role or is Admin.
- * @param {string} role 
- * @param action 
+ * @param {string} role
+ * @param action
  */
 function roleTokenAuthMiddleware(role, action) {
 	return function (req, res, next) {
-		this.authMiddleware(req, res, async () => {
+		authMiddleware(req, res, async () => {
 			const token = req.headers.token || req.body.token || req.query.token;
 			if (await isTokenAuthorized(token, role)) {
 				next();
@@ -120,8 +161,8 @@ function roleTokenAuthMiddleware(role, action) {
 				res.status(HTTP_CODES.FORBIDDEN)
 					.json({ message: `Invalid credentials supplied. Only ${role.toUpperCase()} can ${action}.` });
 			}
-		})
-	}
+		});
+	};
 }
 
 /**
@@ -179,7 +220,7 @@ function obviusUsernameAndPasswordAuthMiddleware(action) {
 				}
 			}
 		});
-	}
+	};
 }
 
 /**
@@ -187,7 +228,7 @@ function obviusUsernameAndPasswordAuthMiddleware(action) {
  * Verifies the request's token against the server's secret token
  * Sets the req field hasValidAuthToken to true or false
  */
-optionalAuthMiddleware = (req, res, next) => {
+const optionalAuthMiddleware = (req, res, next) => {
 	// Set auth token to false initially.
 	req.hasValidAuthToken = false;
 
@@ -201,26 +242,28 @@ optionalAuthMiddleware = (req, res, next) => {
 	if (!validate(token, validParams).valid) {
 		next();
 	} else if (token) {
-		jwt.verify(token, secretToken, (err, decoded) => {
-			if (err) {
-				// do nothing. Could log here if need be
-			} else {
+		verifyActiveTokenAndGetUser(token)
+			.then(({ decoded }) => {
 				req.decoded = decoded;
 				req.hasValidAuthToken = true;
-			}
-			next();
-		});
+				next();
+			})
+			.catch(() => {
+				next();
+			});
 	} else {
 		next();
 	}
 };
 
 module.exports = {
+	authMiddleware,
 	adminAuthMiddleware,
 	csvAuthMiddleware,
 	exportAuthMiddleware,
 	obviusUsernameAndPasswordAuthMiddleware,
 	optionalAuthMiddleware,
 	verifyCredentials,
+	verifyActiveTokenAndGetUser,
 	credentialsRequestValidationMiddleware
 };

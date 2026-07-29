@@ -322,7 +322,7 @@ export default function PreferencesComponent() {
 				<Input
 					type='number'
 					value={localAdminPref.defaultWarningFileSize}
-					onChange={e => makeLocalChanges('defaultWarningFileSize', e.target.value)}
+					onChange={e => makeLocalChanges('defaultWarningFileSize', Number(e.target.value))}
 					min='0'
 					max={Number(localAdminPref.defaultFileSizeLimit)}
 					maxLength={50}
@@ -339,7 +339,7 @@ export default function PreferencesComponent() {
 				<Input
 					type='number'
 					value={localAdminPref.defaultFileSizeLimit}
-					onChange={e => makeLocalChanges('defaultFileSizeLimit', e.target.value)}
+					onChange={e => makeLocalChanges('defaultFileSizeLimit', Number(e.target.value))}
 					min={Number(localAdminPref.defaultWarningFileSize)}
 					maxLength={50}
 					invalid={invalidFuncs.fileSizeLimit()}
@@ -370,16 +370,16 @@ export default function PreferencesComponent() {
 				</Button>
 				<Button
 					type='submit'
-					onClick={() =>
+					onClick={() => {
 						submitPreferences(localAdminPref)
 							.unwrap()
 							.then(() => {
 								showSuccessNotification(translate('updated.preferences'));
 							})
-							.catch(() => {
-								showErrorNotification(translate('failed.to.submit.changes'));
-							})
-					}
+							.catch(err => {
+								showErrorNotification(translate('failed.to.submit.changes') + err.data);
+							});
+					}}
 					disabled={!hasChanges || Object.values(invalidFuncs).some(check => check())}
 					color='primary'
 				>

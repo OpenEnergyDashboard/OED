@@ -409,9 +409,19 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		deleteConversion(payload)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('conversion.delete.success'));
+				// Show source/destination identifiers (not numeric IDs)
+				showSuccessNotification(
+					translate('conversion.delete.success') +
+					' (' + translate('conversion.source') + ' "' + unitDataById[payload.sourceId]?.identifier + '"' +
+					', ' + translate('conversion.destination') + ' "' + unitDataById[payload.destinationId]?.identifier + '")'
+				);
 			}).catch(error => {
-				showErrorNotification(translate('conversion.delete.failure') + error.data.message);
+				showErrorNotification(
+					translate('conversion.delete.failure') +
+					' (' + translate('conversion.source') + ' "' + unitDataById[payload.sourceId]?.identifier + '"' +
+					', ' + translate('conversion.destination') + ' "' + unitDataById[payload.destinationId]?.identifier + '") ' +
+					error.data.message
+				);
 			});
 	};
 
@@ -471,15 +481,34 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		const conversionHasChanges = shouldRedoCik || props.conversion.note != state.note;
 		// Only do work if there are changes
 		if (conversionHasChanges) {
+
 			// Save our changes
 			editConversion({
 				conversionData: {
 					...state,
 					bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
 				}, shouldRedoCik
-			});
+			})
+				.unwrap()
+				.then(() => {
+					// Show source/destination identifiers (not numeric IDs)
+					showSuccessNotification(
+						translate('conversion.successfully.edited.conversion') +
+						' (' + translate('conversion.source') + ' "' + unitDataById[state.sourceId]?.identifier + '"' +
+						', ' + translate('conversion.destination') + ' "' + unitDataById[state.destinationId]?.identifier + '")'
+					);
+				})
+				.catch(err => {
+					showErrorNotification(
+						translate('conversion.failed.to.edit.conversion') +
+						' (' + translate('conversion.source') + ' "' + unitDataById[values.sourceId]?.identifier + '"' +
+						', ' + translate('conversion.destination') + ' "' + unitDataById[values.destinationId]?.identifier + '") ' +
+						err.data
+					);
+				});
 		}
 	};
+
 	const handleWarningCancel = () => {
 		// Close the warning modal
 		setShowWarningModal(false);
@@ -507,13 +536,31 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			const conversionHasChanges = shouldRedoCik || props.conversion.note != state.note;
 			// Only do work if there are changes
 			if (conversionHasChanges) {
+
 				// Save our changes
 				editConversion({
 					conversionData: {
 						...state,
 						bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
 					}, shouldRedoCik
-				});
+				})
+					.unwrap()
+					.then(() => {
+						// Show source/destination identifiers (not numeric IDs)
+						showSuccessNotification(
+							translate('conversion.successfully.edited.conversion') +
+							' (' + translate('conversion.source') + ' "' + unitDataById[state.sourceId]?.identifier + '"' +
+							', ' + translate('conversion.destination') + ' "' + unitDataById[state.destinationId]?.identifier + '")'
+						);
+					})
+					.catch(err => {
+						showErrorNotification(
+							translate('conversion.failed.to.edit.conversion') +
+							' (' + translate('conversion.source') + ' "' + unitDataById[values.sourceId]?.identifier + '"' +
+							', ' + translate('conversion.destination') + ' "' + unitDataById[values.destinationId]?.identifier + '") ' +
+							err.data
+						);
+					});
 			}
 		}
 	};

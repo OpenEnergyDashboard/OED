@@ -10,7 +10,7 @@ import '../../styles/modal.css';
 import { TrueFalseType } from '../../types/items';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import TooltipHelpComponent from '../../components/TooltipHelpComponent';
-import { UnitRepresentType, DisplayableType, UnitType, DisableChecksType } from '../../types/redux/units';
+import { UnitRepresentType, DisplayableType, UnitType, DisableChecksType, UnitData } from '../../types/redux/units';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { unitsApi } from '../../redux/api/unitsApi';
 import { useTranslate } from '../../redux/componentHooks';
@@ -56,10 +56,10 @@ export default function CreateUnitModalComponent() {
 		secInRate: LineGraphRates.hour * 3600,
 		suffix: '',
 		note: '',
-		// These two values are necessary but are not used.
-		// The client code makes the id for the selected unit and default graphic unit be -99
+		// The id property is necessary but not used.
+		// The client code makes the id for the selected unit
 		// so it can tell it is not yet assigned and do the correct logic for that case.
-		// The units API expects these values to be undefined on call so that the database can assign their values.
+		// The units API expects this value to be undefined on call so that the database can assign their values.
 		id: -99,
 		minVal: MIN_VAL,
 		maxVal: MAX_VAL,
@@ -214,14 +214,23 @@ export default function CreateUnitModalComponent() {
 			// set unit to suffix if suffix is not empty
 			typeOfUnit: (state.typeOfUnit != UnitType.suffix && state.suffix != '') ? UnitType.suffix : state.typeOfUnit
 		};
+
 		// Add the new unit and update the store
-		submitCreateUnit(submitState)
+		submitCreateUnit(submitState as unknown as UnitData)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('unit.successfully.create.unit'));
+				showSuccessNotification(
+					translate('unit.successfully.create.unit') + ' "' + submitState.name + '"' +
+					translate('unit.successfully.create.unit.identifier') + submitState.identifier +
+					translate('unit.successfully.create.unit.type') + submitState.typeOfUnit + ')'
+				);
 			})
-			.catch(() => {
-				showErrorNotification(translate('unit.failed.to.create.unit'));
+			.catch(err => {
+				showErrorNotification(
+					translate('unit.failed.to.create.unit') + ' "' + submitState.name + '"' +
+					translate('unit.successfully.create.unit.identifier') + submitState.identifier +
+					translate('unit.successfully.create.unit.type') + submitState.typeOfUnit + ') ' + err.data
+				);
 			});
 		resetState();
 	};

@@ -14,6 +14,8 @@ const User = require('../models/User');
 const { DEFAULT_CIRCLE_SIZE } = require('../models/Map');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
+const { isValidIsoDateTime } = require('../util/timeValidation');
+const omit = require('lodash/omit');
 
 const router = express.Router();
 
@@ -32,6 +34,113 @@ function formatMapForResponse(map) {
 		circleSize: map.circleSize
 	};
 	return formattedMap;
+}
+
+/**
+ * Validates the body of a map create/edit request.
+ * isEdit=true includes the required 'id' property, along with 'displayable', 'note', 'origin', and
+ * 'opposite' as required (edit); isEdit=false excludes them (create), since id is assigned by the DB
+ * on insert and the others are not needed to create the initial map entry.
+ * @param params req.body for a map create or edit request
+ * @param isEdit whether this is validating an edit (true) or create (false) request
+ * @returns {{valid: boolean, errors: array}}
+ */
+function validateMapsParams(params, isEdit = true) {
+	const properties = {
+		name: {
+			type: 'string',
+			minLength: 1,
+			maxLength: SHORT_STRING_MAX_LENGTH
+		},
+		filename: {
+			type: 'string',
+			maxLength: 500
+		},
+		modifiedDate: {
+			type: 'string',
+			minLength: 1,
+			maxLength: STRING_GENERAL_MAX_LENGTH
+		},
+		mapSource: {
+			type: 'string',
+			minLength: 1,
+			// TODO This is a very long string that encodes the actual map. It is unclear the exact maximum
+			// size so it is not clear this is the correct value.
+			maxLength: 100000
+		},
+		note: {
+			oneOf: [
+				{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
+				{ type: 'null' }
+			]
+		},
+		displayable: {
+			type: 'boolean'
+		},
+		northAngle: {
+			type: 'number',
+			minimum: 0,
+			maximum: 360
+		},
+		circleSize: {
+			type: 'number',
+			// The UI limits 0:2 so do that here.
+			minimum: 0,
+			maximum: 2
+		},
+		origin: {
+			oneOf: [
+				{
+					type: 'object',
+					additionalProperties: false,
+					required: ['latitude', 'longitude'],
+					properties: {
+						latitude: { type: 'number', minimum: -90, maximum: 90 },
+						longitude: { type: 'number', minimum: -180, maximum: 180 },
+						// TODO For unknown reasons, map edit is sending this.
+						rawType: {type: 'boolean'}
+					}
+				},
+				{ type: 'null' }
+			]
+		},
+		opposite: {
+			oneOf: [
+				{
+					type: 'object',
+					additionalProperties: false,
+					required: ['latitude', 'longitude'],
+					properties: {
+						latitude: { type: 'number', minimum: -90, maximum: 90 },
+						longitude: { type: 'number', minimum: -180, maximum: 180 },
+						// TODO For unknown reasons, map edit is sending this.
+						rawType: {type: 'boolean'}
+					}
+				},
+				{ type: 'null' }
+			]
+		}
+	};
+
+	const required = ['name', 'modifiedDate', 'filename', 'mapSource'];
+
+	if (isEdit) {
+		properties.id = {
+			type: 'integer',
+			minimum: 1,
+			maximum: 2147483647
+		};
+		required.push('id', 'displayable', 'note', 'origin', 'opposite');
+	}
+
+	const validMap = {
+		type: 'object',
+		additionalProperties: false,
+		required,
+		properties
+	};
+	const validatorResult = validate(params, validMap);
+	return { valid: validatorResult.valid, errors: validatorResult.errors };
 }
 
 router.get('/', optionalAuthMiddleware, async (req, res) => {
@@ -79,81 +188,19 @@ router.get('/:map_id', optionalAuthMiddleware, async (req, res) => {
 });
 
 router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
-	const validMap = {
-		type: 'object',
-		additionalProperties: false,
-		required: ['name', 'modifiedDate', 'filename', 'mapSource'],
-		properties: {
-			name: {
-				type: 'string',
-				minLength: 1,
-				maxLength: SHORT_STRING_MAX_LENGTH
-			},
-			filename: {
-				type: 'string',
-				maxLength: 500
-			},
-			modifiedDate: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_GENERAL_MAX_LENGTH
-			},
-			mapSource: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_GENERAL_MAX_LENGTH
-			},
-			note: {
-				oneOf: [
-					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
-					{ type: 'null' }
-				]
-			},
-			displayable: {
-				type: 'boolean'
-			},
-			northAngle: {
-				type: 'number',
-				minimum: 0,
-				maximum: 360
-			},
-			circleSize: {
-				type: 'number',
-				minimum: 1,
-				maximum: 1000
-			},
-			origin: {
-				oneOf: [
-					{
-						type: 'object',
-						additionalProperties: false,
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: -90, maximum: 90 },
-							longitude: { type: 'number', minimum: -180, maximum: 180 }
-						}
-					},
-					{ type: 'null' }
-				]
-			},
-			opposite: {
-				oneOf: [
-					{
-						type: 'object',
-						additionalProperties: false,
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: -90, maximum: 90 },
-							longitude: { type: 'number', minimum: -180, maximum: 180 }
-						}
-					},
-					{ type: 'null' }
-				]
-			}
-		}
-	};
-	const validationResult = validate(req.body, validMap);
-	if (!validationResult.valid) {
+	// TODO This is a temporary fix because create is sending additional values that are not really
+	// needed: id, calibrationMode, image, calibrationSet, calibrationResult.
+	// The UI should let the admin set the note but dummy up here for now.
+	// It is assumed this will be fixed in the map PR 1314 or soon after that.
+	req.body.note = '';
+	req.body = omit(req.body, 'id', 'calibrationMode', 'image', 'calibrationSet', 'calibrationResult');
+
+	// isEdit=false: id must not be present, since it's assigned by the DB on insert.
+	const validationResult = validateMapsParams(req.body, false);
+	// TODO It is uncertain if the date has a timezone since map creation was not working when that was tested.
+	// This is a comment so if if fails someone knows to see if the second parameter should be false. If it works
+	// then this can be removed.
+	if (!validationResult.valid || !isValidIsoDateTime(req.body.modifiedDate)) {
 		log.error(`Invalid input for mapAPI. ${validationResult.errors}`);
 		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
@@ -167,6 +214,7 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 				const newMap = new Map(
 					undefined,
 					req.body.name,
+					// TODO req.body had displayable but it is not used. Unclear if user should be allowed to set this when created.
 					false,
 					req.body.note,
 					req.body.filename,
@@ -192,88 +240,18 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 });
 
 router.post('/edit', adminAuthMiddleware('edit maps'), async (req, res) => {
-	const validMap = {
-		type: 'object',
-		additionalProperties: false,
-		required: ['id', 'name', 'modifiedDate', 'filename', 'mapSource', 'displayable', 'note', 'origin', 'opposite'],
-		properties: {
-			id: {
-				type: 'integer',
-				minimum: 1,
-				maximum: 2147483647
-			},
-			name: {
-				type: 'string',
-				minLength: 1,
-				maxLength: SHORT_STRING_MAX_LENGTH
-			},
-			filename: {
-				type: 'string',
-				maxLength: 500
-			},
-			modifiedDate: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_GENERAL_MAX_LENGTH
-			},
-			mapSource: {
-				type: 'string',
-				minLength: 1,
-				maxLength: STRING_GENERAL_MAX_LENGTH
-			},
-			note: {
-				oneOf: [
-					{ type: 'string', maxLength: STRING_GENERAL_MAX_LENGTH },
-					{ type: 'null' }
-				]
-			},
-			displayable: {
-				type: 'boolean'
-			},
-			northAngle: {
-				type: 'number',
-				minimum: 0,
-				maximum: 360
-			},
-			circleSize: {
-				type: 'number',
-				minimum: 1,
-				maximum: 1000
-			},
-			origin: {
-				oneOf: [
-					{
-						type: 'object',
-						additionalProperties: false,
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: -90, maximum: 90 },
-							longitude: { type: 'number', minimum: -180, maximum: 180 }
-						}
-					},
-					{ type: 'null' }
-				]
-			},
-			opposite: {
-				oneOf: [
-					{
-						type: 'object',
-						additionalProperties: false,
-						required: ['latitude', 'longitude'],
-						properties: {
-							latitude: { type: 'number', minimum: -90, maximum: 90 },
-							longitude: { type: 'number', minimum: -180, maximum: 180 }
-						}
-					},
-					{ type: 'null' }
-				]
-			}
-		}
-	};
-	const validatorResult = validate(req.body, validMap);
-	if (!validatorResult.valid) {
+	// TODO This is a temporary fix because edit is sending additional values that are not really
+	// needed: calibrationMode, image, calibrationSet, calibrationResult.
+	// It is assumed this will be fixed in the map PR 1314 or soon after that.
+	req.body = omit(req.body, 'calibrationMode', 'image', 'calibrationSet', 'calibrationResult');
+	// isEdit=true: id is required here since the client must tell us which map to update.
+	const validatorResult = validateMapsParams(req.body, true);
+
+	// TODO edit, unlike create, is not currently sending a time zone with the modifiedDate. It is unclear
+	// why they differ but for now don't require it here.
+	if (!validatorResult.valid || !isValidIsoDateTime(req.body.modifiedDate, false)) {
 		log.error(`Invalid map data supplied, err: ${validatorResult.errors}`);
-		res.status(HTTP_CODES.BAD_REQUEST);
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {

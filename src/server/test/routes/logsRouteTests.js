@@ -14,7 +14,7 @@ mocha.describe('Log Routes', () => {
 
 	mocha.before(async () => {
 		// Login to get authentication token
-		const res = await chai.request(app).post('/api/login')
+		const res = await chai.request(app).post('/api/loginLogout/login')
 			.send({ username: testUser.username, password: testUser.password });
 		token = res.body.token;
 
@@ -94,6 +94,20 @@ mocha.describe('Log Routes', () => {
 				.set('token', token)
 				.query({ timeInterval: 'invalid', logTypes: 'INVALID', logLimit: 'invalid' });
 			expect(response.status).to.equal(HTTP_CODES.BAD_REQUEST);
+		});
+
+		mocha.it('should return 400 for malformed time intervals', async () => {
+			const invalidTimeIntervals = [
+				'2023-01-01_2023-12-31',
+				'2023-01-01T00:00:00Z_'
+			];
+			for (const timeInterval of invalidTimeIntervals) {
+				const response = await chai.request(app)
+					.get('/api/logs/logsmsg/getLogsByDateRangeAndType')
+					.set('token', token)
+					.query({ timeInterval, logTypes: 'INFO', logLimit: '10' });
+				expect(response.status).to.equal(HTTP_CODES.BAD_REQUEST);
+			}
 		});
 	});
 

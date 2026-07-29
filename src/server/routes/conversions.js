@@ -24,22 +24,13 @@ function formatConversionForResponse(item) {
 }
 
 /**
- * Route for getting all conversions.
+ * Validates the body of a conversion create/edit request.
+ * Conversions are keyed by sourceId/destinationId rather than a single id, so the same
+ * schema is valid for both /addConversion and /edit; there is no isEdit distinction needed.
+ * @param params req.body for a conversion create or edit request
+ * @returns {{valid: boolean, errors: array}}
  */
-router.get('/', optionalAuthMiddleware, async (req, res) => {
-	const conn = getConnection();
-	try {
-		const rows = await Conversion.getAll(conn);
-		res.json(rows.map(formatConversionForResponse));
-	} catch (err) {
-		log.error(`Error while performing GET conversions details query: ${err}`);
-	}
-});
-
-/**
- * Route for POST, edit conversion.
- */
-router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) => {
+function validateConversionsParams(params) {
 	const validConversion = {
 		type: 'object',
 		maxProperties: 6,
@@ -75,8 +66,30 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 			}
 		}
 	};
+	const validatorResult = validate(params, validConversion);
+	return { valid: validatorResult.valid, errors: validatorResult.errors };
+}
 
-	const validatorResult = validate(req.body, validConversion);
+/**
+ * Route for getting all conversions.
+ */
+router.get('/', optionalAuthMiddleware, async (req, res) => {
+	const conn = getConnection();
+	try {
+		const rows = await Conversion.getAll(conn);
+		res.json(rows.map(formatConversionForResponse));
+	} catch (err) {
+		res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+		log.error(`Error while performing GET conversions details query: ${err}`);
+	}
+});
+
+/**
+ * Route for POST, edit conversion.
+ */
+router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) => {
+	const validatorResult = validateConversionsParams(req.body);
+
 	if (!validatorResult.valid) {
 		log.warn(`Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
@@ -99,42 +112,8 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
  * Route for POST add conversion.
  */
 router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req, res) => {
-	const validConversion = {
-		type: 'object',
-		maxProperties: 6,
-		required: ['sourceId', 'destinationId', 'bidirectional', 'slope', 'intercept'],
-		properties: {
-			sourceId: {
-				type: 'integer',
-				minimum: 1,
-				maximum: Number.MAX_SAFE_INTEGER
-			},
-			destinationId: {
-				type: 'integer',
-				minimum: 1,
-				maximum: Number.MAX_SAFE_INTEGER
-			},
-			bidirectional: {
-				type: 'boolean'
-			},
-			slope: {
-				type: 'number'
-			},
-			intercept: {
-				type: 'number'
-			},
-			note: {
-				oneOf: [
-					{
-						type: 'string',
-						maxLength: STRING_GENERAL_MAX_LENGTH
-					},
-					{ type: 'null' }
-				]
-			}
-		}
-	};
-	const validatorResult = validate(req.body, validConversion);
+	const validatorResult = validateConversionsParams(req.body);
+
 	if (!validatorResult.valid) {
 		log.error(`Got request to insert conversion with invalid conversion data, errors: ${validatorResult.errors}`);
 		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to insert conversion with invalid conversion data. Error(s): ${validatorResult.errors}`);
@@ -171,21 +150,21 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		properties: {
 			sourceId: {
 				type: 'integer',
-				minimum: 0
+				minimum: 1
 			},
 			destinationId: {
 				type: 'integer',
-				minimum: 0
+				minimum: 1
 			},
 			meterIds: {
 				type: 'array',
-				items: { type: 'integer', minimum: 0 },
+				items: { type: 'integer', minimum: 1 },
 				uniqueItems: true,
 				maxItems: 1000
 			},
 			groupIds: {
 				type: 'array',
-				items: { type: 'integer', minimum: 0 },
+				items: { type: 'integer', minimum: 1 },
 				uniqueItems: true,
 				maxItems: 1000
 			}

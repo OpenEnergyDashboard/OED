@@ -11,6 +11,7 @@ const validate = require('jsonschema').validate;
 const { adminAuthMiddleware } = require('./authenticator');
 const { STRING_GENERAL_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
+const { isValidIsoDateTime } = require('../util/timeValidation');
 const router = express.Router();
 router.get('/', async (req, res) => {
 	const conn = getConnection();
@@ -58,6 +59,13 @@ router.post('/new', adminAuthMiddleware('create baselines'), async (req, res) =>
 	};
 
 	if (!validate(req.body, validParams).valid) {
+		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		return;
+	}
+	// baseline.js does not use moment; validate date strings directly
+	// TODO This might not stay and is not used in OED now but need to see if it has a timezone for the check.
+	if (!isValidIsoDateTime(req.body.applyStart) || !isValidIsoDateTime(req.body.applyEnd) ||
+		!isValidIsoDateTime(req.body.calcStart) || !isValidIsoDateTime(req.body.calcEnd)) {
 		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 		return;
 	}

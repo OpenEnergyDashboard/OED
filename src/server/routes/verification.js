@@ -3,16 +3,19 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const secretToken = require('../config').secretToken;
 const validate = require('jsonschema').validate;
 const { TOKEN_MAX_LENGTH } = require('../util/validationConstants');
+const { log } = require('../log');
+const { verifyActiveTokenAndGetUser } = require('./authenticator');
 const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
 
 /**
  * Route for verifying a JWT.
+ * Verifies that the token is cryptographically valid, belongs to an
+ * existing user, and has not been invalidated by server-side session
+ * invalidation logic.
  * @param token
  */
 router.post('/', (req, res) => {
@@ -27,17 +30,20 @@ router.post('/', (req, res) => {
 			}
 		}
 	};
+
 	if (!validate(req.body, validParams).valid) {
 		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const token = req.body.token;
-		jwt.verify(token, secretToken, err => {
-			if (err) {
-				res.status(HTTP_CODES.UNAUTHORIZED).json({ success: false, message: 'Failed to authenticate token.' });
-			} else {
+
+		verifyActiveTokenAndGetUser(token)
+			.then(() => {
 				res.status(HTTP_CODES.OK).json({ success: true });
-			}
-		});
+			})
+			.catch(error => {
+				log.error('Token verification failed.', error);
+				res.status(HTTP_CODES.UNAUTHORIZED).json({ success: false, message: 'Failed to authenticate token.' });
+			});
 	}
 });
 
