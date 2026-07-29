@@ -6,11 +6,11 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from 'reactstrap';
 import { daysApi } from '../../redux/api/daysApi';
-import { weeksApi } from '../../redux/api/weeksApi';
+import { useGetHolidayInstanceGroupsQuery } from '../../redux/api/holidayInstanceGroupsApi';
+import { weeksApi, WeekWithHolidayRateGroup } from '../../redux/api/weeksApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { LocaleDataKey } from '../../translations/data';
-import { Week } from '../../types/redux/weeks';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -25,7 +25,7 @@ interface EditWeekModalComponentProps {
 	/**
 	 * The week to edit
 	 */
-	week: Week;
+	week: WeekWithHolidayRateGroup;
 
 	/**
 	 * Function to run when edit modal closes
@@ -58,6 +58,17 @@ export default function EditWeekModalComponent(props: EditWeekModalComponentProp
 	// Fetch weeks data (used to check if week name already exists)
 	const { data: weeks } = weeksApi.useGetWeeksQuery();
 
+	// Fetch the optional holiday rate groups.
+	const {
+		data: holidayInstanceGroups = [],
+		isFetching: isFetchingHolidayInstanceGroups
+	} = useGetHolidayInstanceGroupsQuery();
+	const sortedHolidayInstanceGroups = React.useMemo(
+		() => [...holidayInstanceGroups].sort((first, second) =>
+			first.name.localeCompare(second.name, undefined, { sensitivity: 'base' })),
+		[holidayInstanceGroups]
+	);
+
 	const [editWeekMutation, { isLoading: isSaving }] = weeksApi.useEditWeekMutation();
 
 	const resetState = () => {
@@ -72,6 +83,13 @@ export default function EditWeekModalComponent(props: EditWeekModalComponentProp
 		setWeekDetails({ ...weekDetails, [e.target.name]: Number(e.target.value) });
 	};
 
+	const handleHolidayRateGroupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setWeekDetails({
+			...weekDetails,
+			holidayInstanceGroupId: e.target.value === '' ? null : Number(e.target.value)
+		});
+	};
+
 	const isWeekUnchanged = React.useMemo(() => {
 		return weekDetails.name === props.week.name &&
 			weekDetails.note === props.week.note &&
@@ -81,7 +99,9 @@ export default function EditWeekModalComponent(props: EditWeekModalComponentProp
 			weekDetails.wednesday === props.week.wednesday &&
 			weekDetails.thursday === props.week.thursday &&
 			weekDetails.friday === props.week.friday &&
-			weekDetails.saturday === props.week.saturday;
+			weekDetails.saturday === props.week.saturday &&
+			(weekDetails.holidayInstanceGroupId ?? null) ===
+				(props.week.holidayInstanceGroupId ?? null);
 	}, [weekDetails, props.week]);
 
 	// Function to handle form submission. Validates the week details and submits them to the API
@@ -175,6 +195,34 @@ export default function EditWeekModalComponent(props: EditWeekModalComponentProp
 										name="note"
 										value={weekDetails.note}
 										onChange={handleStringChange} />
+								</FormGroup>
+							</Col>
+						</Row>
+						{/* Optional holiday rate group */}
+						<Row>
+							<Col>
+								<FormGroup>
+									<Label for="holidayInstanceGroupId">
+										<FormattedMessage
+											id="holiday.rate.group"
+											defaultMessage="Holiday Rate Group"
+										/>
+									</Label>
+									<Input
+										id="holidayInstanceGroupId"
+										type="select"
+										name="holidayInstanceGroupId"
+										value={weekDetails.holidayInstanceGroupId ?? ''}
+										disabled={isFetchingHolidayInstanceGroups}
+										onChange={handleHolidayRateGroupChange}
+									>
+										<option value="">None</option>
+										{sortedHolidayInstanceGroups.map(group => (
+											<option key={group.id} value={group.id} title={group.note}>
+												{group.name}
+											</option>
+										))}
+									</Input>
 								</FormGroup>
 							</Col>
 						</Row>

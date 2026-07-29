@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
- 
+
 const database = require('./database');
 const sqlFile = database.sqlFile;
 
@@ -17,8 +17,21 @@ class Week {
 	 * @param {*} thursday The id for thursday's day_pattern.
 	 * @param {*} friday The id for friday's day_pattern.
 	 * @param {*} saturday The id for saturday's day_pattern.
+	 * @param {*} holidayInstanceGroupId The optional holiday instance group id.
 	 */
-	constructor(id, name, note, sunday, monday, tuesday, wednesday, thursday, friday, saturday) {
+	constructor(
+		id,
+		name,
+		note,
+		sunday,
+		monday,
+		tuesday,
+		wednesday,
+		thursday,
+		friday,
+		saturday,
+		holidayInstanceGroupId
+	) {
 		this.id = id;
 		this.name = name;
 		this.note = note;
@@ -29,6 +42,7 @@ class Week {
 		this.thursday = thursday;
 		this.friday = friday;
 		this.saturday = saturday;
+		this.holidayInstanceGroupId = holidayInstanceGroupId ?? null;
 	}
 
 	/**
@@ -47,16 +61,17 @@ class Week {
 	 */
 	static mapRow(row) {
 		return new Week(
-			row.id, 
-			row.name, 
-			row.note, 
-			row.sunday, 
-			row.monday, 
-			row.tuesday, 
-			row.wednesday, 
-			row.thursday, 
-			row.friday, 
-			row.saturday
+			row.id,
+			row.name,
+			row.note,
+			row.sunday,
+			row.monday,
+			row.tuesday,
+			row.wednesday,
+			row.thursday,
+			row.friday,
+			row.saturday,
+			row.holiday_instance_group_id ?? null
 		);
 	}
 
@@ -70,7 +85,7 @@ class Week {
 		return rows.map(Week.mapRow);
 	}
 
-	/** 
+	/**
 	 * Get the week associated with id. If the week doesn't exist then return null.
 	 * @param {*} id The week id.
 	 * @param {*} conn The connection to use.
@@ -113,6 +128,6 @@ class Week {
 			id: id
 		});
 	}
-} 
+}
 
 module.exports = Week;

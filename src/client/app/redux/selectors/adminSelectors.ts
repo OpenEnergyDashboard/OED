@@ -401,7 +401,8 @@ export const selectDefaultCreateWeekValues = createAppSelector<[], Omit<Week, 'i
 		wednesday: -999,
 		thursday: -999,
 		friday: -999,
-		saturday: -999
+		saturday: -999,
+		holidayInstanceGroupId: ''
 	})
 );
 

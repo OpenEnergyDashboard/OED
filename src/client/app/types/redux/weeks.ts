@@ -31,4 +31,9 @@ export interface Week {
 	thursday: Day['id'];
 	friday: Day['id'];
 	saturday: Day['id'];
+
+	/**
+	 * An optional holiday instance group applied to this week.
+	 */
+	holidayInstanceGroupId?: number | null;
 }

@@ -5,6 +5,10 @@
 import { Week } from '../../types/redux/weeks';
 import { baseApi } from './baseApi';
 
+export type WeekWithHolidayRateGroup = Week & {
+	holidayInstanceGroupId?: number | null;
+};
+
 /**
  * This file defines the weeksApi using RTK Query.
  * It provides endpoints for fetching, adding, deleting, and editing weekly patterns.
@@ -12,7 +16,7 @@ import { baseApi } from './baseApi';
  */
 export const weeksApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
-		getWeeks: builder.query<Week[], void>({
+		getWeeks: builder.query<WeekWithHolidayRateGroup[], void>({
 			query: () => 'api/weeks',
 			// Provides a list of 'Weeks' by id.
 			// If any mutation invalidates any of these tags, the query will refetch.
@@ -23,7 +27,7 @@ export const weeksApi = baseApi.injectEndpoints({
 					[{ type: 'Weeks', id: 'LIST' }]
 		}),
 
-		addWeek: builder.mutation<void, Omit<Week, 'id'>>({
+		addWeek: builder.mutation<void, Omit<WeekWithHolidayRateGroup, 'id'>>({
 			query: week => ({
 				url: 'api/weeks/addWeek',
 				method: 'POST',
@@ -44,7 +48,7 @@ export const weeksApi = baseApi.injectEndpoints({
 			invalidatesTags: (result, error, weekId) => [{ type: 'Weeks', id: weekId.id }]
 		}),
 
-		editWeek: builder.mutation<void, Week>({
+		editWeek: builder.mutation<void, WeekWithHolidayRateGroup>({
 			query: week => ({
 				url: 'api/weeks/edit',
 				method: 'POST',

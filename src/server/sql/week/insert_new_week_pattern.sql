@@ -12,7 +12,8 @@ INSERT INTO week_patterns (
 	wednesday,
 	thursday,
 	friday,
-	saturday
+	saturday,
+	holiday_instance_group_id
 ) VALUES (
 	${name},
 	${note},
@@ -20,7 +21,8 @@ INSERT INTO week_patterns (
 	${monday},
 	${tuesday},
 	${wednesday},
-	${thursday}, 
+	${thursday},
 	${friday},
-	${saturday}
+	${saturday},
+	${holidayInstanceGroupId}
 );

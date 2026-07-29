@@ -5,11 +5,11 @@
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button } from 'reactstrap';
-import { Week } from '../../types/redux/weeks';
+import { WeekWithHolidayRateGroup } from '../../redux/api/weeksApi';
 import EditWeekModalComponent from './EditWeekModalComponent';
 
 interface WeekViewComponentProps {
-	week: Week;
+	week: WeekWithHolidayRateGroup;
 }
 
 /**

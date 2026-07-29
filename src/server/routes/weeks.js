@@ -23,7 +23,11 @@ function formatWeekForResponse(item) {
 		wednesday: item.wednesday,
 		thursday: item.thursday,
 		friday: item.friday,
-		saturday: item.saturday
+		saturday: item.saturday,
+		holidayInstanceGroupId:
+			item.holidayInstanceGroupId ??
+			item.holiday_instance_group_id ??
+			null
 	};
 }
 
@@ -83,11 +87,12 @@ router.get('/:id', adminAuthMiddleware('get week by id'), async(req, res) => {
  * @param {integer} thursday The id for the day pattern used for thursday.
  * @param {integer} friday The id for the day pattern used for friday.
  * @param {integer} saturday The id for the day pattern used for saturday.
+ * @param {integer|null} holidayInstanceGroupId The optional holiday rate group id.
  */
 router.post('/addWeek', adminAuthMiddleware('add week'), async (req, res) => {
 	const validWeek= {
 		type: 'object',
-		maxProperties: 9,
+		maxProperties: 10,
 		required: ['name', 'sunday','monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
 		properties: {
 			name: {
@@ -127,6 +132,15 @@ router.post('/addWeek', adminAuthMiddleware('add week'), async (req, res) => {
 			saturday: {
 				type: 'integer',
 				minimum: 0
+			},
+			holidayInstanceGroupId: {
+				oneOf: [
+					{
+						type: 'integer',
+						minimum: 0
+					},
+					{ type: 'null' }
+				]
 			}
 		}
 	};
@@ -149,7 +163,8 @@ router.post('/addWeek', adminAuthMiddleware('add week'), async (req, res) => {
 				req.body.wednesday,
 				req.body.thursday,
 				req.body.friday,
-				req.body.saturday
+				req.body.saturday,
+				req.body.holidayInstanceGroupId ?? null
 			);
 			await newWeek.insert(conn);
 			success(res, `Successfully inserted week`);
@@ -173,11 +188,12 @@ router.post('/addWeek', adminAuthMiddleware('add week'), async (req, res) => {
  * @param {integer} thursday The new id for the day pattern used for thursday.
  * @param {integer} friday The new id for the day pattern used for friday.
  * @param {integer} saturday The new id for the day pattern used for saturday.
+ * @param {integer|null} holidayInstanceGroupId The optional holiday rate group id.
  */
 router.post('/edit', adminAuthMiddleware('edit week'), async (req, res) => {
 	const validWeek = {
 		type: 'object',
-		maxProperties: 10,
+		maxProperties: 11,
 		required: ['id', 'name', 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'],
 		properties: {
 			id: {
@@ -221,6 +237,15 @@ router.post('/edit', adminAuthMiddleware('edit week'), async (req, res) => {
 			saturday: {
 				type: 'integer',
 				minimum: 0
+			},
+			holidayInstanceGroupId: {
+				oneOf: [
+					{
+						type: 'integer',
+						minimum: 0
+					},
+					{ type: 'null' }
+				]
 			}
 		}
 	};
@@ -243,7 +268,8 @@ router.post('/edit', adminAuthMiddleware('edit week'), async (req, res) => {
 				req.body.wednesday,
 				req.body.thursday,
 				req.body.friday,
-				req.body.saturday
+				req.body.saturday,
+				req.body.holidayInstanceGroupId ?? null
 			);
 			await updatedWeek.update(conn);
 			success(res, `Successfully edited week`);

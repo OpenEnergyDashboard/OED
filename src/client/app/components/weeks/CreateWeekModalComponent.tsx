@@ -6,13 +6,13 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import { Button, Col, Container, FormFeedback, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Row, Table } from 'reactstrap';
 import { daysApi } from '../../redux/api/daysApi';
-import { weeksApi } from '../../redux/api/weeksApi';
+import { useGetHolidayInstanceGroupsQuery } from '../../redux/api/holidayInstanceGroupsApi';
+import { weeksApi, WeekWithHolidayRateGroup } from '../../redux/api/weeksApi';
 import { useTranslate } from '../../redux/componentHooks';
 import { useAppSelector } from '../../redux/reduxHooks';
 import { selectDefaultCreateWeekValues } from '../../redux/selectors/adminSelectors';
 import { tooltipBaseStyle } from '../../styles/modalStyle';
 import { LocaleDataKey } from '../../translations/data';
-import { Week } from '../../types/redux/weeks';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -41,13 +41,26 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 	// Fetch weeks data (used to check if week name already exists)
 	const { data: weeks } = weeksApi.useGetWeeksQuery();
 
+	// Fetch the optional holiday rate groups.
+	const {
+		data: holidayInstanceGroups = [],
+		isFetching: isFetchingHolidayInstanceGroups
+	} = useGetHolidayInstanceGroupsQuery();
+	const sortedHolidayInstanceGroups = React.useMemo(
+		() => [...holidayInstanceGroups].sort((first, second) =>
+			first.name.localeCompare(second.name, undefined, { sensitivity: 'base' })),
+		[holidayInstanceGroups]
+	);
+
 	const [addWeekMutation, { isLoading: isSaving }] = weeksApi.useAddWeekMutation();
 
 	// Default values for the week creation form
 	const defaultValues = useAppSelector(selectDefaultCreateWeekValues);
 
 	// State to hold the week details being created. Initialized with default values.
-	const [weekDetails, setWeekDetails] = React.useState<Omit<Week, 'id'>>(defaultValues);
+	const [weekDetails, setWeekDetails] = React.useState<Omit<WeekWithHolidayRateGroup, 'id'>>({
+		...defaultValues
+	});
 
 	const handleShowModal = () => setShowModal(true);
 	const handleCloseModal = () => {
@@ -61,6 +74,13 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setWeekDetails({ ...weekDetails, [e.target.name]: Number(e.target.value) });
+	};
+
+	const handleHolidayRateGroupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setWeekDetails({
+			...weekDetails,
+			holidayInstanceGroupId: e.target.value === '' ? null : Number(e.target.value)
+		});
 	};
 
 	// Function to handle form submission
@@ -79,7 +99,9 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 
 	// Function to reset the week details to default values. Called when modal is closed.
 	const resetState = () => {
-		setWeekDetails(defaultValues);
+		setWeekDetails({
+			...defaultValues
+		});
 	};
 
 	// State to hold validation message for week name
@@ -166,6 +188,34 @@ export default function CreateWeekModalComponent(): React.ReactElement {
 										name="note"
 										value={weekDetails.note}
 										onChange={handleStringChange} />
+								</FormGroup>
+							</Col>
+						</Row>
+						{/* Optional holiday rate group */}
+						<Row>
+							<Col>
+								<FormGroup>
+									<Label for="holidayInstanceGroupId">
+										<FormattedMessage
+											id="holiday.rate.group"
+											defaultMessage="Holiday Rate Group"
+										/>
+									</Label>
+									<Input
+										id="holidayInstanceGroupId"
+										type="select"
+										name="holidayInstanceGroupId"
+										value={weekDetails.holidayInstanceGroupId ?? ''}
+										disabled={isFetchingHolidayInstanceGroups}
+										onChange={handleHolidayRateGroupChange}
+									>
+										<option value="">None</option>
+										{sortedHolidayInstanceGroups.map(group => (
+											<option key={group.id} value={group.id} title={group.note}>
+												{group.name}
+											</option>
+										))}
+									</Input>
 								</FormGroup>
 							</Col>
 						</Row>
