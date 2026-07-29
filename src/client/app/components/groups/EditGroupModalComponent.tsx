@@ -992,7 +992,12 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 */
 	async function validateDelete() {
 		// Get all parent groups of this group.
-		const { data: parentGroupIDs = [] } = await store.dispatch(groupsApi.endpoints.getParentIDs.initiate(groupState.id, { subscribe: false }));
+		const { data: parentGroupIDs = [] } = await store.dispatch(
+			groupsApi.endpoints.getParentIDs.initiate(groupState.id, {
+				subscribe: false,
+				forceRefetch: true
+			})
+		);
 
 		// If there are parents then you cannot delete this group. Notify admin.
 		if (parentGroupIDs.length !== 0) {
