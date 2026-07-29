@@ -112,11 +112,8 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			// Check if user is allowed to export.
 			let shouldDownload = false;
-			// Estimated file size. The full explanation of the estimate used can be found in the client.
-			// This estimate is also present in src/client/app/redux/thunks/exportThunk.ts and must be kept consistent between files.
 			// This count only checks a single meterID, while client testing checks multiple meterIDs, so the estimate is slightly different.
 			const count = await Reading.getCountByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-			//const fileSize = (count * 0.082 / 1000);
 			const fileSize = estimateRawExportSizeMB(count);
 			const preferences = await Preferences.get(conn);
 			if (fileSize <= preferences.defaultFileSizeLimit) {
