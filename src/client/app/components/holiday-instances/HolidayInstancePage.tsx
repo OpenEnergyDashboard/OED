@@ -38,6 +38,10 @@ const NO_PATTERN = -999;
 // clip at the note/log convention length.
 const MAX_NAME_LENGTH = 15;
 const MAX_NOTE_LENGTH = 30;
+
+// The holiday_instance.name column is VARCHAR(50); cap the input so the
+// database limit can never be hit (avoids surfacing a database error).
+const MAX_NAME_DB_LENGTH = 50;
 const clip = (text: string, max: number) =>
 	text.length > max ? `${text.slice(0, max)} ...` : text;
 
@@ -366,6 +370,7 @@ export default function HolidayInstancePage() {
 										name='name'
 										type='text'
 										value={draft.name}
+										maxLength={MAX_NAME_DB_LENGTH}
 										onChange={e =>
 											setDraft(d => ({ ...d, name: e.target.value }))
 										}
