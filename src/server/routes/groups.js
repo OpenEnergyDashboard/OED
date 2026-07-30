@@ -406,6 +406,8 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 });
 
 router.post('/delete', adminAuthMiddleware('delete groups'), async (req, res) => {
+	// TODO DEBUG: to force the showErrorNotification to pass in EditGroupsModalComponent.tsx
+	req.body.id = -1;
 	const validParams = {
 		type: 'object',
 		additionalProperties: false,

@@ -206,6 +206,8 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
  * Route for deleting a unit by ID.
  */
 router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => {
+	// TODO DEBUG: to force the showErrorNotification to pass in EditUnitsModalComponent.tsx
+	//req.body.id = -1;
 	const validParams = {
 		type: 'object',
 		additionalProperties: false,

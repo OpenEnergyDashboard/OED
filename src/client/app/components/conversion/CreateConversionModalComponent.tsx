@@ -184,6 +184,10 @@ export default function CreateConversionModalComponent() {
 			// Close modal first to avoid repeat clicks
 			setShowModal(false);
 
+			// TODO DEBUG: added in to test the showErrorNotification
+			//conversionState.sourceId = -1;
+			//conversionState.destinationId = -1;
+
 			// Add the new conversion and update the store
 			// Omit the source options , do not need to send in request so remove here.
 			// If source is a meter, make bidirectional false

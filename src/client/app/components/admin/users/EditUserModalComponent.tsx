@@ -195,6 +195,9 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 			...(passwordModified && { password: userDetails.password })
 		};
 
+		//TODO DEBUG
+		//editedUser.username = '';
+
 		submitUserEdits(editedUser)
 			.unwrap()
 			.then(() => {
@@ -209,7 +212,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 				showErrorNotification(
 					translate('users.failed.to.edit.user') +
 					translate('users.successfully.edit.user.username') + userDetails.username + ') ' +
-					error.data.message
+					error.data
 				);
 			});
 		resetPasswordFields();
@@ -228,7 +231,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 				showErrorNotification(
 					translate('users.failed.to.delete.user') +
 					translate('users.successfully.edit.user.username') + props.user.username + ') ' +
-					error.data.message
+					error.data
 				);
 			});
 	};

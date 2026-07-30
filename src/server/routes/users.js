@@ -13,6 +13,7 @@ const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
 const { STRING_GENERAL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
+const { success, failure } = require('./response');
 
 const router = express.Router();
 
@@ -156,8 +157,11 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 // Route for creating a new user.
 router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) => {
 	// isEdit=false: id must not be present, since it's assigned by the DB on insert, and password is required.
-	if (!validateUsersParams(req.body, false).valid) {
-		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
+	const validatorResult = validateUsersParams(req.body, false);
+
+	if (!validatorResult.valid) {
+		log.error(`Got request to insert user with invalid user data, errors: ${validatorResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to insert user with invalid user data. Error(s): ${validatorResult.errors}`);
 	} else {
 		try {
 			const { username, password, role, note } = req.body;
@@ -165,17 +169,19 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 			// Check if user already exists
 			const currentUser = await User.getByUsername(username, conn);
 			if (currentUser !== null) {
-				res.status(HTTP_CODES.BAD_REQUEST).send({ message: `user ${username} already exists so cannot create` });
+				//res.status(HTTP_CODES.BAD_REQUEST).send({ message: `user ${username} already exists so cannot create` });
+				failure(res, HTTP_CODES.BAD_REQUEST, `user ${username} already exists so cannot create`);
 			} else {
 				const hashedPassword = await bcrypt.hash(password, 10);
 				const user = new User(undefined, username, hashedPassword, role, note);
 				await user.insert(conn);
-				res.sendStatus(HTTP_CODES.OK);
+				//res.sendStatus(HTTP_CODES.OK);
+				success(res);
 			}
 		} catch (error) {
 			// Log the error internally and return a generic response
 			log.error(`Error while performing POST request to create user: ${error}`, error);
-			res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send({ message: 'Internal Server Error' });
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while performing POST request to create user: ${error}`);
 		}
 	}
 });
@@ -184,8 +190,11 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 	// isEdit=true: id is required and password remains optional, since a user is only sent a new
 	// password if it should change. The wrapper ('user' key) is validated inside the helper too.
-	if (!validateUsersParams(req.body, true).valid) {
-		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
+	const validatorResult = validateUsersParams(req.body, true);
+	if (!validatorResult.valid) {
+		log.warn(`Got request to edit users with invalid user data, errors: ${validatorResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to edit users with invalid user data, errors: ${validatorResult.errors}`);
+		return;
 	} else {
 		try {
 			const conn = getConnection();
@@ -221,18 +230,21 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 			}
 
 			await Promise.all(userUpdates);
-			return res.sendStatus(HTTP_CODES.OK);
+			//return res.sendStatus(HTTP_CODES.OK);
+			success(res, 'Successfully edited users');
 
 		} catch (error) {
 			// Log internally and send a generic error response.
 			log.error('Error while performing edit user request.', error);
-			res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server Error' });
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while editing users with error(s): ${error}`);
 		}
 	}
 });
 
 // Route for deleting a user.
 router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) => {
+	// TODO DEBUG: to force the showErrorNotification to pass in EditUserModalComponent.tsx
+	//req.body.id = -1;
 	const validParams = {
 		type: 'object',
 		additionalProperties: false,
@@ -245,8 +257,11 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 			}
 		}
 	};
-	if (!validate(req.body, validParams).valid) {
-		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
+
+	const validatorResult = validate(req.body, validParams);
+	if (!validatorResult.valid) {
+		log.error(`Got request to delete users with invalid user data, errors: ${validatorResult.errors}`);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to delete users with invalid user data. Error(s): ${validatorResult.errors}`);
 	} else {
 		try {
 			const conn = getConnection();
@@ -254,14 +269,17 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 			const id = req.decoded.data;
 			const user = await User.getByID(id, conn);
 			if (user.username === username) {// Admins cannot delete themselves
-				res.sendStatus(HTTP_CODES.BAD_REQUEST);
+				//res.sendStatus(HTTP_CODES.BAD_REQUEST);
+				failure(res, HTTP_CODES.BAD_REQUEST, `Admins cannot delete themselves. Error(s): ${validatorResult.errors}`);
 			} else {
 				await User.deleteUser(username, conn);
-				res.sendStatus(HTTP_CODES.OK);
+				//res.sendStatus(HTTP_CODES.OK);
+				success(res, 'Successfully deleted user');
 			}
 		} catch (error) {
 			log.error('Error while performing delete user request', error);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			//res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `'Error while performing delete user request: ${err}`);
 		}
 	}
 });
