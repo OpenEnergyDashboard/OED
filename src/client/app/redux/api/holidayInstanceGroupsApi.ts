@@ -116,7 +116,7 @@ export const holidayInstanceGroupsApi = baseApi.injectEndpoints({
 			invalidatesTags: [{ type: 'HolidayInstanceGroups', id: 'LIST' }]
 		}),
 
-		editHolidayInstanceGroup: builder.mutation<void, UpdateHolidayInstanceGroupPayload>({
+		editHolidayInstanceGroup: builder.mutation<null, UpdateHolidayInstanceGroupPayload>({
 			async queryFn(group, _queryApi, _extraOptions, baseQuery) {
 				const currentMembersResult = await baseQuery(`${membersUrl}/group/${group.id}`);
 				if (currentMembersResult.error) {
@@ -166,7 +166,7 @@ export const holidayInstanceGroupsApi = baseApi.injectEndpoints({
 					}
 				}
 
-				return { data: undefined };
+				return { data: null };
 			},
 			invalidatesTags: (_result, _error, arg) => [
 				{ type: 'HolidayInstanceGroups', id: arg.id },
@@ -174,7 +174,7 @@ export const holidayInstanceGroupsApi = baseApi.injectEndpoints({
 			]
 		}),
 
-		deleteHolidayInstanceGroup: builder.mutation<void, Pick<HolidayInstanceGroup, 'id'>>({
+		deleteHolidayInstanceGroup: builder.mutation<null, Pick<HolidayInstanceGroup, 'id'>>({
 			async queryFn({ id }, _queryApi, _extraOptions, baseQuery) {
 				const currentMembersResult = await baseQuery(`${membersUrl}/group/${id}`);
 				if (currentMembersResult.error) {
@@ -210,7 +210,7 @@ export const holidayInstanceGroupsApi = baseApi.injectEndpoints({
 					return { error: deleteGroupResult.error };
 				}
 
-				return { data: undefined };
+				return { data: null };
 			},
 			invalidatesTags: [{ type: 'HolidayInstanceGroups', id: 'LIST' }]
 		})
