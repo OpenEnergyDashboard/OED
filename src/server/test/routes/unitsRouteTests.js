@@ -5,6 +5,7 @@
 const { mocha, expect, testDB, app, testUser } = require('../common');
 const chai = require('chai');
 const Unit = require('../../models/Unit');
+const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Units Route', () => {
 	let token;
@@ -13,6 +14,14 @@ mocha.describe('Units Route', () => {
 		const res = await chai.request(app).post('/api/loginLogout/login')
 			.send({ username: testUser.username, password: testUser.password });
 		token = res.body.token;
+	});
+
+	mocha.after(async () => {
+		if (token) {
+			await chai.request(app)
+				.post('/api/loginLogout/logout')
+				.set('token', token);
+		}
 	});
 
 	mocha.describe('Edit endpoint', () => {
@@ -28,7 +37,7 @@ mocha.describe('Units Route', () => {
 				name: 'New name',
 				identifier: unit.identifier,
 			});
-			expect(res).to.have.status(200);
+			expect(res).to.have.status(HTTP_CODES.OK);
 			const updatedUnit = await Unit.getById(unit.id, conn);
 			expect(updatedUnit.name).to.equal('New name');
 			expect(updatedUnit.note).to.equal(beforeNote);
