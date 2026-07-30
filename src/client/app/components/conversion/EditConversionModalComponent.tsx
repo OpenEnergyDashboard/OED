@@ -542,8 +542,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			if (conversionHasChanges) {
 
 				// TODO DEBUG: added in to test the showErrorNotification
-				state.sourceId = -1;
-				state.destinationId = -1;
+				//state.sourceId = -1;
+				//state.destinationId = -1;
 
 				// Save our changes
 				editConversion({

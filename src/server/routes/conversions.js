@@ -131,7 +131,8 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
 				);
 				await newConversion.insert(t);
 			});
-			res.sendStatus(HTTP_CODES.OK);
+			//res.sendStatus(HTTP_CODES.OK);
+			success(res);
 		} catch (err) {
 			log.error(`Error while inserting new conversion with error(s): ${err}`);
 			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while inserting new conversion with errors(s): ${err}`);
