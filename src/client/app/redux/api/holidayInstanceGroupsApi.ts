@@ -174,6 +174,7 @@ export const holidayInstanceGroupsApi = baseApi.injectEndpoints({
 			]
 		}),
 
+		//TODO: add safety checks on deletes since once they are applied to a pattern you cannot delete
 		deleteHolidayInstanceGroup: builder.mutation<null, Pick<HolidayInstanceGroup, 'id'>>({
 			async queryFn({ id }, _queryApi, _extraOptions, baseQuery) {
 				const currentMembersResult = await baseQuery(`${membersUrl}/group/${id}`);
