@@ -340,7 +340,14 @@ router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 			res.json(formatMeterForResponse(meter, true));
 		} catch (err) {
 			log.error(`Error while editing a meter with detail "${err['detail']}"`, err);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, err.toString() + ' with detail ' + err['detail']);
+			if (err.toString().includes('duplicate key value violates unique constraint')) {
+				failure(res, HTTP_CODES.BAD_REQUEST, `Meter name "${req.body.name}" already exists`);
+			} else if (err.toString().includes('violates check constraint')) {
+				failure(res, HTTP_CODES.BAD_REQUEST, `Invalid meter data: ${err.toString()}`);
+			} else {
+				log.error(`Error while editing a meter with detail "${err['detail']}"`, err);
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, err.toString() + ' with detail ' + err['detail']);
+			}
 		}
 	}
 });
@@ -411,7 +418,14 @@ router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 			res.json(formatMeterForResponse(newMeter, true));
 		} catch (err) {
 			log.error(`Error while inserting new meter with detail "${err['detail']}"`, err);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, err.toString() + ' with detail ' + err['detail']);
+			if (err.toString().includes('duplicate key value violates unique constraint')) {
+				failure(res, HTTP_CODES.BAD_REQUEST, `Meter name "${req.body.name}" already exists`);
+			} else if (err.toString().includes('violates check constraint')) {
+				failure(res, HTTP_CODES.BAD_REQUEST, `Invalid meter data: ${err.toString()}`);
+			} else {
+				log.error(`Error while inserting new meter with detail "${err['detail']}"`, err);
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, err.toString() + ' with detail ' + err['detail']);
+			}
 		}
 	}
 });
