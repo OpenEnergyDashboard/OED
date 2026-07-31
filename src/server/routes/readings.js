@@ -43,18 +43,21 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 		const meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
 		const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 		try {
-			let count = 0;
-			for (var i = 0; i < meterIDs.length; i++) {
-				const curr = await Reading.getCountByMeterIDAndDateRange(meterIDs[i], timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
-				count += curr
-			}
+			// Count every requested meter in one statement so response time
+			// does not grow by one sequential database round trip per meter.
+			const count = await Reading.getCountByMeterIDsAndDateRange(
+				meterIDs,
+				timeInterval.startTimestamp,
+				timeInterval.endTimestamp,
+				conn
+			);
 			res.send(JSON.stringify(count));
 		} catch (err) {
 			log.error(`Error while performing GET readings COUNT for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
 			res.sendStatus(500);
 		}
 	}
-})
+});
 
 // TODO This route should be limiting access to large file responses to the appropriate users.
 // Currently it is done in the component but also needs to be here.
@@ -106,4 +109,3 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 
 
 module.exports = router;
-

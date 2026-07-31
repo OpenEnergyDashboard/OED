@@ -26,9 +26,28 @@ AS $$
 DECLARE
 	readings_max_tsrange TSRANGE;
 BEGIN
-	SELECT tsrange(min(start_timestamp), max(end_timestamp)) INTO readings_max_tsrange
-	FROM readings r
-	INNER JOIN unnest(meter_ids) meters(id) ON r.meter_id = meters.id;
+	/*
+	 * Find each meter's first start and last end with the readings indexes.
+	 * Aggregating only those boundary rows avoids scanning complete histories
+	 * whenever a group line request automatically chooses its resolution.
+	 */
+	SELECT tsrange(min(first_reading.start_timestamp), max(last_reading.end_timestamp))
+	INTO readings_max_tsrange
+	FROM (SELECT DISTINCT id FROM unnest(meter_ids) requested(id)) meters
+	LEFT JOIN LATERAL (
+		SELECT r.start_timestamp
+		FROM readings r
+		WHERE r.meter_id = meters.id
+		ORDER BY r.start_timestamp
+		LIMIT 1
+	) first_reading ON TRUE
+	LEFT JOIN LATERAL (
+		SELECT r.end_timestamp
+		FROM readings r
+		WHERE r.meter_id = meters.id
+		ORDER BY r.end_timestamp DESC
+		LIMIT 1
+	) last_reading ON TRUE;
 	RETURN tsrange_to_shrink * readings_max_tsrange;
 END;
 $$ LANGUAGE 'plpgsql';

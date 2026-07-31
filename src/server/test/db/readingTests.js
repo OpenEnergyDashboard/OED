@@ -5,7 +5,7 @@
 /**
  * This class is for testing meter readings.
  */
-const { mocha, expect, testDB } = require('../common');
+const { mocha, expect, testDB, chai, app } = require('../common');
 const moment = require('moment');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
@@ -75,6 +75,24 @@ mocha.describe('Readings', () => {
 		await Reading.insertOrUpdateAll([reading1Updated, reading2], conn);
 		const retrievedReadings = await Reading.getAllByMeterID(meter.id, conn);
 		expect(retrievedReadings).to.have.length(2);
+		expect(retrievedReadings[0].reading).to.equal(2);
+		expect(retrievedReadings[0].endTimestamp.isSame(endTimestamp1)).to.equal(true);
+	});
+	mocha.it('preserves sequential upsert behavior for repeated keys in one bulk input', async () => {
+		const conn = testDB.getConnection();
+		const startTimestamp = moment.utc('2017-01-01');
+		const firstEndTimestamp = moment.utc(startTimestamp).add(1, 'hour');
+		const laterEndTimestamp = moment.utc(startTimestamp).add(2, 'hours');
+		await Reading.insertOrUpdateAll([
+			new Reading(meter.id, 1, startTimestamp, firstEndTimestamp),
+			new Reading(meter.id, 2, startTimestamp, laterEndTimestamp)
+		], conn);
+
+		const [retrievedReading] = await Reading.getAllByMeterID(meter.id, conn);
+		expect(retrievedReading.reading).to.equal(2);
+		// The original row-by-row upsert changed only reading, so the first end
+		// timestamp remains part of the compatibility contract.
+		expect(retrievedReading.endTimestamp.isSame(firstEndTimestamp)).to.equal(true);
 	});
 	mocha.it('can keep any data already in the DB', async () => {
 		const conn = testDB.getConnection();
@@ -90,5 +108,48 @@ mocha.describe('Readings', () => {
 		expect(retrievedReading.startTimestamp.isSame(startTimestamp)).to.equal(true);
 		expect(retrievedReading.endTimestamp.isSame(endTimestamp)).to.equal(true);
 		expect(retrievedReading.reading).to.equal(1);
+	});
+	mocha.it('counts readings for multiple meters in one query', async () => {
+		const conn = testDB.getConnection();
+		await new Meter(undefined, 'Second meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+		const secondMeter = await Meter.getByName('Second meter', conn);
+		const firstStart = moment.utc('2018-01-01');
+		const firstEnd = moment.utc(firstStart).add(1, 'hour');
+		const secondStart = moment.utc(firstEnd);
+		const secondEnd = moment.utc(secondStart).add(1, 'hour');
+
+		await Reading.insertAll([
+			new Reading(meter.id, 1, firstStart, firstEnd),
+			new Reading(meter.id, 2, secondStart, secondEnd),
+			new Reading(secondMeter.id, 3, firstStart, firstEnd)
+		], conn);
+
+		const count = await Reading.getCountByMeterIDsAndDateRange(
+			[meter.id, secondMeter.id],
+			firstStart,
+			firstEnd,
+			conn
+		);
+		expect(count).to.equal(2);
+	});
+	mocha.it('returns the combined multi-meter count from the readings API', async () => {
+		const conn = testDB.getConnection();
+		await new Meter(undefined, 'Second meter', null, false, true, Meter.type.MAMAC, null, gps).insert(conn);
+		const secondMeter = await Meter.getByName('Second meter', conn);
+		const startTimestamp = moment.utc('2018-01-01');
+		const endTimestamp = moment.utc(startTimestamp).add(1, 'hour');
+		await Reading.insertAll([
+			new Reading(meter.id, 1, startTimestamp, endTimestamp),
+			new Reading(secondMeter.id, 2, startTimestamp, endTimestamp)
+		], conn);
+
+		const response = await chai.request(app)
+			.get(`/api/readings/line/count/meters/${meter.id},${secondMeter.id}`)
+			.query({ timeInterval: `${startTimestamp.format()}_${endTimestamp.format()}` });
+
+		expect(response).to.have.status(200);
+		// The existing route serializes the number explicitly, so Chai exposes
+		// the response through text rather than parsing it into response.body.
+		expect(response.text).to.equal('2');
 	});
 });

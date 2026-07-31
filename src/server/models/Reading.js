@@ -9,6 +9,10 @@ const log = require('../log');
 
 const sqlFile = database.sqlFile;
 
+// Keep each statement bounded so large CSV and meter imports avoid both
+// per-reading round trips and excessively large PostgreSQL query parameters.
+const READING_INSERT_BATCH_SIZE = 1000;
+
 class Reading {
 	/**
 	 * Creates a new reading
@@ -146,10 +150,7 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertAll(readings, conn) {
-		return conn.tx(t => t.sequence(function seq(i) {
-			const seqT = this;
-			return readings[i] && readings[i].insert(seqT);
-		}));
+		return Reading.insertInBatches(readings, conn);
 	}
 
 	/**
@@ -159,10 +160,32 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertOrUpdateAll(readings, conn) {
-		return conn.tx(t => t.sequence(function seq(i) {
-			const seqT = this;
-			return readings[i] && readings[i].insertOrUpdate(seqT);
-		}));
+		/*
+		 * Sequential upserts kept the first end timestamp but applied the last
+		 * reading value when an input batch repeated a meter/start key. Collapse
+		 * those duplicates before the set-based insert to preserve that behavior
+		 * and avoid PostgreSQL updating the same row twice in one statement.
+		 */
+		const readingsByKey = new Map();
+		for (const reading of readings) {
+			const key = `${reading.meterID}:${reading.startTimestamp.valueOf()}`;
+			const firstReading = readingsByKey.get(key);
+			if (firstReading === undefined) {
+				readingsByKey.set(key, reading);
+			} else {
+				readingsByKey.set(key, new Reading(
+					firstReading.meterID,
+					reading.reading,
+					firstReading.startTimestamp,
+					firstReading.endTimestamp
+				));
+			}
+		}
+		return Reading.insertInBatches(
+			Array.from(readingsByKey.values()),
+			conn,
+			'ON CONFLICT (meter_id, start_timestamp) DO UPDATE SET reading = EXCLUDED.reading'
+		);
 	}
 
 	/**
@@ -172,10 +195,53 @@ class Reading {
 	 * @returns {Promise<any>}
 	 */
 	static insertOrIgnoreAll(readings, conn) {
-		return conn.tx(t => t.sequence(function seq(i) {
-			const seqT = this;
-			return readings[i] && readings[i].insertOrIgnore(seqT);
-		}));
+		return Reading.insertInBatches(
+			readings,
+			conn,
+			'ON CONFLICT (meter_id, start_timestamp) DO NOTHING'
+		);
+	}
+
+	/**
+	 * Inserts readings in set-based batches within one transaction.
+	 * @param {array<Reading>} readings the readings to insert
+	 * @param conn the connection to use
+	 * @param {string} conflictClause fixed conflict behavior for the caller
+	 * @returns {Promise<void>}
+	 */
+	static insertInBatches(readings, conn, conflictClause = '') {
+		return conn.tx(async t => {
+			for (let offset = 0; offset < readings.length; offset += READING_INSERT_BATCH_SIZE) {
+				const batch = readings.slice(offset, offset + READING_INSERT_BATCH_SIZE);
+				/*
+				 * jsonb_to_recordset turns each chunk into typed rows inside
+				 * PostgreSQL, replacing one application/database round trip per
+				 * reading while still firing the existing maintenance trigger.
+				 */
+				await t.none(`
+					INSERT INTO readings (meter_id, reading, start_timestamp, end_timestamp)
+					SELECT
+						input.meter_id,
+						input.reading,
+						input.start_timestamp,
+						input.end_timestamp
+					FROM jsonb_to_recordset(\${readings:json}::jsonb) AS input(
+						meter_id INTEGER,
+						reading FLOAT,
+						start_timestamp TIMESTAMP,
+						end_timestamp TIMESTAMP
+					)
+					${conflictClause}
+				`, {
+					readings: batch.map(reading => ({
+						meter_id: reading.meterID,
+						reading: reading.reading,
+						start_timestamp: reading.startTimestamp,
+						end_timestamp: reading.endTimestamp
+					}))
+				});
+			}
+		});
 	}
 
 	/**
@@ -190,6 +256,23 @@ class Reading {
 			endDate: endDate
 		});
 		return parseInt(row[0].count);
+	}
+
+	/**
+	 * Returns the total number of readings for all supplied meters in one query.
+	 * @param {number[]} meterIDs meter IDs whose readings should be counted
+	 * @param startDate inclusive reading start bound
+	 * @param endDate inclusive reading end bound
+	 * @param conn the connection to use
+	 * @returns {number}
+	 */
+	static async getCountByMeterIDsAndDateRange(meterIDs, startDate, endDate, conn) {
+		const { count } = await conn.one(sqlFile('reading/get_count_by_meter_ids_and_date_range.sql'), {
+			meterIDs,
+			startDate,
+			endDate
+		});
+		return parseInt(count);
 	}
 
 	/**
