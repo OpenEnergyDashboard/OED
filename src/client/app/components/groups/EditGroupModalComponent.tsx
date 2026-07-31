@@ -205,9 +205,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		deleteGroup(groupState.id)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('group.delete.success') + ' ' + groupState.name);
+				showSuccessNotification(
+					translate('group.delete.success') + ' (' + translate('name') + ' "' + groupState.name + '")'
+				);
 			}).catch(error => {
-				showErrorNotification(translate('group.delete.failure') + error.data.message);
+				showErrorNotification(translate('group.delete.failure') + ' ' + error.data);
 			});
 	};
 	/* End Confirm Delete Modal */
@@ -366,7 +368,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					};
 
 					// TODO DEBUG: added in to test the showErrorNotification
-					submitState.name = '';
+					//submitState.name = '';
 
 					// This saves group to the DB and then refreshes the window if the last group being updated and
 					// changes were made to the children. This avoid a reload on name change, etc.

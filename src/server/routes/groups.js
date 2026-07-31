@@ -393,13 +393,16 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 
 				return t.batch(flatten([adoptGroupsQueries, disownGroupsQueries, adoptMetersQueries, disownMetersQueries]));
 			});
-			res.sendStatus(HTTP_CODES.OK);
+			//res.sendStatus(HTTP_CODES.OK);
+			success(res);
 		} catch (err) {
 			if (err.message && err.message === 'Cyclic group detected') {
-				res.status(HTTP_CODES.BAD_REQUEST).send({ message: err.message });
+				//res.status(HTTP_CODES.BAD_REQUEST).send({ message: err.message });
+				failure(res, HTTP_CODES.BAD_REQUEST, err.message);
 			} else {
 				log.error(`Error while editing existing group ${err}`, err);
-				res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+				//res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, "Got request to edit group with invalid data. Error(s): " + validatorResult.errors.toString());
 			}
 		}
 	}
@@ -407,7 +410,7 @@ router.put('/edit', adminAuthMiddleware('edit groups'), async (req, res) => {
 
 router.post('/delete', adminAuthMiddleware('delete groups'), async (req, res) => {
 	// TODO DEBUG: to force the showErrorNotification to pass in EditGroupsModalComponent.tsx
-	req.body.id = -1;
+	//req.body.id = -1;
 	const validParams = {
 		type: 'object',
 		additionalProperties: false,
@@ -425,10 +428,12 @@ router.post('/delete', adminAuthMiddleware('delete groups'), async (req, res) =>
 		const conn = getConnection();
 		try {
 			await Group.delete(req.body.id, conn);
-			res.sendStatus(HTTP_CODES.OK);
+			//res.sendStatus(HTTP_CODES.OK);
+			success(res, 'Successfully deleted group');
 		} catch (err) {
 			log.error(`Error while deleting group ${err}`, err);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			//res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `'Error while deleting group: ${err}`);
 		}
 	}
 });
