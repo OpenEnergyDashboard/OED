@@ -158,7 +158,15 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 			success(res, 'Successfully edited unit');
 		} catch (err) {
 			log.error(`Failed to update unit: ${err}`, err);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, 'Unable to update unit');
+			//failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, 'Unable to update unit');
+			if (err.toString().includes('duplicate key value violates unique constraint')) {
+				failure(res, HTTP_CODES.BAD_REQUEST, `Unit name "${req.body.name}" already exists`);
+			} else if (err.toString().includes('violates check constraint')) {
+				failure(res, HTTP_CODES.BAD_REQUEST, `Invalid unit data: ${err.toString()}`);
+			} else {
+				log.error(`Error while editing a unit with detail "${err['detail']}"`, err);
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, err.toString() + ' with detail ' + err['detail']);
+			}
 		}
 	}
 });
@@ -197,7 +205,15 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 			success(res, 'Unit created successfully');
 		} catch (err) {
 			log.error(`Error while inserting new unit: ${err}`, err);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while inserting new unit: ${err}`);
+			//failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while inserting new unit: ${err}`);
+			if (err.toString().includes('duplicate key value violates unique constraint')) {
+				failure(res, HTTP_CODES.BAD_REQUEST, `Unit name "${req.body.name}" already exists`);
+			} else if (err.toString().includes('violates check constraint')) {
+				failure(res, HTTP_CODES.BAD_REQUEST, `Invalid unit data: ${err.toString()}`);
+			} else {
+				log.error(`Error while inserting new unit with detail "${err['detail']}"`, err);
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, err.toString() + ' with detail ' + err['detail']);
+			}
 		}
 	}
 });

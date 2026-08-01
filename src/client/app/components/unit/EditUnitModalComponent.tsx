@@ -384,6 +384,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				|| (props.unit.secInRate !== state.secInRate
 					&& (props.unit.unitRepresent === UnitRepresentType.flow || props.unit.unitRepresent === UnitRepresentType.raw));
 
+			// TODO DEBUG: added in to test the showErrorNotification
+			//submitState.secInRate = -1;
+
 			// Save our changes by dispatching the submitEditedUnit mutation
 			submitEditedUnit({ editedUnit: submitState, shouldRedoCik, shouldRefreshReadingViews })
 				.unwrap()
