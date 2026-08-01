@@ -3,4 +3,4 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 -- Get conversion for specific source, destination, and time range in cik_vary table.
-SELECT * FROM cik_vary WHERE source_id=${sourceId} AND destination_id=${destinationId} AND start_time<=${queryTime} AND end_time>=${queryTime};
+SELECT * FROM cik_vary WHERE source_id=${sourceId} AND destination_id=${destinationId} AND start_time<=${queryTime} AND end_time>${queryTime};
