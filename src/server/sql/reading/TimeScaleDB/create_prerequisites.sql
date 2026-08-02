@@ -46,9 +46,9 @@
  /*
  * 1. Create hypertable_hourly_split.
  *
- * Stores readings after they have been split into hourly intervals.
- * A single row in readings may produce multiple rows in this table when the
- * reading crosses one or more hour boundaries.
+ * Stores readings after they have been split at both hourly and conversion
+ * boundaries. A single row in readings may produce multiple rows when it
+ * crosses an hour boundary, a cik_vary boundary, or both.
  *
  * Conversion information from cik_vary is stored with each hourly slice so
  * downstream aggregation does not need to join back to cik_vary.
@@ -283,17 +283,19 @@ BEGIN
 
     END IF;
 
-    INSERT INTO hypertable_hourly_split(meter_id, reading, start_timestamp, end_timestamp, unit_represent, sec_in_rate, slope, intercept, graphic_unit_id)
+	INSERT INTO hypertable_hourly_split(meter_id, reading, start_timestamp, end_timestamp, unit_represent, sec_in_rate, slope, intercept, graphic_unit_id)
 	SELECT
 		NEW.meter_id,
 		CASE
 			WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-				(NEW.reading * 3600 / extract(EPOCH FROM (NEW.end_timestamp - NEW.start_timestamp))) * extract(EPOCH FROM (least(NEW.end_timestamp, gen.interval_start + INTERVAL '1 hour') - greatest(NEW.start_timestamp, gen.interval_start)))
+				(NEW.reading * 3600 / extract(EPOCH FROM (NEW.end_timestamp - NEW.start_timestamp)))
+					* extract(EPOCH FROM (slice.end_timestamp - slice.start_timestamp))
 			WHEN u.unit_represent IN ('flow'::unit_represent_type, 'raw'::unit_represent_type ) THEN 
-				(NEW.reading * 3600 / u.sec_in_rate) * extract(EPOCH FROM(least(NEW.end_timestamp, gen.interval_start + INTERVAL '1 hour') - greatest(NEW.start_timestamp,gen.interval_start))
-		) END AS reading,
-		greatest(NEW.start_timestamp, gen.interval_start) AS start_timestamp,
-		least(NEW.end_timestamp, gen.interval_start + INTERVAL '1 hour') AS end_timestamp,
+				(NEW.reading * 3600 / u.sec_in_rate)
+					* extract(EPOCH FROM (slice.end_timestamp - slice.start_timestamp))
+		END AS reading,
+		slice.start_timestamp,
+		slice.end_timestamp,
 		u.unit_represent,
 		u.sec_in_rate,
 		c.slope,
@@ -301,10 +303,17 @@ BEGIN
 		c.destination_id AS graphic_unit_id
 	FROM meters m INNER JOIN 
 		 units u ON m.unit_id = u.id INNER JOIN 
-		 cik_vary c ON c.source_id = m.unit_id AND /*tsrange(c.start_time, c.end_time, '()') && tsrange(NEW.start_timestamp, NEW.end_timestamp, '[]')*/
-		 c.start_time < NEW.end_timestamp AND c.end_time > NEW.start_timestamp CROSS JOIN 
-		 LATERAL generate_series(date_trunc('hour', NEW.start_timestamp), date_trunc_up('hour', NEW.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start)
-	WHERE m.id = NEW.meter_id;
+		 cik_vary c ON c.source_id = m.unit_id
+			AND c.start_time < NEW.end_timestamp
+			AND c.end_time > NEW.start_timestamp CROSS JOIN
+		 LATERAL generate_series(date_trunc('hour', NEW.start_timestamp), date_trunc_up('hour', NEW.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start) CROSS JOIN
+		 LATERAL (
+			SELECT
+				greatest(NEW.start_timestamp, gen.interval_start, c.start_time) AS start_timestamp,
+				least(NEW.end_timestamp, gen.interval_start + INTERVAL '1 hour', c.end_time) AS end_timestamp
+		 ) slice
+	WHERE m.id = NEW.meter_id
+	  AND slice.start_timestamp < slice.end_timestamp;
     RETURN NEW;
 
 END;
@@ -377,12 +386,14 @@ BEGIN
 		r.meter_id,
 		CASE
 			WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-				(r.reading * 3600 / extract(EPOCH FROM(r.end_timestamp - r.start_timestamp))) * extract(EPOCH FROM (least(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') - greatest(r.start_timestamp, gen.interval_start)))
+				(r.reading * 3600 / extract(EPOCH FROM(r.end_timestamp - r.start_timestamp)))
+					* extract(EPOCH FROM (slice.end_timestamp - slice.start_timestamp))
 			WHEN u.unit_represent IN('flow'::unit_represent_type, 'raw'::unit_represent_type) THEN 
-				(r.reading * 3600 / u.sec_in_rate) * extract(EPOCH FROM(least(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') - greatest(r.start_timestamp, gen.interval_start))) 
+				(r.reading * 3600 / u.sec_in_rate)
+					* extract(EPOCH FROM (slice.end_timestamp - slice.start_timestamp))
 		END AS reading,
-		greatest(r.start_timestamp, gen.interval_start) AS start_timestamp,
-		least(r.end_timestamp, gen.interval_start + INTERVAL '1 hour') AS end_timestamp,
+		slice.start_timestamp,
+		slice.end_timestamp,
 		u.unit_represent,
 		u.sec_in_rate,
 		c.slope,
@@ -391,8 +402,15 @@ BEGIN
 	FROM readings r INNER JOIN 
 		 meters m ON r.meter_id = m.id INNER JOIN 
 		 units u ON m.unit_id = u.id INNER JOIN 
-		 cik_vary c ON c.source_id = m.unit_id AND /*tsrange(c.start_time, c.end_time, '()') && tsrange(r.start_timestamp, r.end_timestamp, '[]')*/ 
-		 c.start_time < r.end_timestamp AND c.end_time > r.start_timestamp CROSS JOIN 
-		 LATERAL generate_series(date_trunc('hour', r.start_timestamp), date_trunc_up('hour', r.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start);
+		 cik_vary c ON c.source_id = m.unit_id
+			AND c.start_time < r.end_timestamp
+			AND c.end_time > r.start_timestamp CROSS JOIN
+		 LATERAL generate_series(date_trunc('hour', r.start_timestamp), date_trunc_up('hour', r.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start) CROSS JOIN
+		 LATERAL (
+			SELECT
+				greatest(r.start_timestamp, gen.interval_start, c.start_time) AS start_timestamp,
+				least(r.end_timestamp, gen.interval_start + INTERVAL '1 hour', c.end_time) AS end_timestamp
+		 ) slice
+	WHERE slice.start_timestamp < slice.end_timestamp;
 END;
 $$ LANGUAGE plpgsql;

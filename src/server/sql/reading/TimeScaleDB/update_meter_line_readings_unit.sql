@@ -232,9 +232,9 @@ BEGIN
 	/*
 	 * RAW READINGS
 	 *
-	 * Apply time-varying conversions directly to raw readings. Multiple
-	 * cik_vary segments can overlap one reading, so each converted value is
-	 * weighted by the duration of its overlap with that reading.
+	 * Apply time-varying conversions directly to raw readings. Emit one result
+	 * for every reading/conversion intersection so the line contains an exact
+	 * point boundary whenever the applicable cik_vary segment changes.
 	 */
 	raw_results AS (
 		SELECT
@@ -242,29 +242,10 @@ BEGIN
 			r.meter_id,
 			CASE
 				WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-					/*
-					 * Quantity readings are normalized to a per-hour rate before
-					 * applying the conversion.
-					 */
-					SUM(
-						(EXTRACT(EPOCH FROM (
-							upper(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
-							- lower(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
-						)) / 3600)
-						* (c.slope * (r.reading / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) + c.intercept)
-					) / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)
+					c.slope * (r.reading / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600))
+						+ c.intercept
 				WHEN u.unit_represent IN ('flow'::unit_represent_type, 'raw'::unit_represent_type) THEN
-					/*
-					 * Flow and raw readings are already rates. Normalize them to
-					 * an hourly rate before applying the conversion.
-					 */
-					SUM(
-						(EXTRACT(EPOCH FROM (
-							upper(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
-							- lower(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
-						)) / 3600)
-						* (c.slope * (r.reading * 3600 / u.sec_in_rate) + c.intercept)
-					) / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)
+					c.slope * (r.reading * 3600 / u.sec_in_rate) + c.intercept
 			END AS reading_rate,
 			/*
 			 * Raw meter data has no min/max range. NaN is converted to null by
@@ -272,8 +253,8 @@ BEGIN
 			 */
 			'NaN'::DOUBLE PRECISION AS min_rate,
 			'NaN'::DOUBLE PRECISION AS max_rate,
-			r.start_timestamp,
-			r.end_timestamp
+			greatest(r.start_timestamp, c.start_time) AS start_timestamp,
+			least(r.end_timestamp, c.end_time) AS end_timestamp
 		FROM meter_resolutions selected
 		INNER JOIN readings r ON r.meter_id = selected.meter_id
 		INNER JOIN units u ON u.id = selected.unit_id
@@ -289,16 +270,6 @@ BEGIN
 		WHERE selected.selected_accuracy = 'raw'::reading_line_accuracy
 			AND r.start_timestamp >= lower(selected.requested_range)
 			AND r.end_timestamp <= upper(selected.requested_range)
-		/*
-		 * unit_represent is stable for a meter, but PostgreSQL requires it in
-		 * the GROUP BY because it controls the CASE expression above.
-		 */
-		GROUP BY
-			selected.request_order,
-			r.meter_id,
-			r.start_timestamp,
-			r.end_timestamp,
-			u.unit_represent
 	),
 	/*
 	 * HOURLY READINGS
