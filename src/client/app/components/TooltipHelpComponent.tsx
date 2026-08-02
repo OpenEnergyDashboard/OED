@@ -35,6 +35,7 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.admin.daycreate': { link: `${helpUrl}` }, // TODO: Add specific link for day creation
 		'help.admin.dayedit': { link: `${helpUrl}` }, // TODO: Add specific link for day editing
 		'help.admin.dayview': { link: `${helpUrl}` }, // TODO: Add specific link for day viewing
+		'help.admin.holidayview': { link: `${helpUrl}` }, // TODO: Add specific link for holiday viewing
 		'help.admin.groupcreate': { link: `${helpUrl}/adminGroupCreating/` },
 		'help.admin.groupedit': { link: `${helpUrl}/adminGroupEditing/` },
 		'help.admin.groupview': { link: `${helpUrl}/adminGroupViewing/` },

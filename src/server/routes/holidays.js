@@ -90,8 +90,9 @@ router.get('/', adminAuthMiddleware('get all holidays'), async (req, res) => {
 		const rows = await Holiday.getAll(conn);
 		res.json(rows.map(formatHolidayForResponse));
 	} catch (err) {
-		log.error(`Error while performing GET all holidays query: ${err}`);
-		res.sendStatus(500);
+		const errMsg = `Error while performing GET all holidays query: ${err}`;
+		log.error(errMsg);
+		failure(res, 500, errMsg);
 	}
 });
 
@@ -148,8 +149,9 @@ router.get('/locations', adminAuthMiddleware('get holiday locations'), async (re
 				regions
 			});
 		} catch (err) {
-			log.error(`Error while getting holiday locations: ${err}`);
-			res.sendStatus(500);
+			const errMsg = `Error while getting holiday locations: ${err}`;
+			log.error(errMsg);
+			failure(res, 500, errMsg);
 		}
 	}
 });
@@ -221,8 +223,9 @@ router.post('/refresh', adminAuthMiddleware('refresh holidays'), async (req, res
 				total: importedHolidays.length
 			});
 		} catch (err) {
-			log.error(`Error while refreshing holidays: ${err}`);
-			res.sendStatus(500);
+			const errMsg = `Error while refreshing holidays: ${err}`;
+			log.error(errMsg);
+			failure(res, 500, errMsg);
 		}
 	}
 });
@@ -257,8 +260,9 @@ router.get('/:holidayId', adminAuthMiddleware('get holiday by id'), async (req, 
 			const row = await Holiday.getById(req.params.holidayId, conn);
 			res.json(formatHolidayForResponse(row));
 		} catch (err) {
-			log.error(`Error while performing GET holiday by id query: ${err}`);
-			res.sendStatus(500);
+			const errMsg = `Error while performing GET holiday by id query: ${err}`;
+			log.error(errMsg);
+			failure(res, 500, errMsg);
 		}
 	}
 });

@@ -4,7 +4,7 @@
 
 import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
-import { Alert, Button, Col, FormGroup, Input, Label, Row } from 'reactstrap';
+import { Alert, Button, Col, FormFeedback, FormGroup, Input, Label, Row } from 'reactstrap';
 import {
 	stableEmptyHolidays,
 	useGetHolidaysQuery,
@@ -12,8 +12,10 @@ import {
 	useRefreshHolidaysMutation
 } from '../../redux/api/holidaysApi';
 import { useTranslate } from '../../redux/componentHooks';
-import { titleStyle } from '../../styles/modalStyle';
+import { titleStyle, tooltipBaseStyle } from '../../styles/modalStyle';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
+import TooltipHelpComponent from '../TooltipHelpComponent';
+import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import HolidayViewComponent from './HolidayViewComponent';
 
 /**
@@ -29,6 +31,7 @@ export default function HolidayPage() {
 	const [year, setYear] = React.useState(
 		String(new Date().getFullYear())
 	);
+	// Get saved holidays, location options, and the import/update function from RTK Query.
 	const [refreshHolidays, { isLoading }] = useRefreshHolidaysMutation();
 	const { data: holidays = stableEmptyHolidays } = useGetHolidaysQuery();
 
@@ -37,6 +40,14 @@ export default function HolidayPage() {
 		state: stateCode
 	});
 
+	// Validate the required import fields and disable importing until they are valid.
+	const isCountryValid = countryCode.length > 0;
+	const isYearValid = year.trim().length > 0 && Number.isInteger(Number(year));
+	const isImportValid = isCountryValid && isYearValid;
+
+	// The location endpoint returns countries, states, and regions in one response.
+	// TODO: These simple lookups probably do not need useMemo. Convert them to the
+	// usual OED/RTK style by reading locationData directly.
 	const countries = React.useMemo(() => {
 		if (locationData === undefined) {
 			return [];
@@ -61,6 +72,7 @@ export default function HolidayPage() {
 		return locationData.regions;
 	}, [locationData]);
 
+	// Match saved holidays to the exact location and year, then order them by date and name.
 	const selectedHolidays = React.useMemo(() => {
 		if (countryCode.length === 0) {
 			return [];
@@ -103,6 +115,7 @@ export default function HolidayPage() {
 			});
 	}, [countryCode, stateCode, regionCode, year, holidays]);
 
+	// Clear child selections when the user changes a parent location.
 	const handleCountryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setCountryCode(event.target.value);
 		setStateCode('');
@@ -122,23 +135,20 @@ export default function HolidayPage() {
 		setYear(event.target.value);
 	};
 
+	// Import or update holidays for the selected location and year.
+	// RTK Query refreshes the saved holiday list after a successful request.
 	const handleImport = () => {
-		if (countryCode.length === 0) {
+		if (!isCountryValid) {
 			showErrorNotification(translate('holiday.import.country.required'));
 			return;
 		}
 
-		if (year.trim().length === 0) {
+		if (!isYearValid) {
 			showErrorNotification(translate('holiday.year.invalid'));
 			return;
 		}
 
 		const selectedYear = Number(year);
-
-		if (!Number.isInteger(selectedYear)) {
-			showErrorNotification(translate('holiday.year.invalid'));
-			return;
-		}
 
 		refreshHolidays({
 			country: countryCode,
@@ -154,6 +164,7 @@ export default function HolidayPage() {
 			});
 	};
 
+	// Display saved holidays for the current selection or an empty message.
 	let holidayContent: React.ReactNode = null;
 
 	if (countryCode.length > 0 && selectedHolidays.length === 0) {
@@ -172,9 +183,13 @@ export default function HolidayPage() {
 
 	return (
 		<div className='flexGrowOne'>
+			<TooltipHelpComponent page='holidays' />
 			<div className='container-fluid'>
 				<h2 style={titleStyle}>
 					<FormattedMessage id='holidays' />
+					<div style={tooltipBaseStyle}>
+						<TooltipMarkerComponent page='holidays' helpTextId='help.admin.holidayview' />
+					</div>
 				</h2>
 				<Alert color='warning'>
 					<FormattedMessage id='holiday.history.warning' />
@@ -188,7 +203,9 @@ export default function HolidayPage() {
 							<Input
 								id='holiday-country'
 								type='select'
+								required
 								value={countryCode}
+								invalid={!isCountryValid}
 								onChange={handleCountryChange}
 							>
 								<option value=''>
@@ -200,6 +217,9 @@ export default function HolidayPage() {
 									</option>
 								))}
 							</Input>
+							<FormFeedback>
+								<FormattedMessage id='holiday.import.country.required' />
+							</FormFeedback>
 						</FormGroup>
 					</Col>
 					<Col md='3'>
@@ -257,9 +277,14 @@ export default function HolidayPage() {
 								id='holiday-year'
 								type='number'
 								step='1'
+								required
 								value={year}
+								invalid={!isYearValid}
 								onChange={handleYearChange}
 							/>
+							<FormFeedback>
+								<FormattedMessage id='holiday.year.invalid' />
+							</FormFeedback>
 						</FormGroup>
 					</Col>
 				</Row>
@@ -269,7 +294,7 @@ export default function HolidayPage() {
 							color='primary'
 							type='button'
 							onClick={handleImport}
-							disabled={isLoading}
+							disabled={!isImportValid || isLoading}
 						>
 							<FormattedMessage id='holiday.import.button' />
 						</Button>
