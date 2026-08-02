@@ -13,9 +13,10 @@ const updatedConversion = require('./pathConversion').updatedConversion;
  * The algorithm aligns all segments and combines them for each time range.
  * @param {*} path Array of units (nodes) from source to destination.
  * @param {*} conn Database connection.
+ * @param metadata optional preloaded conversion and segment maps
  * @returns Array of {source, destination, startTime, endTime, slope, intercept}
  */
-async function timeVaryingPathConversion(path, conn) {
+async function timeVaryingPathConversion(path, conn, metadata = null) {
 
 	// 1. Fetch and sort segments for each edge
 	const edgeSegments = [];
@@ -23,17 +24,25 @@ async function timeVaryingPathConversion(path, conn) {
 		const sourceId = path[i].id;
 		const destinationId = path[i + 1].id;
 		//segments are sorted by start_time in getBySourceDestination
-		let segments = await ConversionSegment.getBySourceDestination(sourceId, destinationId, conn);
+		const edgeKey = `${sourceId}:${destinationId}`;
+		let segments = metadata === null
+			? await ConversionSegment.getBySourceDestination(sourceId, destinationId, conn)
+			: metadata.segmentsByEdge.get(edgeKey) || [];
 		// Did not find the conversion segments. Since conversion should exist, it must be the other way around and bidirectional.
 		if (!segments || segments.length === 0) {
 			// Check if reverse conversion exists and is bidirectional
-			const reverseConversion = await Conversion.getBySourceDestination(destinationId, sourceId, conn);
+			const reverseKey = `${destinationId}:${sourceId}`;
+			const reverseConversion = metadata === null
+				? await Conversion.getBySourceDestination(destinationId, sourceId, conn)
+				: metadata.conversionsByEdge.get(reverseKey);
 			// This should never happen. It should have been in the table one way or the other.
 			if (!reverseConversion || !reverseConversion.bidirectional) {
 				throw Error(`No bidirectional conversion found between ${sourceId} and ${destinationId}`);
 			}
 			// Fetch reverse segments and invert them
-			const reverseSegments = await ConversionSegment.getBySourceDestination(destinationId, sourceId, conn);
+			const reverseSegments = metadata === null
+				? await ConversionSegment.getBySourceDestination(destinationId, sourceId, conn)
+				: metadata.segmentsByEdge.get(reverseKey) || [];
 			// This is also really weird that it exist and yet no segments found.
 			if (!reverseSegments || reverseSegments.length === 0) {
 				throw Error(`No conversion segments found for reverse direction between ${destinationId} and ${sourceId}`);

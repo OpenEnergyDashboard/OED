@@ -26,6 +26,11 @@ CREATE TABLE IF NOT EXISTS groups_immediate_children (
 	CHECK (parent_id != child_id) -- No self-references
 );
 
+-- The primary key supports traversal from parent to child. Parent lookups,
+-- cycle detection, deletion, and foreign-key checks traverse in reverse.
+CREATE INDEX IF NOT EXISTS groups_immediate_children_child_parent_idx
+ON groups_immediate_children (child_id, parent_id);
+
 /*
   The groups_deep_children view provides a logical table with a row for each (parent, deep child) relationship in the tree.
  */
@@ -64,6 +69,11 @@ CREATE TABLE IF NOT EXISTS meters_immediate_children (
 	CHECK (parent_id != child_id)
 );
 
+-- Support reverse meter-tree traversal and foreign-key maintenance without a
+-- full scan of the relationship table.
+CREATE INDEX IF NOT EXISTS meters_immediate_children_child_parent_idx
+ON meters_immediate_children (child_id, parent_id);
+
 /*
   Similarly to groups_deep_children, meters_deep_children provides all of the (parent, deep_child) relationships in the
   multitree of meter relationships.
@@ -98,6 +108,11 @@ CREATE TABLE IF NOT EXISTS groups_immediate_meters (
 	meter_id INT NOT NULL REFERENCES meters (id),
 	PRIMARY KEY (group_id, meter_id)
 );
+
+-- The primary key covers group-to-meter access; cache refreshes and meter
+-- deletion checks also need efficient meter-to-group access.
+CREATE INDEX IF NOT EXISTS groups_immediate_meters_meter_group_idx
+ON groups_immediate_meters (meter_id, group_id);
 
 /*
   This view has a row for each (group, deep child meter) relationship represented by the groups DAG.
@@ -139,13 +154,12 @@ CREATE TABLE IF NOT EXISTS groups_immediate_meters (
 CREATE OR REPLACE FUNCTION check_cyclic_groups()
 	RETURNS TRIGGER AS
 	$$
-		DECLARE
-			num_rows INTEGER;
 		BEGIN
-			SELECT COUNT(*) INTO num_rows
-			FROM groups_deep_children WHERE child_id = NEW.parent_id AND parent_id = NEW.child_id;
-
-			IF num_rows > 0 THEN
+			IF EXISTS (
+				SELECT 1
+				FROM groups_deep_children
+				WHERE child_id = NEW.parent_id AND parent_id = NEW.child_id
+			) THEN
 				RAISE EXCEPTION 'Cyclic group detected';
 			END IF;
 			RETURN NEW;

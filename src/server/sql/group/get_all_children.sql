@@ -4,12 +4,22 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
--- Returns a row for each group with the id, an array of the immediate children meters
--- and and array of the immediate group children.
--- Note it return an array with one entry of null if no child or group meters.
-SELECT g.id as group_id, array_agg(DISTINCT gim.meter_id) as child_meters, array_agg(DISTINCT gic.child_id) as child_groups
+-- Aggregate each relationship independently. Joining both relationship tables
+-- before aggregating produces a child-meter x child-group intermediate result
+-- for every group, which becomes expensive for groups with many children.
+SELECT
+	g.id AS group_id,
+	COALESCE(meters.child_meters, ARRAY[]::INTEGER[]) AS child_meters,
+	COALESCE(child_groups.child_groups, ARRAY[]::INTEGER[]) AS child_groups
 FROM groups g
--- Use LEFT OUTER JOIN so get result for all groups.
-LEFT OUTER JOIN groups_immediate_meters gim ON g.id = gim.group_id
-LEFT OUTER JOIN groups_immediate_children gic ON g.id = gic.parent_id
-GROUP BY g.id;
+LEFT JOIN (
+	SELECT group_id, array_agg(meter_id ORDER BY meter_id) AS child_meters
+	FROM groups_immediate_meters
+	GROUP BY group_id
+) meters ON meters.group_id = g.id
+LEFT JOIN (
+	SELECT parent_id, array_agg(child_id ORDER BY child_id) AS child_groups
+	FROM groups_immediate_children
+	GROUP BY parent_id
+) child_groups ON child_groups.parent_id = g.id
+ORDER BY g.id;

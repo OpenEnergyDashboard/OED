@@ -117,6 +117,19 @@ class Group {
 	}
 
 	/**
+	 * Retrieves all groups and their cached deep-meter IDs in one query.
+	 * @param conn the connection to be used
+	 * @returns {Promise<Array<{group: Group, deepMeters: number[]}>>}
+	 */
+	static async getAllWithDeepMeters(conn) {
+		const rows = await conn.any(sqlFile('group/get_all_groups_with_deep_meters.sql'));
+		return rows.map(row => ({
+			group: Group.mapRow(row),
+			deepMeters: row.deep_meters
+		}));
+	}
+
+	/**
 	 * Returns a promise to retrive all groups that displayable is equal to true.
 	 * @param {*} conn The connection to be used
 	 * @returns {Promise.<Array.<Group>>}
@@ -173,6 +186,9 @@ class Group {
 	 * Removes first array entry if only one and null
 	 * @param {[]} array array to remove null
 	 */
+	// TODO: Research whether any external/custom query can still return [null]
+	// here. get_all_children.sql now returns empty arrays, so this method and its
+	// calls in getImmediateChildren can likely be removed.
 	static purgeNull(array) {
 		if (array.length === 1 && array[0] === null) {
 			// Length 1 and only item null so remove from array.

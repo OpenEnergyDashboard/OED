@@ -52,17 +52,12 @@ function formatToOnlyNameID(item) {
 router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
-		const rows = await Group.getAll(conn);
-		deepChildren = [];
-		promises = await rows.map(async (row) => {
-			const deepChildren = await Group.getDeepMetersByGroupID(row.id, conn);
-			return { ...row, children: deepChildren };
-		})
-		Promise.all(promises).then(function (values) {
-			res.json(values.map(formatGroupForResponse));
-		})
+		const rows = await Group.getAllWithDeepMeters(conn);
+		res.json(rows.map(({ group, deepMeters }) =>
+			formatGroupForResponse({ ...group, children: deepMeters })));
 	} catch (err) {
 		log.error(`Error while preforming GET all groups query: ${err}`, err);
+		res.sendStatus(500);
 	}
 });
 
@@ -450,4 +445,3 @@ router.post('/delete', adminAuthMiddleware('delete groups'), async (req, res) =>
 });
 
 module.exports = router;
-

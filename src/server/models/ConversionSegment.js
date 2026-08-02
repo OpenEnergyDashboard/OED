@@ -56,6 +56,18 @@ class ConversionSegment {
 	}
 
 	/**
+	 * Retrieves all conversion segments in edge and chronological order.
+	 * Used when rebuilding derived conversion tables so metadata is loaded once
+	 * instead of queried again for every path edge.
+	 * @param conn the connection to use
+	 * @returns {Promise<Array<ConversionSegment>>}
+	 */
+	static async getAll(conn) {
+		const rows = await conn.any(sqlFile('conversionSegment/get_all.sql'));
+		return rows.map(ConversionSegment.mapRow);
+	}
+
+	/**
 	 * Returns a promise to get all conversion segments with the given source id and destination id from the database. 
 	 * If the conversion segment doesn't exist then return null.
 	 * @param {*} sourceId The source meter's id.

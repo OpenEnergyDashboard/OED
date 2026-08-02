@@ -70,6 +70,9 @@ class CikVary {
 	* @param {*} queryTime Timestamp to check validity.
 	* @returns Matching CikVary objects
 	*/
+	// TODO: Research whether this lookup is used by external consumers. It has
+	// no in-repository callers and references a misspelled/nonexistent SQL path;
+	// remove the method and its unused SQL file if no supported caller needs it.
 	static async getBySourceDestinationStartEnd(conn, sourceId, destinationId, queryTime) {
 		const rows = await conn.any(sqlFile('cik_vary/get_cik_vart_by_source_destination_start_end.sql'), {
 			sourceId,

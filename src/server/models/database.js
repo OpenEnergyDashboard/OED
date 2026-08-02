@@ -31,6 +31,9 @@ function getDB(connectionParameters) {
  * Get the name of the database current being worked on.
  * @returns {string}
  */
+// TODO: Research whether any downstream consumers use the exported currentDB
+// accessor. There are no in-repository callers and no currentDB backing value;
+// if external callers do not rely on it, remove this function and its export.
 function getCurrentDB() {
 	return currentDB;
 }

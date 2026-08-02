@@ -40,6 +40,9 @@ class Reading {
 	/**
 	 * @deprecated Retained for the legacy PostgreSQL materialized-view schema.
 	 */
+	// TODO: Research whether deployments or external scripts still invoke the
+	// legacy schema helpers below. Their in-repository setup calls are commented
+	// out; remove the helpers and legacy SQL once TimescaleDB is the only schema.
 	static createReadingsMaterializedViews(conn) {
 		return conn.none(sqlFile('reading/create_reading_views.sql'));
 	}

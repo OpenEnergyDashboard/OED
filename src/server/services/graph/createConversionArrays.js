@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const Unit = require('../../models/Unit');
+const Conversion = require('../../models/Conversion');
+const ConversionSegment = require('../../models/ConversionSegment');
 const { getPath } = require('./createConversionGraph');
 const { timeVaryingPathConversion } = require('./timeVaryingPathConversion');
 
@@ -14,8 +16,34 @@ const { timeVaryingPathConversion } = require('./timeVaryingPathConversion');
  * @returns Array of time-varying conversion segments.
  */
 async function createCikVaryArray(graph, conn) {
-	const sources = await Unit.getTypeMeter(conn);
-	const destinations = (await Unit.getTypeUnit(conn)).concat(await Unit.getTypeSuffix(conn));
+	/*
+	 * Conversion rebuilding visits the same graph edges through many
+	 * source/destination paths. Load the small metadata tables once so path
+	 * traversal does not issue database queries inside the nested loops.
+	 */
+	const [sources, destinationUnits, suffixUnits, conversions, conversionSegments] = await Promise.all([
+		Unit.getTypeMeter(conn),
+		Unit.getTypeUnit(conn),
+		Unit.getTypeSuffix(conn),
+		Conversion.getAll(conn),
+		ConversionSegment.getAll(conn)
+	]);
+	const destinations = destinationUnits.concat(suffixUnits);
+	const conversionsByEdge = new Map(conversions.map(conversion => [
+		`${conversion.sourceId}:${conversion.destinationId}`,
+		conversion
+	]));
+	const segmentsByEdge = new Map();
+	for (const segment of conversionSegments) {
+		const key = `${segment.sourceId}:${segment.destinationId}`;
+		const edgeSegments = segmentsByEdge.get(key);
+		if (edgeSegments === undefined) {
+			segmentsByEdge.set(key, [segment]);
+		} else {
+			edgeSegments.push(segment);
+		}
+	}
+	const metadata = { conversionsByEdge, segmentsByEdge };
 	const c = [];
 
 	// Iterate over all possible meter unit sources
@@ -28,7 +56,7 @@ async function createCikVaryArray(graph, conn) {
 			const path = getPath(graph, sourceId, destinationId);
 			// If a valid path exists, compute all time-varying conversion segments along that path
 			if (path !== null) {
-				const segments = await timeVaryingPathConversion(path, conn);
+				const segments = await timeVaryingPathConversion(path, conn, metadata);
 				// Add all segments to the result array
 				segments.forEach(seg => {
 					c.push({
@@ -48,4 +76,4 @@ async function createCikVaryArray(graph, conn) {
 
 module.exports = {
 	createCikVaryArray
-}
+};
