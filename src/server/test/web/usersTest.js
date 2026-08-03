@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* This file tests the API for retrieving meters, by artificially
- * inserting meters prior to executing the test code. */
+/* This file tests the API for retrieving users, by artificially
+ * inserting users prior to executing the test code. */
 
 const { chai, mocha, expect, app, testDB, testUser, recreateDB } = require('../common');
 const User = require('../../models/User');
@@ -24,6 +24,14 @@ mocha.describe('Users API', () => {
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
+		mocha.after(async () => {
+			if (token) {
+				await chai.request(app)
+					.post('/api/loginLogout/logout')
+					.set('token', token);
+			}
+		});
+
 		mocha.it('retrieves users', async () => {
 			const conn = testDB.getConnection();
 			const password = await bcrypt.hash('password', 10);
@@ -118,10 +126,21 @@ mocha.describe('Users API', () => {
 						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});
-				mocha.it('should reject request to retrieve users', async () => {
+				mocha.afterEach(async () => {
+					// logout
+					if (token) {
+						await chai.request(app)
+							.post('/api/loginLogout/logout')
+							.set('token', token);
+					}
+				});
+
+				mocha.it(`should reject requests from ${role} to retrieve users`, async () => {
+					// get
 					const res = await chai.request(app).get('/api/users').set('token', token);
 					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
+
 				mocha.it(`should reject requests from ${role} to create users`, async () => {
 					// create
 					const res = await chai.request(app).post('/api/users/create').set('token', token);
