@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* This file tests the API for retrieving meters, by artificially
- * inserting meters prior to executing the test code. */
+/* This file tests the API for retrieving preferences, by artificially
+ * inserting preferences prior to executing the test code. */
 
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const User = require('../../models/User');
@@ -13,24 +13,42 @@ const { HTTP_CODES } = require('../../util/httpCodes');
 mocha.describe('preferences API', () => {
 	mocha.describe('modification api', () => {
 		mocha.describe('edit endpoint', () => {
-			mocha.it('should accept requests from Admin role', async () => {
-				let res = await chai.request(app).post('/api/loginLogout/login')
-					.send({ username: testUser.username, password: testUser.password });
-				expect(res).to.have.status(HTTP_CODES.OK);
-				const token = res.body.token;
-				const preferences = {
-					displayTitle: 'title',
-					defaultChartToRender: 'line',
-					defaultBarStacking: true,
-					defaultLanguage: 'en',
-					defaultWarningFileSize: 5,
-					defaultFileSizeLimit: 25,
-					defaultAreaNormalization: true,
-					defaultAreaUnit: 'meters',
-					defaultMeterReadingFrequency: '1:13:17'
-				}
-				res = await chai.request(app).post('/api/preferences').set('token', token).send({ preferences });
-				expect(res).to.have.status(HTTP_CODES.OK);
+			const preferences = {
+				displayTitle: 'title',
+				defaultChartToRender: 'line',
+				defaultBarStacking: true,
+				defaultLanguage: 'en',
+				defaultWarningFileSize: 5,
+				defaultFileSizeLimit: 25,
+				defaultAreaNormalization: true,
+				defaultAreaUnit: 'meters',
+				defaultMeterReadingFrequency: '1:13:17'
+			};
+			mocha.describe('Admin role: ', () => {
+				let token;
+				mocha.before(async () => {
+					// login
+					let res = await chai.request(app)
+						.post('/api/loginLogout/login')
+						.send({ username: testUser.username, password: testUser.password });
+					token = res.body.token;
+				});
+				mocha.after(async () => {
+					// logout
+					if (token) {
+						await chai.request(app)
+							.post('/api/loginLogout/logout')
+							.set('token', token);
+					}
+				});
+
+				mocha.it('should accept requests from Admin role', async () => {
+					res = await chai.request(app)
+						.post('/api/preferences')
+						.set('token', token)
+						.send({ preferences });
+					expect(res).to.have.status(HTTP_CODES.OK);
+				});
 			});
 
 			mocha.describe('Non-Admin roles: ', () => {
@@ -47,12 +65,25 @@ mocha.describe('preferences API', () => {
 							unauthorizedUser.password = password;
 
 							// login
-							let res = await chai.request(app).post('/api/loginLogout/login')
+							let res = await chai.request(app)
+								.post('/api/loginLogout/login')
 								.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 							token = res.body.token;
 						});
+						mocha.afterEach(async () => {
+							// logout
+							if (token) {
+								await chai.request(app)
+									.post('/api/loginLogout/logout')
+									.set('token', token);
+							}
+						});
+
 						mocha.it(`should reject requests from ${role}`, async () => {
-							let res = await chai.request(app).post('/api/preferences').set('token', token);
+							res = await chai.request(app)
+								.post('/api/preferences')
+								.set('token', token)
+								.send({ preferences });
 							expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 						});
 					}

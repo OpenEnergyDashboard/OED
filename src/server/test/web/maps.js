@@ -83,12 +83,14 @@ mocha.describe('maps API', () => {
 		// Since this .before is in the middle of tests, it should not have issues as
 		// documented in usersTest.js.
 		mocha.before(async () => {
+			// login
 			let res = await chai.request(app)
 				.post('/api/loginLogout/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
 		mocha.after(async () => {
+			// logout
 			if (token) {
 				await chai.request(app)
 					.post('/api/loginLogout/logout')
