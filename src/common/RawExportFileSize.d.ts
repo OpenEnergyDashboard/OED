@@ -4,8 +4,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-export const ESTIMATED_KB_PER_RAW_READING: number;
-export const KB_PER_MB: number;
 /**
  * Estimates the size of a raw export in MB based on the number of readings. 
  * Note that changing the language effects the size about +/- 8%.
