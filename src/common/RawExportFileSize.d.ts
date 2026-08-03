@@ -5,10 +5,10 @@
  */
 
 /**
- * Estimates the size of a raw export in MB based on the number of readings. 
+ * Estimates the size of a raw export in MB based on the number of readings.
  * Note that changing the language effects the size about +/- 8%.
  * This is just a decent estimate for larger files.
- * @param {number} readingCount - The number of readings to estimate.
- * @returns {number} The estimated size in MB.
+ * @param readingCount - The number of readings to estimate.
+ * @returns The estimated size in MB.
  */
 export function estimateRawExportSizeMB(readingCount: number): number;

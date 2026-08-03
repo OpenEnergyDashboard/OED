@@ -7,11 +7,11 @@
 const ESTIMATED_MB_PER_RAW_READING = 8.2e-5;
 
 /**
- * Estimates the size of a raw export in MB based on the number of readings. 
+ * Estimates the size of a raw export in MB based on the number of readings.
  * Note that changing the language effects the size about +/- 8%.
  * This is just a decent estimate for larger files.
- * @param {number} readingCount - The number of readings to estimate.
- * @returns {number} The estimated size in MB.
+ * @param readingCount - The number of readings to estimate.
+ * @returns The estimated size in MB.
  */
 function estimateRawExportSizeMB(readingCount) {
 	return readingCount * ESTIMATED_MB_PER_RAW_READING;
