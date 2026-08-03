@@ -4,8 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const ESTIMATED_KB_PER_RAW_READING = 0.082;
-const KB_PER_MB = 1000;
+const ESTIMATED_MB_PER_RAW_READING = 8.2e-5;
+
 /**
  * Estimates the size of a raw export in MB based on the number of readings. 
  * Note that changing the language effects the size about +/- 8%.
@@ -14,11 +14,9 @@ const KB_PER_MB = 1000;
  * @returns {number} The estimated size in MB.
  */
 function estimateRawExportSizeMB(readingCount) {
-	return readingCount * ESTIMATED_KB_PER_RAW_READING / KB_PER_MB;
+	return readingCount * ESTIMATED_MB_PER_RAW_READING;
 }
 
 module.exports = {
-	ESTIMATED_KB_PER_RAW_READING,
-	KB_PER_MB,
 	estimateRawExportSizeMB
 };
