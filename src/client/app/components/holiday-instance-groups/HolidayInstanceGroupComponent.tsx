@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react';
-import { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 import {
 	useGetHolidayInstancesWithDetailsQuery
@@ -20,6 +19,10 @@ import { titleStyle } from '../../styles/modalStyle';
 import CreateHolidayInstanceGroupModalComponent from './CreateHolidayInstanceGroupModalComponent';
 import HolidayInstanceGroupViewComponent from './HolidayInstanceGroupViewComponent';
 import { HolidayInstanceDetails } from '../../types/redux/holidays';
+import {
+	showErrorNotification,
+	showSuccessNotification
+} from '../../utils/notifications';
 
 const stableEmptyHolidayInstanceDetails: HolidayInstanceDetails[] = [];
 
@@ -29,7 +32,6 @@ const stableEmptyHolidayInstanceDetails: HolidayInstanceDetails[] = [];
  */
 export default function HolidayInstanceGroupComponent() {
 	const translate = useTranslate();
-	const [mutationError, setMutationError] = useState('');
 	const {
 		data: holidayInstances = stableEmptyHolidayInstanceDetails,
 		isLoading: holidayInstancesLoading,
@@ -49,12 +51,12 @@ export default function HolidayInstanceGroupComponent() {
 		holidayInstanceIds: number[],
 		note: string
 	) => {
-		setMutationError('');
 		try {
 			await addHolidayInstanceGroup({ name, holidayInstanceIds, note }).unwrap();
+			showSuccessNotification(translate('holiday.instance.group.create.success'));
 		} catch (error) {
-			setMutationError(
-				`${translate('holiday.instance.group.create.failure')}${JSON.stringify(error)}`
+			showErrorNotification(
+				`${translate('holiday.instance.group.create.failure')}`
 			);
 		}
 	};
@@ -65,7 +67,6 @@ export default function HolidayInstanceGroupComponent() {
 		holidayInstanceIds: number[],
 		note: string
 	) => {
-		setMutationError('');
 		try {
 			await editHolidayInstanceGroup({
 				id: holidayInstanceGroupId,
@@ -73,20 +74,21 @@ export default function HolidayInstanceGroupComponent() {
 				holidayInstanceIds,
 				note
 			}).unwrap();
+			showSuccessNotification(translate('holiday.instance.group.edit.success'));
 		} catch (error) {
-			setMutationError(
-				`${translate('holiday.instance.group.edit.failure')}${JSON.stringify(error)}`
+			showErrorNotification(
+				`${translate('holiday.instance.group.edit.failure')}`
 			);
 		}
 	};
 
 	const handleDeleteHolidayInstanceGroup = async (holidayInstanceGroupId: number) => {
-		setMutationError('');
 		try {
 			await deleteHolidayInstanceGroup({ id: holidayInstanceGroupId }).unwrap();
+			showSuccessNotification(translate('holiday.instance.group.delete.success'));
 		} catch (error) {
-			setMutationError(
-				`${translate('holiday.instance.group.delete.failure')}${JSON.stringify(error)}`
+			showErrorNotification(
+				`${translate('holiday.instance.group.delete.failure')}`
 			);
 		}
 	};
@@ -106,9 +108,6 @@ export default function HolidayInstanceGroupComponent() {
 					<div className='alert alert-danger' role='alert'>
 						<FormattedMessage id='holiday.instance.group.load.failure' />
 					</div>
-				)}
-				{mutationError && (
-					<div className='alert alert-danger' role='alert'>{mutationError}</div>
 				)}
 				<div className='edit-btn'>
 					<CreateHolidayInstanceGroupModalComponent
