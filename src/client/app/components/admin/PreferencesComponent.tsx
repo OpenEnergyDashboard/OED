@@ -326,7 +326,6 @@ export default function PreferencesComponent() {
 					type='number'
 					value={localAdminPref.defaultWarningFileSize}
 					onChange={e => makeLocalChanges('defaultWarningFileSize', Number(e.target.value))}
-					min='0'
 					max={Math.min(
 						Number(localAdminPref.defaultFileSizeLimit),
 						MAX_FILE_SIZE_LIMIT
@@ -335,20 +334,13 @@ export default function PreferencesComponent() {
 					invalid={invalidFuncs.warningFileSize()}
 				/>
 				<FormFeedback>
-					{Number(localAdminPref.defaultWarningFileSize) < 0 ? (
-						<FormattedMessage
-							id="error.greater"
-							values={{ min: 0 }}
-						/>
-					) : (
-						<FormattedMessage
-							id="error.bounds"
-							values={{
-								min: 0,
-								max: Number(localAdminPref.defaultFileSizeLimit)
-							}}
-						/>
-					)}
+					<FormattedMessage
+						id="error.bounds"
+						values={{
+							min: 0,
+							max: Number(localAdminPref.defaultFileSizeLimit)
+						}}
+					/>
 				</FormFeedback>
 			</div>
 			<div>
