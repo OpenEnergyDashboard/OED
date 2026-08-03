@@ -225,7 +225,7 @@ mocha.describe('Time-varying reading conversion boundaries', function () {
 		expect(flow[2].max_rate).to.be.closeTo(1443.75, DELTA);
 	});
 
-	mocha.it('emits raw points at every conversion boundary', async function () {
+	mocha.it('preserves raw meter-reading intervals with duration-weighted conversions', async function () {
 		const quantity = await conn.func('meter_line_readings_unit', [
 			[quantityMeterId], quantityGraphicUnitId, START, END, 'raw', 1440, 1440
 		]);
@@ -233,16 +233,21 @@ mocha.describe('Time-varying reading conversion boundaries', function () {
 			[flowMeterId], flowGraphicUnitId, START, END, 'raw', 1440, 1440
 		]);
 
-		expect(quantity).to.have.lengthOf(8);
-		expect(flow).to.have.lengthOf(9);
-		expectRate(quantity[1], 5.25);
-		expect(quantity[1].end_timestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal('2021-06-02 04:00:00');
-		expectRate(quantity[2], 8.75);
-		expect(quantity[2].start_timestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal('2021-06-02 04:00:00');
-		expectRate(flow[4], 937.5);
-		expect(flow[4].end_timestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal('2021-06-03 18:00:00');
-		expectRate(flow[5], 1312.5);
-		expect(flow[5].start_timestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal('2021-06-03 18:00:00');
+		expect(quantity).to.have.lengthOf(quantityReadings.length);
+		expect(flow).to.have.lengthOf(flowReadings.length);
+		[3, 7.58333333333333, 11.25, 16.5, 28, 45]
+			.forEach((expected, index) => expectRate(quantity[index], expected));
+		[180, 560, 806.25, 1031.25, 1443.75, 1680, 2700]
+			.forEach((expected, index) => expectRate(flow[index], expected));
+
+		quantity.forEach((row, index) => {
+			expect(row.start_timestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal(quantityReadings[index][1]);
+			expect(row.end_timestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal(quantityReadings[index][2]);
+		});
+		flow.forEach((row, index) => {
+			expect(row.start_timestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal(flowReadings[index][1]);
+			expect(row.end_timestamp.format('YYYY-MM-DD HH:mm:ss')).to.equal(flowReadings[index][2]);
+		});
 	});
 
 	mocha.it('keeps one-hour 3D results consistent with the hourly line', async function () {

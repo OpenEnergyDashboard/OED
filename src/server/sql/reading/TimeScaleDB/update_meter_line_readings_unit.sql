@@ -232,9 +232,10 @@ BEGIN
 	/*
 	 * RAW READINGS
 	 *
-	 * Apply time-varying conversions directly to raw readings. Emit one result
-	 * for every reading/conversion intersection so the line contains an exact
-	 * point boundary whenever the applicable cik_vary segment changes.
+	 * Apply time-varying conversions directly to raw readings while preserving
+	 * the original meter-reading interval. When multiple cik_vary segments
+	 * overlap one reading, duration-weight their converted rates into the one
+	 * raw point represented by that reading.
 	 */
 	raw_results AS (
 		SELECT
@@ -242,10 +243,21 @@ BEGIN
 			r.meter_id,
 			CASE
 				WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
-					c.slope * (r.reading / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600))
-						+ c.intercept
+					SUM(
+						(EXTRACT(EPOCH FROM (
+							upper(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
+							- lower(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
+						)) / 3600)
+						* (c.slope * (r.reading / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)) + c.intercept)
+					) / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)
 				WHEN u.unit_represent IN ('flow'::unit_represent_type, 'raw'::unit_represent_type) THEN
-					c.slope * (r.reading * 3600 / u.sec_in_rate) + c.intercept
+					SUM(
+						(EXTRACT(EPOCH FROM (
+							upper(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
+							- lower(tsrange(c.start_time, c.end_time, '()') * tsrange(r.start_timestamp, r.end_timestamp, '[]'))
+						)) / 3600)
+						* (c.slope * (r.reading * 3600 / u.sec_in_rate) + c.intercept)
+					) / (EXTRACT(EPOCH FROM (r.end_timestamp - r.start_timestamp)) / 3600)
 			END AS reading_rate,
 			/*
 			 * Raw meter data has no min/max range. NaN is converted to null by
@@ -253,8 +265,8 @@ BEGIN
 			 */
 			'NaN'::DOUBLE PRECISION AS min_rate,
 			'NaN'::DOUBLE PRECISION AS max_rate,
-			greatest(r.start_timestamp, c.start_time) AS start_timestamp,
-			least(r.end_timestamp, c.end_time) AS end_timestamp
+			r.start_timestamp,
+			r.end_timestamp
 		FROM meter_resolutions selected
 		INNER JOIN readings r ON r.meter_id = selected.meter_id
 		INNER JOIN units u ON u.id = selected.unit_id
@@ -270,6 +282,12 @@ BEGIN
 		WHERE selected.selected_accuracy = 'raw'::reading_line_accuracy
 			AND r.start_timestamp >= lower(selected.requested_range)
 			AND r.end_timestamp <= upper(selected.requested_range)
+		GROUP BY
+			selected.request_order,
+			r.meter_id,
+			r.start_timestamp,
+			r.end_timestamp,
+			u.unit_represent
 	),
 	/*
 	 * HOURLY READINGS
