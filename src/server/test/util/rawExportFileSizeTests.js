@@ -4,11 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const chai = require('chai');
-
-const expect = chai.expect;
-const mocha = require('mocha');
-
+const { chai, expect, mocha } = require('../common');
 const { estimateRawExportSizeMB } = require('../../../common/RawExportFileSize');
 
 mocha.describe('Raw Export File Size Estimator', () => {
