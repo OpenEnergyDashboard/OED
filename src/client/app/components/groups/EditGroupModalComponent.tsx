@@ -991,7 +991,14 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 * If not, then continue delete process.
 	 */
 	async function validateDelete() {
-		// Get all parent groups of this group.
+		/**
+		 * Gets all parent groups of this group since it is easy and this is not done often.
+		 * In principle, the Redux state for groups has this information. However, due to the
+		 * recursive nature of groups, it is a harder to get it from that state so the
+		 * code simply uses the existing server/DB functions to do this.
+		 * Redux does not always think the state has changed so it may use stale state, esp. after a delete.
+		 * Thus, the fetch is forced to avoid this.
+		 */
 		const { data: parentGroupIDs = [] } = await store.dispatch(
 			groupsApi.endpoints.getParentIDs.initiate(groupState.id, {
 				subscribe: false,
