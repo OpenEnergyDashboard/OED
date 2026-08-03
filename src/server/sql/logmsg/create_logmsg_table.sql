@@ -10,4 +10,7 @@ CREATE TABLE IF NOT EXISTS logmsg (
 	log_time TIMESTAMP NOT NULL
 );
 
--- TODO Consider index optimization for queries
+-- Log retrieval filters by type and a time range, orders by time, and applies
+-- a limit. Keep that path index-backed as the append-only log table grows.
+CREATE INDEX IF NOT EXISTS logmsg_time_type_idx
+ON logmsg (log_time, log_type);

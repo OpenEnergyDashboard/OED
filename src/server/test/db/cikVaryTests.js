@@ -10,6 +10,9 @@ const Conversion = require('../../models/Conversion');
 const Unit = require('../../models/Unit');
 const ConversionSegment = require('../../models/ConversionSegment');
 const CikVary = require('../../models/CikVary');
+const TimeScaleDBReading = require('../../models/TimeScaleDB/Reading');
+const refreshAllReadingViews = require('../../services/refreshAllReadingViews');
+const sinon = require('sinon');
 
 async function setupTestData(conn) {
 	await new Unit(undefined, 'Unit 10', 'Unit 10', Unit.unitRepresentType.QUANTITY, 1000, Unit.unitType.METER, '', Unit.displayableType.ADMIN, true, 'Note 10').insert(conn);
@@ -114,5 +117,77 @@ mocha.describe('redoCikVary integration', function () {
 		Object.entries(expectedSlopes).forEach(([key, slopes]) => {
 			expect(grouped[key]).to.deep.equal(slopes);
 		});
+	});
+
+	mocha.it('should require a reading aggregate rebuild after replacing cik_vary', async function () {
+		await redoCikVary(conn);
+
+		const state = await conn.one(`
+			SELECT rebuild_revision, completed_rebuild_revision
+			FROM reading_aggregate_state
+			WHERE id = 1
+		`);
+		expect(Number(state.rebuild_revision)).to.be.greaterThan(Number(state.completed_rebuild_revision));
+	});
+
+	mocha.it('should complete a pending rebuild during a default refresh', async function () {
+		await redoCikVary(conn);
+		await refreshAllReadingViews();
+
+		const state = await conn.one(`
+			SELECT rebuild_revision, completed_rebuild_revision
+			FROM reading_aggregate_state
+			WHERE id = 1
+		`);
+		expect(state.completed_rebuild_revision).to.equal(state.rebuild_revision);
+	});
+
+	mocha.it('should complete pending group cache maintenance during a default refresh', async function () {
+		await redoCikVary(conn);
+		await refreshAllReadingViews();
+
+		const state = await conn.one(`
+			SELECT group_cache_revision, completed_group_cache_revision
+			FROM reading_aggregate_state
+			WHERE id = 1
+		`);
+		expect(state.completed_group_cache_revision).to.equal(state.group_cache_revision);
+	});
+
+	mocha.it('should align hourly and daily refreshes to their own bucket boundaries', function () {
+		const startTimestamp = '2022-08-18 10:15:00';
+		const endTimestamp = '2022-08-18 11:45:00';
+		const hourlyRange = TimeScaleDBReading.getRefreshRange(startTimestamp, endTimestamp, 'hour');
+		const dailyRange = TimeScaleDBReading.getRefreshRange(startTimestamp, endTimestamp, 'day');
+
+		expect(hourlyRange.refreshStart.toISOString()).to.equal('2022-08-18T10:00:00.000Z');
+		expect(hourlyRange.refreshEnd.toISOString()).to.equal('2022-08-18T12:00:00.000Z');
+		expect(dailyRange.refreshStart.toISOString()).to.equal('2022-08-18T00:00:00.000Z');
+		expect(dailyRange.refreshEnd.toISOString()).to.equal('2022-08-19T00:00:00.000Z');
+	});
+
+	mocha.it('should require a rebuild after changing split-row unit metadata', async function () {
+		await conn.none(`
+			UPDATE units
+			SET sec_in_rate = sec_in_rate + 1
+			WHERE id = \${unitId}
+		`, { unitId: unit10Id });
+
+		const state = await conn.one(`
+			SELECT rebuild_revision, completed_rebuild_revision
+			FROM reading_aggregate_state
+			WHERE id = 1
+		`);
+		expect(Number(state.rebuild_revision)).to.be.greaterThan(Number(state.completed_rebuild_revision));
+	});
+
+	mocha.it('should not rebuild by default when split-row sources are current', async function () {
+		const rebuildSpy = sinon.spy(TimeScaleDBReading, 'rebuildReadings');
+		try {
+			await refreshAllReadingViews();
+			expect(rebuildSpy.called).to.equal(false);
+		} finally {
+			rebuildSpy.restore();
+		}
 	});
 });

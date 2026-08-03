@@ -9,6 +9,10 @@ const log = require('../log');
 
 const sqlFile = database.sqlFile;
 
+// Keep each statement bounded so large CSV and meter imports avoid both
+// per-reading round trips and excessively large PostgreSQL query parameters.
+const READING_INSERT_BATCH_SIZE = 1000;
+
 class Reading {
 	/**
 	 * Creates a new reading
@@ -34,18 +38,17 @@ class Reading {
 	}
 
 	/**
-	 * Returns a promise to create the function and materialized views that aggregate
-	 * readings by various time intervals.
-	 * @param conn the database connection to use
-	 * @returns {Promise<void>}
+	 * @deprecated Retained for the legacy PostgreSQL materialized-view schema.
 	 */
+	// TODO: Research whether deployments or external scripts still invoke the
+	// legacy schema helpers below. Their in-repository setup calls are commented
+	// out; remove the helpers and legacy SQL once TimescaleDB is the only schema.
 	static createReadingsMaterializedViews(conn) {
 		return conn.none(sqlFile('reading/create_reading_views.sql'));
 	}
 
 	/**
-	 * Returns a promise to create the compare function
-	 * @param conn the database connection to use
+	 * @deprecated Retained for the legacy PostgreSQL materialized-view schema.
 	 */
 	static createCompareReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_compare_readings.sql'));
@@ -62,63 +65,56 @@ class Reading {
 	}
 
 	/**
-	 * Returns a promise to create the 3D readings function
-	 * @param conn the database connection to use
+	 * @deprecated Retained for the legacy PostgreSQL materialized-view schema.
 	 */
 	static create3DReadingsFunction(conn) {
 		return conn.none(sqlFile('reading/create_function_get_3d_readings.sql'));
 	}
 
 	/**
-	 * Refreshes the hourly readings view.
-	 * Should be called at least once a day but need to do hourly if the site wants zooming in
-	 * to see hourly data as it is available. This function can take more time than refreshing
-	 * the daily readings so be sure calling it more frequently does not impact the
-	 * server response time. If only called once a day, then probably best to do so in the middle
-	 * of the night as suggested for daily refresh.
-	 * @param conn The connection to use
-	 * @returns {Promise<void>}
+	 * @deprecated Use TimeScaleDBReading.refreshReadings().
 	 */
 	static refreshHourlyReadings(conn) {
-		// This can't be a function because you can't call REFRESH inside a function
-		// TODO This will be removed once we completely transition to the unit version.
-		return conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
+		// TODO: Remove the retained legacy implementation once the hypertable implementation is finalized:
+		// return conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
+		// Required lazily to avoid a circular dependency through database.js.
+		// eslint-disable-next-line global-require
+		return require('./TimeScaleDB/Reading').refreshMeterHourlyReadings(conn);
 	}
 
 	/**
-	 * Refreshes the daily readings view.
-	 * Should be called at least once a day, preferably in the middle of the night.
-	 * @param conn The connection to use
-	 * @returns {Promise<void>}
+	 * @deprecated Use TimeScaleDBReading.refreshReadings().
 	 */
 	static refreshDailyReadings(conn) {
-		// This can't be a function because you can't call REFRESH inside a function
-		return conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
+		// TODO: Remove the retained legacy implementation once the hypertable implementation is finalized:
+		// return conn.none('REFRESH MATERIALIZED VIEW meter_daily_readings_unit');
+		// Required lazily to avoid a circular dependency through database.js.
+		// eslint-disable-next-line global-require
+		return require('./TimeScaleDB/Reading').refreshMeterDailyReadings(conn);
 	}
-	
+
 	/**
-	 * Refreshes meter readings views.
-	 * Should be called at least once a day, preferably in the middle of the night.
-	 * @param conn The connection to use
-	 * @returns {Promise<void>}
+	 * @deprecated Use TimeScaleDBReading.refreshReadings().
 	 */
-	static async refreshMeterReadingsViews(conn) {
-		await conn.none('REFRESH MATERIALIZED VIEW hourly_readings_unit');
-		await conn.none('REFRESH MATERIALIZED VIEW daily_readings_unit');
+	static refreshMeterReadingsViews(conn) {
+		// TODO: Remove the retained legacy refreshes once the hypertable implementation is finalized:
+		// await conn.none('REFRESH MATERIALIZED VIEW meter_hourly_readings_unit');
+		// await conn.none('REFRESH MATERIALIZED VIEW meter_daily_readings_unit');
+		// Required lazily to avoid a circular dependency through database.js.
+		// eslint-disable-next-line global-require
+		return require('./TimeScaleDB/Reading').refreshMeterReadings(conn);
 	}
 
-
 	/**
-	 * Refreshes group readings views.
-	 * Should be called at least once a day, preferably in the middle of the night.
-	 * @param conn The connection to use
-	 * @returns {Promise<void>}
+	 * @deprecated Use TimeScaleDBReading.refreshReadings().
 	 */
 	static refreshGroupReadingsViews(conn) {
-		// It is safe to refresh the hourly and daily group views in parallel since they
-		// do not depend one each other unlike meters.
-		return Promise.all([conn.none('REFRESH MATERIALIZED VIEW group_hourly_readings_unit'),
-			conn.none('REFRESH MATERIALIZED VIEW group_daily_readings_unit')]);
+		// TODO: Remove the retained legacy refreshes once the hypertable implementation is finalized:
+		// return Promise.all([conn.none('REFRESH MATERIALIZED VIEW group_hourly_readings_unit'),
+		// 	conn.none('REFRESH MATERIALIZED VIEW group_daily_readings_unit')]);
+		// Required lazily to avoid a circular dependency through database.js.
+		// eslint-disable-next-line global-require
+		return require('./TimeScaleDB/Reading').refreshGroupReadings(conn);
 	}
 
 	/**
@@ -157,10 +153,7 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertAll(readings, conn) {
-		return conn.tx(t => t.sequence(function seq(i) {
-			const seqT = this;
-			return readings[i] && readings[i].insert(seqT);
-		}));
+		return Reading.insertInBatches(readings, conn);
 	}
 
 	/**
@@ -170,10 +163,32 @@ class Reading {
 	 * @returns {Promise.<>}
 	 */
 	static insertOrUpdateAll(readings, conn) {
-		return conn.tx(t => t.sequence(function seq(i) {
-			const seqT = this;
-			return readings[i] && readings[i].insertOrUpdate(seqT);
-		}));
+		/*
+		 * Sequential upserts kept the first end timestamp but applied the last
+		 * reading value when an input batch repeated a meter/start key. Collapse
+		 * those duplicates before the set-based insert to preserve that behavior
+		 * and avoid PostgreSQL updating the same row twice in one statement.
+		 */
+		const readingsByKey = new Map();
+		for (const reading of readings) {
+			const key = `${reading.meterID}:${reading.startTimestamp.valueOf()}`;
+			const firstReading = readingsByKey.get(key);
+			if (firstReading === undefined) {
+				readingsByKey.set(key, reading);
+			} else {
+				readingsByKey.set(key, new Reading(
+					firstReading.meterID,
+					reading.reading,
+					firstReading.startTimestamp,
+					firstReading.endTimestamp
+				));
+			}
+		}
+		return Reading.insertInBatches(
+			Array.from(readingsByKey.values()),
+			conn,
+			'ON CONFLICT (meter_id, start_timestamp) DO UPDATE SET reading = EXCLUDED.reading'
+		);
 	}
 
 	/**
@@ -183,10 +198,53 @@ class Reading {
 	 * @returns {Promise<any>}
 	 */
 	static insertOrIgnoreAll(readings, conn) {
-		return conn.tx(t => t.sequence(function seq(i) {
-			const seqT = this;
-			return readings[i] && readings[i].insertOrIgnore(seqT);
-		}));
+		return Reading.insertInBatches(
+			readings,
+			conn,
+			'ON CONFLICT (meter_id, start_timestamp) DO NOTHING'
+		);
+	}
+
+	/**
+	 * Inserts readings in set-based batches within one transaction.
+	 * @param {array<Reading>} readings the readings to insert
+	 * @param conn the connection to use
+	 * @param {string} conflictClause fixed conflict behavior for the caller
+	 * @returns {Promise<void>}
+	 */
+	static insertInBatches(readings, conn, conflictClause = '') {
+		return conn.tx(async t => {
+			for (let offset = 0; offset < readings.length; offset += READING_INSERT_BATCH_SIZE) {
+				const batch = readings.slice(offset, offset + READING_INSERT_BATCH_SIZE);
+				/*
+				 * jsonb_to_recordset turns each chunk into typed rows inside
+				 * PostgreSQL, replacing one application/database round trip per
+				 * reading while still firing the existing maintenance trigger.
+				 */
+				await t.none(`
+					INSERT INTO readings (meter_id, reading, start_timestamp, end_timestamp)
+					SELECT
+						input.meter_id,
+						input.reading,
+						input.start_timestamp,
+						input.end_timestamp
+					FROM jsonb_to_recordset(\${readings:json}::jsonb) AS input(
+						meter_id INTEGER,
+						reading FLOAT,
+						start_timestamp TIMESTAMP,
+						end_timestamp TIMESTAMP
+					)
+					${conflictClause}
+				`, {
+					readings: batch.map(reading => ({
+						meter_id: reading.meterID,
+						reading: reading.reading,
+						start_timestamp: reading.startTimestamp,
+						end_timestamp: reading.endTimestamp
+					}))
+				});
+			}
+		});
 	}
 
 	/**
@@ -201,6 +259,23 @@ class Reading {
 			endDate: endDate
 		});
 		return parseInt(row[0].count);
+	}
+
+	/**
+	 * Returns the total number of readings for all supplied meters in one query.
+	 * @param {number[]} meterIDs meter IDs whose readings should be counted
+	 * @param startDate inclusive reading start bound
+	 * @param endDate inclusive reading end bound
+	 * @param conn the connection to use
+	 * @returns {number}
+	 */
+	static async getCountByMeterIDsAndDateRange(meterIDs, startDate, endDate, conn) {
+		const { count } = await conn.one(sqlFile('reading/get_count_by_meter_ids_and_date_range.sql'), {
+			meterIDs,
+			startDate,
+			endDate
+		});
+		return parseInt(count);
 	}
 
 	/**

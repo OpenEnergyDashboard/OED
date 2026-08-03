@@ -6,7 +6,8 @@ const { createSchema } = require('../models/database');
 const { log } = require('../log');
 const { getConnection } = require('../db');
 const { insertStandardUnits, insertStandardConversions } = require('../util/insertData');
-const { redoCik } = require('../services/graph/redoCik');
+const { redoCikVary } = require('../services/graph/redoCik');
+const refreshAllReadingViews = require('./refreshAllReadingViews');
 
 (async function createSchemaWrapper() {
 	const conn = getConnection();
@@ -14,7 +15,11 @@ const { redoCik } = require('../services/graph/redoCik');
 		await createSchema(conn);
 		await insertStandardUnits(conn);
 		await insertStandardConversions(conn);
-		await redoCik(conn);
+		await redoCikVary(conn);
+		// redoCikVary replaces conversion metadata atomically and marks the
+		// denormalized hourly split table stale. Rebuild it before the server is
+		// allowed to start so a restart cannot serve aggregates using old slopes.
+		await refreshAllReadingViews();
 		log.info('Schema created', null, true);
 		process.exitCode = 0;
 	} catch (err) {

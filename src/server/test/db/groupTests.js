@@ -197,6 +197,22 @@ mocha.describe('Groups', () => {
 			expect(meters).to.deep.equal([lovedMeter.id]);
 		});
 
+		mocha.it('removes disowned meters from the deep meter cache', async () => {
+			conn = testDB.getConnection();
+			const parent = await Group.getByName('GA', conn);
+			const lovedMeter = await Meter.getByName('MA', conn);
+			const impendingOrphan = await Meter.getByName('MB', conn);
+
+			await parent.adoptMeter(lovedMeter.id, conn);
+			await parent.adoptMeter(impendingOrphan.id, conn);
+			await refreshGroupsDeepMetersView();
+			await parent.disownMeter(impendingOrphan.id, conn);
+			await refreshGroupsDeepMetersView();
+
+			const deepMeters = await Group.getDeepMetersByGroupID(parent.id, conn);
+			expect(deepMeters).to.deep.equal([lovedMeter.id]);
+		});
+
 		mocha.it('can be deleted', async () => {
 			conn = testDB.getConnection();
 			const unwanted = await Group.getByName('GA', conn);

@@ -12,16 +12,14 @@ const { log } = require('../log');
  * @param dataReader {function} A function to fetch readings from each meter
  * @param metersToUpdate [Meter] An array of meters to be updated
  * @param conn the database connection to use
- * @returns {Promise.<void>}
+ * @returns {Promise<Array>} successful results returned by the data readers
  */
 async function updateAllMeters(dataReader, metersToUpdate, conn) {
 	log.info(`Getting meter data`);
 	try {
 		// Do all the network requests in parallel and log errors.
-		// Ignoring that loadArrayInput is called in this sequence and returns values
-		// since this is only called by an automated process at this time.
 		// Issues from the pipeline will be logged by called functions.
-		await Promise.all(
+		const results = await Promise.all(
 			metersToUpdate
 				.map(meter => dataReader(meter, conn))
 				.map(p => p.catch(err => {
@@ -33,8 +31,12 @@ async function updateAllMeters(dataReader, metersToUpdate, conn) {
 					return null;
 				})));
 		log.info('Update finished');
+		// Preserve each successful reader's metadata, such as its imported time
+		// range, while retaining the existing per-meter failure isolation.
+		return results.filter(result => result !== null);
 	} catch (err) {
 		log.error(`Error updating all meters: ${err}`, err);
+		return [];
 	}
 }
 

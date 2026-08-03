@@ -59,7 +59,15 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readin
 					'\n and the pipeline returned these messages: ' + msgTotal;
 			})
 	}
-	return { isAllReadingsOk, msgTotal };
+	const readingRange = readingsToInsert.length === 0 ? {} : {
+		startTimestamp: readingsToInsert.reduce((earliest, reading) =>
+			reading.startTimestamp.isBefore(earliest) ? reading.startTimestamp : earliest,
+		readingsToInsert[0].startTimestamp),
+		endTimestamp: readingsToInsert.reduce((latest, reading) =>
+			reading.endTimestamp.isAfter(latest) ? reading.endTimestamp : latest,
+		readingsToInsert[0].endTimestamp)
+	};
+	return { isAllReadingsOk, msgTotal, ...readingRange };
 }
 
 module.exports = loadArrayInput;

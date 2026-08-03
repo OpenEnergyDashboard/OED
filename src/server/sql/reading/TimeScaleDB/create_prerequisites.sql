@@ -1,0 +1,416 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+ 
+ /*
+ * Prefrace:
+ * 	 This script continues the work introduced in PR#1546, which established the
+ * 	 benchmark for migrating hourly meter reading queries from PostgreSQL
+ * 	 materialized views to TimescaleDB hypertables and continuous aggregates.
+ *
+ * 	 Only the database objects required from PR#1546 were carried forward and
+ * 	 adapted to integrate TimescaleDB continuous aggregates with the existing
+ * 	 hourly meter reading workflow in the timeVary branch.
+ *
+ * Purpose:
+ *
+ *   Create the TimescaleDB infrastructure required by the hourly and daily
+ *   continuous aggregates.
+ *
+ * This script creates:
+ *
+ *   1. hypertable_hourly_split
+ *   2. TimescaleDB hypertable
+ *   3. Supporting indexes
+ *   4. Trigger function to maintain the hypertable
+ *   5. Trigger on readings
+ *   6. Rebuild function
+ *
+ * Data flow:
+ *
+ *   readings
+ *       │
+ *       ▼
+ *   hypertable_hourly_split
+ *
+ * Notes:
+ *
+ *   - This script does not create any continuous aggregates.
+ *   - The trigger maintains the hypertable as readings are inserted,
+ *     updated, or deleted.
+ *   - The rebuild function allows the hypertable to be regenerated from
+ *     readings when required (for example after rebuilding cik_vary).
+ */
+
+ /*
+ * 1. Create hypertable_hourly_split.
+ *
+ * Stores readings after they have been split at both hourly and conversion
+ * boundaries. A single row in readings may produce multiple rows when it
+ * crosses an hour boundary, a cik_vary boundary, or both.
+ *
+ * Conversion information from cik_vary is stored with each hourly slice so
+ * downstream aggregation does not need to join back to cik_vary.
+ *
+ * Columns:
+ *
+ *   reading:
+ *       Reading contribution scaled by the overlap duration within this hour.
+ *
+ *   slope/intercept/graphic_unit_id:
+ *       Conversion parameters required to convert the reading into the target
+ *       graphic unit that was valid at the time of the reading.
+ *
+ *   unit_represent/sec_in_rate:
+ *       Original unit metadata required to correctly aggregate quantity, flow,
+ *       and raw readings.
+ */
+CREATE TABLE IF NOT EXISTS hypertable_hourly_split (
+    meter_id INTEGER NOT NULL,
+    reading FLOAT NOT NULL,
+    start_timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    end_timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+    unit_represent unit_represent_type NOT NULL,
+    sec_in_rate FLOAT NOT NULL,
+    slope FLOAT NOT NULL,
+    intercept FLOAT NOT NULL,
+    graphic_unit_id INTEGER NOT NULL
+);
+
+-- All four aggregates use materialized_only=false, meaning queries can reach unmaterialized split rows.
+CREATE INDEX IF NOT EXISTS hypertable_hourly_split_meter_graphic_time_idx
+ON hypertable_hourly_split
+    (meter_id, graphic_unit_id, start_timestamp DESC);
+
+-- row trigger searches cik_vary by source_id and an overlapping time range
+CREATE INDEX IF NOT EXISTS cik_vary_source_time_idx
+ON cik_vary (source_id, start_time, end_time);
+
+
+/*
+ * 2. Convert hypertable_hourly_split into a TimescaleDB hypertable.
+ *
+ * start_timestamp is used as the time dimension because hourly slices are
+ * primarily queried and aggregated by time range.
+ */
+SELECT create_hypertable(
+    'hypertable_hourly_split',
+     by_range('start_timestamp'),
+    if_not_exists => TRUE
+);
+
+
+/*
+ * 3. Enforce uniqueness of hourly slices.
+ *
+ * The unique index prevents duplicate hourly slices for the same meter and
+ * time range and supports efficient maintenance operations.
+ * This index also improves lookup performance when synchronizing changed
+ * readings.
+ */
+CREATE UNIQUE INDEX IF NOT EXISTS hypertable_hourly_split_meter_time_idx
+ON hypertable_hourly_split
+(
+    meter_id,
+    start_timestamp,
+    end_timestamp,
+    graphic_unit_id,
+    slope,
+    intercept
+);
+
+/*
+ * Track source changes that require rebuilding hypertable_hourly_split.
+ *
+ * A revision counter is used instead of a boolean so a source change that
+ * commits while a rebuild is running cannot be accidentally cleared. The
+ * refresher only records the revision that it actually rebuilt.
+ */
+CREATE TABLE IF NOT EXISTS reading_aggregate_state (
+    id SMALLINT PRIMARY KEY CHECK (id = 1),
+    rebuild_revision BIGINT NOT NULL DEFAULT 0,
+    completed_rebuild_revision BIGINT NOT NULL DEFAULT 0,
+    group_cache_revision BIGINT NOT NULL DEFAULT 0,
+    completed_group_cache_revision BIGINT NOT NULL DEFAULT 0
+);
+
+-- Keep this prerequisite script rerunnable against databases that created the
+-- state table before group-cache revision tracking was added.
+ALTER TABLE reading_aggregate_state
+ADD COLUMN IF NOT EXISTS group_cache_revision BIGINT NOT NULL DEFAULT 0;
+
+ALTER TABLE reading_aggregate_state
+ADD COLUMN IF NOT EXISTS completed_group_cache_revision BIGINT NOT NULL DEFAULT 0;
+
+INSERT INTO reading_aggregate_state (id)
+VALUES (1)
+ON CONFLICT (id) DO NOTHING;
+
+/*
+ * Unit metadata is copied into hypertable_hourly_split. Mark existing split
+ * rows stale when a meter changes units or relevant unit metadata changes.
+ */
+CREATE OR REPLACE FUNCTION mark_reading_aggregate_rebuild_required()
+RETURNS trigger
+AS $$
+BEGIN
+    UPDATE reading_aggregate_state
+    SET rebuild_revision = rebuild_revision + 1
+    WHERE id = 1;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_meter_unit_requires_reading_rebuild
+ON meters;
+
+CREATE TRIGGER trigger_meter_unit_requires_reading_rebuild
+AFTER UPDATE OF unit_id
+ON meters
+FOR EACH ROW
+WHEN (OLD.unit_id IS DISTINCT FROM NEW.unit_id)
+EXECUTE FUNCTION mark_reading_aggregate_rebuild_required();
+
+/*
+ * Group membership, meter units, and conversion paths determine the contents
+ * of the two group dependency caches. Track those changes independently from
+ * reading imports so normal aggregate refreshes can skip cache maintenance.
+ */
+CREATE OR REPLACE FUNCTION mark_group_reading_cache_refresh_required()
+RETURNS trigger
+AS $$
+BEGIN
+    UPDATE reading_aggregate_state
+    SET group_cache_revision = group_cache_revision + 1
+    WHERE id = 1;
+
+    RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trigger_meter_unit_requires_group_cache_refresh
+ON meters;
+
+CREATE TRIGGER trigger_meter_unit_requires_group_cache_refresh
+AFTER UPDATE OF unit_id
+ON meters
+FOR EACH ROW
+WHEN (OLD.unit_id IS DISTINCT FROM NEW.unit_id)
+EXECUTE FUNCTION mark_group_reading_cache_refresh_required();
+
+-- Group hierarchy changes affect inherited meter membership.
+DROP TRIGGER IF EXISTS trigger_group_children_require_group_cache_refresh
+ON groups_immediate_children;
+
+CREATE TRIGGER trigger_group_children_require_group_cache_refresh
+AFTER INSERT OR UPDATE OR DELETE
+ON groups_immediate_children
+FOR EACH STATEMENT
+EXECUTE FUNCTION mark_group_reading_cache_refresh_required();
+
+-- Direct group-meter changes affect both group dependency caches.
+DROP TRIGGER IF EXISTS trigger_group_meters_require_group_cache_refresh
+ON groups_immediate_meters;
+
+CREATE TRIGGER trigger_group_meters_require_group_cache_refresh
+AFTER INSERT OR UPDATE OR DELETE
+ON groups_immediate_meters
+FOR EACH STATEMENT
+EXECUTE FUNCTION mark_group_reading_cache_refresh_required();
+
+DROP TRIGGER IF EXISTS trigger_unit_metadata_requires_reading_rebuild
+ON units;
+
+CREATE TRIGGER trigger_unit_metadata_requires_reading_rebuild
+AFTER UPDATE OF unit_represent, sec_in_rate
+ON units
+FOR EACH ROW
+WHEN (
+    OLD.unit_represent IS DISTINCT FROM NEW.unit_represent
+    OR OLD.sec_in_rate IS DISTINCT FROM NEW.sec_in_rate
+)
+EXECUTE FUNCTION mark_reading_aggregate_rebuild_required();
+
+
+/*
+ * 4. Maintain hypertable_hourly_split from changes in readings.
+ *
+ * This trigger function maintains only the hourly slices associated with the
+ * reading affected by the trigger event.
+ *
+ * INSERT:
+ *     Generate hourly slices for the new reading.
+ *
+ * UPDATE:
+ *     Recalculate hourly slices for the updated reading.
+ *
+ * DELETE:
+ *     Remove hourly slices generated from the deleted reading.
+ */
+CREATE OR REPLACE FUNCTION update_hourly_hypertable()
+RETURNS trigger
+AS $$
+BEGIN
+
+    /*
+     * DELETE removes all hourly slices generated from the deleted reading.
+     */
+    IF TG_OP = 'DELETE' THEN
+
+        DELETE FROM hypertable_hourly_split
+        WHERE meter_id = OLD.meter_id
+          AND start_timestamp >= OLD.start_timestamp
+          AND end_timestamp <= OLD.end_timestamp;
+
+        RETURN OLD;
+
+    END IF;
+
+
+    /*
+     * UPDATE may change the reading duration or hour boundaries.
+     * Remove the hourly slices generated from the previous version
+     * of the reading before rebuilding them from NEW.
+     */
+    IF TG_OP = 'UPDATE' THEN
+
+        DELETE FROM hypertable_hourly_split
+        WHERE meter_id = OLD.meter_id
+          AND start_timestamp >= OLD.start_timestamp
+          AND end_timestamp <= OLD.end_timestamp;
+
+    END IF;
+
+	INSERT INTO hypertable_hourly_split(meter_id, reading, start_timestamp, end_timestamp, unit_represent, sec_in_rate, slope, intercept, graphic_unit_id)
+	SELECT
+		NEW.meter_id,
+		CASE
+			WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+				(NEW.reading * 3600 / extract(EPOCH FROM (NEW.end_timestamp - NEW.start_timestamp)))
+					* extract(EPOCH FROM (slice.end_timestamp - slice.start_timestamp))
+			WHEN u.unit_represent IN ('flow'::unit_represent_type, 'raw'::unit_represent_type ) THEN 
+				(NEW.reading * 3600 / u.sec_in_rate)
+					* extract(EPOCH FROM (slice.end_timestamp - slice.start_timestamp))
+		END AS reading,
+		slice.start_timestamp,
+		slice.end_timestamp,
+		u.unit_represent,
+		u.sec_in_rate,
+		c.slope,
+		c.intercept,
+		c.destination_id AS graphic_unit_id
+	FROM meters m INNER JOIN 
+		 units u ON m.unit_id = u.id INNER JOIN 
+		 cik_vary c ON c.source_id = m.unit_id
+			AND c.start_time < NEW.end_timestamp
+			AND c.end_time > NEW.start_timestamp CROSS JOIN
+		 LATERAL generate_series(date_trunc('hour', NEW.start_timestamp), date_trunc_up('hour', NEW.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start) CROSS JOIN
+		 LATERAL (
+			SELECT
+				greatest(NEW.start_timestamp, gen.interval_start, c.start_time) AS start_timestamp,
+				least(NEW.end_timestamp, gen.interval_start + INTERVAL '1 hour', c.end_time) AS end_timestamp
+		 ) slice
+	WHERE m.id = NEW.meter_id
+	  AND slice.start_timestamp < slice.end_timestamp;
+    RETURN NEW;
+
+END;
+$$ LANGUAGE plpgsql;
+
+/*
+ * 5. Recreate the readings trigger.
+ *
+ * PostgreSQL does not support CREATE TRIGGER IF NOT EXISTS, so the existing
+ * trigger is removed first to make this script safe to rerun during development
+ * and deployment.
+ */
+DROP TRIGGER IF EXISTS trigger_readings_update_hourly_hypertable
+ON readings;
+
+
+/*
+ * 6. Create trigger to maintain hypertable_hourly_split.
+ *
+ * The trigger fires after changes are committed to readings so the trigger
+ * function can query the updated source row when generating hourly slices.
+ *
+ * This trigger maintains the source data used by TimescaleDB continuous
+ * aggregates.
+ *
+ * TimescaleDB continuous aggregates do not refresh immediately from this
+ * trigger. They track affected time ranges through invalidation and are
+ * refreshed separately using:
+ *
+ *     refresh_continuous_aggregate()
+ *
+ *     or a continuous aggregate refresh policy.
+ *
+ * Events:
+ *
+ *   INSERT:
+ *       Creates hourly split records for the new reading.
+ *
+ *   UPDATE:
+ *       Removes old hourly split records and recreates them from the
+ *       modified reading.
+ *
+ *   DELETE:
+ *       Removes hourly split records generated from the deleted reading.
+ */
+CREATE TRIGGER trigger_readings_update_hourly_hypertable
+AFTER INSERT OR UPDATE OR DELETE
+ON readings
+FOR EACH ROW
+EXECUTE FUNCTION update_hourly_hypertable();
+
+
+/*
+ * Rebuild hypertable_hourly_split from the current readings and cik_vary rows.
+ *
+ * This is needed after cik_vary is regenerated because the trigger stores the
+ * conversion metadata that exists at reading insert time. If readings were
+ * inserted before redoCikVary ran, or if conversion segments changed, the split
+ * rows must be rebuilt from the current conversion table before the continuous
+ * aggregate is refreshed.
+ */
+CREATE OR REPLACE FUNCTION rebuild_hourly_hypertable_split()
+RETURNS void
+AS $$
+BEGIN
+	DELETE FROM hypertable_hourly_split;
+
+	INSERT INTO hypertable_hourly_split(meter_id, reading, start_timestamp, end_timestamp, unit_represent, sec_in_rate, slope, intercept, graphic_unit_id)
+	SELECT
+		r.meter_id,
+		CASE
+			WHEN u.unit_represent = 'quantity'::unit_represent_type THEN
+				(r.reading * 3600 / extract(EPOCH FROM(r.end_timestamp - r.start_timestamp)))
+					* extract(EPOCH FROM (slice.end_timestamp - slice.start_timestamp))
+			WHEN u.unit_represent IN('flow'::unit_represent_type, 'raw'::unit_represent_type) THEN 
+				(r.reading * 3600 / u.sec_in_rate)
+					* extract(EPOCH FROM (slice.end_timestamp - slice.start_timestamp))
+		END AS reading,
+		slice.start_timestamp,
+		slice.end_timestamp,
+		u.unit_represent,
+		u.sec_in_rate,
+		c.slope,
+		c.intercept,
+		c.destination_id AS graphic_unit_id
+	FROM readings r INNER JOIN 
+		 meters m ON r.meter_id = m.id INNER JOIN 
+		 units u ON m.unit_id = u.id INNER JOIN 
+		 cik_vary c ON c.source_id = m.unit_id
+			AND c.start_time < r.end_timestamp
+			AND c.end_time > r.start_timestamp CROSS JOIN
+		 LATERAL generate_series(date_trunc('hour', r.start_timestamp), date_trunc_up('hour', r.end_timestamp) - INTERVAL '1 hour', INTERVAL '1 hour') gen(interval_start) CROSS JOIN
+		 LATERAL (
+			SELECT
+				greatest(r.start_timestamp, gen.interval_start, c.start_time) AS start_timestamp,
+				least(r.end_timestamp, gen.interval_start + INTERVAL '1 hour', c.end_time) AS end_timestamp
+		 ) slice
+	WHERE slice.start_timestamp < slice.end_timestamp;
+END;
+$$ LANGUAGE plpgsql;

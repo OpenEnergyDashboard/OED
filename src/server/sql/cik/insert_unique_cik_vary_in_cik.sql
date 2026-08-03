@@ -4,5 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
--- Remove all current values from the cik table.
-DELETE FROM cik;
+-- Put each unique source + destination in cik_vary into cik.
+INSERT INTO cik (source_id, destination_id)
+SELECT DISTINCT source_id, destination_id
+FROM cik_vary
+;

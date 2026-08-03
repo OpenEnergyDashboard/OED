@@ -21,7 +21,7 @@ const saveCsv = require('../services/csvPipeline/saveCsv');
 const uploadMeters = require('../services/csvPipeline/uploadMeters');
 const uploadReadings = require('../services/csvPipeline/uploadReadings');
 const zlib = require('zlib');
-const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const refreshAllReadingViews = require('../services/refreshAllReadingViews');
 const { success, failure } = require('../services/csvPipeline/success');
 
 /** Middleware validation */
@@ -159,6 +159,8 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	let csvFilepath;
 	let isAllReadingsOk;
 	let msgTotal;
+	let startTimestamp;
+	let endTimestamp;
 	try {
 		log.info(`The uploaded file ${uploadedFilepath} was created to upload readings csv data`);
 		let fileBuffer = await fs.readFile(uploadedFilepath);
@@ -174,10 +176,17 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 			csvFilepath = uploadedFilepath;
 		}
 		const conn = getConnection();
-		({ isAllReadingsOk, msgTotal } = await uploadReadings(req, res, csvFilepath, conn));
+		({ isAllReadingsOk, msgTotal, startTimestamp, endTimestamp } = await uploadReadings(req, res, csvFilepath, conn));
 		if (isRefreshReadings) {
 			// Refresh readings so show when daily data is used.
-			await refreshAllReadingViews();
+			// can also not provide the startTimestamp and endTimestamp to refresh all readings.
+			// The idea of including the startTimestamp and endTimestamp is to refresh only the readings 
+			// that were just inserted or updated. However, if the user does not provide these timestamps, 
+			// then the refresh will take longer to complete for dataset that contains large number of buckets
+			// as all the bucket will be checked for update bit.
+			await refreshAllReadingViews(startTimestamp && endTimestamp
+				? { startTimestamp, endTimestamp, rebuild: false }
+				: undefined);
 		}
 	} catch (error) {
 		failure(req, res, error);

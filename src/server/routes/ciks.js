@@ -15,8 +15,6 @@ function formatCikForResponse(item) {
   return {
     meterUnitId: item.meterUnitId,
     nonMeterUnitId: item.nonMeterUnitId,
-    slope: item.slope,
-    intercept: item.intercept
   }
 }
 

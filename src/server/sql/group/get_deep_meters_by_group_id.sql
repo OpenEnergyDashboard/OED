@@ -4,5 +4,5 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 SELECT meter_id
-FROM groups_deep_meters
+FROM groups_deep_meters_cache
 WHERE group_id = ${id}

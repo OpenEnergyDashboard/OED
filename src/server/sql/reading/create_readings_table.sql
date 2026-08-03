@@ -11,3 +11,7 @@ CREATE TABLE IF NOT EXISTS readings (
 	CHECK (start_timestamp < readings.end_timestamp),
   PRIMARY KEY (meter_id, start_timestamp)
 );
+
+-- Supports indexed lookup of the latest reading end for each meter.
+CREATE INDEX IF NOT EXISTS readings_meter_end_timestamp_idx
+ON readings (meter_id, end_timestamp DESC);

@@ -4,29 +4,24 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { log } = require('../log');
+const refreshAllReadingViews = require('./refreshAllReadingViews');
 
-const { getConnection } = require('../db');
-const Reading = require('../models/Reading');
-
-// While the name of this function is refreshReadingViews, the purpose
-// of this function is to refresh the materialized daily views.
-// To make changes in refreshing all reading views, modify
-// /src/services/refreshAllReadingViews.js.
-/**
- * Refreshes daily view.
- */
+// TODO: Remove this retained legacy implementation once the hypertable
+// implementation is finalized.
+// const { log } = require('../log');
+// const { getConnection } = require('../db');
+// const Reading = require('../models/Reading');
 
 /** 
 * @deprecated OED only supports refreshing all views so please use refreshAllReadingViews.
 * See src/server/services/refreshAllReadingViews.js
 */
 async function refreshReadingViews() {
-	const conn = getConnection();
-
-	log.info('Refreshing Materialized Daily Reading Views');
-	await Reading.refreshDailyReadings(conn);
-	log.info('Daily View Refreshed');
+	// const conn = getConnection();
+	// log.info('Refreshing Materialized Daily Reading Views');
+	// await Reading.refreshDailyReadings(conn);
+	// log.info('Daily View Refreshed');
+	await refreshAllReadingViews();
 }
 
 module.exports = { refreshReadingViews };

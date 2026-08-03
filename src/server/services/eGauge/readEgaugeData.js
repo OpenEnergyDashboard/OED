@@ -19,8 +19,9 @@ async function readEgaugeData(meter, conn) {
 	const meterReadings = await requestor.getMeterReadings();
 	await requestor.logout()
 
-	// Store the readings in the database.
-	await loadArrayInput(dataRows = meterReadings,
+	// Store the readings and return the accepted time range so the caller can
+	// refresh only the affected continuous-aggregate buckets.
+	return loadArrayInput(dataRows = meterReadings,
 		meterID = meter.id,
 		mapRowToModel = row => {
 			const readRate = row[0];

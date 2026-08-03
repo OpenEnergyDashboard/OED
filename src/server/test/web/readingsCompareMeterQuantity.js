@@ -183,7 +183,7 @@ mocha.describe('readings API', () => {
 					await prepareTest(unitData, conversionData, meterDatakWh);
 					// Get the unit ID since the DB could use any value.
 					const unitId = await getUnitId('MJ');
-					const expected = [11232.0660730344, 12123.0051081528]; 
+					const expected = [11232.0660730344, 12123.0051081528];
 					// for compare, need the unitID, currentStart, currentEnd, shift
 					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
 						.query({
@@ -200,7 +200,7 @@ mocha.describe('readings API', () => {
 					// Use predefined unit and conversion data
 					const unitData = unitDatakWh.concat([
 						//adding u3, u16
-						{	
+						{
 							// u3
 							name: 'MJ',
 							identifier: 'megaJoules',
@@ -212,7 +212,7 @@ mocha.describe('readings API', () => {
 							preferredDisplay: false,
 							note: 'MJ'
 						},
-						{ 	
+						{
 							// u16
 							name: 'BTU',
 							identifier: '',
@@ -227,7 +227,7 @@ mocha.describe('readings API', () => {
 					]);
 					const conversionData = conversionDatakWh.concat([
 						// adding c2, c3
-						{	
+						{
 							// c2
 							sourceName: 'kWh',
 							destinationName: 'MJ',
@@ -236,7 +236,7 @@ mocha.describe('readings API', () => {
 							intercept: 0,
 							note: 'MJ → BTU'
 						},
-						{	
+						{
 							// c3
 							sourceName: 'MJ',
 							destinationName: 'BTU',
@@ -246,7 +246,7 @@ mocha.describe('readings API', () => {
 							note: 'MJ → BTU'
 						}
 					]);
-					
+
 					// load data into database
 					await prepareTest(unitData, conversionData, meterDatakWh);
 
@@ -260,31 +260,31 @@ mocha.describe('readings API', () => {
 							curr_end: '2022-10-31 17:00:00',
 							shift: 'P1D',
 							graphicUnitId: unitId
-							});
-						expectCompareToEqualExpected(res, expected);
-					});
+						});
+					expectCompareToEqualExpected(res, expected);
+				});
 
 				mocha.it('C11: 1 day shift end 2022-10-31 17:00:00 for 15 minute reading intervals and quantity units & kWh as BTU reverse conversion', async () => {
 					const unitData = unitDatakWh.concat([
 						// adding units u3, u16
 						{
 							// u3
-							name: 'MJ', 
-							identifier: 'megaJoules', 
-							unitRepresent: Unit.unitRepresentType.QUANTITY, 
-							secInRate: 3600, typeOfUnit: Unit.unitType.UNIT, 
-							suffix: '', displayable: Unit.displayableType.ALL, 
-							preferredDisplay: false, 
+							name: 'MJ',
+							identifier: 'megaJoules',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600, typeOfUnit: Unit.unitType.UNIT,
+							suffix: '', displayable: Unit.displayableType.ALL,
+							preferredDisplay: false,
 							note: 'MJ'
 						},
 						{
 							// u16
-							name: 'BTU', identifier: '', 
-							unitRepresent: Unit.unitRepresentType.QUANTITY, 
-							secInRate: 3600, 
-							typeOfUnit: Unit.unitType.UNIT, 
-							suffix: '', displayable: Unit.displayableType.ALL, 
-							preferredDisplay: true, 
+							name: 'BTU', identifier: '',
+							unitRepresent: Unit.unitRepresentType.QUANTITY,
+							secInRate: 3600,
+							typeOfUnit: Unit.unitType.UNIT,
+							suffix: '', displayable: Unit.displayableType.ALL,
+							preferredDisplay: true,
 							note: 'OED created standard unit'
 						},
 					]);
@@ -301,14 +301,14 @@ mocha.describe('readings API', () => {
 						},
 						{
 							// c3
-							sourceName: 'MJ', 
-							destinationName: 'BTU', 
-							bidirectional: true, 
-							slope: 947.8, 
-							intercept: 0, 
-							note: 'MJ → BTU' 
+							sourceName: 'MJ',
+							destinationName: 'BTU',
+							bidirectional: true,
+							slope: 947.8,
+							intercept: 0,
+							note: 'MJ → BTU'
 						},
-	
+
 					]);
 					// redefining the meterData as the unit is different
 					const meterData = [
@@ -421,11 +421,11 @@ mocha.describe('readings API', () => {
 					// for compare, need the unitID, currentStart, currentEnd, shift
 					const res = await chai.request(app).get(`/api/compareReadings/meters/${METER_ID}`)
 						.query({
-						curr_start: '2022-10-31 00:00:00',
-						curr_end: '2022-10-31 17:00:00',
-						shift: 'P1D',
-						graphicUnitId: unitId
-					});
+							curr_start: '2022-10-31 00:00:00',
+							curr_end: '2022-10-31 17:00:00',
+							shift: 'P1D',
+							graphicUnitId: unitId
+						});
 
 					expectCompareToEqualExpected(res, expected);
 				});

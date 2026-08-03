@@ -6,23 +6,68 @@
 
 const { log } = require('../log');
 const { getConnection } = require('../db');
-const Reading = require('../models/Reading');
+const TimeScaleDBReading = require('../models/TimeScaleDB/Reading');
+// TODO: Remove this retained legacy import once the hypertable implementation is finalized.
+// const Reading = require('../models/Reading');
 
-/** 
- * This function is changed from refreshing hourly and daily readings
- * views in parallel using Promise.all() into one by one because
- * daily readings calculation depends on hourly readings.
-*/
-async function refreshAllReadingViews() {
-	const conn = getConnection();
-	// Refresh meter readings views
-	log.info('Refreshing Materialized Hourly and Daily Readings Views');
-	await Reading.refreshMeterReadingsViews(conn);
-	log.info('Materialized Hourly and Daily Readings Views Refreshed');
-	// Refresh group views
-	log.info('Refreshing Group Reading Views');
-	await Reading.refreshGroupReadingsViews(conn);
-	log.info('refreshAllReadingViews completed');
+// Arbitrary, stable application namespace key for a session-level PostgreSQL
+// advisory lock. Every aggregate refresher must use this same key; the numeric
+// value has no transaction ID or database-object meaning.
+// Introduced because meter_hourly_readings was initially encountering deadlocks.
+const REFRESH_ADVISORY_LOCK_ID = 724536221;
+
+async function timedRefresh(label, operation) {
+	const start = Date.now();
+	await operation();
+	log.info(`${label} completed in ${Date.now() - start} ms`);
 }
 
-module.exports = { refreshAllReadingViews };
+/**
+ * Refreshes the TimescaleDB reading aggregates while holding a shared
+ * advisory lock so concurrent imports cannot refresh them simultaneously.
+ * Refreshes are incremental by default. A full split-table rebuild runs only
+ * when explicitly requested or when denormalized source data is marked stale.
+ */
+async function refreshAllReadingViews(options = {}) {
+	const { startTimestamp = null, endTimestamp = null, rebuild = false } = options;
+	if ((startTimestamp === null) !== (endTimestamp === null)) {
+		throw new Error('Both startTimestamp and endTimestamp are required for a bounded reading refresh.');
+	}
+
+	const conn = getConnection();
+	await conn.task(async task => {
+		await task.one('SELECT pg_advisory_lock(${lockId})', { lockId: REFRESH_ADVISORY_LOCK_ID });
+		try {
+			// TODO: Remove these retained legacy refresh calls once the hypertable implementation is finalized.
+			// await timedRefresh('Legacy meter reading views refresh', () => Reading.refreshMeterReadingsViews(task));
+			const rebuildState = await task.one(`
+				SELECT rebuild_revision, completed_rebuild_revision
+				FROM reading_aggregate_state
+				WHERE id = 1
+			`);
+			const rebuildRequired = rebuild
+				|| BigInt(rebuildState.rebuild_revision) > BigInt(rebuildState.completed_rebuild_revision);
+
+			if (rebuildRequired) {
+				await timedRefresh('TimescaleDB reading aggregates rebuild', () => TimeScaleDBReading.rebuildReadings(task));
+				await task.none(`
+					UPDATE reading_aggregate_state
+					SET completed_rebuild_revision = GREATEST(
+						completed_rebuild_revision,
+						\${rebuiltRevision}
+					)
+					WHERE id = 1
+				`, { rebuiltRevision: rebuildState.rebuild_revision });
+			} else {
+				await timedRefresh('TimescaleDB reading aggregates range refresh', () =>
+					TimeScaleDBReading.refreshReadings(task, startTimestamp, endTimestamp));
+			}
+			// await timedRefresh('Legacy group reading views refresh', () => Reading.refreshGroupReadingsViews(task));
+		} finally {
+			await task.one('SELECT pg_advisory_unlock(${lockId})', { lockId: REFRESH_ADVISORY_LOCK_ID });
+		}
+	});
+	log.info('All reading aggregates synchronized');
+}
+
+module.exports = refreshAllReadingViews;

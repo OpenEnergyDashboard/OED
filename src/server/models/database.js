@@ -31,6 +31,9 @@ function getDB(connectionParameters) {
  * Get the name of the database current being worked on.
  * @returns {string}
  */
+// TODO: Research whether any downstream consumers use the exported currentDB
+// accessor. There are no in-repository callers and no currentDB backing value;
+// if external callers do not rely on it, remove this function and its export.
 function getCurrentDB() {
 	return currentDB;
 }
@@ -90,6 +93,8 @@ async function createSchema(conn) {
 	const Week = require('./Week');
 	const Cik = require('./Cik');
 	const CikVary = require('./CikVary');
+	// TimescaleDB
+	const TimeScaleDBReading = require('./TimeScaleDB/Reading');
 
 	/* eslint-enable global-require */
 	await Unit.createUnitTypesEnum(conn);
@@ -120,14 +125,29 @@ async function createSchema(conn) {
 	await LogEmail.createTable(conn);
 	await LogMsg.createLogMsgTypeEnum(conn);
 	await LogMsg.createTable(conn);
-	await Reading.createReadingsMaterializedViews(conn);
-	await Reading.createCompareReadingsFunction(conn);
-	// For 3D reading
-	await Reading.create3DReadingsFunction(conn);
+	// TODO: Remove these retained legacy setup calls once the hypertable implementation is finalized.
+	// await Reading.createReadingsMaterializedViews(conn);
+	// await Reading.createCompareReadingsFunction(conn);
+	// await Reading.create3DReadingsFunction(conn);
 	await Baseline.createTable(conn);
 	await Map.createTable(conn);
 	await conn.none(sqlFile('baseline/create_function_get_average_reading.sql'));
 	await Configfile.createTable(conn);
+	// Create the TimescaleDB continuous aggregate view for readings
+	await TimeScaleDBReading.createReadingHelpers(conn);
+	await TimeScaleDBReading.createPrerequisites(conn);
+	await TimeScaleDBReading.createGroupDependencies(conn);
+	await TimeScaleDBReading.createHourlyReadings(conn);
+	await TimeScaleDBReading.createDailyReadings(conn);
+	await TimeScaleDBReading.createGroupHourlyReadings(conn);
+	await TimeScaleDBReading.createGroupDailyReadings(conn);
+	await TimeScaleDBReading.updateMeterLineReadings(conn);
+	await TimeScaleDBReading.updateGroupLineReadings(conn);
+	await TimeScaleDBReading.updateMeterGroupBar(conn);
+	await TimeScaleDBReading.updateCompareReadings(conn);
+	await TimeScaleDBReading.updateFunctionGet3DReadings(conn);
+	//TODO: Remove these retained legacy setup calls once the hypertable implementation is finalized.
+	// await TimeScaleDBReading.dropLegacyReadingViews(conn);
 }
 
 module.exports = {

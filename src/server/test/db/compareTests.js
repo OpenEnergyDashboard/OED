@@ -12,9 +12,9 @@ const Group = require('../../models/Group');
 const Unit = require('../../models/Unit');
 const { insertStandardUnits, insertStandardConversions } = require('../../util/insertData');
 const { insertSpecialUnits, insertSpecialConversions } = require('../../data/automatedTestingData');
-const { redoCik } = require('../../services/graph/redoCik');
-const { refreshAllReadingViews } = require('../../services/refreshAllReadingViews');
+const refreshAllReadingViews = require('../../services/refreshAllReadingViews');
 const { refreshGroupsDeepMetersView } = require('../../services/refreshGroupsDeepMetersView');
+const { redoCikVary } = require('../../services/graph/redoCik');
 
 mocha.describe('Compare readings', () => {
 	let meter, graphicUnitId, conversionSlope, conn;
@@ -32,7 +32,6 @@ mocha.describe('Compare readings', () => {
 		await insertStandardConversions(conn);
 		await insertSpecialUnits(conn);
 		await insertSpecialConversions(conn);
-		await redoCik(conn);
 		// Make the meter be a kWh meter.
 		const meterUnitId = (await Unit.getByName('Electric_Utility', conn)).id;
 		await new Meter(
@@ -66,6 +65,7 @@ mocha.describe('Compare readings', () => {
 			undefined // reading frequency
 		).insert(conn);
 		meter = await Meter.getByName('Meter', conn);
+		await redoCikVary(conn);
 		await Reading.insertAll([
 			new Reading(meter.id, 1, prevStart, prevEnd),
 			new Reading(meter.id, 10, currStart, currEnd)

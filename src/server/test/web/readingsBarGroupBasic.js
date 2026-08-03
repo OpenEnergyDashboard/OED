@@ -17,7 +17,9 @@ const { prepareTest,
     unitDatakWh,
     conversionDatakWh } = require('../../util/readingsUtils');
 
-mocha.describe('readings API', () => {
+mocha.describe('readings API', function () {
+    // Group bar setup rebuilds and refreshes the TimescaleDB meter and group
+    // aggregates
     mocha.describe('readings test, test if data returned by API is as expected', () => {
         mocha.describe('for bar charts', () => {
             mocha.describe('basic for groups', () => {

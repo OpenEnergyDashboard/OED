@@ -8,11 +8,11 @@
 
 const { generateSine, generateCosine } = require('./generateTestingData');
 const Unit = require('../models/Unit');
+const Group = require('../models/Group');
 const { insertUnits, insertStandardUnits, insertConversions, insertStandardConversions, insertMeters, insertGroups } = require('../util/insertData');
 const { getConnection } = require('../db');
-const { redoCik } = require('../services/graph/redoCik');
-const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
-const fs = require('fs').promises;
+const { redoCikVary } = require('../services/graph/redoCik');
+const refreshAllReadingViews = require('../services/refreshAllReadingViews');
 
 // Define the start and end date for data generation.
 const DEFAULT_OPTIONS = {
@@ -1335,7 +1335,7 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 	await insertSpecialConversions(conn);
 	// Recreate the Cik entries since changed units/conversions.
 	// Do now since needed to insert meters with suffix units.
-	await redoCik(conn);
+	await redoCikVary(conn);
 	// Generate the mathematical test data needed.
 	console.log(`Start loading each set of test data into OED meters, may take minutes):\n`);
 	// This is very fast so wait since simpler and easier to see if this part fails.
@@ -1343,10 +1343,12 @@ async function insertSpecialUnitsConversionsMetersGroups() {
 	// Now do the large dataset generation.
 	await testData();
 	// Recreate the Cik entries since changed meters.
-	await redoCik(conn);
-	// Refresh the readings since added new ones.
-	await refreshAllReadingViews();
+	await redoCikVary(conn);
 	await insertGroups(specialGroups, conn);
+	// Refresh groups deep meters view after adding new groups.
+	await Group.refreshGroupsDeepMetersView(conn);
+	// Refresh the readings since added new ones & groups.
+	await refreshAllReadingViews();
 }
 
 /*

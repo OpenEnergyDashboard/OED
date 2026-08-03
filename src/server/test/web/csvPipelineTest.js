@@ -8,7 +8,7 @@ const Reading = require('../../models/Reading');
 const Point = require('../../models/Point');
 const Unit = require('../../models/Unit');
 const { insertStandardUnits, insertStandardConversions, insertUnits, insertConversions } = require('../../util/insertData')
-const { redoCik } = require('../../services/graph/redoCik');
+const { redoCikVary } = require('../../services/graph/redoCik');
 const util = require('util');
 const fs = require('fs');
 const csv = require('csv');
@@ -560,7 +560,7 @@ for (let fileKey in testCases) {
 			];
 			await insertConversions(conversions, conn);
 			// Recreate the Cik entries since changed units/conversions.
-			await redoCik(conn);
+			await redoCikVary(conn);
 			// We don't need to refresh views since we get readings directly from DB readings table.
 		});
 		const numUploads = testCases[fileKey].chaiRequest.length;
@@ -584,7 +584,7 @@ for (let fileKey in testCases) {
 						Meter.type.OTHER, // type
 						null, // timezone
 					)
-					meter.insert(conn);
+					await meter.insert(conn);
 				}
 				let inputFile = testCases[fileKey]['fileName'][index];
 				let inputPath = `${__dirname}/csvPipeline/${inputFile}`;

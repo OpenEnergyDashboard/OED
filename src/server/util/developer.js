@@ -5,7 +5,7 @@
 const database = require('../models/database');
 const sqlFile = database.sqlFile;
 const { getConnection } = require('../db');
-const { refreshAllReadingViews } = require('../services/refreshAllReadingViews');
+const refreshAllReadingViews = require('../services/refreshAllReadingViews');
 
 // These functions are designed for OED developers.
 

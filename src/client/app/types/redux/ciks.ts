@@ -5,6 +5,4 @@
 export interface CikData {
 	meterUnitId: number;
 	nonMeterUnitId: number;
-	slope: number;
-	intercept: number;
 }
