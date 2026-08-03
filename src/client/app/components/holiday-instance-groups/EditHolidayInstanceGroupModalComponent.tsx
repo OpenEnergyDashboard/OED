@@ -61,6 +61,8 @@ export default function EditHolidayInstanceGroupModalComponent(
 	const [note, setNote] = useState(props.holidayInstanceGroup.note);
 	const [showDeleteConfirmationModal, setShowDeleteConfirmationModal] = useState(false);
 
+	// handle locations
+	// TODO: consider changing how locations are handled to match other pages
 	const locations = React.useMemo(
 		() => Array.from(new Set(
 			props.holidayInstances
@@ -78,6 +80,8 @@ export default function EditHolidayInstanceGroupModalComponent(
 	const selectedLocationOptions = locationOptions.filter(option =>
 		selectedLocations.includes(option.location)
 	);
+
+	// filter holiday instances based on selected locations and sort by name
 	const filteredHolidayInstances = props.holidayInstances.filter(holidayInstance =>
 		selectedLocations.includes(holidayInstance.location.trim())
 	);
@@ -86,6 +90,8 @@ export default function EditHolidayInstanceGroupModalComponent(
 			first.name.localeCompare(second.name, undefined, { sensitivity: 'base' })),
 		[filteredHolidayInstances]
 	);
+
+	// map holiday instances to select options and filter by selected IDs
 	const holidayInstanceOptions: SelectOption[] = sortedHolidayInstances.map(holidayInstance => ({
 		label: holidayInstance.name,
 		value: holidayInstance.id
@@ -96,6 +102,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 	const validName = name.trim() !== '';
 	const validHolidayInstanceGroup = validName && holidayInstanceIds.length > 0;
 
+	// reset state to initial values when modal is opened
 	const resetState = React.useCallback(() => {
 		const groupLocations = Array.from(new Set(
 			props.holidayInstanceGroup.holidayInstanceIds
@@ -114,11 +121,13 @@ export default function EditHolidayInstanceGroupModalComponent(
 		}
 	}, [props.show, resetState]);
 
+	// handle modal close
 	const handleClose = () => {
 		props.handleClose();
 		resetState();
 	};
 
+	// handle save changes
 	const handleSaveChanges = () => {
 		if (!validHolidayInstanceGroup) {
 			return;
@@ -133,6 +142,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 		);
 	};
 
+	// handle delete confirmation modal
 	const handleDeleteConfirmationModalOpen = () => {
 		props.handleClose();
 		setShowDeleteConfirmationModal(true);
@@ -167,6 +177,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 				</ModalHeader>
 				<ModalBody>
 					<Container>
+						{/* Name input */}
 						<FormGroup>
 							<Label for='name'>
 								<FormattedMessage id='name'/>
@@ -187,6 +198,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 
 						<Row xs='1' lg='2'>
 							<Col>
+								{/* Location input */}
 								<FormGroup>
 									<Label for='holidayLocation'>
 										<FormattedMessage
@@ -234,6 +246,9 @@ export default function EditHolidayInstanceGroupModalComponent(
 							</Col>
 							<Col>
 								{/* The holiday instances in this group */}
+								{/* TODO: Consider changing how holiday rates selected. Should you have to select
+								a location first or should location only be used to filter? Consider making it so that
+								all locations are displayed and filtered when location is selected */}
 								<FormGroup>
 									<Label>
 										<FormattedMessage
@@ -264,6 +279,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 							</Col>
 						</Row>
 
+						{/* Note input */}
 						<FormGroup>
 							<Label for='note'>
 								<FormattedMessage id='note'/>
@@ -278,6 +294,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 						</FormGroup>
 					</Container>
 				</ModalBody>
+				{/* Modal footer with action buttons */}
 				<ModalFooter>
 					{props.onDeleteHolidayInstanceGroup && (
 						<Button color='danger' onClick={handleDeleteConfirmationModalOpen}>

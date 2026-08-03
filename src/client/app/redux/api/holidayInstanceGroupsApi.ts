@@ -32,6 +32,9 @@ const membersUrl = 'api/holidayGroupMembers';
  */
 export const holidayInstanceGroupsApi = baseApi.injectEndpoints({
 	endpoints: builder => ({
+		// The list of groups is joined with the list of members to produce a single
+		// list of HolidayInstanceGroup objects. The queryFn is used to coordinate
+		// the two queries and return a single result.
 		getHolidayInstanceGroups: builder.query<HolidayInstanceGroup[], void>({
 			async queryFn(_arg, _queryApi, _extraOptions, baseQuery) {
 				const groupsResult = await baseQuery(groupsUrl);
@@ -67,6 +70,7 @@ export const holidayInstanceGroupsApi = baseApi.injectEndpoints({
 				: [{ type: 'HolidayInstanceGroups', id: 'LIST' }]
 		}),
 
+		// Adds a new holiday instance group and its members.
 		addHolidayInstanceGroup: builder.mutation<HolidayInstanceGroup, CreateHolidayInstanceGroupPayload>({
 			async queryFn(group, _queryApi, _extraOptions, baseQuery) {
 				const groupResult = await baseQuery({
@@ -116,6 +120,7 @@ export const holidayInstanceGroupsApi = baseApi.injectEndpoints({
 			invalidatesTags: [{ type: 'HolidayInstanceGroups', id: 'LIST' }]
 		}),
 
+		// Updates a holiday instance group and its members.
 		editHolidayInstanceGroup: builder.mutation<null, UpdateHolidayInstanceGroupPayload>({
 			async queryFn(group, _queryApi, _extraOptions, baseQuery) {
 				const currentMembersResult = await baseQuery(`${membersUrl}/group/${group.id}`);
@@ -174,6 +179,7 @@ export const holidayInstanceGroupsApi = baseApi.injectEndpoints({
 			]
 		}),
 
+		// Deletes a holiday instance group and its members. If the group cannot be deleted, its members are restored.
 		//TODO: add safety checks on deletes since once they are applied to a pattern you cannot delete
 		deleteHolidayInstanceGroup: builder.mutation<null, Pick<HolidayInstanceGroup, 'id'>>({
 			async queryFn({ id }, _queryApi, _extraOptions, baseQuery) {

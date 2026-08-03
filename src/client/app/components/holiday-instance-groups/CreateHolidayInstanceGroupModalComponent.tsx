@@ -47,6 +47,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 	const [note, setNote] = useState('');
 
 	// handle location
+	// TODO: consider changing how locations are handled to match other pages
 	const locations = React.useMemo(
 		() => Array.from(new Set(
 			props.holidayInstances
@@ -101,6 +102,7 @@ export default function CreateHolidayInstanceGroupModalComponent(
 	};
 
 	// handle submit
+	// TODO: give a warning message and make it so that you are unable to submit if group name already exists
 	const handleSubmit = () => {
 		if (holidayInstanceIds.length === 0) {
 			return;
@@ -198,6 +200,9 @@ export default function CreateHolidayInstanceGroupModalComponent(
 							</Col>
 							<Col>
 								{/* The holiday instances in this group */}
+								{/* TODO: Consider changing how holiday rates selected. Should you have to select
+								a location first or should location only be used to filter? Consider making it so that
+								all locations are displayed and filtered when location is selected */}
 								<FormGroup>
 									<Label>
 										<FormattedMessage

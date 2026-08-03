@@ -29,6 +29,7 @@ export default function HolidayInstanceGroupViewComponent(props) {
 		setShowEditModal(false);
 	};
 
+	// Get the holiday instances that are part of this group.
 	const selectedHolidayInstances = props.holidayInstanceGroup.holidayInstanceIds
 		.map(holidayInstanceId => props.holidayInstances.find(
 			holidayInstance =>
@@ -36,6 +37,7 @@ export default function HolidayInstanceGroupViewComponent(props) {
 		))
 		.filter(holidayInstance => holidayInstance !== undefined);
 
+	// Display the note, truncated if it is too long.
 	const note = props.holidayInstanceGroup.note ?? '';
 	const displayedNote = note.length > 30 ? `${note.slice(0, 29)}...` : note;
 
@@ -51,6 +53,8 @@ export default function HolidayInstanceGroupViewComponent(props) {
 						id='holiday.instances'
 					/>
 				</b>
+				{/* Display the names of the holiday instances in this group. If there are more than one,
+				 display the first one and indicate how many more there are. */}
 				{selectedHolidayInstances.length > 0 ? (
 					<span>
 						{selectedHolidayInstances[0].name}
@@ -69,6 +73,7 @@ export default function HolidayInstanceGroupViewComponent(props) {
 				{displayedNote}
 			</div>
 
+			{/* Display the edit button and modal. */}
 			<div className='edit-btn'>
 				<Button color='secondary' onClick={handleShow}>
 					<FormattedMessage

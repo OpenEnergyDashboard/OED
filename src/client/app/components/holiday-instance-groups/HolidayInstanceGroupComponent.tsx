@@ -31,6 +31,7 @@ const stableEmptyHolidayInstanceDetails: HolidayInstanceDetails[] = [];
  * @returns Holiday instance group page element.
  */
 export default function HolidayInstanceGroupComponent() {
+	// The route stops you from getting to this page if not an admin.
 	const translate = useTranslate();
 	const {
 		data: holidayInstances = stableEmptyHolidayInstanceDetails,
@@ -46,6 +47,7 @@ export default function HolidayInstanceGroupComponent() {
 	const [editHolidayInstanceGroup] = useEditHolidayInstanceGroupMutation();
 	const [deleteHolidayInstanceGroup] = useDeleteHolidayInstanceGroupMutation();
 
+	// handle create holiday instance group
 	const handleCreateHolidayInstanceGroup = async (
 		name: string,
 		holidayInstanceIds: number[],
@@ -61,6 +63,7 @@ export default function HolidayInstanceGroupComponent() {
 		}
 	};
 
+	// handle update holiday instance group
 	const handleUpdateHolidayInstanceGroup = async (
 		holidayInstanceGroupId: number,
 		name: string,
@@ -82,6 +85,7 @@ export default function HolidayInstanceGroupComponent() {
 		}
 	};
 
+	// handle delete holiday instance group
 	const handleDeleteHolidayInstanceGroup = async (holidayInstanceGroupId: number) => {
 		try {
 			await deleteHolidayInstanceGroup({ id: holidayInstanceGroupId }).unwrap();
@@ -104,17 +108,20 @@ export default function HolidayInstanceGroupComponent() {
 						id='holiday.instance.groups'
 					/>
 				</h2>
+				{/* Display error message if there is a load error */}
 				{loadError && (
 					<div className='alert alert-danger' role='alert'>
 						<FormattedMessage id='holiday.instance.group.load.failure' />
 					</div>
 				)}
+				{/* Create holiday instance group button */}
 				<div className='edit-btn'>
 					<CreateHolidayInstanceGroupModalComponent
 						holidayInstances={holidayInstances}
 						onCreateHolidayInstanceGroup={handleCreateHolidayInstanceGroup}
 					/>
 				</div>
+				{/* Display holiday instance groups*/}
 				<div className='card-container'>
 					{isLoading ? (
 						<div>
