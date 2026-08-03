@@ -249,6 +249,7 @@ export default function EditHolidayInstanceGroupModalComponent(
 								{/* TODO: Consider changing how holiday rates selected. Should you have to select
 								a location first or should location only be used to filter? Consider making it so that
 								all locations are displayed and filtered when location is selected */}
+								{/* TODO: Make multiselect border highlighted when invalid */}
 								<FormGroup>
 									<Label>
 										<FormattedMessage
