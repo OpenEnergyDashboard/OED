@@ -6,21 +6,22 @@
 
 const { chai, expect, mocha } = require('../common');
 const { estimateRawExportSizeMB } = require('../../../common/RawExportFileSize');
+const delta = 1e-15;
 
 mocha.describe('Raw Export File Size Estimator', () => {
     mocha.it('returns zero for zero readings', () => {
-        expect(estimateRawExportSizeMB(0)).to.be.closeTo(0, 0.001);
+        expect(estimateRawExportSizeMB(0)).to.be.closeTo(0, delta);
     });
 
     mocha.it('returns 0.082 MB for 1000 readings', () => {
-        expect(estimateRawExportSizeMB(1000)).to.be.closeTo(0.082, 0.001);
+        expect(estimateRawExportSizeMB(1000)).to.be.closeTo(0.082, delta);
     });
 
     mocha.it('returns 0.11808 MB for 1440 readings', () => {
-        expect(estimateRawExportSizeMB(1440)).to.be.closeTo(0.11808, 0.001);
+        expect(estimateRawExportSizeMB(1440)).to.be.closeTo(0.11808, delta);
     });
 
     mocha.it('returns 0.71832 MB for 8760 readings', () => {
-        expect(estimateRawExportSizeMB(8760)).to.be.closeTo(0.71832, 0.001);
+        expect(estimateRawExportSizeMB(8760)).to.be.closeTo(0.71832, delta);
     });
 });
