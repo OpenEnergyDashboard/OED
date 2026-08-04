@@ -175,11 +175,10 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 	}
 	// Get all conversions involving this suffix unit (as source, destination, or bidirectional)
 	const allConversions = await Conversion.getAll(conn);
-	const relatedConversions = allConversions.filter((conversion) => 
-		conversion.sourceId === suffixUnit.id || 
-		conversion.destinationId === suffixUnit.id ||
-		(conversion.bidirectional && (conversion.sourceId === suffixUnit.id || conversion.destinationId === suffixUnit.id))
-	);
+	const relatedConversions = allConversions.filter((conversion) =>
+	conversion.sourceId === suffixUnit.id ||
+	(conversion.bidirectional && conversion.destinationId === suffixUnit.id)
+);
 
 	// Process all related conversions in parallel with proper async handling
 	await Promise.all(relatedConversions.map(async (conversion) => {
@@ -213,12 +212,13 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 					}
 				}
 
-				// Delete the auto-created unit (dependency checks + cik cleanup handled inside)
-				await deleteUnitSafely(otherUnitId, conn);
-
 				// Recursively clean up this unit's related conversions/units
 				// This handles nested suffix chains (A -> B -> C)
 				await removeAdditionalConversionsAndUnits(otherUnit, conn, depth + 1);
+
+				// Delete the auto-created unit (dependency checks + cik cleanup handled inside)
+				await deleteUnitSafely(otherUnitId, conn);
+
 			}
 		} catch (err) {
 			log.error(`Error processing conversion ${conversion.sourceId}->${conversion.destinationId} during suffix unit cleanup: ${err}`, err);
