@@ -84,16 +84,14 @@ mocha.describe('maps API', () => {
 		// documented in usersTest.js.
 		mocha.before(async () => {
 			// login
-			let res = await chai.request(app)
-				.post('/api/loginLogout/login')
+			let res = await chai.request(app).post('/api/loginLogout/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
 		mocha.after(async () => {
 			// logout
 			if (token) {
-				await chai.request(app)
-					.post('/api/loginLogout/logout')
+				await chai.request(app).post('/api/loginLogout/logout')
 					.set('token', token);
 			}
 		});
@@ -129,16 +127,14 @@ mocha.describe('maps API', () => {
 					unauthorizedUser.password = password;
 
 					// login
-					let res = await chai.request(app)
-						.post('/api/loginLogout/login')
+					let res = await chai.request(app).post('/api/loginLogout/login')
 						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});
 				mocha.afterEach(async () => {
 					// logout
 					if (token) {
-						await chai.request(app)
-							.post('/api/loginLogout/logout')
+						await chai.request(app).post('/api/loginLogout/logout')
 							.set('token', token);
 					}
 				});

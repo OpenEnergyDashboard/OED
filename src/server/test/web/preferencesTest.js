@@ -28,23 +28,20 @@ mocha.describe('preferences API', () => {
 				let token;
 				mocha.before(async () => {
 					// login
-					let res = await chai.request(app)
-						.post('/api/loginLogout/login')
+					let res = await chai.request(app).post('/api/loginLogout/login')
 						.send({ username: testUser.username, password: testUser.password });
 					token = res.body.token;
 				});
 				mocha.after(async () => {
 					// logout
 					if (token) {
-						await chai.request(app)
-							.post('/api/loginLogout/logout')
+						await chai.request(app).post('/api/loginLogout/logout')
 							.set('token', token);
 					}
 				});
 
 				mocha.it('should accept requests from Admin role', async () => {
-					res = await chai.request(app)
-						.post('/api/preferences')
+					res = await chai.request(app).post('/api/preferences')
 						.set('token', token)
 						.send({ preferences });
 					expect(res).to.have.status(HTTP_CODES.OK);
@@ -65,23 +62,20 @@ mocha.describe('preferences API', () => {
 							unauthorizedUser.password = password;
 
 							// login
-							let res = await chai.request(app)
-								.post('/api/loginLogout/login')
+							let res = await chai.request(app).post('/api/loginLogout/login')
 								.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 							token = res.body.token;
 						});
 						mocha.afterEach(async () => {
 							// logout
 							if (token) {
-								await chai.request(app)
-									.post('/api/loginLogout/logout')
+								await chai.request(app).post('/api/loginLogout/logout')
 									.set('token', token);
 							}
 						});
 
 						mocha.it(`should reject requests from ${role}`, async () => {
-							res = await chai.request(app)
-								.post('/api/preferences')
+							res = await chai.request(app).post('/api/preferences')
 								.set('token', token)
 								.send({ preferences });
 							expect(res).to.have.status(HTTP_CODES.FORBIDDEN);

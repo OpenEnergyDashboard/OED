@@ -9,19 +9,16 @@ const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Units Route', () => {
 	let token;
-
 	mocha.before(async () => {
 		// login
-		const res = await chai.request(app)
-			.post('/api/loginLogout/login')
+		const res = await chai.request(app).post('/api/loginLogout/login')
 			.send({ username: testUser.username, password: testUser.password });
 		token = res.body.token;
 	});
 	mocha.after(async () => {
 		// logout
 		if (token) {
-			await chai.request(app)
-				.post('/api/loginLogout/logout')
+			await chai.request(app).post('/api/loginLogout/logout')
 				.set('token', token);
 		}
 	});
@@ -34,14 +31,11 @@ mocha.describe('Units Route', () => {
 				1000, Unit.unitType.UNIT, 'Suffix', Unit.displayableType.ALL, true, 'Note');
 			await unit.insert(conn);
 			const beforeNote = unit.note;
-			const res = await chai.request(app)
-				.post('/api/units/edit')
-				.set('token', token)
-				.send({
-					id: unit.id,
-					name: 'New name',
-					identifier: unit.identifier,
-				});
+			const res = await chai.request(app).post('/api/units/edit').set('token', token).send({
+				id: unit.id,
+				name: 'New name',
+				identifier: unit.identifier,
+			});
 			expect(res).to.have.status(HTTP_CODES.OK);
 			const updatedUnit = await Unit.getById(unit.id, conn);
 			expect(updatedUnit.name).to.equal('New name');

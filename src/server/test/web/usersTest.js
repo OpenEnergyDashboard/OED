@@ -26,8 +26,7 @@ mocha.describe('Users API', () => {
 		});
 		mocha.after(async () => {
 			if (token) {
-				await chai.request(app)
-					.post('/api/loginLogout/logout')
+				await chai.request(app).post('/api/loginLogout/logout')
 					.set('token', token);
 			}
 		});
@@ -129,8 +128,7 @@ mocha.describe('Users API', () => {
 				mocha.afterEach(async () => {
 					// logout
 					if (token) {
-						await chai.request(app)
-							.post('/api/loginLogout/logout')
+						await chai.request(app).post('/api/loginLogout/logout')
 							.set('token', token);
 					}
 				});
