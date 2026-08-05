@@ -101,11 +101,11 @@ router.get('/token', optionalAuthMiddleware, async (req, res) => {
 		maxLength: TOKEN_MAX_LENGTH
 	};
 	if (!validate(token, validParams).valid) {
-		failure(res, HTTP_CODES.FORBIDDEN, null, { message: 'No token provided or JSON was invalid.' });
+		failure(res, HTTP_CODES.FORBIDDEN, null, 'No token provided or JSON was invalid.');
 	} else if (token) {
 		jwt.verify(token, secretToken, async (err, decoded) => {
 			if (err) {
-				failure(res, HTTP_CODES.UNAUTHORIZED, err, { message: 'Failed to authenticate token.' }, LogLevel.SILENT);
+				failure(res, HTTP_CODES.UNAUTHORIZED, err, 'Failed to authenticate token.', LogLevel.SILENT);
 			} else {
 				try {
 					const conn = getConnection();
@@ -116,12 +116,12 @@ router.get('/token', optionalAuthMiddleware, async (req, res) => {
 							role: userProfile.role
 						});
 				} catch (error) {
-					failure(res, HTTP_CODES.UNAUTHORIZED, error, { message: 'User does not exist in database.' }, LogLevel.SILENT);
+					failure(res, HTTP_CODES.UNAUTHORIZED, error, 'User does not exist in database.', LogLevel.SILENT);
 				}
 			}
 		});
 	} else {
-		failure(res, HTTP_CODES.FORBIDDEN, null, { message: 'No token provided.' });
+		failure(res, HTTP_CODES.FORBIDDEN, null, 'No token provided.');
 	}
 });
 
@@ -159,7 +159,7 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 
 	if (!validatorResult.valid) {
 		const message = `Got request to insert user with invalid user data. Error(s): ${validatorResult.errors}`;
-		failure(res, HTTP_CODES.BAD_REQUEST, message, { message });
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message);
 	} else {
 		try {
 			const { username, password, role, note } = req.body;
@@ -167,7 +167,7 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 			// Check if user already exists
 			const currentUser = await User.getByUsername(username, conn);
 			if (currentUser !== null) {
-				failure(res, HTTP_CODES.BAD_REQUEST, null, { message: `user ${username} already exists so cannot create` });
+				failure(res, HTTP_CODES.BAD_REQUEST, null, `user ${username} already exists so cannot create`);
 			} else {
 				const hashedPassword = await bcrypt.hash(password, 10);
 				const user = new User(undefined, username, hashedPassword, role, note);
@@ -187,7 +187,7 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 	const validatorResult = validateUsersParams(req.body, true);
 	if (!validatorResult.valid) {
 		const message = `Got request to edit users with invalid user data, errors: ${validatorResult.errors}`;
-		failure(res, HTTP_CODES.BAD_REQUEST, message, { message }, LogLevel.WARN);
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message, LogLevel.WARN);
 		return;
 	} else {
 		try {
@@ -200,7 +200,7 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 				const numberOfAdmins = await User.getNumberOfAdmins(conn);
 				if (numberOfAdmins < 2) {
 					const errorMessage = 'There must be at least one admin remaining to avoid lockout!';
-					failure(res, HTTP_CODES.BAD_REQUEST, errorMessage, { message: errorMessage });
+					failure(res, HTTP_CODES.BAD_REQUEST, errorMessage, errorMessage);
 					return;
 				}
 			}
@@ -247,7 +247,7 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 	const validatorResult = validate(req.body, validParams);
 	if (!validatorResult.valid) {
 		const message = `Got request to delete users with invalid user data. Error(s): ${validatorResult.errors}`;
-		failure(res, HTTP_CODES.BAD_REQUEST, message, { message });
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message);
 	} else {
 		try {
 			const conn = getConnection();
@@ -255,7 +255,7 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 			const id = req.decoded.data;
 			const user = await User.getByID(id, conn);
 			if (user.username === username) {// Admins cannot delete themselves
-				failure(res, HTTP_CODES.BAD_REQUEST);
+				failure(res, HTTP_CODES.BAD_REQUEST, null, 'Admins cannot delete themselves.');
 			} else {
 				await User.deleteUser(username, conn);
 				success(res);
