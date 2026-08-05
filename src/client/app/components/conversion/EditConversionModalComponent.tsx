@@ -97,7 +97,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 	// Determine whether the selected unit is a Suffix unit
 	// Including Suffix input with unit type Unit and Suffix is filled in
-	const isSuffixRelated =  (unit? : UnitData): boolean => 
+	const isSuffixRelated = (unit? : UnitData): boolean =>
 		!!unit && (
 			unit.typeOfUnit === UnitType.suffix || !!unit.suffix?.trim()
 		);
@@ -135,7 +135,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 		return count;
 	};
-	
+
 	// Performs checks to warn the admin of the impact deleting a conversion will have on meter units and possible graphing units.
 	const checkState = async () => {
 		const source = unitDataById[state.sourceId];
@@ -252,8 +252,6 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					return unitDataById[otherId];
 				})
 				.filter(isSuffixRelated);
-
-			
 
 			// Get unique conversions that would be deleted
 			const conversionsToDelete = suffixUnitConversions.filter(c => {
@@ -496,7 +494,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			setDeleteConfirmationMessage(msgElements);
 			handleDeleteConfirmationModalOpen();
 		}
-	
+
 	};
 	/* Confirm Delete Modal */
 	// Separate from state comment to keep everything related to the warning confirmation modal together
