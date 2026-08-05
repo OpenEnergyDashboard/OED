@@ -4,7 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { mocha, expect } = require('../common');
+const { chai, mocha, expect, app } = require('../common');
 const { HTTP_CODES } = require('../../util/httpCodes');
 const sinon = require('sinon');
 const moment = require('moment');
@@ -97,14 +97,19 @@ mocha.describe('unit readings routes', () => {
 						{ reading_rate: 1, min_rate: 1, max_rate: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp }
 					]
 				});
-				const response = await meterLineReadings([1], 99, timeInterval);
+				
+				const res = await chai.request(app)
+								.get(`${LINE_METERS_ENDPOINT}/1`)
+								.query(valid_query);
+
+				expect(res).to.have.status(HTTP_CODES.OK);
 
 				const expectedResponse = {
 					1: [
 						{ reading: 1, min: 1, max: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf() }
 					]
 				};
-				expect(response).to.deep.equal(expectedResponse);
+				expect(res.body).to.deep.equal(expectedResponse);
 			});
 		});
 	});
