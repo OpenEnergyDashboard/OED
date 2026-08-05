@@ -49,12 +49,6 @@ function expectMapsToBeEquivalent(maps, length) {
 }
 
 mocha.describe('maps API', () => {
-	mocha.beforeEach(async () => {
-		// TODO Why is there an empty body here?
-
-		// It seems to work fine if I comment it out.
-		// Deleting the beforeEach() hook should be possible.
-	});
 
 	mocha.it('returns nothing when no map is present', async () => {
 		const res = await chai.request(app).get('/api/maps');
