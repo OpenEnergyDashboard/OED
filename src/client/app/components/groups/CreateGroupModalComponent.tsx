@@ -242,9 +242,6 @@ export default function CreateGroupModalComponent() {
 			const { ...stateWithoutId } = state;
 			const submitState = { ...stateWithoutId, gps: gps };
 
-			// TODO DEBUG: added in to test the showErrorNotification
-			//submitState.name = '';
-
 			// groupsApi.ts's createGroup mutation already strips id/deepMeters/deepGroups internally
 			// before building the request
 			createGroup(submitState)

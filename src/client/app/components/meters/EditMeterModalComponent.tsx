@@ -240,10 +240,6 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 							&& unitDataById[localMeterEdits.unitId].unitRepresent == UnitRepresentType.quantity));
 
 
-				// TODO DEBUG: added in to test the showErrorNotification
-				//submitState.name = '';
-				//submitState.identifier = '';
-
 				// Submit new meter if checks where ok.
 				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews })
 					.unwrap()

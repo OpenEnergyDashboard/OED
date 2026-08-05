@@ -6,7 +6,6 @@ const express = require('express');
 const Meter = require('../models/Meter');
 const User = require('../models/User');
 const Unit = require('../models/Unit');
-const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const { isTokenAuthorized } = require('../util/userRoles');
@@ -15,7 +14,7 @@ const Point = require('../models/Point');
 const moment = require('moment');
 const { MeterTimeSortTypesJS } = require('../services/csvPipeline/validateCsvUploadParams');
 const merge = require('lodash/merge');
-const { failure, success } = require('./response');
+const { failure, success, LogLevel } = require('./response');
 const { updateNonNullExpression } = require('typescript');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
@@ -117,7 +116,7 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 		const rows = await query(conn);
 		res.json(rows.map(row => formatMeterForResponse(row, isAuthorizedCSV)));
 	} catch (err) {
-		log.error(`Error while performing GET all meters query: ${err}`, err);
+		failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET all meters query: ${err.message}`, { cause: err }));
 	}
 });
 
@@ -140,7 +139,8 @@ router.get('/:meter_id', optionalAuthMiddleware, async (req, res) => {
 		}
 	};
 	if (!validate(req.params, validParams).valid) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		// No message given so as not to reveal whether the meter exists, matching the branch below.
+		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
@@ -150,11 +150,11 @@ router.get('/:meter_id', optionalAuthMiddleware, async (req, res) => {
 				// not displayable but the user is logged in, also fine.
 				res.json(formatMeterForResponse(meter, req.hasValidAuthToken));
 			} else {
-				res.sendStatus(HTTP_CODES.BAD_REQUEST);
+				// No message given so as not to reveal that the meter exists but is non-displayable.
+				failure(res, HTTP_CODES.BAD_REQUEST);
 			}
 		} catch (err) {
-			log.error(`Error while performing GET specific meter by id query: ${err}`, err);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET specific meter by id query: ${err.message}`, { cause: err }));
 		}
 	}
 });
@@ -279,8 +279,8 @@ router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 	// isEdit=true: id is required here since the client must tell us which meter to update.
 	const response = validateMeterParams(req.body, true)
 	if (!response.valid) {
-		log.warn(`Got request to edit a meter with invalid meter data, errors: ${response.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, 'validation failed with ' + response.errors.toString());
+		const message = 'validation failed with ' + response.errors.toString();
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message, LogLevel.WARN);
 	} else if (
 		(req.body.startTimestamp && !isValidIsoDateTime(req.body.startTimestamp, false)) ||
 		(req.body.endTimestamp && !isValidIsoDateTime(req.body.endTimestamp, false)) ||
@@ -288,7 +288,7 @@ router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 		(req.body.minDate && !isValidIsoDateTime(req.body.minDate)) ||
 		(req.body.maxDate && !isValidIsoDateTime(req.body.maxDate))
 	) {
-		failure(res, HTTP_CODES.BAD_REQUEST, 'invalid date/time format');
+		failure(res, HTTP_CODES.BAD_REQUEST, null, 'invalid date/time format');
 	} else {
 		const conn = getConnection();
 		try {
@@ -334,19 +334,16 @@ router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 			// The frequency may be different since DB stores as interval so it is returned
 			// and the meter updated by this value.
 			meter.readingFrequency = await meter.update(conn);
-			// TODO This is not using the success function since it needs to return values.
-			// At some point we probably should fuse the success and returning values.
 			// Need to format since some properties have different names than come from DB.
-			res.json(formatMeterForResponse(meter, true));
+			success(res, formatMeterForResponse(meter, true));
 		} catch (err) {
-			log.error(`Error while editing a meter with detail "${err['detail']}"`, err);
 			if (err.toString().includes('duplicate key value violates unique constraint')) {
-				failure(res, HTTP_CODES.BAD_REQUEST, `Meter name "${req.body.name}" already exists`);
+				failure(res, HTTP_CODES.BAD_REQUEST, err, `Meter name "${req.body.name}" already exists`, LogLevel.SILENT);
 			} else if (err.toString().includes('violates check constraint')) {
-				failure(res, HTTP_CODES.BAD_REQUEST, `Invalid meter data: ${err.toString()}`);
+				failure(res, HTTP_CODES.BAD_REQUEST, err, `Invalid meter data: ${err.toString()}`, LogLevel.SILENT);
 			} else {
-				log.error(`Error while editing a meter with detail "${err['detail']}"`, err);
-				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, err.toString() + ' with detail ' + err['detail']);
+				const detail = err['detail'] ? ` with detail "${err['detail']}"` : '';
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while editing a meter${detail}: ${err.message}`, { cause: err }));
 			}
 		}
 	}
@@ -359,8 +356,8 @@ router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 	// isEdit=false: id must not be present, since it's assigned by the DB on insert.
 	const response = validateMeterParams(req.body, false)
 	if (!response.valid) {
-		log.warn(`Got request to create a meter with invalid meter data, errors: ${response.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, 'validation failed with ' + response.errors.toString());
+		const message = 'validation failed with ' + response.errors.toString();
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message, LogLevel.WARN);
 	} else if (
 		// The default value for start/endTimestamp does have a timezone but it is not required nor put
 		// in when OED sets the value later so not checked here.
@@ -370,7 +367,7 @@ router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 		(req.body.minDate && !isValidIsoDateTime(req.body.minDate)) ||
 		(req.body.maxDate && !isValidIsoDateTime(req.body.maxDate))
 	) {
-		failure(res, HTTP_CODES.BAD_REQUEST, 'invalid date/time format');
+		failure(res, HTTP_CODES.BAD_REQUEST, null, 'invalid date/time format');
 	} else {
 		const conn = getConnection();
 		try {
@@ -412,19 +409,16 @@ router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 			);
 			// insert updates the newMeter values from DB.
 			await newMeter.insert(conn);
-			// TODO This is not using the success function since it needs to return values.
-			// At some point we probably should fuse the success and returning values.
 			// Need to format since some properties have different names than come from DB.
-			res.json(formatMeterForResponse(newMeter, true));
+			success(res, formatMeterForResponse(newMeter, true));
 		} catch (err) {
-			log.error(`Error while inserting new meter with detail "${err['detail']}"`, err);
 			if (err.toString().includes('duplicate key value violates unique constraint')) {
-				failure(res, HTTP_CODES.BAD_REQUEST, `Meter name "${req.body.name}" already exists`);
+				failure(res, HTTP_CODES.BAD_REQUEST, err, `Meter name "${req.body.name}" already exists`, LogLevel.SILENT);
 			} else if (err.toString().includes('violates check constraint')) {
-				failure(res, HTTP_CODES.BAD_REQUEST, `Invalid meter data: ${err.toString()}`);
+				failure(res, HTTP_CODES.BAD_REQUEST, err, `Invalid meter data: ${err.toString()}`, LogLevel.SILENT);
 			} else {
-				log.error(`Error while inserting new meter with detail "${err['detail']}"`, err);
-				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, err.toString() + ' with detail ' + err['detail']);
+				const detail = err['detail'] ? ` with detail "${err['detail']}"` : '';
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while inserting new meter${detail}: ${err.message}`, { cause: err }));
 			}
 		}
 	}

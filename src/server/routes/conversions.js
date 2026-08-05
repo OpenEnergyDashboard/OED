@@ -3,10 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const { log } = require('../log');
 const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
-const { success, failure } = require('./response');
+const { success, failure, LogLevel } = require('./response');
 const { HTTP_CODES } = require('../util/httpCodes');
 const validate = require('jsonschema').validate;
 
@@ -79,8 +78,7 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 		const rows = await Conversion.getAll(conn);
 		res.json(rows.map(formatConversionForResponse));
 	} catch (err) {
-		res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
-		log.error(`Error while performing GET conversions details query: ${err}`);
+		failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET conversions details query: ${err.message}`, { cause: err }));
 	}
 });
 
@@ -91,8 +89,8 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 	const validatorResult = validateConversionsParams(req.body);
 
 	if (!validatorResult.valid) {
-		log.warn(`Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`);
+		const message = `Got request to edit conversions with invalid conversion data, errors: ${validatorResult.errors}`;
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message, LogLevel.WARN);
 		return;
 	} else {
 		const conn = getConnection();
@@ -100,11 +98,10 @@ router.post('/edit', adminAuthMiddleware('edit conversions'), async (req, res) =
 			const updatedConversion = new Conversion(req.body.sourceId, req.body.destinationId, req.body.bidirectional,
 				req.body.slope, req.body.intercept, req.body.note);
 			await updatedConversion.update(conn);
+			success(res);
 		} catch (err) {
-			log.error(`Error while editing conversion with error(s): ${err}`);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while editing conversion with error(s): ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while editing conversion with error(s): ${err.message}`, { cause: err }));
 		}
-		success(res);
 	}
 });
 
@@ -115,8 +112,8 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
 	const validatorResult = validateConversionsParams(req.body);
 
 	if (!validatorResult.valid) {
-		log.error(`Got request to insert conversion with invalid conversion data, errors: ${validatorResult.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to insert conversion with invalid conversion data. Error(s): ${validatorResult.errors}`);
+		const message = `Got request to insert conversion with invalid conversion data. Error(s): ${validatorResult.errors}`;
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message);
 	} else {
 		const conn = getConnection();
 		try {
@@ -131,11 +128,9 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
 				);
 				await newConversion.insert(t);
 			});
-			//res.sendStatus(HTTP_CODES.OK);
 			success(res);
 		} catch (err) {
-			log.error(`Error while inserting new conversion with error(s): ${err}`);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while inserting new conversion with errors(s): ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while inserting new conversion with error(s): ${err.message}`, { cause: err }));
 		}
 	}
 });
@@ -144,8 +139,6 @@ router.post('/addConversion', adminAuthMiddleware('add conversions'), async (req
  * Route for POST, delete conversion.
  */
 router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, res) => {
-	// TODO DEBUG: to force the showErrorNotification to pass in EditConversionsModalComponent.tsx
-	//req.body.meterIds.push(0);
 	// Accept sourceId, destinationId, meterIds, groupIds
 	const validConversion = {
 		type: 'object',
@@ -177,8 +170,8 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
-		log.error(`Got request to delete conversions with invalid conversion data, errors: ${validatorResult.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
+		const message = `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`;
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message);
 	} else {
 		const { sourceId, destinationId, meterIds = [], groupIds = [] } = req.body;
 		const conn = getConnection();
@@ -197,8 +190,7 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 			});
 			success(res, 'Successfully deleted conversion and updated meters/groups');
 		} catch (err) {
-			log.error(`Error while deleting conversion and updating meters/groups: ${err}`);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while deleting conversion and updating meters/groups: ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while deleting conversion and updating meters/groups: ${err.message}`, { cause: err }));
 		}
 	}
 });
@@ -214,16 +206,15 @@ router.post('/simulate-delete', adminAuthMiddleware('simulate deleting conversio
 	};
 	const validatorResult = validate(req.body, validConversion);
 	if (!validatorResult.valid) {
-		log.warn(`Got request to simulate deletion of conversions with invalid conversion data, errors: ${validatorResult.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to delete conversions with invalid conversion data. Error(s): ${validatorResult.errors}`);
+		const message = `Got request to simulate deletion of conversions with invalid conversion data. Error(s): ${validatorResult.errors}`;
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message, LogLevel.WARN);
 	} else {
 		try {
 			const conn = getConnection();
 			const result = await simulateDeleteConversion(req.body, conn);
-			return res.json(result);
+			success(res, result);
 		} catch (err) {
-			log.error(`Error while simulating deletion of conversion with error(s): ${err}`);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while simulating deletion of conversion with errors(s): ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while simulating deletion of conversion with error(s): ${err.message}`, { cause: err }));
 		}
 	}
 });

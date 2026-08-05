@@ -195,9 +195,6 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 			...(passwordModified && { password: userDetails.password })
 		};
 
-		//TODO DEBUG
-		//editedUser.username = '';
-
 		submitUserEdits(editedUser)
 			.unwrap()
 			.then(() => {

@@ -115,9 +115,6 @@ export default function CreateUserModal() {
 		// introducing omit() in the client files for User could cause unexpected issues. We are acknowledging that the codebase currently has a different
 		// implementation for handleSubmit() compared to other client files.
 		const newUser: User = { username: userDetails.username, role: userDetails.role, password: userDetails.password, note: userDetails.note };
-
-		//TODO DEBUG
-		//newUser.username = '';
 		createUser(newUser)
 			.unwrap()
 			.then(() => {

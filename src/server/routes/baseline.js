@@ -6,20 +6,20 @@
 const { getConnection } = require('../db');
 const express = require('express');
 const Baseline = require('../models/Baseline');
-const log = require('../log');
 const validate = require('jsonschema').validate;
 const { adminAuthMiddleware } = require('./authenticator');
 const { STRING_GENERAL_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidIsoDateTime } = require('../util/timeValidation');
+const { success, failure } = require('./response');
 const router = express.Router();
 router.get('/', async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rawBaselines = await Baseline.getAllBaselines(conn);
-		res.json(rawBaselines);
+		success(res, rawBaselines);
 	} catch (err) {
-		log(`Error while getting all baselines: ${err}`, 'error');
+		failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while getting all baselines: ${err.message}`, { cause: err }));
 	}
 });
 router.post('/new', adminAuthMiddleware('create baselines'), async (req, res) => {
@@ -59,14 +59,14 @@ router.post('/new', adminAuthMiddleware('create baselines'), async (req, res) =>
 	};
 
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
 		return;
 	}
 	// baseline.js does not use moment; validate date strings directly
 	// TODO This might not stay and is not used in OED now but need to see if it has a timezone for the check.
 	if (!isValidIsoDateTime(req.body.applyStart) || !isValidIsoDateTime(req.body.applyEnd) ||
 		!isValidIsoDateTime(req.body.calcStart) || !isValidIsoDateTime(req.body.calcEnd)) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
 		return;
 	}
 
@@ -80,10 +80,9 @@ router.post('/new', adminAuthMiddleware('create baselines'), async (req, res) =>
 			req.body.calcEnd,
 			req.body.note);
 		await baseline.insert(conn);
-		res.sendStatus(HTTP_CODES.OK);
+		success(res);
 	} catch (err) {
-		res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
-		log(`Error while adding baseline: ${err}`, 'error');
+		failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while adding baseline: ${err.message}`, { cause: err }));
 	}
 });
 module.exports = router;
