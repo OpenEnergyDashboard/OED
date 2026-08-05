@@ -11,7 +11,7 @@ const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Log Routes', () => {
 	let token, currentLogToDb;
-	mocha.beforeEach(async () => {
+	mocha.before(async () => {
 		// Login to get authentication token
 		const res = await chai.request(app).post('/api/loginLogout/login')
 			.send({ username: testUser.username, password: testUser.password });
@@ -23,8 +23,8 @@ mocha.describe('Log Routes', () => {
 		currentLogToDb = log.logToDb;
 		log.logToDb = true;
 	});
-	mocha.afterEach(async () => {
-		// Logout after each test is done
+	mocha.after(async () => {
+		// Logout after all tests are done
 		if (token) {
 			await chai.request(app).post('/api/loginLogout/logout')
 				.set('token', token);
