@@ -4,15 +4,16 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { expect } = require('chai');
-const common = require('../common');
+//const { expect } = require('chai');
+const { mocha, chai, app, testUser, expect, testDB } = require('../common');
+//const common = require('../common');
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
 const { HTTP_CODES } = require('../../util/httpCodes');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../../config').secretToken;
 
-const { chai, mocha, app, testUser } = common;
+//const { chai, mocha, app, testUser } = common;
 
 mocha.describe('Session Invalidation Security', () => {
 	const LOGIN_ENDPOINT = '/api/loginLogout/login';
@@ -159,7 +160,7 @@ mocha.describe('Session Invalidation Security', () => {
 		let csvUser;
 
 		mocha.beforeEach(async () => {
-			const conn = common.testDB.getConnection();
+			const conn = testDB.getConnection();
 
 			csvUser = new User(
 				undefined,

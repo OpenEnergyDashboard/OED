@@ -4,8 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { expect } = require('chai');
-const { chai, mocha, app } = require('../common');
+const { chai, mocha, app, expect } = require('../common');
 const { testInvalidField, validateInt, validateBool, validateNoExtraFields } = require('../util/validationHelpers');
 const { STRING_GENERAL_MAX_LENGTH } = require('../../util/validationConstants');
 const { HTTP_CODES } = require('../../util/httpCodes');
