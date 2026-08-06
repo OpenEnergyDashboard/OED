@@ -24,7 +24,8 @@ const { meterLineReadings,
 
 const {
 	expectValidCommaSeparatedIds,
-	validateCommaSeparatedIdPatterns
+	validateCommaSeparatedIdPatterns,
+	validateNumericIdInPath
 } = require('../util/validationHelpers');
 
 const { createTimeString } = require('../../util/readingsUtils');
@@ -197,24 +198,36 @@ mocha.describe('unit readings routes', () => {
 		});
 	});
 
-	mocha.describe('the meter 3D readings route', () => {
-		mocha.describe('validation', () => {
-			mocha.it('fails to validate when the meter_ids param is wrong', () => {
-				const validationResult = validateMeterThreeDReadingsParams({ meter_ids: '1,2' });
-				expect(validationResult).to.equal(false);
-			});
-			mocha.it('validates when the meter_ids param is valid', () => {
-				const validationResult = validateMeterThreeDReadingsParams({ meter_ids: '1' });
-				expect(validationResult).to.equal(true);
-			});
-			mocha.it('validates when the time interval is valid', () => {
-				const validationResult = validateThreeDQueryParams({
-					timeInterval: createTimeString('2022-01-01', '00:00:00', '2023-01-01', '00:00:00'), graphicUnitId: '99', readingInterval: '1'
-				});
-				expect(validationResult).to.equal(true);
-			});
 
-			// TODO Maybe check for invalid for each value in validateLineReadingsQueryParams (also in Bar below).
+	mocha.describe('the meter 3D readings route', () => {
+		const THREE_D_METERS_ENDPOINT = '/api/unitReadings/threeD/meters';
+		const valid_query = { timeInterval: createTimeString('2022-01-01', '00:00:00', '2023-01-01', '00:00:00'), graphicUnitId: '99', readingInterval: '1' }
+
+		mocha.describe('validation', () => {
+			mocha.it('fails to validate when the meter_ids param is wrong', async () => {
+				await validateNumericIdInPath({
+					baseEndpoint: THREE_D_METERS_ENDPOINT,
+					invalidValues: [
+						'abc',
+						'1,',
+						',1',
+						'1,2',
+						'1,,2',
+						'1;2',
+						'1.5',
+						'-1',
+						'1 2',
+					],
+					query: valid_query,
+				});
+			});
+			mocha.it('validates when the time interval is valid', async () => {
+				await expectValidCommaSeparatedIds({
+					baseEndpoint: THREE_D_METERS_ENDPOINT,
+					validValues: ['1', '12'],
+					query: valid_query
+				});
+			});
 		});
 
 		// This needs to run the after() for this test so separated into its own describe since after works at that level. 
@@ -231,7 +244,8 @@ mocha.describe('unit readings routes', () => {
 			mocha.it('returns threeD readings correctly when called correctly', async () => {
 				// The moments in these tests all involve TimeInterval that converts to UTC
 				// and not the DB so okay to use local timezone.
-				const timeInterval = new TimeInterval(moment('2017-01-01'), moment('2017-01-02'));
+				const timeString = '2017-01-01T00:00:00.000Z_2017-01-02T00:00:00.000Z';
+                const timeInterval = TimeInterval.fromString(timeString);
 
 				// getMeterThreeDReadings is called by meterThreeDReadings. This makes it appear the result is what is given here.
 				readingsStub = sinon.stub(Reading, 'getThreeDReadings');
@@ -240,14 +254,25 @@ mocha.describe('unit readings routes', () => {
 						{ reading: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp }
 					]
 				});
-				const response = await meterThreeDReadings([1], 99, timeInterval, 1);
+
+				const three_d_test_query = {
+					timeInterval: timeString,
+					graphicUnitId: '99',
+					readingInterval: '1'
+				};
+
+				const res = await chai.request(app)
+					.get(`${THREE_D_METERS_ENDPOINT}/1`)
+					.query(three_d_test_query);
+
+				expect(res).to.have.status(HTTP_CODES.OK);
 
 				const expectedResponse = {
 					1: [
-						{ reading: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp }
+						{ reading: 1, start_timestamp: timeInterval.startTimestamp.toISOString() , end_timestamp: timeInterval.endTimestamp.toISOString() }
 					]
 				};
-				expect(response).to.deep.equal(expectedResponse);
+				expect(res.body).to.deep.equal(expectedResponse);
 			});
 		});
 	});
