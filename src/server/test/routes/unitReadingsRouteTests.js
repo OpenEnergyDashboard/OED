@@ -49,14 +49,14 @@ mocha.describe('unit readings routes', () => {
 				await validateCommaSeparatedIdPatterns({
 					baseEndpoint: LINE_METERS_ENDPOINT,
 					invalidValues: [
-						'abc',          
-						'1,',          
-						',1',            
-						'1,,2',          
-						'1;2',           
-						'1.5',         
-						'-1',            
-						'1 2',           
+						'abc',
+						'1,',
+						',1',
+						'1,,2',
+						'1;2',
+						'1.5',
+						'-1',
+						'1 2',
 					],
 					query: valid_query,
 					expectedStatuses: [HTTP_CODES.OK, HTTP_CODES.NOT_FOUND, HTTP_CODES.INTERNAL_SERVER_ERROR]
@@ -70,9 +70,6 @@ mocha.describe('unit readings routes', () => {
 				})
 			});
 		});
-
-		// TODO The mocha documentation (https://mochajs.org/#arrow-functions) discourages lambda functions. Thus, the following used function().
-		// Should consider removing lambda functions from all tests.
 
 		// This needs to run the after() for this test so separated into its own describe since after works at that level. 
 		mocha.describe('correct call', function () {
@@ -88,7 +85,8 @@ mocha.describe('unit readings routes', () => {
 			mocha.it('returns line readings correctly when called correctly', async function () {
 				// The moments in these tests all involve TimeInterval that converts to UTC
 				// and not the DB so okay to use local timezone.
-				const timeInterval = new TimeInterval(moment('2017-01-01'), moment('2017-01-02'));
+				const timeString = '2017-01-01T00:00:00.000Z_2017-01-02T00:00:00.000Z';
+                const timeInterval = TimeInterval.fromString(timeString);
 
 				// getMeterLineReadings is called by meterLineReadings. This makes it appear the result is what is given here.
 				readingsStub = sinon.stub(Reading, 'getMeterLineReadings');
@@ -97,10 +95,15 @@ mocha.describe('unit readings routes', () => {
 						{ reading_rate: 1, min_rate: 1, max_rate: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp }
 					]
 				});
-				
+
+				const line_test_query = {
+					timeInterval: timeString,
+					graphicUnitId: '99'
+				};
+
 				const res = await chai.request(app)
-								.get(`${LINE_METERS_ENDPOINT}/1`)
-								.query(valid_query);
+					.get(`${LINE_METERS_ENDPOINT}/1`)
+					.query(line_test_query);
 
 				expect(res).to.have.status(HTTP_CODES.OK);
 
