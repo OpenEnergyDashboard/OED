@@ -99,10 +99,19 @@ mocha.describe('groups API', () => {
 		// Since this .before is in the middle of tests, it should not have issues as
 		// documented in usersTest.js.
 		mocha.before(async () => {
+			// login
 			let res = await chai.request(app).post('/api/loginLogout/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
+		mocha.after(async () => {
+			// logout
+			if (token) {
+				await chai.request(app).post('/api/loginLogout/logout')
+					.set('token', token);
+			}
+		});
+		
 		mocha.describe('create endpoint', () => {
 
 			mocha.it('rejects all requests with an invalid token with 401', async () => {
@@ -133,6 +142,11 @@ mocha.describe('groups API', () => {
 						// create
 						res = await chai.request(app).post('/api/groups/create').set('token', currentToken);
 						expect(res).to.have.status(expectedResponseStatus);
+						// logout
+						if (currentToken) {
+							await chai.request(app).post('/api/loginLogout/logout')
+								.set('token', currentToken);
+						}
 					});
 
 				}
@@ -190,6 +204,11 @@ mocha.describe('groups API', () => {
 						// edit
 						res = await chai.request(app).put('/api/groups/edit').set('token', currentToken);
 						expect(res).to.have.status(expectedResponseStatus);
+						// logout
+						if (currentToken) {
+							await chai.request(app).post('/api/loginLogout/logout')
+								.set('token', currentToken);
+						}
 					});
 
 				}
