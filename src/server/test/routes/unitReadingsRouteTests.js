@@ -116,22 +116,37 @@ mocha.describe('unit readings routes', () => {
 			});
 		});
 	});
+
+
 	mocha.describe('the bar readings route', () => {
+		const BAR_METERS_ENDPOINT = '/api/unitReadings/bar/meters';
+		const valid_query = { timeInterval: TimeInterval.unbounded().toString(), barWidthDays: '28', graphicUnitId: '99' };
 
 		mocha.describe('validation', () => {
-			mocha.it('fails to validate when the meter_ids param is wrong', () => {
-				const validationResult = validateMeterBarReadingsParams({ meter_ids: 'not_a_number' });
-				expect(validationResult).to.equal(false);
+			mocha.it('fails to validate when the meter_ids param is wrong', async () => {
+				await validateCommaSeparatedIdPatterns({
+					baseEndpoint: BAR_METERS_ENDPOINT,
+					invalidValues: [
+						'abc',
+						'1,',
+						',1',
+						'1,,2',
+						'1;2',
+						'1.5',
+						'-1',
+						'1 2',
+					],
+					query: valid_query,
+					expectedStatuses: [HTTP_CODES.OK, HTTP_CODES.NOT_FOUND, HTTP_CODES.INTERNAL_SERVER_ERROR]
+				});
 			});
-			mocha.it('validates when the meter_ids param is valid', () => {
-				const validationResult = validateMeterBarReadingsParams({ meter_ids: '1,2,3' });
-				expect(validationResult).to.equal(true);
-			});
-			mocha.it('validates when the time interval is valid', () => {
-				const validationResult = validateBarReadingsQueryParams(
-					{ timeInterval: TimeInterval.unbounded().toString(), barWidthDays: '28', graphicUnitId: '99' }
-				);
-				expect(validationResult).to.equal(true);
+
+			mocha.it('validates when the time interval is valid', async () => {
+				await expectValidCommaSeparatedIds({
+					baseEndpoint: BAR_METERS_ENDPOINT,
+					validValues: ['1', '12', '1,2,3'],
+					query: valid_query
+				})
 			});
 		});
 
@@ -148,8 +163,9 @@ mocha.describe('unit readings routes', () => {
 			});
 
 			mocha.it('returns bar readings correctly when called correctly', async () => {
-				const timeInterval = new TimeInterval(moment('2017-01-01'), moment('2017-01-02'));
-
+				const timeString = '2017-01-01T00:00:00.000Z_2017-01-02T00:00:00.000Z';
+                const timeInterval = TimeInterval.fromString(timeString);
+				
 				// getMeterBarReadings is called by meterBarReadings. This makes it appear the result is what is given here.
 				readingsStub = sinon.stub(Reading, 'getMeterBarReadings');
 				readingsStub.resolves({
@@ -157,14 +173,26 @@ mocha.describe('unit readings routes', () => {
 						{ reading: 1, start_timestamp: timeInterval.startTimestamp, end_timestamp: timeInterval.endTimestamp }
 					]
 				});
-				const response = await meterBarReadings([1], 99, 1, timeInterval);
+
+				const bar_test_query = {
+					timeInterval: timeString,
+					graphicUnitId: '99',
+					barWidthDays: '1'
+				};
+
+				const res = await chai.request(app)
+					.get(`${BAR_METERS_ENDPOINT}/1`)
+					.query(bar_test_query);
+
+				expect(res).to.has.status(HTTP_CODES.OK);
+
 				const expectedResponse = {
 					1: [
 						{ reading: 1, startTimestamp: timeInterval.startTimestamp.valueOf(), endTimestamp: timeInterval.endTimestamp.valueOf() }
 					]
 				};
 
-				expect(response).to.deep.equal(expectedResponse);
+				expect(res.body).to.deep.equal(expectedResponse);
 			});
 		});
 	});
@@ -229,8 +257,8 @@ mocha.describe('unit readings routes', () => {
 				const validationResult = validateGroupThreeDReadingsParams({ meter_ids: '1,2' });
 				expect(validationResult).to.equal(false);
 			});
-		mocha.it('validates when the group_id param is valid', () => {
-			const validationResult = validateGroupThreeDReadingsParams({ group_id: '1' });
+			mocha.it('validates when the group_id param is valid', () => {
+				const validationResult = validateGroupThreeDReadingsParams({ group_id: '1' });
 				expect(validationResult).to.equal(true);
 			});
 			mocha.it('validates when the time interval is valid', () => {
