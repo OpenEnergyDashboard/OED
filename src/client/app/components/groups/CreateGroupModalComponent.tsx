@@ -31,6 +31,7 @@ import { AreaUnitType, getAreaUnitConversion } from '../../utils/getAreaUnitConv
 import { getGPSString } from '../../utils/input';
 import { showSuccessNotification, showErrorNotification, showWarnNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import ListDisplayComponent from '../ListDisplayComponent';
 import MultiSelectComponent from '../MultiSelectComponent';
 import TooltipHelpComponent from '../TooltipHelpComponent';
@@ -115,6 +116,7 @@ export default function CreateGroupModalComponent() {
 	/* State */
 	// State for the created group.
 	const [state, setState] = useState(defaultValues);
+	const [pendingAreaCalculation, setPendingAreaCalculation] = useState<{ message: string; area: number } | null>(null);
 
 	// Handlers for each type of input change
 
@@ -179,16 +181,28 @@ export default function CreateGroupModalComponent() {
 				if (notifyMsg != '') {
 					msg += '\n' + translate('group.area.calculate.error.header') + notifyMsg;
 				}
-				if (window.confirm(msg)) {
+				setPendingAreaCalculation({
+					message: msg,
 					// the + here converts back into a number
-					setState({ ...state, ['area']: + areaSum.toPrecision(6) });
-				}
+					area: + areaSum.toPrecision(6)
+				});
 			} else {
 				showErrorNotification(translate('group.area.calculate.error.group.unit'));
 			}
 		} else {
 			showErrorNotification(translate('group.area.calculate.error.no.meters'));
 		}
+	};
+
+	const handleAreaCalculationConfirm = () => {
+		if (pendingAreaCalculation !== null) {
+			setState(currentState => ({ ...currentState, area: pendingAreaCalculation.area }));
+		}
+		setPendingAreaCalculation(null);
+	};
+
+	const handleAreaCalculationCancel = () => {
+		setPendingAreaCalculation(null);
 	};
 
 	const handleClose = () => {
@@ -370,6 +384,13 @@ export default function CreateGroupModalComponent() {
 					disabled={!canSave}
 				/>
 			)}
+			<ConfirmActionModalComponent
+				show={pendingAreaCalculation !== null}
+				actionTitle={translate('group.area.calculate')}
+				actionConfirmMessage={pendingAreaCalculation?.message}
+				handleClose={handleAreaCalculationCancel}
+				actionFunction={handleAreaCalculationConfirm}
+			/>
 			{/* Show modal button */}
 			<Button color='secondary' onClick={handleShow}>
 				<FormattedMessage id="create.group" />
