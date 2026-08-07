@@ -53,14 +53,15 @@ async function loadCsvInput(
 	honorDst = false,
 	relaxedParsing = false,
 	useMeterZone = false,
-	warnOnCumulativeReset = false
+	warnOnCumulativeReset = false,
+	language = 'en' //added for internationalization: language preference from user
 ) {
 	try {
 		const dataRows = await readCsv(filePath, headerRow);
 		return loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition,
 			isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
 			readingGap, readingLengthVariation, isEndOnly, shouldUpdate, conditionSet, conn,
-			honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset);
+			honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset, language);
 	} catch (err) {
 		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);
 	}
