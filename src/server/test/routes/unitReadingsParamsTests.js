@@ -9,18 +9,6 @@ const { HTTP_CODES } = require('../../util/httpCodes');
 const sinon = require('sinon');
 const moment = require('moment');
 const Reading = require('../../models/Reading');
-const { meterLineReadings,
-	validateLineReadingsParams,
-	validateLineReadingsQueryParams,
-	meterBarReadings,
-	validateMeterBarReadingsParams,
-	validateBarReadingsQueryParams,
-	meterThreeDReadings,
-	groupThreeDReadings,
-	validateMeterThreeDReadingsParams,
-	validateGroupThreeDReadingsParams,
-	validateThreeDQueryParams,
-} = require('../../routes/unitReadings');
 
 const {
 	expectValidCommaSeparatedIds,
@@ -32,13 +20,6 @@ const { createTimeString } = require('../../util/readingsUtils');
 
 const { TimeInterval } = require('../../../common/TimeInterval');
 
-// TODO is this actually used anywhere?
-function mockResponse() {
-	return {
-		sendStatus: sinon.spy(),
-		json: sinon.spy()
-	};
-}
 
 mocha.describe('unit readings routes', () => {
 	mocha.describe('the line readings route', () => {
@@ -185,7 +166,7 @@ mocha.describe('unit readings routes', () => {
 					.get(`${BAR_METERS_ENDPOINT}/1`)
 					.query(bar_test_query);
 
-				expect(res).to.has.status(HTTP_CODES.OK);
+				expect(res).to.have.status(HTTP_CODES.OK);
 
 				const expectedResponse = {
 					1: [
