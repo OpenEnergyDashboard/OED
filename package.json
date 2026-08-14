@@ -67,6 +67,7 @@
 		"csv": "~5.3.2",
 		"csv-stringify": "~5.6.5",
 		"d3": "~7.8.5",
+		"date-holidays": "~3.33.0",
 		"dotenv": "~16.4.5",
 		"escape-html": "~1.0.3",
 		"express": "~4.19.2",

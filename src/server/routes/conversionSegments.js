@@ -238,8 +238,8 @@ router.post('/splitEarlier', adminAuthMiddleware('split earlier conversion segme
 			},
 			newWeekPatternsId: {
 				oneOf: [
-					{type: 'integer', minimum: 0},
-					{type: 'null'}
+					{ type: 'integer' },
+					{ type: 'null' }
 				]
 			},
 			newSlope: {
@@ -271,7 +271,7 @@ router.post('/splitEarlier', adminAuthMiddleware('split earlier conversion segme
 			await ConversionSegment.splitEarlier(
 				req.body.sourceId,
 				req.body.destinationId,
-				req.body.newWeekPatternsId,
+				req.body.newWeekPatternsId === -99 ? null : req.body.newWeekPatternsId,
 				req.body.newSlope,
 				req.body.newIntercept,
 				req.body.newNote,
@@ -323,8 +323,8 @@ router.post('/splitLater', adminAuthMiddleware('split later conversion segment')
 			},
 			newWeekPatternsId: {
 				oneOf: [
-					{type: 'integer', minimum: 0},
-					{type: 'null'}
+					{ type: 'integer' },
+					{ type: 'null' }
 				]
 			},
 			newSlope: {
@@ -356,7 +356,7 @@ router.post('/splitLater', adminAuthMiddleware('split later conversion segment')
 			await ConversionSegment.splitLater(
 				req.body.sourceId,
 				req.body.destinationId,
-				req.body.newWeekPatternsId,
+				req.body.newWeekPatternsId === -99 ? null : req.body.newWeekPatternsId,
 				req.body.newSlope,
 				req.body.newIntercept,
 				req.body.newNote,
@@ -404,8 +404,8 @@ router.post('/edit', adminAuthMiddleware('edit conversion segment'), async (req,
 			},
 			weekPatternsId: {
 				oneOf: [
-					{type: 'integer', minimum: 0},
-					{type: 'null'}
+					{ type: 'integer' },
+					{ type: 'null' }
 				]
 			},
 			slope: {
@@ -446,7 +446,7 @@ router.post('/edit', adminAuthMiddleware('edit conversion segment'), async (req,
 			const updatedConversionSegment = new ConversionSegment(
 				req.body.sourceId, 
 				req.body.destinationId, 
-				req.body.weekPatternsId, 
+				req.body.weekPatternsId === -99 ? null : req.body.weekPatternsId,
 				req.body.slope, 
 				req.body.intercept, 
 				momentToIsoOrInfinity(req.body.startTime),

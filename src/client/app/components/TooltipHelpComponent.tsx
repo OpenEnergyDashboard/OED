@@ -6,10 +6,10 @@ import * as React from 'react';
 import { FormattedMessage } from 'react-intl';
 import ReactTooltip from 'react-tooltip';
 import { selectOEDVersion } from '../redux/api/versionApi';
+import { useTranslate } from '../redux/componentHooks';
 import { useAppSelector } from '../redux/reduxHooks';
 import { selectHelpUrl } from '../redux/slices/adminSlice';
 import '../styles/tooltip.css';
-import { useTranslate } from '../redux/componentHooks';
 
 interface TooltipHelpProps {
 	page: string; // Specifies which page the tip is in.
@@ -32,6 +32,10 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.admin.conversioncreate': { link: `${helpUrl}/adminConversionCreating/` },
 		'help.admin.conversionedit': { link: `${helpUrl}/adminConversionEditing/` },
 		'help.admin.conversionview': { link: `${helpUrl}/adminConversionViewing/` },
+		'help.admin.daycreate': { link: `${helpUrl}` }, // TODO: Add specific link for day creation
+		'help.admin.dayedit': { link: `${helpUrl}` }, // TODO: Add specific link for day editing
+		'help.admin.dayview': { link: `${helpUrl}` }, // TODO: Add specific link for day viewing
+		'help.admin.holidayview': { link: `${helpUrl}` }, // TODO: Add specific link for holiday viewing
 		'help.admin.groupcreate': { link: `${helpUrl}/adminGroupCreating/` },
 		'help.admin.groupedit': { link: `${helpUrl}/adminGroupEditing/` },
 		'help.admin.groupview': { link: `${helpUrl}/adminGroupViewing/` },
@@ -44,6 +48,9 @@ export default function TooltipHelpComponent(props: TooltipHelpProps) {
 		'help.admin.unitedit': { link: `${helpUrl}/adminUnitEditing/` },
 		'help.admin.unitview': { link: `${helpUrl}/adminUnitViewing/` },
 		'help.admin.users': { link: `${helpUrl}/adminUser/` },
+		'help.admin.weekcreate': { link: `${helpUrl}` }, // TODO: Add specific link for week creation
+		'help.admin.weekedit': { link: `${helpUrl}` }, // TODO: Add specific link for week editing
+		'help.admin.weekview': { link: `${helpUrl}` }, // TODO: Add specific link for week viewing
 		'help.csv.meters': { link: `${helpUrl}/adminMetersImport/` },
 		'help.csv.readings': { link: `${helpUrl}/adminReadingsImport/` },
 		'help.home.area.normalize': { link: `${helpUrl}/areaNormalization/` },

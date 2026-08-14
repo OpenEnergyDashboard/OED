@@ -12,5 +12,6 @@ UPDATE week_patterns
 		wednesday = ${wednesday},
 		thursday = ${thursday},
 		friday = ${friday},
-		saturday = ${saturday}
+		saturday = ${saturday},
+		holiday_instance_group_id = ${holidayInstanceGroupId}
 	WHERE id = ${id};

@@ -43,6 +43,13 @@ export const largeTitleStyle: React.CSSProperties = {
 	display: 'inline-block'
 };
 
+export const modalSectionDividerStyle: React.CSSProperties = {
+	borderTop: '1px solid gray',
+	left: '-2rem',
+	width: '100vw',
+	position: 'relative'
+};
+
 export const pill: React.CSSProperties = {
 	margin: '2px',
 	userSelect: 'none',

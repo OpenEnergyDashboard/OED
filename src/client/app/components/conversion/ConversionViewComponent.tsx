@@ -61,12 +61,6 @@ export default function ConversionViewComponent(props: ConversionViewComponentPr
 				<b><FormattedMessage id="conversion.bidirectional" /></b> {translate(`TrueFalseType.${props.conversion.bidirectional.toString()}`)}
 			</div>
 			<div className="item-container">
-				<b><FormattedMessage id="conversion.slope" /></b> {props.conversion.slope}
-			</div>
-			<div className="item-container">
-				<b><FormattedMessage id="conversion.intercept" /></b> {props.conversion.intercept}
-			</div>
-			<div className="item-container">
 				{/* Only show first 30 characters so card does not get too big. Should limit to one line */}
 				<b><FormattedMessage id="note" /></b> {props.conversion.note.slice(0, 29)}
 			</div>

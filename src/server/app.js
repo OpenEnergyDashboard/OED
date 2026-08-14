@@ -35,6 +35,10 @@ const conversionSegments = require('./routes/conversionSegments');
 const days = require('./routes/days');
 const daySegments = require('./routes/daySegments');
 const weeks = require('./routes/weeks');
+const holidays = require('./routes/holidays');
+const holidayInstances = require('./routes/holidayInstances');
+const holidayInstanceGroups = require('./routes/holidayInstanceGroups');
+const holidayGroupMembers = require('./routes/holidayGroupMembers');
 const ciks = require('./routes/ciks');
 
 // Limit the rate of overall requests to OED
@@ -141,6 +145,10 @@ app.use('/api/units', units);
 app.use('/api/conversions', conversions);
 app.use('/api/days', days);
 app.use('/api/weeks', weeks);
+app.use('/api/holidays', holidays);
+app.use('/api/holidayInstances', holidayInstances);
+app.use('/api/holidayInstanceGroups', holidayInstanceGroups);
+app.use('/api/holidayGroupMembers', holidayGroupMembers);
 app.use('/api/conversionSegments', conversionSegments);
 app.use('/api/daySegments', daySegments);
 app.use('/api/ciks', ciks);

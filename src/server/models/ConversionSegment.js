@@ -64,7 +64,7 @@ class ConversionSegment {
 	 * @returns {Promise.<ConversionSegment>}
 	 */
 	static async getBySourceDestination(sourceId, destinationId, conn) {
-		const rows = await conn.many(sqlFile('conversionSegment/get_by_source_destination.sql'), {
+		const rows = await conn.any(sqlFile('conversionSegment/get_by_source_destination.sql'), {
 			sourceId: sourceId,
 			destinationId: destinationId
 		});
@@ -130,7 +130,7 @@ class ConversionSegment {
 	 */
 	static async splitEarlier(sourceId, destinationId, newWeekPatternsId, newSlope, newIntercept, newNote, startTime, endTime, splitTime, conn) {
 		return conn.tx(async t => {
-			// get all data for the original segment
+			// get all original values of the segment being split
 			const originalSegment = await t.one(sqlFile('conversionSegment/get_by_source_destination_start_end.sql'), {
 				sourceId: sourceId,
 				destinationId: destinationId,
@@ -164,6 +164,7 @@ class ConversionSegment {
 				originalStartTime: originalSegment.start_time,
 				originalEndTime: originalSegment.end_time
 			});
+
 		});
 	}
 
@@ -309,16 +310,15 @@ class ConversionSegment {
 		}
 
 		return conn.tx(async t => {
-			// update the start time of the next segment
-			await t.none(sqlFile('conversionSegment/update_next_seg_start_to_curr_start.sql'), {
+			// delete segment passed in
+			await t.none(sqlFile('conversionSegment/delete_conversion_segment.sql'), {
 				sourceId: sourceId,
 				destinationId: destinationId,
 				startTime: startTime,
 				endTime: endTime
 			});
-
-			// delete segment passed in
-			await t.none(sqlFile('conversionSegment/delete_conversion_segment.sql'), {
+			// update the start time of the next segment
+			await t.none(sqlFile('conversionSegment/update_next_seg_start_to_curr_start.sql'), {
 				sourceId: sourceId,
 				destinationId: destinationId,
 				startTime: startTime,
