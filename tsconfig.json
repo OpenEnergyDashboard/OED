@@ -5,6 +5,7 @@
  */
 {
 	"compilerOptions": {
+		"ignoreDeprecations": "6.0",
 		"baseUrl": "./src/client/app/",
 		"outDir": "./src/client/public/app/",
 		"sourceMap": true,

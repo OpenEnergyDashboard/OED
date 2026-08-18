@@ -13,6 +13,8 @@ jobs:
       OED_DB_PASSWORD: travisTest
       OED_DB_DATABASE: travis_ci_dummy
       OED_DB_TEST_DATABASE: travis_ci_test
+      OED_DB_TEST_USER: oed_test
+      OED_DB_TEST_PASSWORD: oedTestOnly
       OED_DB_HOST: postgres
       OED_DB_PORT: 5432
       OED_TOKEN_SECRET: travis
