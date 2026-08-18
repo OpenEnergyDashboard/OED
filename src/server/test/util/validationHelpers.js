@@ -4,12 +4,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { expect } = require('chai');
-const chaiHttp = require('chai-http');
-const { chai, app } = require('../common');
+//const { expect } = require('chai');
+//const chaiHttp = require('chai-http');
+//const { chai, app } = require('../common');
+const { chai, expect } = require('../common');
+const { app } = require('../commonTestDB');
 const { HTTP_CODES } = require('../../util/httpCodes');
 
-chai.use(chaiHttp);
+//chai.use(chaiHttp);
 
 /**
  * Sends a POST request to the specified API endpoint with a test payload,

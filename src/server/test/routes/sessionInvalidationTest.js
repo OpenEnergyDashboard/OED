@@ -5,8 +5,10 @@
  */
 
 //const { expect } = require('chai');
-const { mocha, chai, app, testUser, expect, testDB } = require('../common');
 //const common = require('../common');
+//const { mocha, chai, app, testUser, expect, testDB } = require('../common');
+const { chai, mocha, expect } = require('../common');
+const { app, testUser, testDB } = require('../commonTestDB');
 const bcrypt = require('bcryptjs');
 const User = require('../../models/User');
 const { HTTP_CODES } = require('../../util/httpCodes');

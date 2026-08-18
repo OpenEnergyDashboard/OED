@@ -4,11 +4,11 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const chai = require('chai');
+//const chai = require('chai');
 
-const expect = chai.expect;
-const mocha = require('mocha');
-
+//const expect = chai.expect;
+//const mocha = require('mocha');
+const { chai, mocha, expect } = require('../common');
 const { findMaxSemanticVersion, compareSemanticVersion } = require('../../util');
 
 mocha.describe('compareTwoSemanticVersion', () => {
