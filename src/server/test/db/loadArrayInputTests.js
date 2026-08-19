@@ -5,7 +5,9 @@
  */
 
 const moment = require('moment');
-const { mocha, expect, testDB } = require('../common');
+//const { mocha, expect, testDB } = require('../common');
+const { mocha, expect } = require('../common');
+const { testDB } = require('../commonTestDB');
 const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
 const loadArrayInput = require('../../services/pipeline-in-progress/loadArrayInput');

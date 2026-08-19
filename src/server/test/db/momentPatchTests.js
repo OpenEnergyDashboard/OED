@@ -4,7 +4,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { mocha, expect, testDB } = require('../common');
+//const { mocha, expect, testDB } = require('../common');
+const { mocha, expect } = require('../common');
+const { testDB } = require('../commonTestDB');
 const moment = require('moment');
 
 mocha.describe('MomentJS patching', () => {

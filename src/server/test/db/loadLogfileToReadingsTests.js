@@ -5,7 +5,9 @@
  */
 
 const Meter = require('../../models/Meter');
-const { mocha, expect, testDB } = require('../common');
+//const { mocha, expect, testDB } = require('../common');
+const { mocha, expect } = require('../common');
+const { testDB } = require('../commonTestDB');
 const demuxCsvWithSingleColumnTimestamps = require('../../services/obvius/csvDemux');
 const loadLogfileToReadings = require('../../services/obvius/loadLogfileToReadings');
 
