@@ -4,8 +4,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-//const { expect } = require('chai');
-//const mocha = require('mocha');
 const { expect, mocha } = require('../common');
 const { isValidIsoDateTime, isValidIsoDuration, isValidTimeInterval } = require('../../util/timeValidation');
 

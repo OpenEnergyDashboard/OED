@@ -3,11 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const moment = require('moment');
-const mocha = require('mocha');
-const chai = require('chai');
-const chaiAsPromised = require('chai-as-promised');
-chai.use(chaiAsPromised);
-const expect = chai.expect;
+const { chai, mocha, expect } = require('./common');
 const { TimeInterval } = require('../../common/TimeInterval');
 
 

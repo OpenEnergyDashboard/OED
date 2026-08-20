@@ -5,7 +5,6 @@
  */
 
 const moment = require('moment');
-//const { mocha, expect, testDB } = require('../common');
 const { mocha, expect } = require('../common');
 const { testDB } = require('../commonTestDB');
 const readCsv = require('../../services/pipeline-in-progress/readCsv');

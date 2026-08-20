@@ -7,7 +7,8 @@
     See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
 */
 
-const { chai, mocha, expect, app } = require('../common');
+const { chai, mocha, expect } = require('../common');
+const { app } = require('../commonTestDB');
 const { createTimeString,
     ETERNITY,
     METER_ID,

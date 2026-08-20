@@ -5,7 +5,8 @@
 /* This file tests the API for retrieving meters, by artificially
  * inserting meters prior to executing the test code. */
 
-const { chai, mocha, expect, app, testDB, testUser } = require('../common');
+const { chai, mocha, expect } = require('../common');
+const { app, testUser, testDB } = require('../commonTestDB');
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const { HTTP_CODES } = require('../../util/httpCodes');

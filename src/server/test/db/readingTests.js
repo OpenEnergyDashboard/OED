@@ -5,7 +5,6 @@
 /**
  * This class is for testing meter readings.
  */
-//const { mocha, expect, testDB } = require('../common');
 const { mocha, expect } = require('../common');
 const { testDB } = require('../commonTestDB');
 const moment = require('moment');

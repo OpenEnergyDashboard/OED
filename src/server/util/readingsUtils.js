@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { expect, testDB } = require('../test/common');
+const { expect } = require('../test/common');
+const { testDB } = require('../test/commonTestDB');
 const { TimeInterval } = require('../../common/TimeInterval');
 const { insertUnits, insertConversions, insertMeters, insertGroups } = require('./insertData');
 const Unit = require('../models/Unit');

@@ -4,9 +4,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-//const { expect } = require('chai');
-//const common = require('../common');
-//const { mocha, chai, app, testUser, expect, testDB } = require('../common');
 const { chai, mocha, expect } = require('../common');
 const { app, testUser, testDB } = require('../commonTestDB');
 const bcrypt = require('bcryptjs');
