@@ -2,10 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* This file exports two useful items: testDB, which provides the method .getConnection,
- * returning a connection to the testing database, and recreateDB, which destroys the
- * database and creates a new schema there.
- */
+//This file exports a pre-configured mocha, chai, and expect for use in tests.
 
 const mocha = require('mocha');
 const chai = require('chai');
