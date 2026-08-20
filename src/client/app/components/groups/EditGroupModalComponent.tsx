@@ -124,6 +124,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	};
 
 	/* State */
+	const [pendingAreaCalculation, setPendingAreaCalculation] = useState<{ message: string; area: number } | null>(null);
 	// Handlers for each type of input change where update the local edit state.
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,26 +234,41 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
 					}
 				});
-				let msg = translate('group.area.calculate.header') + areaSum + ' ' + translate(`AreaUnitType.${groupState.areaUnit}`);
+				// The + here converts back into a number and removes trailing zeroes.
+				const roundedArea = +areaSum.toPrecision(6);
+				let msg = translate('group.area.calculate.confirm')
+					+ roundedArea + ' '
+					+ translate(`AreaUnitType.${groupState.areaUnit}`) + '?';
 				if (notifyMsg != '') {
 					msg += '\n' + translate('group.area.calculate.error.header') + notifyMsg;
 				}
-				if (window.confirm(msg)) {
-					setEditGroupsState({
-						...editGroupsState,
-						[groupState.id]: {
-							...editGroupsState[groupState.id],
-							// the + here converts back into a number. this method also removes trailing zeroes.
-							['area']: +areaSum.toPrecision(6)
-						}
-					});
-				}
+				setPendingAreaCalculation({
+					message: msg,
+					area: roundedArea
+				});
 			} else {
 				showErrorNotification(translate('group.area.calculate.error.group.unit'));
 			}
 		} else {
 			showErrorNotification(translate('group.area.calculate.error.no.meters'));
 		}
+	};
+
+	const handleAreaCalculationConfirm = () => {
+		if (pendingAreaCalculation !== null) {
+			setEditGroupsState(currentState => ({
+				...currentState,
+				[groupState.id]: {
+					...currentState[groupState.id],
+					area: pendingAreaCalculation.area
+				}
+			}));
+		}
+		setPendingAreaCalculation(null);
+	};
+
+	const handleAreaCalculationCancel = () => {
+		setPendingAreaCalculation(null);
 	};
 
 	// Reset the state to default values.
@@ -501,6 +517,15 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					disabled={!canSave || !validGroup}
 				/>
 			)}
+			<ConfirmActionModalComponent
+				show={pendingAreaCalculation !== null}
+				actionTitle={translate('group.area.calculate')}
+				actionConfirmMessage={pendingAreaCalculation?.message}
+				handleClose={handleAreaCalculationCancel}
+				actionFunction={handleAreaCalculationConfirm}
+				actionRejectText={translate('cancel')}
+				actionConfirmText={translate('group.area.calculate.update')}
+			/>
 			{/* This is for the modal for delete. */}
 			<ConfirmActionModalComponent
 				show={showDeleteConfirmationModal}

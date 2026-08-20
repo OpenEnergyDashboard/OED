@@ -177,16 +177,17 @@ export default function CreateGroupModalComponent() {
 						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
 					}
 				});
+				// The + here converts back into a number and removes trailing zeroes.
+				const roundedArea = +areaSum.toPrecision(6);
 				let msg = translate('group.area.calculate.confirm')
-					+ areaSum + ' '
+					+ roundedArea + ' '
 					+ translate(`AreaUnitType.${state.areaUnit}`) + '?';
 				if (notifyMsg != '') {
 					msg += '\n' + translate('group.area.calculate.error.header') + notifyMsg;
 				}
 				setPendingAreaCalculation({
 					message: msg,
-					// the + here converts back into a number
-					area: + areaSum.toPrecision(6)
+					area: roundedArea
 				});
 			} else {
 				showErrorNotification(translate('group.area.calculate.error.group.unit'));
