@@ -32,6 +32,10 @@ const selectCanExport = (state: RootState) => {
 	return !fetchInProgress && (meterDeps.compatibleEntities.length > 0 || groupDeps.compatibleEntities.length > 0);
 };
 
+interface ExportRawReadingsArgs {
+	requestConfirmation: (message: string) => Promise<boolean>;
+}
+
 export const exportGraphReadingsThunk = createAppThunk(
 	'graph/exportGraphData',
 	(_unused, api) => {
@@ -114,7 +118,7 @@ export const exportGraphReadingsThunk = createAppThunk(
 
 export const exportRawReadings = createAppThunk(
 	'graph/ExportRaw',
-	async (_arg, api) => {
+	async ({ requestConfirmation }: ExportRawReadingsArgs, api) => {
 		const state = api.getState();
 		if (!selectCanExport(state)) {
 			return api.rejectWithValue('Data Fetch In Progress, Or No data');
@@ -150,7 +154,7 @@ export const exportRawReadings = createAppThunk(
 				// A user allowed to do this but need to check okay with them.
 				const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
 					translate('csv.download.size.warning.verify') + '?';
-				const consent = window.confirm(msg);
+				const consent = await requestConfirmation(msg);
 				if (consent) {
 					shouldDownload = true;
 				}
@@ -164,7 +168,7 @@ export const exportRawReadings = createAppThunk(
 			// Anyone can download if they approve
 			const msg = translate('csv.download.size.warning.size') + ` ${fileSize.toFixed(2)}MB. ` +
 				translate('csv.download.size.warning.verify') + '?';
-			const consent = window.confirm(msg);
+			const consent = await requestConfirmation(msg);
 			if (consent) {
 				shouldDownload = true;
 			}
