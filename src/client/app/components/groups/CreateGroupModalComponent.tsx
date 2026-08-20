@@ -177,7 +177,9 @@ export default function CreateGroupModalComponent() {
 						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
 					}
 				});
-				let msg = translate('group.area.calculate.header') + areaSum + ' ' + translate(`AreaUnitType.${state.areaUnit}`);
+				let msg = translate('group.area.calculate.confirm')
+					+ areaSum + ' '
+					+ translate(`AreaUnitType.${state.areaUnit}`) + '?';
 				if (notifyMsg != '') {
 					msg += '\n' + translate('group.area.calculate.error.header') + notifyMsg;
 				}
@@ -390,6 +392,8 @@ export default function CreateGroupModalComponent() {
 				actionConfirmMessage={pendingAreaCalculation?.message}
 				handleClose={handleAreaCalculationCancel}
 				actionFunction={handleAreaCalculationConfirm}
+				actionRejectText={translate('cancel')}
+				actionConfirmText={translate('group.area.calculate.update')}
 			/>
 			{/* Show modal button */}
 			<Button color='secondary' onClick={handleShow}>
