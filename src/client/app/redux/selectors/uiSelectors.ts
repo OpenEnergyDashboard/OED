@@ -5,7 +5,7 @@ import { LanguageTypes } from 'types/redux/i18n';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
-import { selectChartLinkHideOptions, selectSelectedLanguage } from '../../redux/slices/appStateSlice';
+import { selectChartLinkHideOptions, selectSelectedLanguage, selectEnableAllUnits } from '../../redux/slices/appStateSlice';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
 import { ChartTypes, ShiftAmount } from '../../types/redux/graph';
@@ -298,7 +298,8 @@ export const selectUnitSelectData = createAppSelector(
 		selectGraphAreaNormalization,
 		selectSelectedLanguage,
 		selectGroupDataById,
-		selectCik
+		selectCik,
+		selectEnableAllUnits
 	],
 	(unitDataById,
 		meterDataById,
@@ -308,7 +309,8 @@ export const selectUnitSelectData = createAppSelector(
 		areaNormalization,
 		selectSelectedLanguage,
 		groupDataById,
-		globalCikState) => {
+		globalCikState,
+		enableAllUnits) => {
 		// Holds all units that are compatible with selected meters/groups
 		const compatibleUnits = new Set<number>();
 		// Holds all units that are not compatible with selected meters/groups
@@ -329,11 +331,15 @@ export const selectUnitSelectData = createAppSelector(
 			});
 		});
 
+		// Filter out non-preferred units unless the user has enabled all units
+		// Displayability and admin visibility were already handled by selectVisibleUnitOrSuffixState
+		const unitsToDisplay = enableAllUnits ? visibleUnitsOrSuffixes : visibleUnitsOrSuffixes.filter(unit => unit.preferredDisplay);
+
 		if (allSelectedMeters.size == 0) {
 			// No meters/groups are selected. This includes the case where the selectedUnit is -99.
 			// Every unit is okay/compatible in this case so skip the work needed below.
 			// Filter the units to be displayed by user status and displayable type
-			visibleUnitsOrSuffixes.forEach(unit => {
+			unitsToDisplay.forEach(unit => {
 				if (areaNormalization && unit.unitRepresent === UnitRepresentType.raw) {
 					incompatibleUnits.add(unit.id);
 				} else {
@@ -346,7 +352,7 @@ export const selectUnitSelectData = createAppSelector(
 			const units = unitsCompatibleWithMeters(allSelectedMeters, meterDataById, globalCikState);
 
 			// Loop over all units (they must be of type unit or suffix - case 1)
-			visibleUnitsOrSuffixes.forEach(o => {
+			unitsToDisplay.forEach(o => {
 				// Control displayable ones (case 2)
 				if (units.has(o.id)) {
 					// Should show as compatible (case 3)
@@ -517,4 +523,3 @@ export const selectChartLink = createAppSelector(
 		return linkText;
 	}
 );
-
