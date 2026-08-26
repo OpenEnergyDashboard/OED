@@ -115,13 +115,8 @@ services:
             # it is VERY important that it be yes for security reasons. If you are doing
             # development then you should be changing the other docker file as per the help
             # page for developers.
-            # OED_PRODUCTION: yes
-            # TODO THIS VALUE IS TEMPORARILY BEING SET TO no DURING THE TRANSITION TO THE NEW SETUP WHERE
-            #       THERE IS A SEPARATE DOCKER CONFIGURATION FILE FOR DEVELOPERS. THIS ALLOWS DEVELOPERS
-            #       TO CONTINUE TO USE THE CURRENT COMMAND TO START UP OED. THE PLAN IS TO REMOVE THIS
-            #       AFTER THE PHASE IN PERIOD.
-            OED_PRODUCTION: no
-            # See the ports mapping below to change the port used on your system.
+            OED_PRODUCTION: yes
+           # See the ports mapping below to change the port used on your system.
             # Normally OED_SERVER_PORT is not modified.
             OED_SERVER_PORT: 3000
             # Normally these users are fine and there should be no reason to change the next
