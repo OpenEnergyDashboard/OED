@@ -4,6 +4,7 @@
 
 const express = require('express');
 const { optionalAuthMiddleware } = require('./authenticator');
+const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
 const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
@@ -109,6 +110,13 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			// Get the routed meter id and time for the desired readings.
 			meterID = req.params.meter_id;
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			// Non-displayable meters are only visible to authenticated users so
+			// unauthenticated requests cannot enumerate hidden meter data.
+			const meter = await Meter.getByID(meterID, conn);
+			if (!meter.displayable && !req.hasValidAuthToken) {
+				failure(res, HTTP_CODES.FORBIDDEN);
+				return;
+			}
 			// Check if user is allowed to export.
 			let shouldDownload = false;
 			// Estimated file size. The full explanation of the estimate used can be found in the client.
