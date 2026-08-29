@@ -22,9 +22,14 @@ const { success, failure } = require('./response');
 const router = express.Router();
 
 /**
- * Fetches a meter by ID and enforces that non-displayable meters are only
- * visible to authenticated requests. On failure, sends the response and
- * returns null so the caller can stop processing.
+ * Fetches a meter by ID and enforces that non-displayable meters are only visible to
+ * authenticated requests. If the meter does not exist or the request is not allowed to
+ * see it, the response is sent here and null is returned so the caller stops processing.
+ * @param meterID {int} the id of the meter to fetch
+ * @param conn the database connection to use
+ * @param req the Express request, used to check for a valid authentication token
+ * @param res the Express response, which is sent on failure
+ * @returns {Meter} the meter, or null if a failure response was already sent
  */
 async function getAuthorizedMeter(meterID, conn, req, res) {
 	let meter;
