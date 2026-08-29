@@ -5,3 +5,4 @@
  */
 
 export const MAX_FILE_SIZE_LIMIT: number;
+export const MAX_METER_READING_GAP: number;

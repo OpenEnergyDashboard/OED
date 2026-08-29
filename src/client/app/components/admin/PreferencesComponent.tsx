@@ -21,7 +21,7 @@ import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
 import { checkboxStyle, labelStyle } from '../../styles/modalStyle';
-import { MAX_FILE_SIZE_LIMIT } from '../../../../common/preferencesValidationConstants';
+import { MAX_FILE_SIZE_LIMIT, MAX_METER_READING_GAP } from '../../../../common/preferencesValidationConstants';
 
 /**
  * @returns Preferences Component for Administrative use
@@ -64,7 +64,10 @@ export default function PreferencesComponent() {
 			const maxMoment = moment(localAdminPref.defaultMeterMaximumDate);
 			return !maxMoment.isValid() || !maxMoment.isSameOrBefore(MAX_DATE_MOMENT) || !maxMoment.isSameOrAfter(minMoment);
 		},
-		readingGap: (): boolean => { return Number(localAdminPref.defaultMeterReadingGap) < 0; },
+		readingGap: (): boolean => {
+			return Number(localAdminPref.defaultMeterReadingGap) < 0
+				|| Number(localAdminPref.defaultMeterReadingGap) > MAX_METER_READING_GAP;
+		},
 
 		meterErrors: (): boolean => {
 			return Number(localAdminPref.defaultMeterMaximumErrors) < 0
@@ -229,11 +232,12 @@ export default function PreferencesComponent() {
 					value={localAdminPref.defaultMeterReadingGap}
 					onChange={e => makeLocalChanges('defaultMeterReadingGap', e.target.value)}
 					min='0'
+					max={MAX_METER_READING_GAP}
 					maxLength={50}
 					invalid={invalidFuncs.readingGap()}
 				/>
 				<FormFeedback>
-					<FormattedMessage id="error.bounds" values={{ min: 0, max: Infinity }} />
+					<FormattedMessage id="error.bounds" values={{ min: 0, max: MAX_METER_READING_GAP }} />
 				</FormFeedback>
 			</div>
 			<div>
