@@ -2,30 +2,30 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const express = require('express');
-const { CSVPipelineError } = require('./CustomErrors');
-const Meter = require('../../models/Meter');
-const readCsv = require('../pipeline-in-progress/readCsv');
-const Unit = require('../../models/Unit');
-const { normalizeBoolean } = require('./validateCsvUploadParams');
-const { HTTP_CODES } = require('../../util/httpCodes');
+const express = require("express");
+const { CSVPipelineError } = require("./CustomErrors");
+const Meter = require("../../models/Meter");
+const readCsv = require("../pipeline-in-progress/readCsv");
+const Unit = require("../../models/Unit");
+const { normalizeBoolean, MeterTimeSortTypesJS } = require("./validateCsvUploadParams");
+const moment = require("moment-timezone");
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
- * @param {express.Request} req 
- * @param {express.Response} res 
+ * @param {express.Request} req
+ * @param {express.Response} res
  * @param {filepath} filepath Path to meters csv file.
  * @param conn Connection to the database.
  */
 async function uploadMeters(req, res, filepath, conn) {
-	const temp = (await readCsv(filepath)).map(row => {
-		// The Canonical structure of each row in the Meters CSV file is the order of the fields 
+	const temp = (await readCsv(filepath)).map((row) => {
+		// The Canonical structure of each row in the Meters CSV file is the order of the fields
 		// declared in the Meter constructor. If no headerRow is provided (i.e. headerRow === false),
 		// then we assume that the uploaded CSV file follows this Canonical structure.
 
 		// For now, we do not use the header row to remap the ordering of the columns.
 		// To Do: Use header row to remap the indices to fit the Meter constructor
-		return row.map(val => val === '' ? undefined : val);
+		return row.map((val) => (val === "" ? undefined : val));
 	});
 
 	// If there is a header row, we remove and ignore it for now.
@@ -42,6 +42,21 @@ async function uploadMeters(req, res, filepath, conn) {
 	try {
 		for (let i = 0; i < meters.length; i++) {
 			let meter = meters[i];
+
+			//validation for boolean values
+			const boolCheck = validateBooleanFields(meter, i);
+			if (!boolCheck.value) {
+				throw new CSVPipelineError(boolCheck.boolMsg, undefined, 500);
+			}
+
+			// Validate min and max values
+			const minValue = meter[27];
+			const maxValue = meter[28];
+			const minMaxCheck = validateMinMaxValues(minValue, maxValue, i);
+			if (!minMaxCheck.value) {
+				throw new CSVPipelineError(minMaxCheck.minMaxErrorMsg, undefined, 500);
+			}
+
 			// First verify GPS is okay
 			// This assumes that the sixth column is the GPS as order is assumed for now in a GPS file.
 			const gpsInput = meter[6];
@@ -51,11 +66,87 @@ async function uploadMeters(req, res, filepath, conn) {
 				const { validGps, message } = isValidGPSInput(gpsInput);
 				if (!validGps) {
 					let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid with error of "${message}"`;
-					throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+					throw new CSVPipelineError(msg, undefined, 500);
 				}
 				// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
 				// DB is longitude, latitude.
 				meter[6] = switchGPS(gpsInput);
+			}
+
+			// verify the area input
+			const areaInput = meter[9];
+			const areaInputCheck = isValidArea(areaInput, i);
+			if (!areaInputCheck.value) {
+				throw new CSVPipelineError(areaInputCheck.areaNumMsg, undefined, 500);
+			}
+
+			// verify the Gap input is greater than zero
+			const gapInput = meter[14];
+			const gapReadingCheck = validateGap(gapInput, i);
+			if (!gapReadingCheck.value) {
+				throw new CSVPipelineError(gapReadingCheck.gapMsg, undefined, 500);
+			}
+
+			// verify the Variation input
+			const variationInput = meter[15];
+			const variationCheck = validateVariation(variationInput, i);
+			if (!variationCheck.value) {
+				throw new CSVPipelineError(variationCheck.variationMsg, undefined, 500);
+			}
+
+			// validate reading duplication
+			const duplicateValue = meter[16];
+			const duplicateCheck = isDuplicate(duplicateValue, i);
+			if (!duplicateCheck.value) {
+				throw new CSVPipelineError(duplicateCheck.duplicateMsg, undefined, 500);
+			}
+
+			const timeSortValue = meter[17];
+			const timeSortCheck = isValidTimeSort(timeSortValue, i);
+			if (!timeSortCheck.value) {
+				throw new CSVPipelineError(timeSortCheck.timeSortMsg, undefined, 500);
+			}
+
+			// validate minDate & maxDate
+			const minDate = meter[29];
+			const maxDate = meter[30];
+			const dateCheck = validateDateRange(minDate, maxDate, i);
+			if (!dateCheck.value) {
+				throw new CSVPipelineError(dateCheck.dateMsg, undefined, 500);
+			}
+
+			const timezone = meter[5];
+			const timeZoneCheck = isValidTimeZone(timezone, i);
+			if (!timeZoneCheck.value) {
+				throw new CSVPipelineError(timeZoneCheck.timeZoneMsg, undefined, 500);
+			}
+
+			// Verify area unit provided
+			const areaUnitString = meter[25];
+			const areaUnitCheck = isValidAreaUnit(areaUnitString, i);
+			if (!areaUnitCheck.value) {
+				throw new CSVPipelineError(areaUnitCheck.areaUnitMsg, undefined, 500);
+			}
+
+			//Verify the relationship between areaUnit & areaValue
+			//When areaUnit is none areaValue must be zero
+			const areaCheck = validateArea(areaInput, areaUnitString, i);
+			if (!areaCheck.value) {
+				throw new CSVPipelineError(areaCheck.areaMsg, undefined, 500);
+			}
+
+			//checks to make sure max error value is a number between 0 and 75 if it is provided.
+			const maxErrorInput = meter[31];
+			const maxErrorCheck = validateMaxError(maxErrorInput, i);
+			if (!maxErrorCheck.value) {
+				throw new CSVPipelineError(maxErrorCheck.maxErrorMsg, undefined, 500);
+			}
+
+			// Verify meter type
+			const meterTypeString = meter[4];
+			const meterTypeCheck = isValidMeterType(meterTypeString, i);
+			if (!meterTypeCheck.value) {
+				throw new CSVPipelineError(meterTypeCheck.meterTypeMsg, undefined, 500);
 			}
 
 			// Process unit.
@@ -63,17 +154,21 @@ async function uploadMeters(req, res, filepath, conn) {
 			const unitId = await getUnitId(unitName, Unit.unitType.METER, conn);
 			if (!unitId) {
 				const msg = `For meter ${meter[0]} the unit of ${unitName} is invalid`;
-				throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+				throw new CSVPipelineError(msg, undefined, 500);
 			}
 			// Replace the unit's name by its id.
 			meter[23] = unitId;
 
 			// Process default graphic unit.
 			const defaultGraphicUnitName = meter[24];
-			const defaultGraphicUnitId = await getUnitId(defaultGraphicUnitName, Unit.unitType.UNIT, conn);
+			const defaultGraphicUnitId = await getUnitId(
+				defaultGraphicUnitName,
+				Unit.unitType.UNIT,
+				conn,
+			);
 			if (!defaultGraphicUnitId) {
 				const msg = `For meter ${meter[0]} the default graphic unit of ${defaultGraphicUnitName} is invalid`;
-				throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+				throw new CSVPipelineError(msg, undefined, 500);
 			}
 			// Replace the default graphic unit's name by its id.
 			meter[24] = defaultGraphicUnitId;
@@ -92,30 +187,41 @@ async function uploadMeters(req, res, filepath, conn) {
 					}
 				} else if (meters.length !== 1) {
 					// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
-					throw new CSVPipelineError(`Meter identifier provided (\"${identifierOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+					throw new CSVPipelineError(
+						`Meter identifier provided (\"${identifierOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`,
+						undefined,
+						500,
+					);
 				}
 				let currentMeter;
-				currentMeter = await Meter.getByIdentifier(identifierOfMeter, conn)
-					.catch(error => {
-						// Did not find the meter.
-						let msg = `Meter identifier of \"${identifierOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
-						throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
-					});
+				currentMeter = await Meter.getByIdentifier(
+					identifierOfMeter,
+					conn,
+				).catch((error) => {
+					// Did not find the meter.
+					let msg = `Meter identifier of \"${identifierOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
+					throw new CSVPipelineError(msg, undefined, 500);
+				});
 				currentMeter.merge(...meter);
 				await currentMeter.update(conn);
 			} else {
 				// Inserting the new meter
-				await new Meter(undefined, ...meter).insert(conn)
-					.catch(error => {
-						// Probably duplicate meter.
-						throw new CSVPipelineError(
-							`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
-					}
+				await new Meter(undefined, ...meter).insert(conn).catch((error) => {
+					// Probably duplicate meter.
+					throw new CSVPipelineError(
+						`Meter name of \"${meter[0]}\" got database error of: ${error.message}`,
+						undefined,
+						500,
 					);
+				});
 			}
 		}
 	} catch (error) {
-		throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+		throw new CSVPipelineError(
+			`Failed to upload meters due to internal OED Error: ${error.message}`,
+			undefined,
+			500,
+		);
 	}
 }
 
@@ -129,29 +235,256 @@ async function uploadMeters(req, res, filepath, conn) {
  * @returns true if string is GPS and false otherwise.
  */
 function isValidGPSInput(input) {
-	let message = '';
+	let message = "";
 	let validGps = true;
-	if (input.indexOf(',') === -1) { // if there is no comma
-		message = 'GPS Input is missing a comma';
+	if (input.indexOf(",") === -1) {
+		// if there is no comma
+		message = "GPS Input is missing a comma";
 		validGps = false;
-	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
-		message = 'GPS Input has too many commas';
+	} else if (input.indexOf(",") !== input.lastIndexOf(",")) {
+		// if there are multiple commas
+		message = "GPS Input has too many commas";
 		validGps = false;
 	}
 	if (validGps) {
 		// Works if value is not a number since parseFloat returns a NaN so treated as invalid later.
-		const array = input.split(',').map((value) => parseFloat(value));
+		const array = input.split(",").map((value) => parseFloat(value));
 		const latitudeIndex = 0;
 		const longitudeIndex = 1;
-		const latitudeConstraint = array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
-		const longitudeConstraint = array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
+		const latitudeConstraint =
+			array[latitudeIndex] >= -90 && array[latitudeIndex] <= 90;
+		const longitudeConstraint =
+			array[longitudeIndex] >= -180 && array[longitudeIndex] <= 180;
 		const result = latitudeConstraint && longitudeConstraint;
 		if (!result) {
 			validGps = false;
-			message = 'Invalid GPS coordinate, latitude must be an integer between -90 and 90, longitude must be an integer between -180 and 180. You input: ' + input;
+			message =
+				"Invalid GPS coordinate, latitude must be an integer between -90 and 90, longitude must be an integer between -180 and 180. You input: " +
+				input;
 		}
 	}
 	return { validGps, message };
+}
+
+/**
+ * Validates the min and max reasonable limits
+ * Ensures both are valid numeric values (allowing floating points and Infinity)
+ * and verifies that the minimum value does not exceed the maximum value
+ * @param {string | number} minValue - inclusive minimum acceptable reading value
+ * @param {string | number} maxValue - inclusive maximum acceptable reading value
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+
+function validateMinMaxValues(minValue, maxValue, rowIndex) {
+	let msg = "";
+
+	//Quick exit if both are empty
+	if (
+		(minValue === undefined || minValue === "" || minValue === null) &&
+		(maxValue === undefined || maxValue === "" || maxValue === null)
+	) {
+		return { minMaxErrorMsg: "", value: true };
+	}
+
+	//1.Test if minValue is a Valid number
+	if (minValue !== undefined && minValue !== "" && minValue !== null) {
+		if (typeof minValue !== "number" && Number.isNaN(Number(minValue))) {
+			msg = `Invalid Min in row ${rowIndex + 1}: "${minValue}" is not a number.`;
+			return { minMaxErrorMsg: msg, value: false };
+		}
+	}
+	//2.Check if maxValue is a Valid Number
+	if (maxValue !== undefined && maxValue !== "" && maxValue !== null) {
+		if (typeof maxValue !== "number" && Number.isNaN(Number(maxValue))) {
+			msg = `Invalid Max in row ${rowIndex + 1}: "${maxValue}" is not a number.`;
+			return { minMaxErrorMsg: msg, value: false };
+		}
+	}
+
+	//3.Convert to a number now that we know they are valid
+	let minNum;
+
+	//if its not empty convert it to a number otherwise fall back to DB defaults
+	if (minValue !== undefined && minValue !== "" && minValue !== null) {
+		minNum = Number(minValue);
+	} else {
+		minNum = Number.MIN_SAFE_INTEGER;
+	}
+
+	let maxNum;
+
+	//if its not empty convert it to a number otherwise fall back to DB defaults
+	if (maxValue !== undefined && maxValue !== "" && maxValue !== null) {
+		maxNum = Number(maxValue);
+	} else {
+		maxNum = Number.MAX_SAFE_INTEGER;
+	}
+	//4.Test if min > max
+	if (minNum > maxNum) {
+		msg = `Invalid Min/Max Values in row ${rowIndex + 1}: Min ("${minValue}") is greater than Max ("${maxValue}").`;
+		return { minMaxErrorMsg: msg, value: false };
+	}
+	return { minMaxErrorMsg: "", value: true };
+}
+
+/**
+ * Validates the max error value for a given meter row. Range should be between 0 and 75 if it is provided
+ * Allows for empty value which is treated as valid. Also allows for floating point values
+ * @param {number | string} maxErrorValue - The raw max error value extracted from the CSV row
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+function validateMaxError(maxErrorValue, rowIndex) {
+	let msg = "";
+
+	//check existence
+	if (
+		maxErrorValue === undefined ||
+		maxErrorValue === null ||
+		maxErrorValue === ""
+	) {
+		return { maxErrorMsg: "", value: true };
+	}
+
+	//Strict type check
+	if (
+		typeof maxErrorValue !== "number" &&
+		Number.isNaN(Number(maxErrorValue))
+	) {
+		msg = `Invalid Max Error in row ${rowIndex + 1}: "${maxErrorValue}" is not a number.`;
+		return { maxErrorMsg: msg, value: false };
+	}
+
+	//Conversion
+	const val = Number(maxErrorValue);
+
+	//Now that we know its a number, check if it is in the valid range
+	if (val < 0 || val > 75) {
+		msg = `Invalid Max Error in row ${rowIndex + 1}: "${maxErrorValue}" Max error must be between 0 and 75.`;
+		return { maxErrorMsg: msg, value: false };
+	}
+
+	return { maxErrorMsg: "", value: true };
+}
+
+/**
+ * Validates whether the minimum and maximum dates are valid
+ * Also validates that the minimum date comes before or is equal to the maximum date
+ * @param {String} minDate - The minimum date string
+ * @param {String} maxDate - The maximum date string
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} - An Object containing the error message (if any) and a boolean success flag
+ */
+function validateDateRange(minDate, maxDate, rowIndex) {
+	let msg = "";
+
+	const trimmedMin = typeof minDate === "string" ? minDate.trim() : minDate;
+	const trimmedMax = typeof maxDate === "string" ? maxDate.trim() : maxDate;
+
+	if (trimmedMin === undefined || trimmedMin === null || trimmedMin === "") {
+		msg = `Invalid min date in row ${rowIndex + 1}: Min date must be provided.`;
+		return { dateMsg: msg, value: false };
+	}
+
+	if (trimmedMax === undefined || trimmedMax === null || trimmedMax === "") {
+		msg = `Invalid max date in row ${rowIndex + 1}: Max date must be provided.`;
+		return { dateMsg: msg, value: false };
+	}
+
+	const acceptedFormats = [
+		"YYYY-MM-DD",
+		"YYYY-M-D",
+		"MM-DD-YYYY",
+		"M-D-YYYY",
+		"M-DD-YYYY",
+		"MM-D-YYYY",
+		"YYYY-M-DD",
+		"YYYY-MM-D",
+		"YYYY-MM-DD HH:mm:ss",
+		"YYYY-MM-DD H:m:s",
+		"MM-DD-YYYY HH:mm:ss",
+		"MM-DD-YYYY H:m:s",
+		"M-D-YYYY HH:mm:ss",
+		"M-D-YYYY H:m:s",
+		"M-DD-YYYY HH:mm:ss",
+		"M-DD-YYYY H:m:s",
+		"MM-D-YYYY HH:mm:ss",
+		"MM-D-YYYY H:m:s",
+		"YYYY-M-DD HH:mm:ss",
+		"YYYY-M-DD H:m:s",
+		"YYYY-MM-D HH:mm:ss",
+		"YYYY-MM-D HH:mm:ss",
+	];
+
+	//create moment objects directly
+	const minMoment = moment(trimmedMin, acceptedFormats, true);
+	const maxMoment = moment(trimmedMax, acceptedFormats, true);
+
+	//Check if they are valid dates
+	if (!minMoment.isValid()) {
+		msg = `Invalid min date in row ${rowIndex + 1}: "${minDate}".`;
+		return { dateMsg: msg, value: false };
+	}
+
+	if (!maxMoment.isValid()) {
+		msg = `Invalid max date in row ${rowIndex + 1}: "${maxDate}".`;
+		return { dateMsg: msg, value: false };
+	}
+
+	//Check if min is before or equal to max
+	if (!minMoment.isSameOrBefore(maxMoment)) {
+		msg = `Date range error in row ${rowIndex + 1}: Min date: ("${minDate}") must be before or equal to Max date: ("${maxDate}").`;
+		return { dateMsg: msg, value: false };
+	}
+
+	return { dateMsg: "", value: true };
+}
+
+/**
+ * Validates the area value and its relationship with the area unit
+ * Ensures the value is a valid number, non-negative, and correctly corresponds to the 'none' unit
+ * @param {number | string} areaValue - The raw area value extracted from the CSV row
+ * @param {string} areaUnitString - The raw area unit extracted from the CSV row
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+function validateArea(areaValue, areaUnitString, rowIndex) {
+	let msg = "";
+
+	// Check existence
+	if (areaValue === undefined || areaValue === "" || areaValue === null) {
+		return { areaMsg: "", value: true };
+	}
+
+	//Validate its a number
+	if (typeof areaValue !== "number" && Number.isNaN(Number(areaValue))) {
+		msg = `Invalid area value in row ${rowIndex + 1}: "${areaValue}" is not a number.`;
+		return { areaMsg: msg, value: false };
+	}
+
+	//Convert now that we know it is valid
+	const val = Number(areaValue);
+
+	//Without this Infinity could be passed as Valid but that would not make sense.
+	if (!Number.isFinite(val)) {
+		msg = `Invalid area value in row ${rowIndex + 1}: "${areaValue}" is not a finite number.`;
+		return { areaMsg: msg, value: false };
+	}
+
+	//Check it is not negative
+	if (val < 0) {
+		msg = `Invalid area value in row ${rowIndex + 1}: "${areaValue}" must be a positive number.`;
+		return { areaMsg: msg, value: false };
+	}
+
+	// If unit is 'none', area value cannot be specified (areaValue must be zero)
+	if (areaUnitString === Unit.areaUnitType.NONE && val !== 0) {
+		msg = `Invalid area value in row ${rowIndex + 1}: "${areaValue}". When Area Unit is 'none', Area Value must be exactly 0.`;
+		return { areaMsg: msg, value: false };
+	}
+
+	return { areaMsg: "", value: true };
 }
 
 /**
@@ -161,9 +494,118 @@ function isValidGPSInput(input) {
  * @returns the new string with the updated GPS pair
  */
 function switchGPS(gpsString) {
-	const array = gpsString.split(',');
+	const array = gpsString.split(",");
 	// return String(array[1] + "," + array[0]);
-	return (array[1] + ',' + array[0]);
+	return array[1] + "," + array[0];
+}
+
+/**
+ * Checks if the area provided is a number and if it is larger than zero.
+ * @param {number | string} areaInput - The provided area for the meter
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+function isValidArea(areaInput, rowIndex) {
+	let msg = "";
+
+	//Quick exit if empty
+	if (areaInput === undefined || areaInput === null || areaInput === "") {
+		msg = `Invalid area in row ${rowIndex + 1}: Value cannot be empty.`;
+		return { areaNumMsg: msg, value: false };
+	}
+
+	// check for non-number input, which is not allowed
+	if (typeof areaInput !== "number" && Number.isNaN(Number(areaInput))) {
+		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" is not a number.`;
+		return { areaNumMsg: msg, value: false };
+	}
+
+	const areaNum = Number(areaInput);
+
+	//Check for Infinity or -Infinity inputs
+	if (!Number.isFinite(areaNum)) {
+		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" must be a finite number.`;
+		return { areaNumMsg: msg, value: false };
+	}
+
+	//Check for positive
+	if (areaNum < 0) {
+		msg = `Invalid area in row ${rowIndex + 1}: "${areaInput}" cannot be negative.`;
+		return { areaNumMsg: msg, value: false };
+	}
+
+	return { areaNumMsg: msg, value: true };
+}
+
+/**
+ * Checks if the unit of measurement for area is valid
+ * @param {string} areaUnit - the unit of measurement for area
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag
+ */
+function isValidAreaUnit(areaUnit, rowIndex) {
+	let msg = "";
+	const validTypes = Object.values(Unit.areaUnitType);
+	// must be one of the enum values
+	if (validTypes.includes(areaUnit)) {
+		return { areaUnitMsg: "", value: true };
+	} else {
+		msg = `Unrecognizable area unit in row ${rowIndex + 1}: "${areaUnit}" is not a valid unit.`;
+		return { areaUnitMsg: msg, value: false };
+	}
+}
+
+/**
+ * Checks if the time sort value provided is accurate (should be increasing or decreasing)
+ * @param {string} timeSortValue - The provided time sort
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag
+ */
+function isValidTimeSort(timeSortValue, rowIndex) {
+	let msg = "";
+	const validTimes = Object.values(MeterTimeSortTypesJS);
+	// must be one of the enum values
+	if (validTimes.includes(timeSortValue)) {
+		return { timeSortMsg: "", value: true };
+	} else {
+		msg = `Unrecognized time sort value in row ${rowIndex + 1}: "${timeSortValue}" is not a valid value. Time sort must be either increasing or decreasing.`;
+		return { timeSortMsg: msg, value: false };
+	}
+}
+
+/**
+ * Checks if the meter type provided is one of the options allowed when creating a meter.
+ * @param {string} meterTypeString - The string for the meter type
+ * @param {number} rowIndex - The current row index for error reporting.
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag.
+ */
+function isValidMeterType(meterTypeString, rowIndex) {
+	let msg = "";
+	const validTypes = Object.values(Meter.type);
+	if (validTypes.includes(meterTypeString)) {
+		return { meterTypeMsg: "", value: true };
+	} else {
+		msg = `Invalid meter type in row ${rowIndex + 1}: "${meterTypeString}" is not valid. Valid types are: ${Object.values(Meter.type).join(", ")}.`;
+		return { meterTypeMsg: msg, value: false };
+	}
+}
+
+/**
+ * Checks the provided time zone and if it is a real time zone
+ * @param {string} zone - The provided time zone from the csv
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag
+ */
+function isValidTimeZone(zone, rowIndex) {
+	let msg = "";
+
+	const validZones = moment.tz.names();
+	if (validZones.includes(zone)) {
+		return { timeZoneMsg: msg, value: true };
+	} else {
+		msg = `Invalid time zone in row ${rowIndex + 1}: "${zone}" is not valid.`;
+		return { timeZoneMsg: msg, value: false };
+	}
 }
 
 /**
@@ -172,7 +614,7 @@ function switchGPS(gpsString) {
  * @param {string} unitName The given unit's name.
  * @param {Unit.unitType} expectedUnitType the expected unit's type.
  * @param {*} conn The connection to use.
- * @returns 
+ * @returns
  */
 async function getUnitId(unitName, expectedUnitType, conn) {
 	// Case no unit.
@@ -182,6 +624,183 @@ async function getUnitId(unitName, expectedUnitType, conn) {
 	// Return null if the unit doesn't exist or its type is different from expectation.
 	if (!unit || unit.typeOfUnit !== expectedUnitType) return null;
 	return unit.id;
+}
+
+/**
+ * Validates all boolean-like fields for a given meter row.
+ * @param {Array} meter - A single row from the CSV file.
+ * @param {number} rowIndex - The current row index for error reporting.
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag
+ */
+function validateBooleanFields(meter, rowIndex) {
+	let msg = "";
+	// all inputs that involve a true or false all being validated together.
+	const booleanFields = {
+		2: "enabled",
+		3: "displayable",
+		10: "cumulative",
+		11: "reset",
+		18: "end only",
+		32: "disableChecks",
+	};
+
+	// this array has values which may be left empty
+	const booleanUndefinedAcceptable = [
+		"cumulative",
+		"reset",
+		"end only",
+		"disableChecks",
+	];
+
+	for (const [index, name] of Object.entries(booleanFields)) {
+		let value = meter[index];
+
+		// allows upper/lower case.
+		if (value === "" || value === undefined) {
+			if (booleanUndefinedAcceptable.includes(name)) {
+				// skip if the value is undefined
+				continue;
+			}
+			msg = `Invalid input for '${name}' in row ${rowIndex + 1}: Value cannot be empty.`;
+			return { boolMsg: msg, value: false };
+		}
+
+		let checkValue = value;
+		if (typeof checkValue === "string") {
+			checkValue = checkValue.toLowerCase().trim();
+		}
+
+		const isValid =
+			checkValue === "true" ||
+			checkValue === "false" ||
+			checkValue === true ||
+			checkValue === false ||
+			checkValue === "yes" ||
+			checkValue === "no";
+
+		if (!isValid) {
+			msg = `Invalid input for '${name}' in row ${rowIndex + 1}: "${value}". Expected 'true', 'false', 'yes', or 'no'.`;
+			return { boolMsg: msg, value: false };
+		}
+	}
+	return { boolMsg: "", value: true };
+}
+
+/**
+ * Checks if the number of times each reading is given lies within the range 1 to 9 inclusive
+ * @param {number} duplicateValue - The number of times each reading is repeated in the meter data
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} - An object containing the error message (if any) and a boolean success flag
+ */
+function isDuplicate(duplicateValue, rowIndex) {
+	let msg = "";
+
+	//DB defaults to 1
+	if (duplicateValue === undefined) {
+		return { duplicateMsg: "", value: true };
+	}
+
+	if (duplicateValue === null || duplicateValue === "") {
+		msg = `Invalid duplicate value in row ${rowIndex + 1}: "${duplicateValue}" is not a valid integer.`;
+		return { duplicateMsg: msg, value: false };
+	}
+
+	//Validate it is a number
+	if (
+		typeof duplicateValue !== "number" &&
+		Number.isNaN(Number(duplicateValue))
+	) {
+		msg = `Invalid duplicate value in row ${rowIndex + 1}: "${duplicateValue}" is not a number.`;
+		return { duplicateMsg: msg, value: false };
+	}
+
+	if (duplicateValue < 1 || duplicateValue > 9) {
+		msg = `Invalid duplicate value in row ${rowIndex + 1}: "${duplicateValue}" must be between 1-9.`;
+		return { duplicateMsg: msg, value: false };
+	}
+	return { duplicateMsg: "", value: true };
+}
+
+/**
+ * Validates the Gap Reading to ensure it is a number greater than zero
+ * @param {string | number} gapValue - the allowed time variation in seconds that a gap may occur between two readings, default 0
+ * @param {number} rowIndex - The current row index for error reporting
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+function validateGap(gapValue, rowIndex) {
+	let msg = "";
+
+	//DB defaults to zero if empty
+	if (gapValue === "" || gapValue === undefined || gapValue === null) {
+		return { gapMsg: "", value: true };
+	}
+
+	//Check if it is a number
+	if (typeof gapValue !== "number" && Number.isNaN(Number(gapValue))) {
+		msg = `Invalid Gap Reading in row ${rowIndex + 1}: "${gapValue}" is not a number.`;
+		return { gapMsg: msg, value: false };
+	}
+
+	//Convert now that we know it is a number
+	const gapNum = Number(gapValue);
+
+	if (!Number.isFinite(gapNum)) {
+		msg = `Invalid Gap Reading in row ${rowIndex + 1}: "${gapValue}" cannot be an infinite number.`;
+		return { gapMsg: msg, value: false };
+	}
+
+	//Check if it is negative
+	if (gapNum < 0) {
+		msg = `Invalid Gap Reading in row ${rowIndex + 1}: "${gapValue}" cannot be negative.`;
+		return { gapMsg: msg, value: false };
+	}
+
+	return { gapMsg: "", value: true };
+}
+
+/**
+ * Valdates the Reading Variation to ensure it is a positive number
+ * @param {string | number} variationValue - The raw variation value extracted from the meter array,
+ * representing the allowed time variation in seconds
+ * @param {number} rowIndex - The current row index for error reporting.
+ * @returns {Object} An object containing the error message (if any) and a boolean success flag
+ */
+function validateVariation(variationValue, rowIndex) {
+	let msg = "";
+
+	//DB defaults to zero if empty, columns allow null
+	if (
+		variationValue === "" ||
+		variationValue === undefined ||
+		variationValue === null
+	) {
+		return { variationMsg: "", value: true };
+	}
+
+	//Validate it is a number
+	if (
+		typeof variationValue !== "number" &&
+		Number.isNaN(Number(variationValue))
+	) {
+		msg = `Invalid Reading Variation in row ${rowIndex + 1}: "${variationValue}" is not a number.`;
+		return { variationMsg: msg, value: false };
+	}
+
+	//convert now that we know it is a valid number
+	const variationNum = Number(variationValue);
+
+	if (!Number.isFinite(variationNum)) {
+		msg = `Invalid Reading Variation in row ${rowIndex + 1}: "${variationValue}" cannot be an infinite number.`;
+		return { variationMsg: msg, value: false };
+	}
+
+	//Check that it is not negative
+	if (variationNum < 0) {
+		msg = `Invalid Reading Variation in row ${rowIndex + 1}: "${variationValue}" cannot be negative.`;
+		return { variationMsg: msg, value: false };
+	}
+
+	return { variationMsg: "", value: true };
 }
 
 module.exports = uploadMeters;
