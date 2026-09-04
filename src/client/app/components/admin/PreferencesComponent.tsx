@@ -326,6 +326,7 @@ export default function PreferencesComponent() {
 					type='number'
 					value={localAdminPref.defaultWarningFileSize}
 					onChange={e => makeLocalChanges('defaultWarningFileSize', Number(e.target.value))}
+					min='0'
 					max={Math.min(
 						Number(localAdminPref.defaultFileSizeLimit),
 						MAX_FILE_SIZE_LIMIT
