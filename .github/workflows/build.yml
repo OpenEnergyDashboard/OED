@@ -9,18 +9,18 @@ on:
 jobs:
   run-checks-tests:
     env:
-      OED_DB_USER: test
-      OED_DB_PASSWORD: travisTest
-      OED_DB_DATABASE: travis_ci_dummy
-      OED_DB_TEST_DATABASE: travis_ci_test
-      OED_DB_TEST_USER: oed_test
-      OED_DB_TEST_PASSWORD: oedTestOnly
+      OED_DB_USER: oed
+      OED_DB_PASSWORD: opened
+      OED_DB_DATABASE: oed
+      OED_DB_TEST_DATABASE: oed_testing
+      OED_DB_TEST_USER: oedtestuser
+      OED_DB_TEST_PASSWORD: oedtestpassword
       OED_DB_HOST: postgres
       OED_DB_PORT: 5432
       OED_TOKEN_SECRET: travis
       OED_SERVER_PORT: 3000
       OED_TEST_SITE_READING_RATE: 00:15:00
-      POSTGRES_PASSWORD: travisTest
+      POSTGRES_PASSWORD: oedpassword
 
     runs-on: ubuntu-latest
     # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
@@ -30,8 +30,8 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_PASSWORD: travisTest
-          POSTGRES_DB: travis_ci_test
+          POSTGRES_PASSWORD: oedpassword
+          POSTGRES_DB: oed_testing
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
