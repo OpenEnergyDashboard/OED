@@ -96,6 +96,7 @@ class Conversion {
 			destination: destination
 		});
 	}
+
 }
 
 module.exports = Conversion;
