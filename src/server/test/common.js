@@ -17,5 +17,5 @@ chai.use(chaiHttp);
 module.exports = {
 	chai,
 	mocha,
-	expect,
+	expect
 };
