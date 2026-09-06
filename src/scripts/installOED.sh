@@ -147,12 +147,6 @@ else
 		# Redirect stderr to a file
 		npm run createdb |& tee /tmp/oed.error > /dev/null
 		createdb_code=${PIPESTATUS[0]}
-		printf "Start dump env\n"
-		export
-		printf "End dump env\n"
-		printf "Start dump script\n"
-		cat /docker-entrypoint-initdb.d/*.sql
-		printf "End dump script\n"
 		# TODO: This should be moved to the error case below once issues with this process are under control.
 		# If all is well it could go inside the case where an unknown error occurred.
 		# Dump the output from the database creation attempt.
