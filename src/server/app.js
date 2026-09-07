@@ -32,18 +32,7 @@ const conversionArray = require('./routes/conversionArray');
 const units = require('./routes/units');
 const conversions = require('./routes/conversions');
 const ciks = require('./routes/ciks');
-const { HTTP_CODES } = require('./util/httpCodes');
-
-// Detect test environment and use higher rate limits during tests.
-// Rate limiting is critical for security in production but interferes with automated testing.
-// Using a separate test rate limiter (100x production limits) ensures the middleware is still
-// exercised during tests while preventing test failures from rate limiting.
-// 100x is certainly big enough to avoid issues and the exact value should not be important as
-// the goal is to avoid hitting rate limiting in testing.
-// Note that NODE_ENV of test should only be set for the testing environment and is done in
-// package.json in the script section for the test ones.
-const isTestEnvironment = process.env.NODE_ENV === 'test';
-const testMultiplier = isTestEnvironment ? 100 : 1;
+const crypto = require('node:crypto');
 
 // Limit the rate of overall requests to OED
 // TODO Verify that user see the message returned, see https://express-rate-limit.mintlify.app/reference/configuration#message
@@ -162,6 +151,13 @@ router.get('*', (req, res) => {
 
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
+
+		//assigns a value to the nonce in order to check for authenticity
+		const nonce = crypto.randomBytes(16).toString('base64url');
+		htmlPlusData = htmlPlusData.replace(/{{nonce}}/g, nonce);
+
+		res.setHeader('Content-Security-Policy', `default-src 'self'; img-src 'self' data: ; font-src 'self' https://maxcdn.bootstrapcdn.com ; media-src 'self'; script-src 'self' 'nonce-${nonce}' ; style-src 'self' 'nonce-${nonce}' 'unsafe-inline';`)
+
 		res.send(htmlPlusData);
 	});
 });
