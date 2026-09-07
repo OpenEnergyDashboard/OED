@@ -3,7 +3,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
+const pgPromise = require('pg-promise');
 const { optionalAuthMiddleware } = require('./authenticator');
+const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
 const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
@@ -19,6 +21,34 @@ const { success, failure } = require('./response');
 const { estimateRawExportSizeMB } = require('../../common/RawExportFileSize');
 
 const router = express.Router();
+
+/**
+ * Fetches a meter by ID and enforces that non-displayable meters are only visible to
+ * authenticated requests. If the meter does not exist or the request is not allowed to
+ * see it, the response is sent here and null is returned so the caller stops processing.
+ * @param meterID {int} the id of the meter to fetch
+ * @param conn the database connection to use
+ * @param req the Express request, used to check for a valid authentication token
+ * @param res the Express response, which is sent on failure
+ * @returns {Meter} the meter, or null if a failure response was already sent
+ */
+async function getAuthorizedMeter(meterID, conn, req, res) {
+	let meter;
+	try {
+		meter = await Meter.getByID(meterID, conn);
+	} catch (err) {
+		if (err instanceof pgPromise.errors.QueryResultError && err.code === pgPromise.errors.queryResultErrorCode.noData) {
+			failure(res, HTTP_CODES.NOT_FOUND);
+			return null;
+		}
+		throw err;
+	}
+	if (!meter.displayable && !req.hasValidAuthToken) {
+		failure(res, HTTP_CODES.FORBIDDEN);
+		return null;
+	}
+	return meter;
+}
 
 /**
  * Route for fetching readings count by meter IDs and time interval.
@@ -57,6 +87,12 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			let count = 0;
 			for (var i = 0; i < meterIDs.length; i++) {
+				// Non-displayable meters are only visible to authenticated users so
+				// unauthenticated requests cannot enumerate hidden meters' reading counts.
+				const meter = await getAuthorizedMeter(meterIDs[i], conn, req, res);
+				if (!meter) {
+					return;
+				}
 				const curr = await Reading.getCountByMeterIDAndDateRange(meterIDs[i], timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 				count += curr
 			}
@@ -110,6 +146,12 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			// Get the routed meter id and time for the desired readings.
 			meterID = req.params.meter_id;
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			// Non-displayable meters are only visible to authenticated users so
+			// unauthenticated requests cannot enumerate hidden meter data.
+			const meter = await getAuthorizedMeter(meterID, conn, req, res);
+			if (!meter) {
+				return;
+			}
 			// Check if user is allowed to export.
 			let shouldDownload = false;
 			// This count only checks a single meterID, while client testing checks multiple meterIDs, so the estimate is slightly different.
