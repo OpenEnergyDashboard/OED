@@ -239,6 +239,7 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 						(unitDataById[props.meter.unitId].unitRepresent != UnitRepresentType.quantity
 							&& unitDataById[localMeterEdits.unitId].unitRepresent == UnitRepresentType.quantity));
 
+
 				// Submit new meter if checks where ok.
 				editMeter({ meterData: submitState, shouldRefreshViews: shouldRefreshReadingViews })
 					.unwrap()

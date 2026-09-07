@@ -4,6 +4,11 @@
 
 const fs = require('fs');
 const express = require('express');
+// TODO Temporary patch for Express 4, which does not forward rejected async route handler
+// promises to the global error handler on its own (Express 5 does this natively). Remove this
+// import (and the express-async-errors dependency in package.json) once Express 5 is adopted —
+// see issue #1676 for that migration.
+require('express-async-errors');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const favicon = require('serve-favicon');
@@ -182,7 +187,9 @@ app.use((err, req, res, next) => {
 		return res.status(HTTP_CODES.BAD_REQUEST).send('Bad Request');
 	}
 
-	log.error('Unhandled request error caught by global error handler; logging forwarded err object.', err);
+	// Include the method/URL so the admin-visible log entry can be traced back to a specific
+	// request instead of just showing a generic message with no route context.
+	log.error(`Unhandled request error caught by global error handler for ${req.method} ${req.originalUrl}; logging forwarded err object.`, err);
 	// If response headers are already sent, Express cannot safely change the response
 	// Forward to the default Express handler to finish error
 	if (res.headersSent) {

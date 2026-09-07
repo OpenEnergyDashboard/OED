@@ -209,7 +209,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 				showErrorNotification(
 					translate('users.failed.to.edit.user') +
 					translate('users.successfully.edit.user.username') + userDetails.username + ') ' +
-					error.data.message
+					error.data
 				);
 			});
 		resetPasswordFields();
@@ -228,7 +228,7 @@ export default function EditUserModalComponent(props: EditUserModalComponentProp
 				showErrorNotification(
 					translate('users.failed.to.delete.user') +
 					translate('users.successfully.edit.user.username') + props.user.username + ') ' +
-					error.data.message
+					error.data
 				);
 			});
 	};

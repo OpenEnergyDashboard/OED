@@ -4,13 +4,13 @@
 
 const express = require('express');
 const Preferences = require('../models/Preferences');
-const { log } = require('../log');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidIsoDateTime } = require('../util/timeValidation');
+const { success, failure } = require('./response');
 
 const router = express.Router();
 
@@ -21,9 +21,9 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
 	try {
 		const rows = await Preferences.get(conn);
-		res.json(rows);
+		success(res, rows);
 	} catch (err) {
-		log.error(`Error while performing GET all preferences query: ${err}`, err);
+		failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET all preferences query: ${err.message}`, { cause: err }));
 	}
 });
 
@@ -112,7 +112,8 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 		}
 	};
 	if (!validate(req.body, validParams).valid) {
-		return res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
+		return;
 	}
 
 	const prefs = req.body.preferences;
@@ -121,16 +122,16 @@ router.post('/', adminAuthMiddleware('edit site preferences'), async (req, res) 
 		(prefs.defaultMeterMinimumDate && !isValidIsoDateTime(prefs.defaultMeterMinimumDate)) ||
 		(prefs.defaultMeterMaximumDate && !isValidIsoDateTime(prefs.defaultMeterMaximumDate))
 	) {
-		return res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
+		return;
 	}
 
 	const conn = getConnection();
 	try {
 		const rows = await Preferences.update(prefs, conn);
-		return res.json(rows);
+		success(res, rows);
 	} catch (err) {
-		log.error(`Error while performing POST update preferences: ${err}`, err);
-		return res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+		failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing POST update preferences: ${err.message}`, { cause: err }));
 	}
 });
 

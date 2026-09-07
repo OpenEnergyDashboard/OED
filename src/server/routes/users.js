@@ -6,13 +6,13 @@ const bcrypt = require('bcryptjs');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const express = require('express');
 const User = require('../models/User');
-const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
 const { STRING_GENERAL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
+const { success, failure, LogLevel } = require('./response');
 
 const router = express.Router();
 
@@ -89,7 +89,7 @@ router.get('/', adminAuthMiddleware('get all users'), async (req, res) => {
 		const rows = await User.getAll(conn);
 		res.json(rows);
 	} catch (err) {
-		log.error(`Error while performing GET all users query: ${err}`, err);
+		failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET all users query: ${err.message}`, { cause: err }));
 	}
 });
 
@@ -101,11 +101,11 @@ router.get('/token', optionalAuthMiddleware, async (req, res) => {
 		maxLength: TOKEN_MAX_LENGTH
 	};
 	if (!validate(token, validParams).valid) {
-		res.status(HTTP_CODES.FORBIDDEN).json({ message: 'No token provided or JSON was invalid.' });
+		failure(res, HTTP_CODES.FORBIDDEN, null, { message: 'No token provided or JSON was invalid.' });
 	} else if (token) {
 		jwt.verify(token, secretToken, async (err, decoded) => {
 			if (err) {
-				res.status(HTTP_CODES.UNAUTHORIZED).json({ message: 'Failed to authenticate token.' });
+				failure(res, HTTP_CODES.UNAUTHORIZED, err, { message: 'Failed to authenticate token.' }, LogLevel.SILENT);
 			} else {
 				try {
 					const conn = getConnection();
@@ -116,12 +116,12 @@ router.get('/token', optionalAuthMiddleware, async (req, res) => {
 							role: userProfile.role
 						});
 				} catch (error) {
-					res.status(HTTP_CODES.UNAUTHORIZED).json({ message: 'User does not exist in database.' });
+					failure(res, HTTP_CODES.UNAUTHORIZED, error, { message: 'User does not exist in database.' }, LogLevel.SILENT);
 				}
 			}
 		});
 	} else {
-		res.status(HTTP_CODES.FORBIDDEN).send({ message: 'No token provided.' });
+		failure(res, HTTP_CODES.FORBIDDEN, null, { message: 'No token provided.' });
 	}
 });
 
@@ -140,15 +140,14 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 		}
 	};
 	if (!validate(req.params, validParams).valid) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
 			const rows = await User.getByID(req.params.user_id, conn);
 			res.json(rows);
 		} catch (err) {
-			log.error(`Error while performing GET specific user by id query: ${err}`, err);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET specific user by id query: ${err.message}`, { cause: err }));
 		}
 	}
 });
@@ -156,8 +155,11 @@ router.get('/:user_id', adminAuthMiddleware('get one user'), async (req, res) =>
 // Route for creating a new user.
 router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) => {
 	// isEdit=false: id must not be present, since it's assigned by the DB on insert, and password is required.
-	if (!validateUsersParams(req.body, false).valid) {
-		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
+	const validatorResult = validateUsersParams(req.body, false);
+
+	if (!validatorResult.valid) {
+		const message = `Got request to insert user with invalid user data. Error(s): ${validatorResult.errors}`;
+		failure(res, HTTP_CODES.BAD_REQUEST, message, { message });
 	} else {
 		try {
 			const { username, password, role, note } = req.body;
@@ -165,17 +167,15 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 			// Check if user already exists
 			const currentUser = await User.getByUsername(username, conn);
 			if (currentUser !== null) {
-				res.status(HTTP_CODES.BAD_REQUEST).send({ message: `user ${username} already exists so cannot create` });
+				failure(res, HTTP_CODES.BAD_REQUEST, null, { message: `user ${username} already exists so cannot create` });
 			} else {
 				const hashedPassword = await bcrypt.hash(password, 10);
 				const user = new User(undefined, username, hashedPassword, role, note);
 				await user.insert(conn);
-				res.sendStatus(HTTP_CODES.OK);
+				success(res);
 			}
 		} catch (error) {
-			// Log the error internally and return a generic response
-			log.error(`Error while performing POST request to create user: ${error}`, error);
-			res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send({ message: 'Internal Server Error' });
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing POST request to create user: ${error.message}`, { cause: error }));
 		}
 	}
 });
@@ -184,8 +184,11 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 	// isEdit=true: id is required and password remains optional, since a user is only sent a new
 	// password if it should change. The wrapper ('user' key) is validated inside the helper too.
-	if (!validateUsersParams(req.body, true).valid) {
-		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
+	const validatorResult = validateUsersParams(req.body, true);
+	if (!validatorResult.valid) {
+		const message = `Got request to edit users with invalid user data, errors: ${validatorResult.errors}`;
+		failure(res, HTTP_CODES.BAD_REQUEST, message, { message }, LogLevel.WARN);
+		return;
 	} else {
 		try {
 			const conn = getConnection();
@@ -197,10 +200,8 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 				const numberOfAdmins = await User.getNumberOfAdmins(conn);
 				if (numberOfAdmins < 2) {
 					const errorMessage = 'There must be at least one admin remaining to avoid lockout!';
-					log.error(errorMessage);
-					return res.status(HTTP_CODES.BAD_REQUEST).json({
-						message: errorMessage,
-					});
+					failure(res, HTTP_CODES.BAD_REQUEST, errorMessage, { message: errorMessage });
+					return;
 				}
 			}
 
@@ -221,12 +222,10 @@ router.post('/edit', adminAuthMiddleware('edit a user'), async (req, res) => {
 			}
 
 			await Promise.all(userUpdates);
-			return res.sendStatus(HTTP_CODES.OK);
+			success(res);
 
 		} catch (error) {
-			// Log internally and send a generic error response.
-			log.error('Error while performing edit user request.', error);
-			res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({ message: 'Internal Server Error' });
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing edit user request: ${error.message}`, { cause: error }));
 		}
 	}
 });
@@ -245,8 +244,10 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 			}
 		}
 	};
-	if (!validate(req.body, validParams).valid) {
-		res.status(HTTP_CODES.BAD_REQUEST).json({ message: 'Invalid params' });
+	const validatorResult = validate(req.body, validParams);
+	if (!validatorResult.valid) {
+		const message = `Got request to delete users with invalid user data. Error(s): ${validatorResult.errors}`;
+		failure(res, HTTP_CODES.BAD_REQUEST, message, { message });
 	} else {
 		try {
 			const conn = getConnection();
@@ -254,14 +255,13 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 			const id = req.decoded.data;
 			const user = await User.getByID(id, conn);
 			if (user.username === username) {// Admins cannot delete themselves
-				res.sendStatus(HTTP_CODES.BAD_REQUEST);
+				failure(res, HTTP_CODES.BAD_REQUEST);
 			} else {
 				await User.deleteUser(username, conn);
-				res.sendStatus(HTTP_CODES.OK);
+				success(res);
 			}
 		} catch (error) {
-			log.error('Error while performing delete user request', error);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing delete user request: ${error.message}`, { cause: error }));
 		}
 	}
 });
