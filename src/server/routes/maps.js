@@ -16,6 +16,7 @@ const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LEN
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidIsoDateTime } = require('../util/timeValidation');
 const omit = require('lodash/omit');
+const { success, failure, LogLevel } = require('./response');
 
 const router = express.Router();
 
@@ -156,7 +157,7 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 		const rows = await query(conn);
 		res.json(rows.map(row => formatMapForResponse(row)));
 	} catch (err) {
-		log.error(`Error while performing GET all maps query: ${err}`, err);
+		failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET all maps query: ${err.message}`, { cause: err }));
 	}
 });
 
@@ -174,15 +175,14 @@ router.get('/:map_id', optionalAuthMiddleware, async (req, res) => {
 		}
 	};
 	if (!validate(req.params, validParams).valid) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
 			const map = await Map.getByID(req.params.map_id, conn);
 			res.json(formatMapForResponse(map));
 		} catch (err) {
-			log.error(`Error while performing GET specific map by id query: ${err}`, err);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET specific map by id query: ${err.message}`, { cause: err }));
 		}
 	}
 });
@@ -201,8 +201,7 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 	// This is a comment so if if fails someone knows to see if the second parameter should be false. If it works
 	// then this can be removed.
 	if (!validationResult.valid || !isValidIsoDateTime(req.body.modifiedDate)) {
-		log.error(`Invalid input for mapAPI. ${validationResult.errors}`);
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Invalid input for mapAPI. ${validationResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -227,13 +226,12 @@ router.post('/create', adminAuthMiddleware('create maps'), async (req, res) => {
 				);
 				await newMap.insert(t);
 			});
-			res.sendStatus(HTTP_CODES.OK);
+			success(res);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "maps_name_key"') {
-				res.status(HTTP_CODES.BAD_REQUEST).json({ error: `Map "${req.body.name}" is already in use.` });
+				failure(res, HTTP_CODES.BAD_REQUEST, err, { error: `Map "${req.body.name}" is already in use.` }, LogLevel.SILENT);
 			} else {
-				log.error(`Error while inserting new map ${err}`, err);
-				res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while inserting new map: ${err.message}`, { cause: err }));
 			}
 		}
 	}
@@ -250,8 +248,7 @@ router.post('/edit', adminAuthMiddleware('edit maps'), async (req, res) => {
 	// TODO edit, unlike create, is not currently sending a time zone with the modifiedDate. It is unclear
 	// why they differ but for now don't require it here.
 	if (!validatorResult.valid || !isValidIsoDateTime(req.body.modifiedDate, false)) {
-		log.error(`Invalid map data supplied, err: ${validatorResult.errors}`);
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST, `Invalid map data supplied, err: ${validatorResult.errors}`);
 	} else {
 		const conn = getConnection();
 		try {
@@ -273,15 +270,13 @@ router.post('/edit', adminAuthMiddleware('edit maps'), async (req, res) => {
 				);
 				await editedMap.update(t);
 			});
-			res.sendStatus(HTTP_CODES.OK);
+			success(res);
 			log.info(`Successfully edited map ${req.body.id}`);
 		} catch (err) {
 			if (err.toString() === 'error: duplicate key value violates unique constraint "maps_name_key"') {
-				res.sendStatus(HTTP_CODES.BAD_REQUEST);
-				log.error(`Map "${req.body.name}" is already in use.`);
+				failure(res, HTTP_CODES.BAD_REQUEST, `Map "${req.body.name}" is already in use.`);
 			} else {
-				log.error(`Error while updating map ${err}`, err);
-				res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while updating map: ${err.message}`, { cause: err }));
 			}
 		}
 	}
@@ -301,15 +296,14 @@ router.post('/delete', adminAuthMiddleware('delete maps'), async (req, res) => {
 		}
 	};
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
 			await Map.delete(req.body.id, conn);
-			res.sendStatus(HTTP_CODES.OK);
+			success(res);
 		} catch (err) {
-			log.error(`Error while deleting group ${err}`, err);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while deleting map: ${err.message}`, { cause: err }));
 		}
 	}
 });

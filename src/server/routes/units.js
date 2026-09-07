@@ -4,12 +4,11 @@
 
 const express = require('express');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
-const { log } = require('../log');
 const { getConnection } = require('../db');
 const Unit = require('../models/Unit');
 const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const validate = require('jsonschema').validate;
-const { success, failure } = require('./response');
+const { success, failure, LogLevel } = require('./response');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH } = require('../util/validationConstants');
 const router = express.Router();
@@ -124,8 +123,7 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 		const rows = await Unit.getAll(conn);
 		res.json(rows.map(formatUnitForResponse));
 	} catch (err) {
-		log.error(`Error fetching units: ${err}`, err);
-		res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+		failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error fetching units: ${err.message}`, { cause: err }));
 	}
 });
 
@@ -137,8 +135,8 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 	const validatorResult = validateUnitsParams(req.body, true);
 
 	if (!validatorResult.valid) {
-		log.warn(`Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`);
+		const message = `Got request to edit units with invalid unit data, errors: ${validatorResult.errors}`;
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message, LogLevel.WARN);
 	} else {
 		const conn = getConnection();
 		try {
@@ -157,8 +155,7 @@ router.post('/edit', adminAuthMiddleware('edit units'), async (req, res) => {
 			await unit.update(conn);
 			success(res, 'Successfully edited unit');
 		} catch (err) {
-			log.error(`Failed to update unit: ${err}`, err);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, 'Unable to update unit');
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Failed to update unit: ${err.message}`, { cause: err }));
 		}
 	}
 });
@@ -171,8 +168,8 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 	const validationResult = validateUnitsParams(req.body, false);
 
 	if (!validationResult.valid) {
-		log.error(`Got request to edit units with invalid unit data, errors: ${validationResult.errors}`);
-		failure(res, HTTP_CODES.BAD_REQUEST, `Got request to add units with invalid unit data, errors: ${validationResult.errors}`);
+		const message = `Got request to add units with invalid unit data, errors: ${validationResult.errors}`;
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message);
 	} else {
 		const conn = getConnection();
 		try {
@@ -196,8 +193,7 @@ router.post('/addUnit', adminAuthMiddleware('add units'), async (req, res) => {
 			});
 			success(res, 'Unit created successfully');
 		} catch (err) {
-			log.error(`Error while inserting new unit: ${err}`, err);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while inserting new unit: ${err}`);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while inserting new unit: ${err.message}`, { cause: err }));
 		}
 	}
 });
@@ -216,9 +212,8 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 	// Ensure delete request is valid
 	const validatorResult = validate(req.body, validParams);
 	if (!validatorResult.valid) {
-		const errorMsg = `Got request to delete a unit with invalid data, error(s):  ${validatorResult.errors}`;
-		log.warn(errorMsg);
-		failure(res, HTTP_CODES.BAD_REQUEST, errorMsg);
+		const message = `Got request to delete a unit with invalid data, error(s):  ${validatorResult.errors}`;
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message, LogLevel.WARN);
 	} else {
 		const conn = getConnection();
 		const unitId = req.body.id;
@@ -228,9 +223,7 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 			await Unit.delete(unitId, conn);
 			success(res, 'Successfully deleted unit');
 		} catch (err) {
-			const errorMsg = `Error while deleting unit with error(s): ${err}`;
-			log.error(errorMsg);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, errorMsg);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while deleting unit with error(s): ${err.message}`, { cause: err }));
 		}
 	}
 });

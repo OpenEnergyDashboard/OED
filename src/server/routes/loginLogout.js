@@ -8,11 +8,11 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const secretToken = require('../config').secretToken;
 const validate = require('jsonschema').validate;
-const { log } = require('../log');
 const { getConnection } = require('../db');
 const { credentialsRequestValidationMiddleware, verifyActiveTokenAndGetUser } = require('./authenticator');
 const { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
+const { success, failure, LogLevel } = require('./response');
 
 const router = express.Router();
 /**
@@ -40,7 +40,7 @@ router.post('/login', credentialsRequestValidationMiddleware, async (req, res) =
 	};
 
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
 		try {
@@ -55,16 +55,15 @@ router.post('/login', credentialsRequestValidationMiddleware, async (req, res) =
 			const isValid = user !== null && passwordMatches;
 			if (isValid) {
 				const token = jwt.sign({ data: user.id }, secretToken, { expiresIn: 86400 });
-				res.json({ token: token, username: user.username, role: user.role });
+				success(res, { token: token, username: user.username, role: user.role });
 			} else {
 				throw new Error('Unauthorized password');
 			}
 		} catch (err) {
 			if (err.message === 'Unauthorized password' || err.message === 'No data returned from the query.') {
-				res.status(HTTP_CODES.UNAUTHORIZED).send({ text: 'Not authorized' });
+				failure(res, HTTP_CODES.UNAUTHORIZED, err, { text: 'Not authorized' }, LogLevel.SILENT);
 			} else {
-				log.error(`Unable to check user password for ${req.body.username}`, err);
-				res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send({ text: 'Internal Server Error' });
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Unable to check user password for ${req.body.username}: ${err.message}`, { cause: err }));
 			}
 		}
 	}
@@ -94,7 +93,7 @@ router.post('/logout', async (req, res) => {
 	};
 
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
 		return;
 	}
 
@@ -106,15 +105,14 @@ router.post('/logout', async (req, res) => {
 		const { user } = await verifyActiveTokenAndGetUser(req.body.token);
 		const conn = getConnection();
 		await User.invalidateTokensBeforeNow(user.id, conn);
-		res.status(HTTP_CODES.OK).json({ success: true, message: 'Logout successful.' });
+		success(res, { success: true, message: 'Logout successful.' });
 	} catch (error) {
 		if (error.code === 'TOKEN_INVALIDATED') {
-			res.status(HTTP_CODES.OK).json({ success: true, message: 'Logout successful.' });
+			success(res, { success: true, message: 'Logout successful.' });
 		} else if (error.message === 'No data returned from the query.') {
-			res.status(HTTP_CODES.UNAUTHORIZED).json({ success: false, message: 'Logout failed.' });
+			failure(res, HTTP_CODES.UNAUTHORIZED, null, { success: false, message: 'Logout failed.' });
 		} else {
-			log.error('Logout failed while invalidating user tokens.', error);
-			res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).json({ success: false, message: 'Logout failed.' });
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Logout failed while invalidating user tokens: ${error.message}`, { cause: error }));
 		}
 	}
 });
