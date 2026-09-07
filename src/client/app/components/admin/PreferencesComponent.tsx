@@ -21,6 +21,7 @@ import { useTranslate } from '../../redux/componentHooks';
 import TimeZoneSelect from '../TimeZoneSelect';
 import { defaultAdminState } from '../../redux/slices/adminSlice';
 import { checkboxStyle, labelStyle } from '../../styles/modalStyle';
+import { MAX_FILE_SIZE_LIMIT, MAX_METER_READING_GAP } from '../../../../common/preferencesValidationConstants';
 
 /**
  * @returns Preferences Component for Administrative use
@@ -63,7 +64,10 @@ export default function PreferencesComponent() {
 			const maxMoment = moment(localAdminPref.defaultMeterMaximumDate);
 			return !maxMoment.isValid() || !maxMoment.isSameOrBefore(MAX_DATE_MOMENT) || !maxMoment.isSameOrAfter(minMoment);
 		},
-		readingGap: (): boolean => { return Number(localAdminPref.defaultMeterReadingGap) < 0; },
+		readingGap: (): boolean => {
+			return Number(localAdminPref.defaultMeterReadingGap) < 0
+				|| Number(localAdminPref.defaultMeterReadingGap) > MAX_METER_READING_GAP;
+		},
 
 		meterErrors: (): boolean => {
 			return Number(localAdminPref.defaultMeterMaximumErrors) < 0
@@ -72,11 +76,13 @@ export default function PreferencesComponent() {
 
 		warningFileSize: (): boolean => {
 			return Number(localAdminPref.defaultWarningFileSize) < 0
+				|| Number(localAdminPref.defaultWarningFileSize) > MAX_FILE_SIZE_LIMIT
 				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit);
 		},
 
 		fileSizeLimit: (): boolean => {
 			return Number(localAdminPref.defaultFileSizeLimit) < 0
+				|| Number(localAdminPref.defaultFileSizeLimit) > MAX_FILE_SIZE_LIMIT
 				|| Number(localAdminPref.defaultWarningFileSize) > Number(localAdminPref.defaultFileSizeLimit);
 		}
 	};
@@ -226,11 +232,12 @@ export default function PreferencesComponent() {
 					value={localAdminPref.defaultMeterReadingGap}
 					onChange={e => makeLocalChanges('defaultMeterReadingGap', e.target.value)}
 					min='0'
+					max={MAX_METER_READING_GAP}
 					maxLength={50}
 					invalid={invalidFuncs.readingGap()}
 				/>
 				<FormFeedback>
-					<FormattedMessage id="error.bounds" values={{ min: 0, max: Infinity }} />
+					<FormattedMessage id="error.bounds" values={{ min: 0, max: MAX_METER_READING_GAP }} />
 				</FormFeedback>
 			</div>
 			<div>
@@ -323,13 +330,21 @@ export default function PreferencesComponent() {
 					type='number'
 					value={localAdminPref.defaultWarningFileSize}
 					onChange={e => makeLocalChanges('defaultWarningFileSize', Number(e.target.value))}
-					min='0'
-					max={Number(localAdminPref.defaultFileSizeLimit)}
+					max={Math.min(
+						Number(localAdminPref.defaultFileSizeLimit),
+						MAX_FILE_SIZE_LIMIT
+					)}
 					maxLength={50}
 					invalid={invalidFuncs.warningFileSize()}
 				/>
 				<FormFeedback>
-					<FormattedMessage id="error.bounds" values={{ min: 0, max: Number(localAdminPref.defaultFileSizeLimit) }} />
+					<FormattedMessage
+						id="error.bounds"
+						values={{
+							min: 0,
+							max: Number(localAdminPref.defaultFileSizeLimit)
+						}}
+					/>
 				</FormFeedback>
 			</div>
 			<div>
@@ -341,11 +356,18 @@ export default function PreferencesComponent() {
 					value={localAdminPref.defaultFileSizeLimit}
 					onChange={e => makeLocalChanges('defaultFileSizeLimit', Number(e.target.value))}
 					min={Number(localAdminPref.defaultWarningFileSize)}
+					max={MAX_FILE_SIZE_LIMIT}
 					maxLength={50}
 					invalid={invalidFuncs.fileSizeLimit()}
 				/>
 				<FormFeedback>
-					<FormattedMessage id="error.bounds" values={{ min: Number(localAdminPref.defaultWarningFileSize), max: Infinity }} />
+					<FormattedMessage
+						id="error.bounds"
+						values={{
+							min: Number(localAdminPref.defaultWarningFileSize),
+							max: MAX_FILE_SIZE_LIMIT
+						}}
+					/>
 				</FormFeedback>
 			</div>
 			<div>
