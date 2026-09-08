@@ -5,7 +5,7 @@ import { LanguageTypes } from 'types/redux/i18n';
 import { selectGroupDataById } from '../../redux/api/groupsApi';
 import { selectMeterDataById } from '../../redux/api/metersApi';
 import { selectUnitDataById } from '../../redux/api/unitsApi';
-import { selectChartLinkHideOptions, selectSelectedLanguage } from '../../redux/slices/appStateSlice';
+import { selectChartLinkHideOptions, selectIsKeepCurrent, selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { DataType } from '../../types/Datasources';
 import { GroupedOption, SelectOption } from '../../types/items';
 import { ChartTypes, ShiftAmount } from '../../types/redux/graph';
@@ -453,9 +453,10 @@ export const selectChartLink = createAppSelector(
 		selectGraphState,
 		selectChartLinkHideOptions,
 		selectSliderRangeInterval,
+		selectIsKeepCurrent,
 		state => state.maps.selectedMap
 	],
-	(current, chartLinkHideOptions, rangeSliderInterval, selectedMap) => {
+	(current, chartLinkHideOptions, rangeSliderInterval, isKeepCurrent, selectedMap) => {
 		// Determine the beginning of the URL to add arguments to.
 		// This is the current URL.
 		const winLocHref = window.location.href;
@@ -513,6 +514,9 @@ export const selectChartLink = createAppSelector(
 		linkText += `&minMax=${current.showMinMax}`;
 		if (chartLinkHideOptions) {
 			linkText += '&optionsVisibility=false';
+		}
+		if (isKeepCurrent && current.queryTimeInterval.getStartTimestamp() && !current.queryTimeInterval.getEndTimestamp()) {
+			linkText += `&currentTime=${encodeURIComponent(current.timeCreated)}`;
 		}
 		return linkText;
 	}

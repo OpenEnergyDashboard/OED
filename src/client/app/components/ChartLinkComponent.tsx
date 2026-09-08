@@ -5,15 +5,27 @@
 import * as React from 'react';
 import { toast } from 'react-toastify';
 import ReactTooltip from 'react-tooltip';
-import { Button, ButtonGroup, Input } from 'reactstrap';
+import { Button, ButtonGroup, Input} from 'reactstrap';
 import { useAppDispatch, useAppSelector } from '../redux/reduxHooks';
 import { selectChartLink } from '../redux/selectors/uiSelectors';
-import { selectChartLinkHideOptions, setChartLinkOptionsVisibility } from '../redux/slices/appStateSlice';
-import { selectSelectedGroups, selectSelectedMeters } from '../redux/slices/graphSlice';
-import { showErrorNotification, showInfoNotification } from '../utils/notifications';
+import {
+	selectChartLinkHideOptions, selectIsKeepCurrent, setChartLinkOptionsVisibility,
+	setIsKeepCurrent
+} from '../redux/slices/appStateSlice';
+import {
+	selectSelectedGroups,
+	selectSelectedMeters,
+	selectQueryTimeInterval
+} from '../redux/slices/graphSlice';
+import {
+	showErrorNotification,
+	showInfoNotification
+} from '../utils/notifications';
 import { useTranslate } from '../redux/componentHooks';
 import TooltipMarkerComponent from './TooltipMarkerComponent';
-import { wellStyle, rowFlexStart } from '../styles/modalStyle';
+import { wellStyle, rowFlexStart, labelStyle } from '../styles/modalStyle';
+import { checkboxStyle } from '../styles/modalStyle';
+
 
 /**
  * @returns chartLinkComponent
@@ -26,59 +38,123 @@ export default function ChartLinkComponent() {
 	const linkHideOptions = useAppSelector(selectChartLinkHideOptions);
 	const selectedMeters = useAppSelector(selectSelectedMeters);
 	const selectedGroups = useAppSelector(selectSelectedGroups);
+	const queryTimeInterval = useAppSelector(selectQueryTimeInterval);
+	const isKeepCurrent = useAppSelector(selectIsKeepCurrent);
 	const ref = React.useRef<HTMLDivElement>(null);
+
+	const keepCurrentAvailable = queryTimeInterval.getStartTimestamp() != null && queryTimeInterval.getEndTimestamp() == null;
+	React.useEffect(() => {
+		if (!keepCurrentAvailable && isKeepCurrent) {
+			dispatch(setIsKeepCurrent(false));
+		}
+	}, [keepCurrentAvailable, isKeepCurrent]);
+
 	const handleButtonClick = () => {
 		// First attempt to write directly to user's clipboard.
-		navigator.clipboard.writeText(linkText)
+		navigator.clipboard
+			.writeText(linkText)
 			.then(() => {
-				showInfoNotification(translate('clipboard.copied'), toast.POSITION.TOP_RIGHT, 1000);
+				showInfoNotification(
+					translate('clipboard.copied'),
+					toast.POSITION.TOP_RIGHT,
+					1000
+				);
 			})
 			.catch(() => {
 				// if operation fails, open copyable text for manual copy.
-				showErrorNotification(translate('clipboard.not.copied'), toast.POSITION.TOP_RIGHT, 1000);
+				showErrorNotification(
+					translate('clipboard.not.copied'),
+					toast.POSITION.TOP_RIGHT,
+					1000
+				);
 				setLinkTextVisible(true);
 			});
 	};
 	if (selectedMeters.length > 0 || selectedGroups.length > 0) {
 		return (
 			<div>
+				<div style={labelStyle}>{translate('chart.link.options.title')}</div>
+				{/* hide options checkbox */}
+				<div className="checkbox">
+					<Input
+						type="checkbox"
+						style={checkboxStyle}
+						defaultChecked={linkHideOptions}
+						onClickCapture={e => {
+							e.stopPropagation();
+							dispatch(setChartLinkOptionsVisibility(!linkHideOptions));
+						}}
+						onMouseOver={() => {
+							ref.current && ReactTooltip.show(ref.current);
+						}}
+						onMouseLeave={() => {
+							ref.current && ReactTooltip.hide(ref.current);
+						}}
+					/>
+					<label>{translate('hide.options.when.using.this.label')}</label>
+					<TooltipMarkerComponent
+						page="home"
+						helpTextId="help.home.toggle.chart.link"
+					/>
+				</div>
+				{/* keep current checkbox */}
+				<div className="checkbox">
+					<Input
+						type="checkbox"
+						style={checkboxStyle}
+						onMouseOver={() => {
+							ref.current && ReactTooltip.show(ref.current);
+						}}
+						onMouseLeave={() => {
+							ref.current && ReactTooltip.hide(ref.current);
+						}}
+						checked={isKeepCurrent}
+						onChange={e => dispatch(setIsKeepCurrent(e.target.checked))}
+						disabled={!keepCurrentAvailable}
+					/>
+
+					<label
+						style={{
+							color: keepCurrentAvailable
+								? undefined
+								: 'hsl(0, 0%, 70%)'
+						}}
+					>
+						{translate('keep.chart.current.label')}
+					</label>
+					<TooltipMarkerComponent page="home" helpTextId="help.home.toggle.chart.link.keep.current" />
+				</div>
+
 				<div style={rowFlexStart}>
-					<ButtonGroup >
-						<Button outline onClick={handleButtonClick} >
-							<div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly', gap: '1em', alignItems: 'center' }}>
+
+					<ButtonGroup>
+						<Button outline onClick={handleButtonClick}>
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'row',
+									justifyContent: 'space-evenly',
+									gap: '1em',
+									alignItems: 'center'
+								}}
+							>
 								{translate('chart.link')}
-								<div ref={ref} data-for={'home'} data-tip={'help.home.toggle.chart.link'}								>
-									<Input type='checkbox' defaultChecked={linkHideOptions}
-										onClickCapture={e => {
-											e.stopPropagation();
-											dispatch(setChartLinkOptionsVisibility(!linkHideOptions));
-										}}
-										onMouseOver={() => {
-											ref.current && ReactTooltip.show(ref.current);
-										}}
-										onMouseLeave={() => {
-											ref.current && ReactTooltip.hide(ref.current);
-										}}
-									/>
-								</div>
+
 							</div>
 						</Button>
-						<Button outline onClick={() => setLinkTextVisible(visible => !visible)}>
+						<Button
+							outline
+							onClick={() => setLinkTextVisible(visible => !visible)}
+						>
 							{linkTextVisible ? 'x' : 'v'}
 						</Button>
+
 					</ButtonGroup>
-					<TooltipMarkerComponent page='home' helpTextId='help.home.toggle.chart.link' />
 				</div>
-				{
-					linkTextVisible &&
-					<div style={wellStyle}>
-						{linkText}
-					</div>
-				}
-			</div >
+				{linkTextVisible && <div style={wellStyle}>{linkText}</div>}
+			</div>
 		);
-	}
-	else {
+	} else {
 		return null;
 	}
 }

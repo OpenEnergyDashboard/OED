@@ -25,6 +25,7 @@ const defaultState: GraphState = {
 	initialXAxisRange: TimeInterval.unbounded(),
 	queryTimeInterval: TimeInterval.unbounded(),
 	rangeSliderInterval: TimeInterval.unbounded(),
+	timeCreated: moment().format(),
 	duration: moment.duration(4, 'weeks'),
 	comparePeriod: ComparePeriod.Week,
 	compareTimeInterval: calculateCompareTimeInterval(ComparePeriod.Week, moment()),
@@ -85,6 +86,7 @@ export const graphSlice = createSlice({
 		},
 		updateTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
 			state.current.queryTimeInterval = action.payload;
+			state.current.timeCreated = moment().format();
 		},
 		updateShiftTimeInterval: (state, action: PayloadAction<TimeInterval>) => {
 			state.current.shiftTimeInterval = action.payload;
@@ -98,6 +100,7 @@ export const graphSlice = createSlice({
 		updateTimeIntervalAndSliderRange: (state, action: PayloadAction<TimeInterval>) => {
 			state.current.queryTimeInterval = action.payload;
 			state.current.rangeSliderInterval = action.payload;
+			state.current.timeCreated = moment().format();
 		},
 		resetRangeSliderStack: state => {
 			state.current.rangeSliderInterval = TimeInterval.unbounded();
@@ -220,6 +223,8 @@ export const graphSlice = createSlice({
 				processGraphLink,
 				({ current }, { payload }) => {
 					current.hotlinked = true;
+					current.timeCreated = moment().format();
+					let keepCurrentTime: string | undefined;
 					payload.forEach((value, key) => {
 						// TODO Needs to be refactored into a single dispatch/reducer pair.
 						// It is a best practice to reduce the number of dispatch calls, so this logic should be converted into a single reducer for the graphSlice
@@ -289,8 +294,30 @@ export const graphSlice = createSlice({
 							case 'shiftTimeInterval':
 								current.shiftTimeInterval = TimeInterval.fromString(value);
 								break;
+							case 'currentTime':
+								keepCurrentTime = value;
+								break;
 						}
 					});
+					if (keepCurrentTime !== undefined) {
+						const linkCurrentTime = moment.parseZone(keepCurrentTime);
+						const nowSlicedToUtc = moment().utcOffset(linkCurrentTime.utcOffset()).utcOffset(0, true);
+						const linkTimeSlicedToUtc = linkCurrentTime.clone().utcOffset(0, true);
+						const serverEndTime = moment.max(nowSlicedToUtc, linkTimeSlicedToUtc).clone();
+						const linkServerStart = current.queryTimeInterval.getStartTimestamp();
+						if (linkServerStart) {
+							const linkShift = moment.duration(linkServerStart.diff(linkTimeSlicedToUtc));
+							const serverStartTime = serverEndTime.clone().add(linkShift);
+							const usedShift = moment.duration(serverStartTime.diff(linkServerStart));
+							current.queryTimeInterval = new TimeInterval(serverStartTime, serverEndTime);
+							const sliderStart = current.rangeSliderInterval.getStartTimestamp();
+							const sliderEnd = current.rangeSliderInterval.getEndTimestamp();
+							current.rangeSliderInterval = new TimeInterval(
+								sliderStart && sliderStart.clone().add(usedShift),
+								sliderEnd && sliderEnd.clone().add(usedShift)
+							);
+						}
+					}
 				}
 			)
 			.addMatcher(preferencesApi.endpoints.getPreferences.matchFulfilled, ({ current }, action) => {
@@ -349,11 +376,12 @@ export const {
 	selectSelectedGroups, selectQueryTimeInterval,
 	selectThreeDMeterOrGroup, selectCompareTimeInterval,
 	selectThreeDMeterOrGroupID, selectThreeDReadingInterval,
-	selectLastMeterOrGroup, selectGraphAreaNormalization,
+	selectLastMeterOrGroup,
 	selectSliderRangeInterval, selectDefaultGraphState,
 	selectHistoryIsDirty, selectPlotlySliderMax,
 	selectPlotlySliderMin, selectShiftAmount,
-	selectShiftTimeInterval, selectInitialXAxisRange
+	selectShiftTimeInterval, selectInitialXAxisRange,
+	selectGraphAreaNormalization
 } = graphSlice.selectors;
 
 // actionCreators exports

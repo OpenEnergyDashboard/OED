@@ -53,9 +53,10 @@ nohup.out
 
 # Visual Studio Code settings file
 .vscode/settings.json
-
 # tmp file
 src/server/tmp/*
+as
+d
 
 #ui-testing screenshots
 src/cypress/screenshots/*
