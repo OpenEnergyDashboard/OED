@@ -163,7 +163,52 @@ mocha.describe('readings API', () => {
 
 					// Add LR10 here
 
-					// Add LR11 here
+					mocha.it(
+                        'LR11: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as MJ reverse conversion',
+                        async () => {
+                            const unitDataU = unitDatakWh.concat([
+                                { 
+                                    name: 'MJ', 
+                                    identifier: 'megaJoules', 
+                                    unitRepresent: Unit.unitRepresentType.QUANTITY, 
+                                    secInRate: 3600, 
+                                    typeOfUnit: Unit.unitType.UNIT, 
+                                    suffix: '', 
+                                    displayable: Unit.displayableType.ALL, 
+                                    preferredDisplay: false, 
+                                    note: 'MJ' 
+                                },
+                            ]);
+
+                            // c6
+                            const unitDataC = conversionDatakWh.concat([
+                                { 
+                                    sourceName: 'MJ', 
+                                    destinationName: 'kWh', 
+                                    bidirectional: true, 
+                                    slope: 1/3.6, 
+                                    intercept: 0, 
+                                    note: 'MJ → kWh' 
+                                },
+                            ]);
+                            // Prepare test data using existing utility
+                            await prepareTest(unitDataU, unitDataC, meterDatakWh);
+                            //Get unit ID for MJ
+                            const unitId = await getUnitId('MJ');
+                            //Load the expected data for the LR11 date range and unit configuration
+                            const expected = await parseExpectedCsv(
+								'src/server/test/web/readingsData/expected_line_range_ri_15_mu_kWh_gu_MJ_st_-inf_et_inf',
+                            );
+                            //Send API request using time range and graphic unit
+                            const res = await chai.request(app).get(`/api/unitReadings/line/meters/${METER_ID}`)
+                                .query({
+                                    timeInterval: ETERNITY.toString(),
+                                    graphicUnitId: unitId
+                                });
+                            //Assert the response only includes data within that range and format
+                            expectRangeToEqualExpected(res, expected, METER_ID, 1);
+                        },
+                    );
 
 					mocha.it('LR12: range should have daily points for 15 minute reading intervals and quantity units with +-inf start/end time & kWh as BTU chained', async () => {
 						// u1 (kWh) and u2 (Electric_Utility) come from unitDatakWh; add u3 (MJ) and u16 (BTU).
