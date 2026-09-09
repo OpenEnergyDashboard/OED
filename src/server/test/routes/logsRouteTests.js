@@ -4,7 +4,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { chai, mocha, expect, app, testUser } = require('../common');
+const { chai, mocha, expect } = require('../common');
+const { app, testUser } = require('../commonTestDB');
 const moment = require('moment');
 const { log } = require('../../log');
 const { HTTP_CODES } = require('../../util/httpCodes');

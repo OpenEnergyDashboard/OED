@@ -4,7 +4,8 @@
 
 /* This file tests the groups API. */
 
-const { chai, mocha, expect, app, testUser, testDB, recreateDB } = require('../common');
+const { chai, mocha, expect } = require('../common');
+const { app, testUser, testDB, recreateDB } = require('../commonTestDB');
 const bcrypt = require('bcryptjs');
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
