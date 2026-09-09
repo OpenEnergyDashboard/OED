@@ -41,7 +41,7 @@ mocha.describe('unit readings routes', () => {
 						'1 2',
 					],
 					query: valid_query,
-					expectedStatuses: [HTTP_CODES.OK, HTTP_CODES.NOT_FOUND, HTTP_CODES.INTERNAL_SERVER_ERROR]
+					expectedStatus: [HTTP_CODES.BAD_REQUEST]
 				});
 			});
 			mocha.it('validates when the meter_ids param is valid', async () => {
@@ -119,7 +119,7 @@ mocha.describe('unit readings routes', () => {
 						'1 2',
 					],
 					query: valid_query,
-					expectedStatuses: [HTTP_CODES.OK, HTTP_CODES.NOT_FOUND, HTTP_CODES.INTERNAL_SERVER_ERROR]
+					expectedStatus: [HTTP_CODES.BAD_REQUEST]
 				});
 			});
 
