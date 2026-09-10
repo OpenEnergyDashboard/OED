@@ -11,6 +11,7 @@ const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../config').secretToken;
+const { validatePasswordPolicy } = require('../util/validatePassword');
 const { STRING_GENERAL_MAX_LENGTH, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH, TOKEN_MAX_LENGTH, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 
@@ -161,6 +162,21 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 	} else {
 		try {
 			const { username, password, role, note } = req.body;
+
+			/* Determine the password’s size in bytes (using UTF-8 encoding) since some characters
+			take more than one byte, then reject the request if it exceeds 72 bytes to prevent
+			bcrypt from silently truncating the password before hashing */
+			const byteLength = Buffer.byteLength(password, 'utf8');
+			if (byteLength > 72) {
+				return res.status(400).send({ message: 'Password must not exceed 72 bytes.' });
+			}
+			
+			// Password policy validation
+			const errorMessage = validatePasswordPolicy(password, username, role);
+			if (errorMessage) {
+				return res.status(400).send({ message: errorMessage });
+			}
+
 			const conn = getConnection();
 			// Check if user already exists
 			const currentUser = await User.getByUsername(username, conn);
