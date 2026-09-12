@@ -126,6 +126,8 @@ services:
             # This user is used when the standard OED testing is run. It is left in this Docker
             # config file in case sites want to run the test suite.
             OED_DB_TEST_DATABASE: oed_testing
+            OED_DB_TEST_USER: oedtestuser
+            OED_DB_TEST_PASSWORD: oedtestpassword
             # Docker will set this hostname.
             OED_DB_HOST: database
             # This is the standard postgres port. At a site this should not cause issues as it
