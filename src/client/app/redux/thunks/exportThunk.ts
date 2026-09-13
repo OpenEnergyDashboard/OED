@@ -25,6 +25,7 @@ import { createAppThunk } from './appThunk';
 import { selectAnythingFetching } from '../../redux/selectors/apiSelectors';
 import { RootState } from '../../store';
 import { find, sortBy } from 'lodash';
+import { estimateRawExportSizeMB } from '../../../../common/RawExportFileSize';
 
 const selectCanExport = (state: RootState) => {
 	const fetchInProgress = selectAnythingFetching(state);
@@ -134,10 +135,7 @@ export const exportRawReadings = createAppThunk(
 		// the wrong value. The time to do this is small compared to most raw exports (if file is large
 		// when it matters).
 		const count = await dispatch(metersApi.endpoints.lineReadingsCount.initiate({ meterIDs, timeInterval })).unwrap();
-		// Estimated file size in MB. Note that changing the language effects the size about +/- 8%.
-		// This is just a decent estimate for larger files.
-		// This estimate is also present in src/server/routes/readings.js and must be kept consistent between files.
-		const fileSize = (count * 0.082 / 1000);
+		const fileSize = estimateRawExportSizeMB(count);
 		// Decides if the readings should be exported, true if should.
 		let shouldDownload = false;
 		if (fileSize <= adminState.defaultWarningFileSize) {
