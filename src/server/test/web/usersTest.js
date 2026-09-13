@@ -13,7 +13,7 @@ const { HTTP_CODES } = require('../../util/httpCodes');
 mocha.describe('Users API', () => {
 	mocha.describe('Admin role', () => {
 		let token;
-		mocha.before(async () => {
+		mocha.beforeEach(async () => {
 			// This .before happens before the one in common.js. If the DB is not in a normal
 			// state at the end of previous test then the user does not exist and the token
 			// is undefined. This can happen if running a single test and you kill it while running.
@@ -24,7 +24,7 @@ mocha.describe('Users API', () => {
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
-		mocha.after(async () => {
+		mocha.afterEach(async () => {
 			if (token) {
 				await chai.request(app).post('/api/loginLogout/logout')
 					.set('token', token);

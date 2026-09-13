@@ -74,15 +74,15 @@ mocha.describe('maps API', () => {
 	});
 	mocha.describe('Admin role:', () => {
 		let token;
-		// Since this .before is in the middle of tests, it should not have issues as
+		// Since this .beforeEach is in the middle of tests, it should not have issues as
 		// documented in usersTest.js.
-		mocha.before(async () => {
+		mocha.beforeEach(async () => {
 			// login
 			let res = await chai.request(app).post('/api/loginLogout/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
-		mocha.after(async () => {
+		mocha.afterEach(async () => {
 			// logout
 			if (token) {
 				await chai.request(app).post('/api/loginLogout/logout')

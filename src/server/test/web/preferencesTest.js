@@ -26,13 +26,13 @@ mocha.describe('preferences API', () => {
 			};
 			mocha.describe('Admin role: ', () => {
 				let token;
-				mocha.before(async () => {
+				mocha.beforeEach(async () => {
 					// login
 					let res = await chai.request(app).post('/api/loginLogout/login')
 						.send({ username: testUser.username, password: testUser.password });
 					token = res.body.token;
 				});
-				mocha.after(async () => {
+				mocha.afterEach(async () => {
 					// logout
 					if (token) {
 						await chai.request(app).post('/api/loginLogout/logout')

@@ -9,13 +9,13 @@ const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Units Route', () => {
 	let token;
-	mocha.before(async () => {
+	mocha.beforeEach(async () => {
 		// login
 		const res = await chai.request(app).post('/api/loginLogout/login')
 			.send({ username: testUser.username, password: testUser.password });
 		token = res.body.token;
 	});
-	mocha.after(async () => {
+	mocha.afterEach(async () => {
 		// logout
 		if (token) {
 			await chai.request(app).post('/api/loginLogout/logout')
