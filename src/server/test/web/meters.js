@@ -157,16 +157,31 @@ mocha.describe('meters API', () => {
 
 	mocha.describe('Admin role & CSV role:', () => {
 		for (const role in User.role) {
-			if (User.role[role] !== User.role.OBVIUS && User.role[role] !== User.role.EXPORT) {
+			if (User.role[role] == User.role.ADMIN || User.role[role] == User.role.CSV) {
 				let token;
-				// Since this .before is in the middle of tests, it should not have issues as
-				// documented in usersTest.js.
-				mocha.before(async () => {
-					let res = await chai.request(app).post('/api/loginLogout/login')
-						.send({ username: testUser.username, password: testUser.password });
-					token = res.body.token;
-				});
-				mocha.it('returns all meters', async () => {
+				mocha.beforeEach(async () => {
+                    // insert test user
+                    const conn = testDB.getConnection();
+                    const password = 'password';
+                    const hashedPassword = await bcrypt.hash(password, 10);
+                    const authorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+                    await authorizedUser.insert(conn);
+                    authorizedUser.password = password;
+
+                    // login
+                    let res = await chai.request(app).post('/api/loginLogout/login')
+                        .send({ username: authorizedUser.username, password: authorizedUser.password });
+                    token = res.body.token;
+                });
+                mocha.afterEach(async () => {
+                    // logout
+                    if (token) {
+                        await chai.request(app).post('/api/loginLogout/logout')
+                            .set('token', token);
+                    }
+                });
+
+				mocha.it(`should return all meters for ${role}`, async () => {
 					const conn = testDB.getConnection();
 					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
 						'Identified 1', 'notes 1', 10.0, true, true, '01:01:25', '05:05:05', 5.1, 7.3, 1, 'increasing', false,
@@ -217,7 +232,14 @@ mocha.describe('meters API', () => {
 						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});
-
+				mocha.afterEach(async () => {
+					// logout
+					if (token) {
+						await chai.request(app).post('/api/loginLogout/logout')
+							.set('token', token);
+					}
+				});
+				
 				mocha.it('should only return visible data', async () => {
 					const conn = testDB.getConnection();
 					await new Meter(undefined, 'Meter 1', '1.1.1.1', true, true, Meter.type.MAMAC, '+01', gps,
