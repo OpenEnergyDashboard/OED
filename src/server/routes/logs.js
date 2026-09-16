@@ -14,7 +14,7 @@ const { TimeInterval } = require('../../common/TimeInterval');
 const { STRING_GENERAL_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidTimeInterval } = require('../util/timeValidation');
-const { success, failure } = require('./response');
+const { success, failure, LogLevel } = require('./response');
 
 const router = express.Router();
 
@@ -57,7 +57,8 @@ router.post('/info', adminAuthMiddleware('create info log'), async (req, res) =>
 		log.info(req.body.message);
 		success(res);
 	} else {
-		failure(res, HTTP_CODES.BAD_REQUEST, 'invalid input from client logger');
+		const message = 'Invalid input from client logger for POST /info';
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message, LogLevel.WARN);
 	}
 });
 
@@ -67,7 +68,8 @@ router.post('/warn', adminAuthMiddleware('create warn log'), async (req, res) =>
 		log.warn(req.body.message);
 		success(res);
 	} else {
-		failure(res, HTTP_CODES.BAD_REQUEST, 'invalid input from client logger');
+		const message = 'Invalid input from client logger for POST /warn';
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message, LogLevel.WARN);
 	}
 });
 
@@ -77,7 +79,8 @@ router.post('/error', adminAuthMiddleware('create error log'), async (req, res) 
 		log.error(req.body.message);
 		success(res);
 	} else {
-		failure(res, HTTP_CODES.BAD_REQUEST, 'invalid input from client logger');
+		const message = 'Invalid input from client logger for POST /error';
+		failure(res, HTTP_CODES.BAD_REQUEST, message, message, LogLevel.WARN);
 	}
 });
 

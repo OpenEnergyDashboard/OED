@@ -288,7 +288,7 @@ router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 		(req.body.minDate && !isValidIsoDateTime(req.body.minDate)) ||
 		(req.body.maxDate && !isValidIsoDateTime(req.body.maxDate))
 	) {
-		failure(res, HTTP_CODES.BAD_REQUEST, null, 'invalid date/time format');
+		failure(res, HTTP_CODES.BAD_REQUEST, new Error('Invalid date/time format for meter edit request'), 'Invalid date/time format');
 	} else {
 		const conn = getConnection();
 		try {
@@ -338,9 +338,9 @@ router.post('/edit', adminAuthMiddleware('edit meters'), async (req, res) => {
 			success(res, formatMeterForResponse(meter, true));
 		} catch (err) {
 			if (err.toString().includes('duplicate key value violates unique constraint')) {
-				failure(res, HTTP_CODES.BAD_REQUEST, err, `Meter name "${req.body.name}" already exists`, LogLevel.SILENT);
+				failure(res, HTTP_CODES.BAD_REQUEST, err, `Failure likely because meter name "${req.body.name}" already exists`);
 			} else if (err.toString().includes('violates check constraint')) {
-				failure(res, HTTP_CODES.BAD_REQUEST, err, `Invalid meter data: ${err.toString()}`, LogLevel.SILENT);
+				failure(res, HTTP_CODES.BAD_REQUEST, err, 'Invalid meter data');
 			} else {
 				const detail = err['detail'] ? ` with detail "${err['detail']}"` : '';
 				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while editing a meter${detail}: ${err.message}`, { cause: err }));
@@ -367,7 +367,7 @@ router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 		(req.body.minDate && !isValidIsoDateTime(req.body.minDate)) ||
 		(req.body.maxDate && !isValidIsoDateTime(req.body.maxDate))
 	) {
-		failure(res, HTTP_CODES.BAD_REQUEST, null, 'invalid date/time format');
+		failure(res, HTTP_CODES.BAD_REQUEST, new Error('Invalid date/time format for meter creation request'), 'Invalid date/time format');
 	} else {
 		const conn = getConnection();
 		try {
@@ -413,9 +413,9 @@ router.post('/addMeter', adminAuthMiddleware('add meter'), async (req, res) => {
 			success(res, formatMeterForResponse(newMeter, true));
 		} catch (err) {
 			if (err.toString().includes('duplicate key value violates unique constraint')) {
-				failure(res, HTTP_CODES.BAD_REQUEST, err, `Meter name "${req.body.name}" already exists`, LogLevel.SILENT);
+				failure(res, HTTP_CODES.BAD_REQUEST, err, `Failure likely because meter name "${req.body.name}" already exists`);
 			} else if (err.toString().includes('violates check constraint')) {
-				failure(res, HTTP_CODES.BAD_REQUEST, err, `Invalid meter data: ${err.toString()}`, LogLevel.SILENT);
+				failure(res, HTTP_CODES.BAD_REQUEST, err, 'Invalid meter data');
 			} else {
 				const detail = err['detail'] ? ` with detail "${err['detail']}"` : '';
 				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while inserting new meter${detail}: ${err.message}`, { cause: err }));
