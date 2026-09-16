@@ -3,9 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const { log } = require('../log');
 const { getConnection } = require('../db');
 const Cik = require('../models/Cik');
+const { success, failure } = require('./response');
+const { HTTP_CODES } = require('../util/httpCodes');
 
 const router = express.Router();
 
@@ -27,8 +28,8 @@ router.get('/', async (req, res) => {
   const conn = getConnection();
   try {
     const rows = await Cik.getAll(conn);
-    res.json(rows.map(formatCikForResponse));
+    success(res, rows.map(formatCikForResponse));
   } catch (err) {
-    log.error(`Error while performing GET ciks details query: ${err}`);
+    failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET ciks details query: ${err.message}`, { cause: err }));
   }
 });

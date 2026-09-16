@@ -54,7 +54,7 @@ router.use(middleware.paramsLookupMixin);
  * @param {string} reason The reason for the failure.
  *
  */
-function failure(req, res, reason = '') {
+function failureObvius(req, res, reason = '') {
 	reason = escapeHtml(reason); // escape html to sanitize html
 	const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	log.error(`Obvius protocol request from ${ip} failed due to ${reason}`);
@@ -71,7 +71,7 @@ function failure(req, res, reason = '') {
  * @param {string} comment Any additional data to be returned to the client.
  *
  */
-function success(req, res, comment = '') {
+function successObvius(req, res, comment = '') {
 	comment = escapeHtml(comment); // escape html to sanitize html
 	res.status(HTTP_CODES.OK) // 200 OK
 		.send(`<pre>\nSUCCESS\n${comment}</pre>\n`);
@@ -102,7 +102,7 @@ function handleStatus(req, res) {
 	}
 	log.info(s);
 
-	success(req, res);
+	successObvius(req, res);
 }
 
 /**
@@ -138,14 +138,14 @@ function verifyObviusUser(req, res, next) {
 	// The test for password and username existence is redone later with JSONSchema but left since error
 	// message is different for historical reasons.
 	if (!password) {
-		failure(req, res, 'password parameter is required.');
+		failureObvius(req, res, 'password parameter is required.');
 	} else if (!username) {
-		failure(req, res, 'username parameter is required.');
+		failureObvius(req, res, 'username parameter is required.');
 	} else if (typeof password !== 'string' || password.length > PASSWORD_MAX_LENGTH) {
-		failure(req, res, 'Invalid password format.');
+		failureObvius(req, res, 'Invalid password format.');
 		// TODO 254 should be checked as accurate and then a global const here and in tests.
 	} else if (typeof username !== 'string' || username.length > 254) {
-		failure(req, res, 'Invalid username format.');
+		failureObvius(req, res, 'Invalid username format.');
 	} else {
 		// Authenticate Obvius user after all validation passes.
 		// See above for why only have username and not email.
@@ -163,7 +163,7 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 
 	const mode = req.param('mode', false);
 	if (mode === false) {
-		failure(req, res, 'Request must include mode parameter.');
+		failureObvius(req, res, 'Request must include mode parameter.');
 		return;
 	}
 
@@ -175,11 +175,11 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 	if (mode === obvius.mode.logfile_upload) {
 		const serialNumber = req.param('serialnumber', false);
 		if (!serialNumber) {
-			failure(req, res, 'Logfile Upload Requires Serial Number');
+			failureObvius(req, res, 'Logfile Upload Requires Serial Number');
 			return;
 		}
 		if (typeof serialNumber !== 'string' || serialNumber.length > 100) {
-			failure(req, res, 'Invalid serial number format');
+			failureObvius(req, res, 'Invalid serial number format');
 			return;
 		}
 		const conn = getConnection();
@@ -192,7 +192,7 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 				data = zlib.gunzipSync(fx.buffer);
 			} catch (err) {
 				log.error(err);
-				failure(req, res, `Unable to gunzip incoming buffer: ${err}`);
+				failureObvius(req, res, `Unable to gunzip incoming buffer: ${err}`);
 				return;
 			}
 			// The original code did not await for the Promise to finish. The new version
@@ -202,23 +202,23 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 		}
 		// TODO This version returns an error. Should check all usage to be sure it is properly handled.
 		Promise.all(loadLogfilePromises).then(() => {
-			success(req, res, 'Logfile Upload IS PROVISIONAL');
+			successObvius(req, res, 'Logfile Upload IS PROVISIONAL');
 		}).catch((err) => {
 			log.warn(`Logfile Upload had issues from ip: ${ip}`, err)
-			failure(req, res, 'Logfile Upload had issues');
+			failureObvius(req, res, 'Logfile Upload had issues');
 		});
 		// This return may not be needed.
 		return;
 	}
 
 	if (mode === obvius.mode.config_file_download) {
-		failure(req, res, 'Config Download Not Implemented');
+		failureObvius(req, res, 'Config Download Not Implemented');
 		return;
 	}
 
 	if (mode === obvius.mode.config_file_manifest) {
 		const conn = getConnection();
-		success(req, res, await listConfigfiles(conn));
+		successObvius(req, res, await listConfigfiles(conn));
 		return;
 	}
 
@@ -228,21 +228,21 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 		const modbusDevice = req.param('modbusdevice', false);
 
 		if (!serialNumber) {
-			failure(req, res, 'Config Upload Requires Serial Number');
+			failureObvius(req, res, 'Config Upload Requires Serial Number');
 			return;
 		}
 		if (!modbusDevice) {
-			failure(req, res, 'Config Upload Requires Modbus Device ID');
+			failureObvius(req, res, 'Config Upload Requires Modbus Device ID');
 			return;
 		}
 
 		// Basic parameter validation
 		if (typeof serialNumber !== 'string' || serialNumber.length > 100) {
-			failure(req, res, 'Invalid serial number format');
+			failureObvius(req, res, 'Invalid serial number format');
 			return;
 		}
 		if (typeof modbusDevice !== 'string' || modbusDevice.length > 50) {
-			failure(req, res, 'Invalid modbus device format');
+			failureObvius(req, res, 'Invalid modbus device format');
 			return;
 		}
 		const conn = getConnection();
@@ -258,17 +258,17 @@ router.all('/', obviusLog, verifyObviusUser, async (req, res) => {
 
 			const cf = new Configfile(undefined, req.param('serialnumber'), req.param('modbusdevice'), moment(), md5(data), data, true);
 			await cf.insert(conn);
-			success(req, res, `Acquired config log with (pseudo)filename ${cf.makeFilename()}.`);
+			successObvius(req, res, `Acquired config log with (pseudo)filename ${cf.makeFilename()}.`);
 		}
 		return;
 	}
 
 	if (mode === obvius.mode.test) {
-		failure(req, res, 'Test Not Implemented');
+		failureObvius(req, res, 'Test Not Implemented');
 		return;
 	}
 
-	failure(req, res, `Unknown mode '${mode}'`);
+	failureObvius(req, res, `Unknown mode '${mode}'`);
 });
 
 module.exports = router;

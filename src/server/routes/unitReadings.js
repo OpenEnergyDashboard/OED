@@ -15,6 +15,7 @@ const moment = require('moment');
 const { STRING_GENERAL_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidTimeInterval } = require('../util/timeValidation');
+const { success, failure } = require('./response');
 
 function validateMeterLineReadingsParams(params) {
 	const validParams = {
@@ -406,120 +407,148 @@ function createRouter() {
 	// Route for fetching line readings by meter IDs
 	router.get('/line/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else {
-			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
-			const graphicUnitID = req.query.graphicUnitId;
-			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			const forJson = await meterLineReadings(meterIDs, graphicUnitID, timeInterval);
-			res.json(forJson);
+			try {
+				const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+				const graphicUnitID = req.query.graphicUnitId;
+				const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+				const forJson = await meterLineReadings(meterIDs, graphicUnitID, timeInterval);
+				success(res, forJson);
+			} catch (err) {
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET line readings for meters: ${err.message}`, { cause: err }));
+			}
 		}
 	});
 
 	// Route for fetching line readings by group IDs
 	router.get('/line/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupLineReadingsParams(req.params) && validateLineReadingsQueryParams(req.query))) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else {
-			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
-			const graphicUnitID = req.query.graphicUnitId;
-			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			const forJson = await groupLineReadings(groupIDs, graphicUnitID, timeInterval);
-			res.json(forJson);
+			try {
+				const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
+				const graphicUnitID = req.query.graphicUnitId;
+				const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+				const forJson = await groupLineReadings(groupIDs, graphicUnitID, timeInterval);
+				success(res, forJson);
+			} catch (err) {
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET line readings for groups: ${err.message}`, { cause: err }));
+			}
 		}
 	});
 
 	// Route for fetching bar readings by meter IDs
 	router.get('/bar/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else {
-			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
-			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			const barWidthDays = Number(req.query.barWidthDays);
-			const graphicUnitID = req.query.graphicUnitId;
-			const forJson = await meterBarReadings(meterIDs, graphicUnitID, barWidthDays, timeInterval);
-			res.json(forJson);
+			try {
+				const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+				const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+				const barWidthDays = Number(req.query.barWidthDays);
+				const graphicUnitID = req.query.graphicUnitId;
+				const forJson = await meterBarReadings(meterIDs, graphicUnitID, barWidthDays, timeInterval);
+				success(res, forJson);
+			} catch (err) {
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET bar readings for meters: ${err.message}`, { cause: err }));
+			}
 		}
 	});
 
 	// Route for fetching bar readings by group IDs
 	router.get('/bar/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupBarReadingsParams(req.params) && validateBarReadingsQueryParams(req.query))) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else {
-			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
-			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			const barWidthDays = Number(req.query.barWidthDays);
-			const graphicUnitID = req.query.graphicUnitId;
-			const forJson = await groupBarReadings(groupIDs, graphicUnitID, barWidthDays, timeInterval);
-			res.json(forJson);
+			try {
+				const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
+				const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+				const barWidthDays = Number(req.query.barWidthDays);
+				const graphicUnitID = req.query.graphicUnitId;
+				const forJson = await groupBarReadings(groupIDs, graphicUnitID, barWidthDays, timeInterval);
+				success(res, forJson);
+			} catch (err) {
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET bar readings for groups: ${err.message}`, { cause: err }));
+			}
 		}
 	});
 
 	// Route for fetching radar readings by meter IDs
 	router.get('/radar/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else {
-			const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
-			const graphicUnitID = req.query.graphicUnitId;
-			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			const forJson = await meterRadarReadings(meterIDs, graphicUnitID, timeInterval);
-			res.json(forJson);
+			try {
+				const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+				const graphicUnitID = req.query.graphicUnitId;
+				const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+				const forJson = await meterRadarReadings(meterIDs, graphicUnitID, timeInterval);
+				success(res, forJson);
+			} catch (err) {
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET radar readings for meters: ${err.message}`, { cause: err }));
+			}
 		}
 	});
 
 	// Route for fetching radar readings by group IDs
 	router.get('/radar/groups/:group_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupRadarReadingsParams(req.params) && validateRadarReadingsQueryParams(req.query))) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval, true)) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else {
-			const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
-			const graphicUnitID = req.query.graphicUnitId;
-			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			const forJson = await groupRadarReadings(groupIDs, graphicUnitID, timeInterval);
-			res.json(forJson);
+			try {
+				const groupIDs = req.params.group_ids.split(',').map(idStr => Number(idStr));
+				const graphicUnitID = req.query.graphicUnitId;
+				const timeInterval = TimeInterval.fromString(req.query.timeInterval);
+				const forJson = await groupRadarReadings(groupIDs, graphicUnitID, timeInterval);
+				success(res, forJson);
+			} catch (err) {
+				failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET radar readings for groups: ${err.message}`, { cause: err }));
+			}
 		}
 	});
 
 	// Route for fetching 3D readings by meter IDs
 	router.get('/threeD/meters/:meter_ids', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateMeterThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval)) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else {
 			// Get time range to validate 1 year or less.
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			if (!timeInterval.getIsBounded()) {
 				// Cannot do if not bounded.
-				res.sendStatus(HTTP_CODES.BAD_REQUEST);
+				failure(res, HTTP_CODES.BAD_REQUEST);
 			} else {
 				const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
 				// Gets 0 unless one day beyond a year but that okay since don't do partial days.
 				const durationInYears = duration.years();
 				if (durationInYears >= 1) {
 					// Limit 3D to one year of data.
-					res.sendStatus(HTTP_CODES.BAD_REQUEST);
+					failure(res, HTTP_CODES.BAD_REQUEST);
 				} else {
-					const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
-					const graphicUnitID = req.query.graphicUnitId;
-					const readingInterval = req.query.readingInterval;
-					const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingInterval);
-					res.json(forJson);
+					try {
+						const meterIDs = req.params.meter_ids.split(',').map(idStr => Number(idStr));
+						const graphicUnitID = req.query.graphicUnitId;
+						const readingInterval = req.query.readingInterval;
+						const forJson = await meterThreeDReadings(meterIDs, graphicUnitID, timeInterval, readingInterval);
+						success(res, forJson);
+					} catch (err) {
+						failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET threeD readings for meters: ${err.message}`, { cause: err }));
+					}
 				}
 			}
 		}
@@ -528,28 +557,32 @@ function createRouter() {
 	// Route for fetching 3D readings by group ID
 	router.get('/threeD/groups/:group_id', optionalAuthMiddleware, async (req, res) => {
 		if (!(validateGroupThreeDReadingsParams(req.params) && validateThreeDQueryParams(req.query))) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else if (!isValidTimeInterval(req.query.timeInterval)) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 		} else {
 			// Get time range to validate 1 year or less.
 			const timeInterval = TimeInterval.fromString(req.query.timeInterval);
 			if (!timeInterval.getIsBounded()) {
 				// Cannot do if not bounded.
-				res.sendStatus(HTTP_CODES.BAD_REQUEST);
+				failure(res, HTTP_CODES.BAD_REQUEST);
 			} else {
 				const duration = moment.duration(timeInterval.endTimestamp.diff(timeInterval.startTimestamp));
 				// Gets 0 unless one day beyond a year but that okay since don't do partial days.
 				const durationInYears = duration.years();
 				if (durationInYears >= 1) {
 					// Limit 3D to one year of data.
-					res.sendStatus(HTTP_CODES.BAD_REQUEST);
+					failure(res, HTTP_CODES.BAD_REQUEST);
 				} else {
-					const groupID = req.params.group_id;
-					const graphicUnitID = req.query.graphicUnitId;
-					const readingInterval = req.query.readingInterval;
-					const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingInterval);
-					res.json(forJson);
+					try {
+						const groupID = req.params.group_id;
+						const graphicUnitID = req.query.graphicUnitId;
+						const readingInterval = req.query.readingInterval;
+						const forJson = await groupThreeDReadings(groupID, graphicUnitID, timeInterval, readingInterval);
+						success(res, forJson);
+					} catch (err) {
+						failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET threeD readings for group: ${err.message}`, { cause: err }));
+					}
 				}
 			}
 		}

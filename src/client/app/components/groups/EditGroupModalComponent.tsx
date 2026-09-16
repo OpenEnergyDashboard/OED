@@ -205,9 +205,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 		deleteGroup(groupState.id)
 			.unwrap()
 			.then(() => {
-				showSuccessNotification(translate('group.delete.success') + ' ' + groupState.name);
+				showSuccessNotification(
+					translate('group.delete.success') + ' (' + translate('name') + ' "' + groupState.name + '")'
+				);
 			}).catch(error => {
-				showErrorNotification(translate('group.delete.failure') + error.data.message);
+				showErrorNotification(translate('group.delete.failure') + ' ' + error.data);
 			});
 	};
 	/* End Confirm Delete Modal */

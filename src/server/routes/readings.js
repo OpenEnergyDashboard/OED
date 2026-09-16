@@ -6,7 +6,6 @@ const express = require('express');
 const { optionalAuthMiddleware } = require('./authenticator');
 const Reading = require('../models/Reading');
 const TimeInterval = require('../../common/TimeInterval').TimeInterval;
-const { log } = require('../log');
 const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const { STRING_GENERAL_MAX_LENGTH: GENERAL_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
@@ -47,7 +46,7 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 		}
 	};
 	if (!validate(req.params, validParams).valid || !validate(req.query, validQueries).valid || !isValidTimeInterval(req.query.timeInterval, true)) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
 		let meterIDs;
 		let timeInterval;
@@ -63,8 +62,7 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 			// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
 			res.send(JSON.stringify(count));
 		} catch (err) {
-			log.error(`Error while performing GET readings COUNT for line with meters ${meterIDs} with time interval ${timeInterval}: ${err}`, err);
-			res.sendStatus(HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET readings COUNT for line with meters ${meterIDs} with time interval ${timeInterval}: ${err.message}`, { cause: err }));
 		}
 	}
 })
@@ -137,8 +135,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 				success(res, rawReadings);
 			}
 		} catch (err) {
-			log.error(`Error while performing GET raw readings for line with meter ${meterID} with time interval ${timeInterval}: ${err}`, err);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET raw readings for line with meter ${meterID} with time interval ${timeInterval}: ${err.message}`, { cause: err }));
 		}
 	}
 });

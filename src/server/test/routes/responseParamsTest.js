@@ -123,7 +123,7 @@ mocha.describe('Response Utility Functions', () => {
 			const mockRes = createMockResponse();
 			const comment = 'Operation failed';
 
-			failure(mockRes, HTTP_CODES.BAD_REQUEST, comment);
+			failure(mockRes, HTTP_CODES.BAD_REQUEST, null, comment);
 
 			expect(mockRes.statusCode).to.equal(HTTP_CODES.BAD_REQUEST);
 			expect(mockRes.sentData).to.equal(comment);
@@ -135,7 +135,7 @@ mocha.describe('Response Utility Functions', () => {
 
 			errorCodes.forEach(code => {
 				const freshMockRes = createMockResponse();
-				failure(freshMockRes, code, `Error ${code}`);
+				failure(freshMockRes, code, null, `Error ${code}`);
 
 				expect(freshMockRes.statusCode).to.equal(code);
 				const expectedData = code >= 500 ? internalErrorMsg : `Error ${code}`;
@@ -251,7 +251,7 @@ mocha.describe('Response Utility Functions', () => {
 			const mockRes = createMockResponse();
 			const unicodeComment = '🚀👨‍💻🔐💾📱';
 
-			failure(mockRes, HTTP_CODES.BAD_REQUEST, unicodeComment);
+			failure(mockRes, HTTP_CODES.BAD_REQUEST, null, unicodeComment);
 
 			expect(mockRes.statusCode).to.equal(HTTP_CODES.BAD_REQUEST);
 			expect(mockRes.sentData).to.equal(unicodeComment);

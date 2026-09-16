@@ -60,6 +60,13 @@ class Logger {
 		if (error !== null) {
 			if (error.stack) {
 				messageToLog += `Stacktrace: \n${error.stack}\n`;
+				// If this error wraps another one (e.g. new Error(msg, { cause: originalErr })),
+				// also print the original's stack so console/file output isn't limited to just
+				// where the wrapper was created — this only affects console/file output, not the
+				// message stored in the DB, which is unaffected either way.
+				if (error.cause && error.cause.stack) {
+					messageToLog += `Caused by: \n${error.cause.stack}\n`;
+				}
 			} else {
 				// It's possible someone passed in an error that isn't actually an Error object
 				// because javascript lets you throw anything. In that case, the error won't have

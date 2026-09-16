@@ -130,7 +130,7 @@ export default function CreateUserModal() {
 				showErrorNotification(
 					translate('users.failed.to.create.user') +
 					translate('users.successfully.edit.user.username') + userDetails.username + ') ' +
-					error.data.message);
+					(typeof error.data === 'string' ? error.data : error.data?.message) ?? 'Unknown error');
 				resetPasswordFields();
 			});
 	};

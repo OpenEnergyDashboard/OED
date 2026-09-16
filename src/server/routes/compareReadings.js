@@ -12,6 +12,7 @@ const Reading = require('../models/Reading');
 const { STRING_GENERAL_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { isValidIsoDuration } = require('../util/timeValidation');
+const { success, failure } = require('./response');
 
 const DATE_TIME_WITH_TIME_REGEX = /^\d{4}-\d{2}-\d{2}(?:T| )\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?$/;
 
@@ -118,7 +119,7 @@ function createRouter() {
 
 	router.get('/meters/:meter_ids', async (req, res) => {
 		if (!(validateMeterCompareReadingsParams(req.params) && validateQueryParams(req.query))) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 			return;
 		}
 		const meterIDs = req.params.meter_ids.split(',').map(id => parseInt(id));
@@ -128,20 +129,24 @@ function createRouter() {
 		const shiftRaw = req.query.shift;
 
 		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 			return;
 		}
 
-		// The string sent should set the timezone to UTC so honor that as OED uses UTC.
-		const currStart = moment.parseZone(currStartRaw, moment.ISO_8601, true);
-		const currEnd = moment.parseZone(currEndRaw, moment.ISO_8601, true);
-		const shift = moment.duration(shiftRaw);
-		res.json(await meterCompareReadings(meterIDs, graphicUnitID, currStart, currEnd, shift));
+		try {
+			// The string sent should set the timezone to UTC so honor that as OED uses UTC.
+			const currStart = moment.parseZone(currStartRaw, moment.ISO_8601, true);
+			const currEnd = moment.parseZone(currEndRaw, moment.ISO_8601, true);
+			const shift = moment.duration(shiftRaw);
+			success(res, await meterCompareReadings(meterIDs, graphicUnitID, currStart, currEnd, shift));
+		} catch (err) {
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET meter compare readings: ${err.message}`, { cause: err }));
+		}
 	});
 
 	router.get('/groups/:group_ids', async (req, res) => {
 		if (!(validateGroupCompareReadingsParams(req.params) && validateQueryParams(req.query))) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 			return;
 		}
 		const groupIDs = req.params.group_ids.split(',').map(id => parseInt(id));
@@ -151,15 +156,19 @@ function createRouter() {
 		const shiftRaw = req.query.shift;
 
 		if (!isValidCompareDateTime(currStartRaw) || !isValidCompareDateTime(currEndRaw) || !isValidIsoDuration(shiftRaw)) {
-			res.sendStatus(HTTP_CODES.BAD_REQUEST);
+			failure(res, HTTP_CODES.BAD_REQUEST);
 			return;
 		}
 
-		// The string sent should set the timezone to UTC so honor that as OED uses UTC.
-		const currStart = moment.parseZone(currStartRaw, moment.ISO_8601, true);
-		const currEnd = moment.parseZone(currEndRaw, moment.ISO_8601, true);
-		const shift = moment.duration(shiftRaw);
-		res.json(await groupCompareReadings(groupIDs, graphicUnitID, currStart, currEnd, shift));
+		try {
+			// The string sent should set the timezone to UTC so honor that as OED uses UTC.
+			const currStart = moment.parseZone(currStartRaw, moment.ISO_8601, true);
+			const currEnd = moment.parseZone(currEndRaw, moment.ISO_8601, true);
+			const shift = moment.duration(shiftRaw);
+			success(res, await groupCompareReadings(groupIDs, graphicUnitID, currStart, currEnd, shift));
+		} catch (err) {
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, new Error(`Error while performing GET group compare readings: ${err.message}`, { cause: err }));
+		}
 	});
 
 	return router;

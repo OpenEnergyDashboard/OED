@@ -5,9 +5,9 @@
 const express = require('express');
 const validate = require('jsonschema').validate;
 const { TOKEN_MAX_LENGTH } = require('../util/validationConstants');
-const { log } = require('../log');
 const { verifyActiveTokenAndGetUser } = require('./authenticator');
 const { HTTP_CODES } = require('../util/httpCodes');
+const { success, failure } = require('./response');
 
 const router = express.Router();
 
@@ -32,17 +32,15 @@ router.post('/', (req, res) => {
 	};
 
 	if (!validate(req.body, validParams).valid) {
-		res.sendStatus(HTTP_CODES.BAD_REQUEST);
+		failure(res, HTTP_CODES.BAD_REQUEST);
 	} else {
 		const token = req.body.token;
-
 		verifyActiveTokenAndGetUser(token)
 			.then(() => {
-				res.status(HTTP_CODES.OK).json({ success: true });
+				success(res, { success: true });
 			})
 			.catch(error => {
-				log.error('Token verification failed.', error);
-				res.status(HTTP_CODES.UNAUTHORIZED).json({ success: false, message: 'Failed to authenticate token.' });
+				failure(res, HTTP_CODES.UNAUTHORIZED, new Error(`Token verification failed: ${error.message}`, { cause: error }), { success: false, message: 'Failed to authenticate token.' });
 			});
 	}
 });
