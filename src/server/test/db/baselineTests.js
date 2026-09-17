@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { mocha, expect, testDB } = require('../common');
+const { mocha, expect } = require('../common');
+const { testDB } = require('../commonTestDB');
 const Baseline = require('../../models/Baseline');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');

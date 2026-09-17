@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { mocha, expect, testDB, app, testUser } = require('../common');
-const chai = require('chai');
+const { chai, mocha, expect } = require('../common');
+const { app, testUser, testDB } = require('../commonTestDB');
 const Unit = require('../../models/Unit');
 
 mocha.describe('Units Route', () => {
