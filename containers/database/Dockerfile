@@ -10,6 +10,9 @@ FROM postgres:15.3
 
 # Sent from the build for the database in the main docker-compose.yml file.
 ARG OED_DB_PASSWORD
+# Declared (but unused) so BuildKit doesn't warn that this build arg,
+# also present in the merged common variables, was never consumed.
+ARG POSTGRES_PASSWORD
 
 # All SQL files in the build context
 # get copied into the container and
