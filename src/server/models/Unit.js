@@ -186,6 +186,42 @@ class Unit {
 		return Unit.mapRow(row);
 	}
 
+	/**
+	 * Checks whether a unit with the given id currently exists.
+	 * @param {number} id The unit's id.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<boolean>}
+	 */
+	static async exists(id, conn) {
+		const row = await conn.oneOrNone(sqlFile('unit/get_by_id.sql'), { id: id });
+		return row !== null;
+	}
+
+	/**
+	 * Locks a unit's row for the duration of the current transaction, preventing
+	 * concurrent modification by other sessions. Must be called within a transaction.
+	 * @param {number} id The unit's id.
+	 * @param {*} conn The connection to use (should be a transaction).
+	 * @returns {Promise.<Unit>}
+	 */
+	static async lockById(id, conn) {
+		const row = await conn.one(sqlFile('unit/lock_by_id.sql'), { id: id });
+		return Unit.mapRow(row);
+	}
+
+	/**
+	 * Finds suffix-type units that may have been orphaned (left visible with
+	 * no remaining conversions) after cleaning up around the given source/destination
+	 * units. Used as a post-delete sanity check, not a guarantee.
+	 * @param {number} sourceId The conversion's source unit id.
+	 * @param {number} destinationId The conversion's destination unit id.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<Array.<{id: number, name: string}>>}
+	 */
+	static async findOrphanedSuffixUnits(sourceId, destinationId, conn) {
+		return await conn.any(sqlFile('unit/find_orphaned_suffix_units.sql'), { sourceId, destinationId });
+	}
+
 	// TODO: Returns a special value if it doesn't exist
 	/**
 	 * Returns the associated unit for the given name.

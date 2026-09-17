@@ -13,9 +13,13 @@ const { HTTP_CODES } = require('../util/httpCodes');
 const validate = require('jsonschema').validate;
 
 const { simulateDeleteConversion } = require('../services/conversionSimulation');
-const { checkUnitDependencies, getUnitDependencyDetails } = require('../services/graph/checkUnitDependencies');
+const { getUnitDependencyDetails } = require('../services/graph/checkUnitDependencies');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const { STRING_GENERAL_MAX_LENGTH } = require('../util/validationConstants');
+const Meter = require('../models/Meter');
+const Group = require('../models/Group');
+const { redoCik } = require('../services/graph/redoCik');
+const { isSuffixRelated } = require('../util/suffixUnitCheck');
 
 
 const router = express.Router();
@@ -195,8 +199,6 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 			// Check for dependencies on suffix units that will be affected
 			// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
 			// This provides better error messages before attempting deletion
-			const isSuffixRelated = (unit) => unit.typeOfUnit === 'suffix' || (unit.suffix && unit.suffix.trim() !== '');
-
 			const suffixUnitsToCheck = [];
 			if (isSuffixRelated(source)) {
 				suffixUnitsToCheck.push({ unit: source, role: 'source' });
@@ -262,42 +264,28 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 						await Conversion.delete(destinationId, sourceId, t);
 					}
 				}
-				// Update meters if any
+				// Update meters, if any, by setting their default graphic unit to NULL
 				for (const meterId of meterIds) {
-					await t.none(`UPDATE meters SET default_graphic_unit = NULL WHERE id = ${meterId}`);
+					await Meter.clearDefaultGraphicUnit(meterId, t);
 				}
-				// Update groups if any
+				// Update groups, if any, by setting their default graphic unit to NULL
 				for (const groupId of groupIds) {
-					await t.none(`UPDATE groups SET default_graphic_unit = NULL WHERE id = ${groupId}`);
+					await Group.clearDefaultGraphicUnit(groupId, t);
 				}
 				// Delete conversion
 				await Conversion.delete(sourceId, destinationId, t);
 			});
 
-			// Verify no orphaned suffix units after cleanup (performance: only check if suffix units were involved)
-			if (source.typeOfUnit === 'suffix' || dest.typeOfUnit === 'suffix') {
+			// Verify if units were orphaned after suffix cleanup (performance: only check if suffix units were involved)
+			// Track the units that may be orphaned
+			let orphanedUnits = [];
+			// Track if failures occured during orphan check
+			let orphanedCheckFailed = false;
+			if (isSuffixRelated(source) || isSuffixRelated(dest)) {
 				try {
 					// Use efficient query with LIMIT to avoid scanning large tables unnecessarily
 					// Only check recently affected units to improve performance on large databases
-					const orphanedUnits = await conn.any(`
-						SELECT u.id, u.name 
-						FROM units u
-						WHERE u.type_of_unit = 'suffix'::unit_type
-						AND u.displayable != 'none'::displayable_type
-						AND (u.id = $1 OR u.id = $2 OR u.id IN (
-							SELECT DISTINCT CASE 
-								WHEN c.source_id IN ($1, $2) THEN c.destination_id
-								WHEN c.destination_id IN ($1, $2) THEN c.source_id
-							END
-							FROM conversions c
-							WHERE (c.source_id IN ($1, $2) OR c.destination_id IN ($1, $2))
-						))
-						AND NOT EXISTS (
-							SELECT 1 FROM conversions c 
-							WHERE (c.source_id = u.id OR c.destination_id = u.id)
-						)
-						LIMIT 100
-					`, [sourceId, destinationId]);
+					orphanedUnits = await Unit.findOrphanedSuffixUnits(sourceId, destinationId, conn);
 					if (orphanedUnits.length > 0) {
 						log.warn(`Found ${orphanedUnits.length} potentially orphaned suffix units after cleanup: ${orphanedUnits.map(u => `${u.id} (${u.name})`).join(', ')}`);
 						// Log metrics for monitoring

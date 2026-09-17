@@ -9,6 +9,8 @@ const Group = require('../models/Group');
 const Unit = require('../models/Unit');
 const { createConversionGraph, createConversionGraphFromArray } = require('./graph/createConversionGraph');
 const { intersectSets, compatibleUnitsForMeter } = require('../util/compatibleUnits');
+const { isSuffixRelated } = require('../util/suffixUnitCheck');
+const { getOtherConnections } = require('./graph/checkUnitDependencies');
 
 /**
  * Simulates what conversions and units would be removed when deleting a conversion involving suffix units.
@@ -74,16 +76,17 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 	
 	// 3. Simulate suffix unit cleanup if applicable
 	let conversionsToRemove = [
-		{ sourceId, destinationId } // The conversion being deleted
+		// The conversion being deleted
+		{ sourceId, destinationId } 
 	];
-	
-	const isSuffixRelated = (unit) => unit && (unit.typeOfUnit === 'suffix' || (unit.suffix && unit.suffix.trim() !== ''));
-
+	// Validate if the source unit is a suffix related unit
+	// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
 	if (isSuffixRelated(sourceUnit)) {
 		const cleanup = simulateSuffixUnitCleanup(sourceUnit, allConversions, allUnits);
 		conversionsToRemove.push(...cleanup.conversionsToRemove);
 	}
-
+	// Validate if the destination unit is a suffix related unit
+	// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
 	if (isSuffixRelated(destUnit)) {
 		const cleanup = simulateSuffixUnitCleanup(destUnit, allConversions, allUnits);
 		conversionsToRemove.push(...cleanup.conversionsToRemove);

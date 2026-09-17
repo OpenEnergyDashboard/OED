@@ -7,7 +7,6 @@ const { pathConversion } = require('./pathConversion');
 const Conversion = require('../../models/Conversion');
 const { getAllPaths } = require('./createConversionGraph');
 const { log } = require('../../log');
-const { canSafelyHideSuffixUnit } = require('./checkUnitDependencies');
 const { deleteUnitSafely } = require('./checkUnitDependencies');
 
 /**

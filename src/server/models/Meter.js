@@ -130,6 +130,16 @@ class Meter {
 	}
 
 	/**
+	 * Gets all meters that use the given unit as either their base unit or default graphic unit.
+	 * @param {number} unitId The unit's id.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<Array>}
+	 */
+	static async getByUnitOrDefaultGraphic(unitId, conn) {
+		return await conn.any(sqlFile('meter/get_meter_by_unit_or_default_graphic.sql'), { unitId });
+	}
+
+	/**
 	 * Check if a meter with the same name is already in the database.
 	 * @param conn the connection to be used.
 	 * @returns {boolean}
@@ -302,6 +312,24 @@ class Meter {
 		// input. Thus, the query returns that value.
 		const resp = await conn.one(sqlFile('meter/update_meter.sql'), meter);
 		return resp.reading_frequency;
+	}
+	
+	/**
+	 * Clears a meter's default graphic unit (sets it to NULL).
+	 * @param {number} id The meter's id.
+	 * @param {*} conn The connection to use.
+	 */
+	static async clearDefaultGraphicUnit(id, conn) {
+		await conn.none(sqlFile('meter/clear_default_graphic_unit.sql'), { id: id });
+	}
+
+	/**
+	 * Clears a meter's base unit (sets unit_id to NULL).
+	 * @param {number} id The meter's id.
+	 * @param {*} conn The connection to use.
+	 */
+	static async clearUnitId(id, conn) {
+		await conn.none(sqlFile('meter/clear_unit_id.sql'), { id: id });
 	}
 
 	/**

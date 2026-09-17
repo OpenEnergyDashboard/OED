@@ -22,7 +22,7 @@ import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import { showErrorNotification, showSuccessNotification } from '../../utils/notifications';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
 import { SimpleUnsavedWarningComponent } from '../SimpleUnsavedWarningComponent';
-
+import { conversionArrow } from '../../utils/conversionArrow';
 
 interface EditConversionModalComponentProps {
 	show: boolean;
@@ -97,10 +97,11 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 	// Determine whether the selected unit is a Suffix unit
 	// Including Suffix input with unit type Unit and Suffix is filled in
-	const isSuffixRelated = (unit? : UnitData): boolean =>
-		!!unit && (
-			unit.typeOfUnit === UnitType.suffix || !!unit.suffix?.trim()
+	const isSuffixRelated = (unit? : UnitData): boolean => {
+		return !!unit && (
+			unit.typeOfUnit === UnitType.suffix || unit.suffix !== ''
 		);
+	};
 
 	// Determine whether the selected source or destination is a suffix unit
 	const isSuffixUsed = () => {
@@ -236,8 +237,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				);
 			}
 			// Suffix unit to Suffix Unit deletion
-		} else if (
-			isSuffixRelated(source) || isSuffixRelated(dest)) {
+		} else if (isSuffixRelated(source) || isSuffixRelated(dest)) {
 			const suffixUnit = isSuffixRelated(source) ? source : dest;
 			// Find all conversions involving this suffix unit (as source or destination)
 			const suffixUnitConversions = conversionDetails.filter(c =>
@@ -245,34 +245,35 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				(c.bidirectional && c.destinationId === suffixUnit.id)
 			);
 
-			// Find OED-created suffix-type units that would be cascade deleted
-			const suffixTypeUnitsToDelete = suffixUnitConversions
+			// Find conversions involving the given suffix unit
+			// that connect to another suffix-related unit.
+			const conversionsToDelete = suffixUnitConversions.filter(c => {
+				const otherId = c.sourceId === suffixUnit.id ? c.destinationId : c.sourceId;
+				return isSuffixRelated(unitDataById[otherId]);
+			});
+
+			// Find the suffix-related units of conversionsToDelete.
+			// Return the units that may be cascade deleted.
+			const suffixTypeUnitsToDelete = conversionsToDelete
 				.map(c => {
 					const otherId = c.sourceId === suffixUnit.id ? c.destinationId : c.sourceId;
 					return unitDataById[otherId];
-				})
-				.filter(isSuffixRelated);
-
-			// Get unique conversions that would be deleted
-			const conversionsToDelete = suffixUnitConversions.filter(c => {
-				const otherId = c.sourceId === suffixUnit.id ? c.destinationId : c.sourceId;
-				const otherUnit = unitDataById[otherId];
-				return isSuffixRelated(otherUnit);
-			});
+				});
 
 			// Check for meters/groups using affected suffix units
 			const affectedSuffixUnitIds = new Set(suffixTypeUnitsToDelete.map(u => u.id));
-			affectedSuffixUnitIds.add(suffixUnit.id); // Also check the main suffix unit
+			// Also check the main suffix unit
+			affectedSuffixUnitIds.add(suffixUnit.id); 
 
 			// Check meters using these units (as unitId or defaultGraphicUnit)
 			const affectedMetersList = Object.values(meterDataById).filter(meter =>
 				affectedSuffixUnitIds.has(meter.unitId) ||
-				(meter.defaultGraphicUnit !== null && affectedSuffixUnitIds.has(meter.defaultGraphicUnit))
+				affectedSuffixUnitIds.has(meter.defaultGraphicUnit)
 			);
 
 			// Check groups using these units (as defaultGraphicUnit)
 			const affectedGroupsList = Object.values(groupDataById).filter(group =>
-				group.defaultGraphicUnit !== null && affectedSuffixUnitIds.has(group.defaultGraphicUnit)
+				affectedSuffixUnitIds.has(group.defaultGraphicUnit)
 			);
 
 			// Display dependency warnings, affected meters and groups if any
@@ -281,7 +282,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					<div key="suffix-dependencies-warning">
 						<span className="bold">{translate('conversion.delete.suffix.dependencies.warning')}</span>
 						{affectedMetersList.length > 0 && (
-							<div style={{ marginTop: '8px' }}>
+							<div>
 								<span className="bold">{translate('conversion.delete.suffix.meters.affected')}:</span>
 								<ul>
 									{affectedMetersList.map(m => (
@@ -291,7 +292,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							</div>
 						)}
 						{affectedGroupsList.length > 0 && (
-							<div style={{ marginTop: '8px' }}>
+							<div>
 								<span className="bold">{translate('conversion.delete.suffix.groups.affected')}:</span>
 								<ul>
 									{affectedGroupsList.map(g => (
@@ -324,13 +325,13 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					<div key="suffix-conversions-to-delete">
 						<span className="bold">{translate('conversion.delete.suffix.conversions.to.delete')}:</span>
 						<ul>
-							{conversionsToDelete.map((c, idx) => {
-								const s = unitDataById[c.sourceId]?.name || unitDataById[c.sourceId]?.identifier || c.sourceId;
-								const d = unitDataById[c.destinationId]?.name || unitDataById[c.destinationId]?.identifier || c.destinationId;
-								const bidirectional = c.bidirectional ? ' ↔ ' : ' → ';
+							{conversionsToDelete.map((conversion, idx) => {
+								const sourceName = unitDataById[conversion.sourceId].name;
+								const destinationName = unitDataById[conversion.destinationId].name;
+								const arrow = conversionArrow(conversion.bidirectional);
 								return (
-									<li key={`${c.sourceId}-${c.destinationId}-${idx}`}>
-										"{s}"{bidirectional}"{d}"
+									<li key={`${conversion.sourceId}-${conversion.destinationId}-${idx}`}>
+										"{sourceName}"{arrow}"{destinationName}"
 									</li>
 								);
 							})}
@@ -365,7 +366,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					cancel = true;
 				} else {
 					// Group meters by lostUnits
-					// Display all meters that are loosing the same set of units
+					// Display all meters that are losing the same set of units
 					const meterLossMap = new Map<string, string[]>();
 					result.affectedMeters.forEach(meter => {
 						const key = JSON.stringify([...meter.lostUnits].sort());
@@ -394,7 +395,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					});
 
 					// Group non-orphaned groups by lostUnits
-					// Display all groups loosing the same set of units
+					// Display all groups losing the same set of units
 					const groupLossMap = new Map<string, string[]>();
 					const nonOrphanedGroups = result.affectedGroups?.filter(group => !group.orphaned);
 					nonOrphanedGroups.forEach(group => {
@@ -460,7 +461,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							);
 						}
 					});
-					// Save twhich meters.groups need their default unit cleared
+					// Save which meters.groups need their default unit cleared
 					setMetersWithLostDefault(metersLostDefault);
 					setGroupsWithLostDefault(groupsLostDefault);
 				}
@@ -474,22 +475,27 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				cancel = true;
 			}
 		}
-		// Route to appropriate modal based on any above set cancle condition
+		// Process the appropriate modal based on the cancel conditions set above
 		if (cancel) {
-			msgElements.push(
-				<div key="restricted">
-					<br />
-					{translate('conversion.delete.restricted')}
-				</div>
-			);
+    		msgElements.push(
+        		<div key="restricted">
+            		<br />
+            		<span className="bold">
+                		{translate('conversion.delete.restricted')}
+            		</span>
+        		</div>
+    		);
 			setDeleteConfirmationMessage(msgElements);
 			handleCancelModalOpen();
 		} else {
-			// Confirm deletion if no blcoking issues
+			// Confirm deletion if no blocking issues
 			msgElements.push(
 				<div key="final-confirm">
-					{translate('conversion.delete.conversion')} [{props.conversionIdentifier}] ?
-				</div>
+        			<br />
+        			<span className="bold">
+            			{translate('conversion.delete.conversion')} [{props.conversionIdentifier}] ?
+        			</span>
+    			</div>
 			);
 			setDeleteConfirmationMessage(msgElements);
 			handleDeleteConfirmationModalOpen();
@@ -522,7 +528,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		// Do not call the handler function because we do not want to open the parent modal
 		setShowDeleteConfirmationModal(false);
 		// Bundle the conversions, meters, and groups to delete
-		// Backend will cleat the references as part of the same delete
+		// Backend will clear the references as part of the same delete
 		const payload = {
 			sourceId: state.sourceId,
 			destinationId: state.destinationId,

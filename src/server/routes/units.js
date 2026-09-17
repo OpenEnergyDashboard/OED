@@ -257,7 +257,7 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 			// Perform all operations in a single transaction for atomicity
 			await conn.tx(async t => {
 				// Lock the unit to prevent concurrent modifications
-				await t.one('SELECT * FROM units WHERE id = $1 FOR UPDATE', [unitId]);
+				await Unit.lockById(unitId, t);
 				
 				// Reload unit within transaction to ensure consistency
 				const unitInTx = await Unit.getById(unitId, t);
@@ -270,7 +270,7 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 				
 				// Handle units with suffix string (not suffix-type)
 				// These units may have conversions involving suffix units that need cleanup
-				if (unitInTx.suffix && unitInTx.suffix.trim() !== '') {
+				if (unitInTx.suffix && unitInTx.suffix !== '') {
 					log.info(`Unit ${unitId} has suffix "${unitInTx.suffix}". Checking for suffix-involved conversions.`);
 					
 					// Get all conversions involving this unit

@@ -107,6 +107,16 @@ class Group {
 	}
 
 	/**
+	 * Gets all groups that use the given unit as their default graphic unit.
+	 * @param {number} unitId The unit's id.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<Array>}
+	 */
+	static async getByDefaultGraphicUnit(unitId, conn) {
+		return await conn.any(sqlFile('group/get_group_by_default_graphic_unit.sql'), { unitId });
+	}
+
+	/**
 	 * returns a promise to retrieve all groups in the database
 	 * @param conn the connection to be used.
 	 * @returns {Promise.<array.<Group>>}
@@ -241,6 +251,15 @@ class Group {
 			group.defaultGraphicUnit = null;
 		}
 		await conn.none(sqlFile('group/update_group.sql'), group);
+	}
+
+	/**
+	 * Clears a group's default graphic unit (sets it to NULL).
+	 * @param {number} id The group's id.
+	 * @param {*} conn The connection to use.
+	 */
+	static async clearDefaultGraphicUnit(id, conn) {
+		await conn.none(sqlFile('group/clear_default_graphic_unit.sql'), { id: id });
 	}
 
 	/**
