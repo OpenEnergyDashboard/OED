@@ -230,7 +230,7 @@ export default function PreferencesComponent() {
 				<Input
 					type='number'
 					value={localAdminPref.defaultMeterReadingGap}
-					onChange={e => makeLocalChanges('defaultMeterReadingGap', e.target.value)}
+					onChange={e => makeLocalChanges('defaultMeterReadingGap', Number(e.target.value))}
 					min='0'
 					max={MAX_METER_READING_GAP}
 					maxLength={50}
@@ -247,7 +247,7 @@ export default function PreferencesComponent() {
 				<Input
 					type='number'
 					value={localAdminPref.defaultMeterMaximumErrors}
-					onChange={e => makeLocalChanges('defaultMeterMaximumErrors', e.target.value)}
+					onChange={e => makeLocalChanges('defaultMeterMaximumErrors', Number(e.target.value))}
 					min='0'
 					max={MAX_ERRORS}
 					maxLength={50}
