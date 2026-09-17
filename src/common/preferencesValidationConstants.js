@@ -7,7 +7,8 @@
  * Used by both frontend and backend to keep validation consistent.
  */
 const PREFERENCES_VALIDATION_CONSTANTS = {
-	MAX_FILE_SIZE_LIMIT: 1000000000
+	MAX_FILE_SIZE_LIMIT: 1000000000,
+	MAX_METER_READING_GAP: 86400
 };
 
 module.exports = PREFERENCES_VALIDATION_CONSTANTS;
