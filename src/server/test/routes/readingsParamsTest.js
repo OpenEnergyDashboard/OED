@@ -24,6 +24,7 @@ const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
 const Unit = require('../../models/Unit');
 const User = require('../../models/User');
+const { insertMeters } = require('../../util/insertData');
 
 /** Shared valid timeInterval for line reading routes (used in multiple tests in this file). */
 const READINGS_LINE_TIME_INTERVAL = '2020-01-01T00:00:00.000Z_2020-01-02T00:00:00.000Z';
@@ -104,9 +105,8 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					.get(`${LINE_COUNT_BASE_ENDPOINT}/${encodeURIComponent(sqlInjection)}`)
 					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
 
-				// Should not crash server. parseInt takes the leading '1' from the injected string as
-				// the meter id, and since meter 1 does not exist in this test's fresh schema, 404 is expected.
-				expect([HTTP_CODES.OK, HTTP_CODES.BAD_REQUEST, HTTP_CODES.NOT_FOUND, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
+				// Should not crash server, may return 200, 400 or 500
+				expect([HTTP_CODES.OK, HTTP_CODES.BAD_REQUEST, HTTP_CODES.INTERNAL_SERVER_ERROR]).to.include(res.status);
 			});
 
 			mocha.it('should reject XSS attempts in timeInterval', async () => {
@@ -380,69 +380,31 @@ mocha.describe('Readings Route Parameter Validation', () => {
 
 	mocha.describe('Non-Displayable Meter Access Control', () => {
 		let conn;
-		let unitId;
+		let unitName;
 		let displayableMeterID;
 		let hiddenMeterID;
 		let meterNameCounter = 0;
 
 		/**
 		 * Inserts a test meter with the given displayable flag and a single reading
-		 * within READINGS_LINE_TIME_INTERVAL. A real unit is assigned to the meter since
-		 * a meter with no unit assigned is forced to displayable=false on insert.
+		 * within READINGS_LINE_TIME_INTERVAL, via insertMeters so meter/reading creation
+		 * goes through OED's normal data loading path.
 		 * @param displayable Whether the created meter should be displayable.
 		 * @returns The inserted meter's id.
 		 */
 		async function createTestMeter(displayable) {
 			meterNameCounter += 1;
-			const gps = new Point(1, 1);
-			const start = moment.utc('2020-01-01T00:00:00Z');
-			const meter = new Meter(
-				undefined,
-				`Access Control Test Meter ${meterNameCounter}`,
-				null,
-				false,
-				displayable,
-				Meter.type.MAMAC,
-				null,
-				gps
-			);
-			meter.unitId = unitId;
-			meter.defaultGraphicUnit = unitId;
-			await meter.insert(conn);
-			await Reading.insertAll([
-				new Reading(meter.id, 10, start.clone(), start.clone().add(1, 'hour'))
+			const name = `Access Control Test Meter ${meterNameCounter}`;
+			await insertMeters([
+				{
+					name,
+					unit: unitName,
+					defaultGraphicUnit: unitName,
+					displayable,
+					data: [{ value: 10, startTimeStamp: '2020-01-01 00:00:00', endTimeStamp: '2020-01-01 01:00:00' }]
+				}
 			], conn);
-			return meter.id;
-		}
-
-		/**
-		 * Sends a request to the given endpoint as either an unauthenticated user or a
-		 * user with the given role, then verifies the response status.
-		 * @param endpoint The full readings endpoint path (base + meter id(s)) to request.
-		 * @param role The role to log in as, or null for an unauthenticated request.
-		 * @param expectedStatus The expected HTTP response status.
-		 */
-		async function expectMeterAccessStatus(endpoint, role, expectedStatus) {
-			let token;
-			try {
-				let req = chai.request(app)
-					.get(endpoint)
-					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
-
-				if (role !== null) {
-					token = await getTokenForRole(role, conn);
-					req = req.set('token', token);
-				}
-
-				const res = await req;
-				expect(res).to.have.status(expectedStatus);
-			} finally {
-				if (token) {
-					await chai.request(app)
-						.post('/api/loginLogout/logout')
-						.set('token', token);
-				}
-			}
+			return (await Meter.getByName(name, conn)).id;
 		}
 
 		mocha.beforeEach(async () => {
@@ -453,48 +415,118 @@ mocha.describe('Readings Route Parameter Validation', () => {
 			const unit = new Unit(undefined, 'Access Control Test Unit', 'Access Control Test Unit', Unit.unitRepresentType.QUANTITY,
 				1000, Unit.unitType.UNIT, '', Unit.displayableType.ALL, true, 'Test unit for access control tests');
 			await unit.insert(conn);
-			unitId = unit.id;
+			unitName = unit.name;
 			displayableMeterID = await createTestMeter(true);
 			hiddenMeterID = await createTestMeter(false);
 		});
 
 		mocha.describe(`GET ${RAW_READINGS_BASE_ENDPOINT}/:meter_id`, () => {
 			mocha.it('allows anonymous access to a displayable meter', async () => {
-				await expectMeterAccessStatus(`${RAW_READINGS_BASE_ENDPOINT}/${displayableMeterID}`, null, HTTP_CODES.OK);
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${displayableMeterID}`)
+					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+				expect(res).to.have.status(HTTP_CODES.OK);
+				expect(res.body).to.be.an('array').with.lengthOf(1);
 			});
 
-			mocha.it('rejects anonymous access to a non-displayable meter', async () => {
-				await expectMeterAccessStatus(`${RAW_READINGS_BASE_ENDPOINT}/${hiddenMeterID}`, null, HTTP_CODES.FORBIDDEN);
+			mocha.it('hides reading data from anonymous access to a non-displayable meter', async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/${hiddenMeterID}`)
+					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+				expect(res).to.have.status(HTTP_CODES.OK);
+				expect(res.body).to.be.an('array').with.lengthOf(0);
 			});
 
-			mocha.it('allows authenticated access to a non-displayable meter', async () => {
-				await expectMeterAccessStatus(`${RAW_READINGS_BASE_ENDPOINT}/${hiddenMeterID}`, User.role.ADMIN, HTTP_CODES.OK);
+			mocha.it('returns no reading data for a nonexistent meter', async () => {
+				const res = await chai.request(app)
+					.get(`${RAW_READINGS_BASE_ENDPOINT}/999999999`)
+					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+				expect(res).to.have.status(HTTP_CODES.OK);
+				expect(res.body).to.be.an('array').with.lengthOf(0);
 			});
 
-			mocha.it('returns 404 for a nonexistent meter', async () => {
-				await expectMeterAccessStatus(`${RAW_READINGS_BASE_ENDPOINT}/999999999`, null, HTTP_CODES.NOT_FOUND);
+			mocha.describe('when authenticated as an admin', () => {
+				let token;
+
+				// beforeEach/afterEach, not before/after: the outer 'Non-Displayable Meter Access
+				// Control' beforeEach recreates the whole DB schema for every test (including the
+				// one below), which would delete a user created by a one-time before() before its
+				// test ran.
+				mocha.beforeEach(async () => {
+					token = await getTokenForRole(User.role.ADMIN, testDB.getConnection());
+				});
+
+				mocha.afterEach(async () => {
+					await chai.request(app).post('/api/loginLogout/logout').set('token', token);
+				});
+
+				mocha.it('allows access to a non-displayable meter', async () => {
+					const res = await chai.request(app)
+						.get(`${RAW_READINGS_BASE_ENDPOINT}/${hiddenMeterID}`)
+						.set('token', token)
+						.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+					expect(res).to.have.status(HTTP_CODES.OK);
+					expect(res.body).to.be.an('array').with.lengthOf(1);
+				});
 			});
 		});
 
 		mocha.describe(`GET ${LINE_COUNT_BASE_ENDPOINT}/:meter_ids`, () => {
 			mocha.it('allows anonymous access to a displayable meter', async () => {
-				await expectMeterAccessStatus(`${LINE_COUNT_BASE_ENDPOINT}/${displayableMeterID}`, null, HTTP_CODES.OK);
+				const res = await chai.request(app)
+					.get(`${LINE_COUNT_BASE_ENDPOINT}/${displayableMeterID}`)
+					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+				expect(res).to.have.status(HTTP_CODES.OK);
+				expect(res.text).to.equal('1');
 			});
 
-			mocha.it('rejects anonymous access to a non-displayable meter', async () => {
-				await expectMeterAccessStatus(`${LINE_COUNT_BASE_ENDPOINT}/${hiddenMeterID}`, null, HTTP_CODES.FORBIDDEN);
+			mocha.it('excludes a non-displayable meter from an anonymous count', async () => {
+				const res = await chai.request(app)
+					.get(`${LINE_COUNT_BASE_ENDPOINT}/${hiddenMeterID}`)
+					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+				expect(res).to.have.status(HTTP_CODES.OK);
+				expect(res.text).to.equal('0');
 			});
 
-			mocha.it('allows authenticated access to a non-displayable meter', async () => {
-				await expectMeterAccessStatus(`${LINE_COUNT_BASE_ENDPOINT}/${hiddenMeterID}`, User.role.ADMIN, HTTP_CODES.OK);
+			mocha.it('returns zero for a nonexistent meter', async () => {
+				const res = await chai.request(app)
+					.get(`${LINE_COUNT_BASE_ENDPOINT}/999999999`)
+					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+				expect(res).to.have.status(HTTP_CODES.OK);
+				expect(res.text).to.equal('0');
 			});
 
-			mocha.it('returns 404 for a nonexistent meter', async () => {
-				await expectMeterAccessStatus(`${LINE_COUNT_BASE_ENDPOINT}/999999999`, null, HTTP_CODES.NOT_FOUND);
+			mocha.it('counts only the displayable meter in an anonymous request for a mixed list', async () => {
+				const res = await chai.request(app)
+					.get(`${LINE_COUNT_BASE_ENDPOINT}/${displayableMeterID},${hiddenMeterID}`)
+					.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+				expect(res).to.have.status(HTTP_CODES.OK);
+				expect(res.text).to.equal('1');
 			});
 
-			mocha.it('rejects anonymous access when any meter in the list is non-displayable', async () => {
-				await expectMeterAccessStatus(`${LINE_COUNT_BASE_ENDPOINT}/${displayableMeterID},${hiddenMeterID}`, null, HTTP_CODES.FORBIDDEN);
+			mocha.describe('when authenticated as an admin', () => {
+				let token;
+
+				// beforeEach/afterEach, not before/after: the outer 'Non-Displayable Meter Access
+				// Control' beforeEach recreates the whole DB schema for every test (including the
+				// one below), which would delete a user created by a one-time before() before its
+				// test ran.
+				mocha.beforeEach(async () => {
+					token = await getTokenForRole(User.role.ADMIN, testDB.getConnection());
+				});
+
+				mocha.afterEach(async () => {
+					await chai.request(app).post('/api/loginLogout/logout').set('token', token);
+				});
+
+				mocha.it('includes a non-displayable meter in an authenticated count', async () => {
+					const res = await chai.request(app)
+						.get(`${LINE_COUNT_BASE_ENDPOINT}/${displayableMeterID},${hiddenMeterID}`)
+						.set('token', token)
+						.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+					expect(res).to.have.status(HTTP_CODES.OK);
+					expect(res.text).to.equal('2');
+				});
 			});
 		});
 	});

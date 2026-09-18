@@ -3,9 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 const express = require('express');
-const pgPromise = require('pg-promise');
 const { optionalAuthMiddleware } = require('./authenticator');
-const Meter = require('../models/Meter');
 const Reading = require('../models/Reading');
 const TimeInterval = require('../../common/TimeInterval').TimeInterval;
 const { log } = require('../log');
@@ -20,34 +18,6 @@ const User = require('../models/User');
 const { success, failure } = require('./response');
 
 const router = express.Router();
-
-/**
- * Fetches a meter by ID and enforces that non-displayable meters are only visible to
- * authenticated requests. If the meter does not exist or the request is not allowed to
- * see it, the response is sent here and null is returned so the caller stops processing.
- * @param meterID {int} the id of the meter to fetch
- * @param conn the database connection to use
- * @param req the Express request, used to check for a valid authentication token
- * @param res the Express response, which is sent on failure
- * @returns {Meter} the meter, or null if a failure response was already sent
- */
-async function getAuthorizedMeter(meterID, conn, req, res) {
-	let meter;
-	try {
-		meter = await Meter.getByID(meterID, conn);
-	} catch (err) {
-		if (err instanceof pgPromise.errors.QueryResultError && err.code === pgPromise.errors.queryResultErrorCode.noData) {
-			failure(res, HTTP_CODES.NOT_FOUND);
-			return null;
-		}
-		throw err;
-	}
-	if (!meter.displayable && !req.hasValidAuthToken) {
-		failure(res, HTTP_CODES.FORBIDDEN);
-		return null;
-	}
-	return meter;
-}
 
 /**
  * Route for fetching readings count by meter IDs and time interval.
@@ -84,15 +54,14 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 			const conn = getConnection();
 			meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			// Non-displayable meters only contribute to the count for authenticated requests,
+			// the same as a meter id that does not exist.
+			const requireDisplayable = !req.hasValidAuthToken;
 			let count = 0;
 			for (var i = 0; i < meterIDs.length; i++) {
-				// Non-displayable meters are only visible to authenticated users so
-				// unauthenticated requests cannot enumerate hidden meters' reading counts.
-				const meter = await getAuthorizedMeter(meterIDs[i], conn, req, res);
-				if (!meter) {
-					return;
-				}
-				const curr = await Reading.getCountByMeterIDAndDateRange(meterIDs[i], timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+				const curr = await Reading.getCountByMeterIDAndDateRange(
+					meterIDs[i], timeInterval.startTimestamp, timeInterval.endTimestamp, requireDisplayable, conn
+				);
 				count += curr
 			}
 			// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
@@ -145,18 +114,17 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			// Get the routed meter id and time for the desired readings.
 			meterID = req.params.meter_id;
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
-			// Non-displayable meters are only visible to authenticated users so
-			// unauthenticated requests cannot enumerate hidden meter data.
-			const meter = await getAuthorizedMeter(meterID, conn, req, res);
-			if (!meter) {
-				return;
-			}
+			// Non-displayable meters only return data for authenticated requests, the same
+			// as a meter id that does not exist.
+			const requireDisplayable = !req.hasValidAuthToken;
 			// Check if user is allowed to export.
 			let shouldDownload = false;
 			// Estimated file size. The full explanation of the estimate used can be found in the client.
 			// This estimate is also present in src/client/app/redux/thunks/exportThunk.ts and must be kept consistent between files.
 			// This count only checks a single meterID, while client testing checks multiple meterIDs, so the estimate is slightly different.
-			const count = await Reading.getCountByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+			const count = await Reading.getCountByMeterIDAndDateRange(
+				meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, requireDisplayable, conn
+			);
 			const fileSize = (count * 0.082 / 1000);
 			const preferences = await Preferences.get(conn);
 			if (fileSize <= preferences.defaultFileSizeLimit) {
@@ -174,7 +142,9 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			} else {
 				// Get the raw readings for this meter over time range desired.
 				// Note this returns unusual identifiers to save space and does not return the meter id.
-				const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+				const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(
+					meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, requireDisplayable, conn
+				);
 				// They are ready to go back.
 				// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
 				success(res, rawReadings);

@@ -166,14 +166,19 @@ class Reading {
 
 	/**
 	 * Returns the count(number of rows) for a meter
-	 * @param meterID 
-	 * @param conn 
+	 * @param meterID
+	 * @param startDate
+	 * @param endDate
+	 * @param requireDisplayable if true (the default), a meter that is not displayable
+	 * contributes no count, the same as a meter id that does not exist.
+	 * @param conn
 	 */
-	static async getCountByMeterIDAndDateRange(meterID, startDate, endDate, conn) {
+	static async getCountByMeterIDAndDateRange(meterID, startDate, endDate, requireDisplayable = true, conn) {
 		const row = await conn.any(sqlFile('reading/get_count_by_meter_id_and_date_range.sql'), {
 			meterID: meterID,
 			startDate: startDate,
-			endDate: endDate
+			endDate: endDate,
+			requireDisplayable: requireDisplayable
 		});
 		return parseInt(row[0].count);
 	}
@@ -196,14 +201,17 @@ class Reading {
 	 * @param meterID
 	 * @param {Date} startDate
 	 * @param {Date} endDate
+	 * @param requireDisplayable if true (the default), a meter that is not displayable
+	 * returns no readings, the same as a meter id that does not exist.
 	 * @param conn is the connection to use.
 	 * @returns {Promise.<array.<Reading>>}
 	 */
-	static async getReadingsByMeterIDAndDateRange(meterID, startDate, endDate, conn) {
+	static async getReadingsByMeterIDAndDateRange(meterID, startDate, endDate, requireDisplayable = true, conn) {
 		const rows = await conn.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), {
 			meterID: meterID,
 			startDate: startDate,
-			endDate: endDate
+			endDate: endDate,
+			requireDisplayable: requireDisplayable
 		});
 		// This does not do the usual row mapping because the identifiers are not the usual ones and there
 		// is no meter id. All this is to make the data smaller.
