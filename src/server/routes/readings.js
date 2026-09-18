@@ -55,9 +55,14 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 			const conn = getConnection();
 			meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			// Non-displayable meters only contribute to the count for authenticated requests,
+			// the same as a meter id that does not exist.
+			const requireDisplayable = !req.hasValidAuthToken;
 			let count = 0;
 			for (var i = 0; i < meterIDs.length; i++) {
-				const curr = await Reading.getCountByMeterIDAndDateRange(meterIDs[i], timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+				const curr = await Reading.getCountByMeterIDAndDateRange(
+					meterIDs[i], timeInterval.startTimestamp, timeInterval.endTimestamp, requireDisplayable, conn
+				);
 				count += curr
 			}
 			// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
@@ -110,10 +115,15 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			// Get the routed meter id and time for the desired readings.
 			meterID = req.params.meter_id;
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			// Non-displayable meters only return data for authenticated requests, the same
+			// as a meter id that does not exist.
+			const requireDisplayable = !req.hasValidAuthToken;
 			// Check if user is allowed to export.
 			let shouldDownload = false;
 			// This count only checks a single meterID, while client testing checks multiple meterIDs, so the estimate is slightly different.
-			const count = await Reading.getCountByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+			const count = await Reading.getCountByMeterIDAndDateRange(
+				meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, requireDisplayable, conn
+			);
 			const fileSize = estimateRawExportSizeMB(count);
 			const preferences = await Preferences.get(conn);
 			if (fileSize <= preferences.defaultFileSizeLimit) {
@@ -131,7 +141,9 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			} else {
 				// Get the raw readings for this meter over time range desired.
 				// Note this returns unusual identifiers to save space and does not return the meter id.
-				const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+				const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(
+					meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, requireDisplayable, conn
+				);
 				// They are ready to go back.
 				// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
 				success(res, rawReadings);
