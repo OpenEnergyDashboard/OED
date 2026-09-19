@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-/* This file tests the API for retrieving meters, by artificially
- * inserting meters prior to executing the test code. */
+/* This file tests the API for retrieving maps, by artificially
+ * inserting maps prior to executing the test code. */
 
 const { chai, mocha, expect, app, testDB, testUser } = require('../common');
 const { Map } = require('../../models/Map');
@@ -49,9 +49,6 @@ function expectMapsToBeEquivalent(maps, length) {
 }
 
 mocha.describe('maps API', () => {
-	mocha.beforeEach(async () => {
-		// TODO Why is there an empty body here?
-	});
 
 	mocha.it('returns nothing when no map is present', async () => {
 		const res = await chai.request(app).get('/api/maps');
@@ -77,13 +74,22 @@ mocha.describe('maps API', () => {
 	});
 	mocha.describe('Admin role:', () => {
 		let token;
-		// Since this .before is in the middle of tests, it should not have issues as
+		// Since this .beforeEach is in the middle of tests, it should not have issues as
 		// documented in usersTest.js.
-		mocha.before(async () => {
+		mocha.beforeEach(async () => {
+			// login
 			let res = await chai.request(app).post('/api/loginLogout/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
+		mocha.afterEach(async () => {
+			// logout
+			if (token) {
+				await chai.request(app).post('/api/loginLogout/logout')
+					.set('token', token);
+			}
+		});
+
 		mocha.it('returns all maps', async () => {
 			const conn = testDB.getConnection();
 			await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 1.0, 0.1).insert(conn);
@@ -119,6 +125,14 @@ mocha.describe('maps API', () => {
 						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});
+				mocha.afterEach(async () => {
+					// logout
+					if (token) {
+						await chai.request(app).post('/api/loginLogout/logout')
+							.set('token', token);
+					}
+				});
+
 				mocha.it(`should reject requests from ${role} to create maps`, async () => {
 					// get maps
 					let res = await chai.request(app).post('/api/maps/create').set('token', token);
@@ -170,7 +184,7 @@ mocha.describe('maps API', () => {
 		expect(res.body).to.have.property('name', 'Map 2');
 	});
 
-	mocha.it('responds appropriately when the meter in question does not exist', async () => {
+	mocha.it('responds appropriately when the map in question does not exist', async () => {
 		const conn = testDB.getConnection();
 		const map = new Map(undefined, 'Map', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder', 0.0, 0.0);
 		await map.insert(conn);
