@@ -14,6 +14,8 @@ const { success, failure } = require('./response');
 const { HTTP_CODES } = require('../util/httpCodes');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH } = require('../util/validationConstants');
 const router = express.Router();
+const { checkUnitDependencies } = require('../services/graph/checkUnitDependencies');
+const { redoCik } = require('../services/graph/redoCik');
 
 function formatUnitForResponse(unit) {
 	return {
@@ -231,7 +233,6 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 				return;
 			}
 			// Check for dependencies before deletion
-			const { checkUnitDependencies } = require('../services/graph/checkUnitDependencies');
 			const deps = await checkUnitDependencies(unitId, conn);
 		
 			// If unit has meter/group dependencies, provide detailed error
@@ -303,6 +304,11 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 				// Just try to delete it to save the extra database call, since the database will return an error anyway if the row does not exist
 				await Unit.delete(unitId, t);
 			});
+			// Full Cik recalculation after all cascading deletes complete, to
+			// correctly handle any unit pairs whose path routed through a deleted
+			// unit, not just the units/conversions directly touched above.
+			await redoCik(conn);
+	
 			success(res, 'Successfully deleted unit');
 		} catch (err) {
 			const errorMsg = `Error while deleting unit with error(s): ${err}`;

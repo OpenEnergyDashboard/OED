@@ -53,6 +53,19 @@ class Cik {
 	}
 
 	/**
+	 * Deletes cik rows directly referencing the given unit. This is a
+	 * stopgap to satisfy the foreign key on cik before deleting a unit's
+	 * row. It does not catch rows for unrelated unit pairs whose path
+	 * happened to route through this unit. redoCik should be called
+	 * afterward for a fully correct recalculation.
+	 * @param {number} unitId The unit's id.
+	 * @param {*} conn The connection to use.
+	 */
+	static async deleteByUnitId(unitId, conn) {
+		await conn.none(sqlFile('cik/delete_by_unit_id.sql'), { unitId });
+	}
+
+	/**
 	 * Inserts each element of the array with an actual conversion into the cik table.
 	 * The current values in the table are removed first.
 	 * @param {*} cik is the OED conversion array from the graph.

@@ -14,4 +14,6 @@ function isSuffixRelated(unit) {
 	return !!unit && (unit.typeOfUnit === 'suffix' || unit.suffix !== '');
 }
 
-module.exports = { isSuffixRelated };
+module.exports = {
+	isSuffixRelated
+ };

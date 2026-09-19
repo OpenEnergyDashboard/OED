@@ -10,7 +10,6 @@ const Unit = require('../models/Unit');
 const { createConversionGraph, createConversionGraphFromArray } = require('./graph/createConversionGraph');
 const { intersectSets, compatibleUnitsForMeter } = require('../util/compatibleUnits');
 const { isSuffixRelated } = require('../util/suffixUnitCheck');
-const { getOtherConnections } = require('./graph/checkUnitDependencies');
 
 /**
  * Simulates what conversions and units would be removed when deleting a conversion involving suffix units.
@@ -22,12 +21,11 @@ const { getOtherConnections } = require('./graph/checkUnitDependencies');
  */
 function simulateSuffixUnitCleanup(suffixUnit, allConversions, allUnits) {
 	const conversionsToRemove = [];
-	const unitsToHide = [];
+	const unitsToDelete = [];
 	
 	// Find all conversions involving this suffix unit
 	const relatedConversions = allConversions.filter((conversion) => 
-		conversion.sourceId === suffixUnit.id || 
-		conversion.destinationId === suffixUnit.id ||
+		conversion.sourceId === suffixUnit.id ||
 		(conversion.bidirectional && (conversion.sourceId === suffixUnit.id || conversion.destinationId === suffixUnit.id))
 	);
 	
@@ -52,13 +50,13 @@ function simulateSuffixUnitCleanup(suffixUnit, allConversions, allUnits) {
 				});
 			}
 			
-			if (!unitsToHide.includes(otherUnitId)) {
-				unitsToHide.push(otherUnitId);
+			if (!unitsToDelete.includes(otherUnitId)) {
+				unitsToDelete.push(otherUnitId);
 			}
 		}
 	}
 	
-	return { conversionsToRemove, unitsToHide };
+	return { conversionsToRemove, unitsToDelete};
 }
 async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 
@@ -79,17 +77,22 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 		// The conversion being deleted
 		{ sourceId, destinationId } 
 	];
+	// Track units that will be deleted
+	let allUnitsToDelete = [];
+
 	// Validate if the source unit is a suffix related unit
 	// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
 	if (isSuffixRelated(sourceUnit)) {
 		const cleanup = simulateSuffixUnitCleanup(sourceUnit, allConversions, allUnits);
 		conversionsToRemove.push(...cleanup.conversionsToRemove);
+		allUnitsToDelete.push(...cleanup.unitsToDelete);
 	}
 	// Validate if the destination unit is a suffix related unit
 	// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
 	if (isSuffixRelated(destUnit)) {
 		const cleanup = simulateSuffixUnitCleanup(destUnit, allConversions, allUnits);
 		conversionsToRemove.push(...cleanup.conversionsToRemove);
+		allUnitsToDelete.push(...cleanup.unitsToDelete);
 	}
 	
 	// Remove duplicates (in case both source and dest are suffix units and share conversions)
@@ -99,10 +102,27 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 	
 	// 4. Remove all affected conversions from the simulation
 	const newConversions = allConversions.filter(c => {
-		return !uniqueConversionsToRemove.some(toRemove =>
+		// Remove conversions explicitly identified for removal
+		// (e.g The deleted conversion, it's parent -> link)
+		const isExplicitlyRemoved = uniqueConversionsToRemove.some( toRemove =>
 			c.sourceId === toRemove.sourceId && c.destinationId === toRemove.destinationId
 		);
+		// Remove conversions touching the units being deleted.
+		// `uniqueConversionsToRemove doesn't catch unit conversions
+		// beyond a units direct parent link. This resolves the missed detection.
+		const touchesDeletedUnit = allUnitsToDelete.includes(c.sourceId) || allUnitsToDelete.includes(c.destinationId);
+		return !isExplicitlyRemoved && !touchesDeletedUnit;
 	});
+
+	// Check which units would have zero remaining conversions after the simulated delete.
+	// Mirrors `Unit.findOrphanedUnits` logic but against the simulation.
+	// Filter units that are created by OED, currently visable, and have zero conversions post delete.
+	const potentiallyOrphanedUnits = allUnits.filter(u =>
+		u.displayable !== Unit.displayableType.NONE &&
+		!allUnitsToDelete.includes(u.id) &&
+		!newConversions.some(c => c.sourceId === u.id || c.destinationId === u.id)
+	).map(u => ({ id: u.id, name: u.name }));
+	
 
 	// 5. Build simulated graph and Cik array
 	const simulatedGraph = createConversionGraphFromArray(allUnits, newConversions);
@@ -163,7 +183,7 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 		}
 	}
 
-	return { affectedMeters, affectedGroups };
+	return { affectedMeters, affectedGroups, potentiallyOrphanedUnits };
 }
 
 module.exports = { simulateDeleteConversion };

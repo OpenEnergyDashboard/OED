@@ -350,6 +350,20 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					destinationId: state.destinationId
 				}).unwrap();
 
+				// Orphaned Suffix unit check
+				if (result.potentiallyOrphanedUnits?.length > 0) {
+					msgElements.push(
+						<div key="potentially-orphaned-units">
+							<span className="bold">{translate('conversion.delete.unit.orphan')}:</span>
+							<ul>
+								{result.potentiallyOrphanedUnits.map((u) => (
+    								<li key={u.id}>"{u.name}"</li>
+								))}
+							</ul>
+						</div>
+					);
+				}
+
 				// Orphaned groups check
 				const orphanedGroups = result.affectedGroups?.filter(group => group.orphaned);
 				if (orphanedGroups.length > 0) {

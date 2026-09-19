@@ -23,6 +23,7 @@ export interface ConversionsState {
 export interface SimulateDeleteResult {
 	affectedMeters: SimulateDeleteAffectedMeter[];
 	affectedGroups: SimulateDeleteAffectedGroup[];
+	potentiallyOrphanedUnits: SimulateDeletePotentiallyOrphanedUnit[];
 }
 
 export interface SimulateDeleteAffectedMeter {
@@ -36,4 +37,9 @@ export interface SimulateDeleteAffectedGroup {
 	groupName: string;
 	lostUnits: number[];
 	orphaned: boolean;
+}
+
+export interface SimulateDeletePotentiallyOrphanedUnit {
+	id: number;
+	name: string;
 }

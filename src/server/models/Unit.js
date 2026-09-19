@@ -218,8 +218,8 @@ class Unit {
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Array.<{id: number, name: string}>>}
 	 */
-	static async findOrphanedSuffixUnits(sourceId, destinationId, conn) {
-		return await conn.any(sqlFile('unit/find_orphaned_suffix_units.sql'), { sourceId, destinationId });
+	static async findOrphanedUnits(conn) {
+		return await conn.any(sqlFile('unit/find_orphaned_units.sql'));
 	}
 
 	// TODO: Returns a special value if it doesn't exist

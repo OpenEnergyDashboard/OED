@@ -235,22 +235,25 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 			// Perform all operations in a single transaction for atomicity
 			await conn.tx(async t => {
 				// Lock the units to prevent concurrent modifications
-				await t.one('SELECT * FROM units WHERE id = $1 FOR UPDATE', [sourceId]);
-				await t.one('SELECT * FROM units WHERE id = $1 FOR UPDATE', [destinationId]);
+				await Unit.lockById(sourceId, t);
+				await Unit.lockById(destinationId, t);
 				
 				// Check if the source or the destination is a suffix unit and clean up related conversions/units
 				// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
-				const isSuffixRelated = (unit) => unit.typeOfUnit === 'suffix' || (unit.suffix && unit.suffix.trim() !== '');
-
 				if (isSuffixRelated(source)) {
 					log.info(`Suffix-related unit ${sourceId} is used in conversion deletion as source. Cleaning up related conversions and units.`);
 					const sourceInTx = await Unit.getById(sourceId, t);
 					await removeAdditionalConversionsAndUnits(sourceInTx, t);
 				}
 				if (isSuffixRelated(dest)) {
-					log.info(`Suffix-related unit ${destinationId} is used in conversion deletion as destination. Cleaning up related conversions and units.`);
-					const destInTx = await Unit.getById(destinationId, t);
-					await removeAdditionalConversionsAndUnits(destInTx, t);
+					const destStillExists = await Unit.exists(destinationId, t);
+					if (destStillExists) {
+						log.info(`Suffix-related unit ${destinationId} is used in conversion deletion as destination. Cleaning up related conversions and units.`);
+						const destInTx = await Unit.getById(destinationId, t);
+						await removeAdditionalConversionsAndUnits(destInTx, t);
+					} else {
+						log.info(`Suffix-related unit ${destinationId} was already cleaned up as part of source unit ${sourceId}'s cascade.`);
+    				}
 				}
 				
 				// Handle bidirectional conversion deletion safely
@@ -279,21 +282,19 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 			// Verify if units were orphaned after suffix cleanup (performance: only check if suffix units were involved)
 			// Track the units that may be orphaned
 			let orphanedUnits = [];
-			// Track if failures occured during orphan check
-			let orphanedCheckFailed = false;
 			if (isSuffixRelated(source) || isSuffixRelated(dest)) {
 				try {
 					// Use efficient query with LIMIT to avoid scanning large tables unnecessarily
 					// Only check recently affected units to improve performance on large databases
-					orphanedUnits = await Unit.findOrphanedSuffixUnits(sourceId, destinationId, conn);
+					orphanedUnits = await Unit.findOrphanedUnits(conn);
 					if (orphanedUnits.length > 0) {
 						log.warn(`Found ${orphanedUnits.length} potentially orphaned suffix units after cleanup: ${orphanedUnits.map(u => `${u.id} (${u.name})`).join(', ')}`);
 						// Log metrics for monitoring
 						log.info(`Conversion deletion metrics: sourceId=${sourceId}, destId=${destinationId}, orphanedUnits=${orphanedUnits.length}`);
 					}
 				} catch (err) {
-					// Non-critical check, log but don't fail
-					log.warn(`Error checking for orphaned units: ${err}`);
+					// Non-critical orphan unit check, log but don't fail
+					log.warn(`Error checking for orphaned units. Could not successfully verify if units were orphaned by this deletion : ${err}`);
 				}
 			}
 			success(res, 'Successfully deleted conversion and updated meters/groups');

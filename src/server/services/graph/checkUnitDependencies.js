@@ -38,25 +38,6 @@ async function checkUnitDependencies(unitId, conn) {
 }
 
 /**
- * Checks if a unit has any other conversions beyond the one specified.
- * Used to detect whether deleting a conversion would sever connections
- * that an admin may not expect. Like orphaning a unit via cascade deletion.
- * @param {number} unitId The unit to check.
- * @param {number} excludeSourceId The source id of the conversion to exclude from the check.
- * @param {number} excludeDestinationId The destination id of the conversion to exclude from the check.
- * @param {*} conn The connection to use.
- * @returns {Promise.<Array>} The other conversions, if any.
- */
-async function getOtherConnections(unitId, excludeSourceId, excludeDestinationId, conn) {
-	const allConversions = await Conversion.getConversionsByUnitID(unitId, conn);
-	// Exclude converstions that contain the source or destination Id provided from results
-	return allConversions.filter( conv =>
-		!((conv.sourceId === excludeSourceId && conv.destinationId === excludeDestinationId) ||
-		(conv.sourceId === excludeDestinationId && conv.destinationId === excludeSourceId))
-	);
-}
-
-/**
  * Gets detailed dependency information for UI warnings.
  * @param {number} unitId The unit ID to check
  * @param {*} conn Database connection
@@ -104,31 +85,39 @@ async function deleteUnitSafely(unitId, conn) {
 	for (const meter of deps.meters) {
 		if (meter.unit_id === unitId) {
 			log.warn(`Clearing base unit for meter "${meter.name}" (ID: ${meter.id}) to allow deletion of unit ${unitId}.`);
-			await conn.none('UPDATE meters SET unit_id = NULL WHERE id = $1', [meter.id]);
+			await Meter.clearUnitId(meter.id, conn);
 		}
 		if (meter.default_graphic_unit === unitId) {
-			await conn.none('UPDATE meters SET default_graphic_unit = NULL WHERE id = $1', [meter.id]);
+			await Meter.clearDefaultGraphicUnit(meter.id, conn);
 		}
 	}
 
 	// Clear any group using this as its default graphic unit.
 	for (const group of deps.groups) {
-		await conn.none('UPDATE groups SET default_graphic_unit = NULL WHERE id = $1', [group.id]);
+		await Group.clearDefaultGraphicUnit(group.id, conn);
 	}
 
 	// Delete any other conversions still referencing this unit.
+
+	/**
+	 * NOTE: This can orphan a downstream auto-created unit if the other side of
+	 * a deleted conversion is itself a suffix-type unit that depended on this
+	 * link. The orphaning of a unit is no longer silent to the admin/user
+	 * and the delete simulation detects and reports this case to the admin.
+	 * TODO: A full path re-walk (to prevent the orphaning) would be needed to detect
+	 * and clean up that case.
+	 */ 
 	for (const conv of deps.conversions) {
 		log.info(`Deleting conversion ${conv.source_id}->${conv.destination_id} to allow deletion of unit ${unitId}.`);
-		await conn.none('DELETE FROM conversions WHERE source_id = $1 AND destination_id = $2', [conv.source_id, conv.destination_id]);
+		await Conversion.delete(conv.source_id, conv.destination_id, conn);
 	}
 
-	await conn.none('DELETE FROM cik WHERE source_id = $1 OR destination_id = $1', [unitId]);
+	await Cik.deleteByUnitId(unitId, conn);
 	await Unit.delete(unitId, conn);
 }
 
 module.exports = {
 	checkUnitDependencies,
-	canSafelyHideSuffixUnit,
 	getUnitDependencyDetails,
 	deleteUnitSafely
 };
