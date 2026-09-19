@@ -15,6 +15,7 @@ import DateRangeComponent from './DateRangeComponent';
 import ErrorBarComponent from './ErrorBarComponent';
 import ExportComponent from '../components/ExportComponent';
 import GraphicRateMenuComponent from './GraphicRateMenuComponent';
+import EnableAllUnitsComponent from './EnableAllUnitsComponent';
 import { useTranslate } from '../redux/componentHooks';
 
 /**
@@ -51,39 +52,46 @@ export default function MoreOptionsComponent() {
 							{chartToRender == ChartTypes.line && !isBoundedAnywhere && <DateRangeComponent />}
 							{chartToRender == ChartTypes.line && <AreaUnitSelectComponent />}
 							{chartToRender == ChartTypes.line && <ErrorBarComponent />}
+							{chartToRender == ChartTypes.line && <EnableAllUnitsComponent />}
 							{chartToRender == ChartTypes.line && <ExportComponent />}
 							{chartToRender == ChartTypes.line && <ChartLinkComponent />}
 
 							{/* More UI options for bar graphic */}
 							{chartToRender == ChartTypes.bar && !isBoundedAnywhere && <DateRangeComponent />}
 							{chartToRender == ChartTypes.bar && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.bar && <EnableAllUnitsComponent />}
 							{chartToRender == ChartTypes.bar && <ExportComponent />}
 							{chartToRender == ChartTypes.bar && <ChartLinkComponent />}
 
 							{/* More UI options for compare graphic */}
 							{chartToRender == ChartTypes.compare && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.compare && <EnableAllUnitsComponent />}
 							{chartToRender == ChartTypes.compare && <ChartLinkComponent />}
 
 							{/* More UI options for map graphic */}
 							{chartToRender == ChartTypes.map && !isBoundedAnywhere && <DateRangeComponent />}
 							{chartToRender == ChartTypes.map && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.map && <EnableAllUnitsComponent />}
 							{chartToRender == ChartTypes.map && <ChartLinkComponent />}
 
 							{/* More UI options for 3D graphic */}
 							{chartToRender == ChartTypes.threeD && <GraphicRateMenuComponent />}
 							{chartToRender == ChartTypes.threeD && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.threeD && <EnableAllUnitsComponent />}
 							{chartToRender == ChartTypes.threeD && <ChartLinkComponent />}
 
 							{/* More UI options for radar graphic */}
 							{chartToRender == ChartTypes.radar && <GraphicRateMenuComponent />}
 							{chartToRender == ChartTypes.radar && !isBoundedAnywhere && <DateRangeComponent />}
 							{chartToRender == ChartTypes.radar && <AreaUnitSelectComponent />}
+							{chartToRender == ChartTypes.radar && <EnableAllUnitsComponent />}
 							{chartToRender == ChartTypes.radar && <ChartLinkComponent />}
 
 							{/*More UI options for compare line */}
 							{chartToRender === ChartTypes.compareLine && <GraphicRateMenuComponent />}
 							{chartToRender === ChartTypes.compareLine && <AreaUnitSelectComponent />}
 							{chartToRender === ChartTypes.compareLine && <ErrorBarComponent />}
+							{chartToRender === ChartTypes.compareLine && <EnableAllUnitsComponent />}
 							{chartToRender === ChartTypes.compareLine && <ChartLinkComponent />}
 						</ModalBody>
 						<ModalFooter></ModalFooter>
