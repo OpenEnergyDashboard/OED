@@ -97,7 +97,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 
 	// Determine whether the selected unit is a Suffix unit
 	// Including Suffix input with unit type Unit and Suffix is filled in
-	const isSuffixRelated = (unit? : UnitData): boolean => {
+	const isSuffixRelated = (unit?: UnitData): boolean => {
 		return !!unit && (
 			unit.typeOfUnit === UnitType.suffix || unit.suffix !== ''
 		);
@@ -107,7 +107,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const isSuffixUsed = () => {
 		const source = unitDataById[state.sourceId];
 		const dest = unitDataById[state.destinationId];
-		return isSuffixRelated(source) ||  isSuffixRelated(dest);
+		return isSuffixRelated(source) || isSuffixRelated(dest);
 	};
 
 	/**
@@ -143,6 +143,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		const dest = unitDataById[state.destinationId];
 		const msgElements: React.ReactNode[] = [];
 		let cancel = false;
+		// Use to label OED-created units
+		let suffixTypeUnitsToDeleteIds: Set<number> = new Set();
 
 		// Meter source orphan check
 		if (source.typeOfUnit === UnitType.meter) {
@@ -232,7 +234,9 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				msgElements.push(
 					<div key="unit-orphan">
 						<span className="bold">{translate('conversion.delete.unit.orphan')} </span>
-						"{dest.name}".
+						<ul>
+							<li>"{dest.name}"</li>
+						</ul>
 					</div>
 				);
 			}
@@ -259,11 +263,12 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					const otherId = c.sourceId === suffixUnit.id ? c.destinationId : c.sourceId;
 					return unitDataById[otherId];
 				});
-
+			// Populate computed units
+			suffixTypeUnitsToDeleteIds = new Set(suffixTypeUnitsToDelete.map(u => u.id))
 			// Check for meters/groups using affected suffix units
-			const affectedSuffixUnitIds = new Set(suffixTypeUnitsToDelete.map(u => u.id));
+			const affectedSuffixUnitIds = new Set(suffixTypeUnitsToDeleteIds);
 			// Also check the main suffix unit
-			affectedSuffixUnitIds.add(suffixUnit.id); 
+			affectedSuffixUnitIds.add(suffixUnit.id);
 
 			// Check meters using these units (as unitId or defaultGraphicUnit)
 			const affectedMetersList = Object.values(meterDataById).filter(meter =>
@@ -357,7 +362,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							<span className="bold">{translate('conversion.delete.unit.orphan')}:</span>
 							<ul>
 								{result.potentiallyOrphanedUnits.map((u) => (
-    								<li key={u.id}>"{u.name}"</li>
+									<li key={u.id}>"{u.name}"</li>
 								))}
 							</ul>
 						</div>
@@ -389,24 +394,36 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 						}
 						meterLossMap.get(key)!.push(meter.meterName);
 					});
-					meterLossMap.forEach((meterNames, lostUnitsKey) => {
-						const lostUnits = JSON.parse(lostUnitsKey).map(Number);
+					if (meterLossMap.size > 0) {
 						msgElements.push(
-							<div key={`meters-${lostUnitsKey}`}>
-								<span className="bold">{translate('conversion.delete.meter.affected')}: </span>
-								<div style={{ marginLeft: 16 }}>
-									{meterNames.map(name => (
-										<div key={name}>"{name}"</div>
-									))}
+							<div key={"meters-affected"}>
+								<div className="lost-units-section-heading">
+									<span className="bold">{translate('conversion.delete.meter.affected')}: </span>
 								</div>
-								<span className="bold">{translate('conversion.delete.lost.units')}: </span>
-								{lostUnits.map((id: number, i: number) => (
-									<span key={id}>"{unitDataById[id]?.name || id}"{i < lostUnits.length - 1 ? ', ' : ''}</span>
-								))}
-								<br /><br />
+								{Array.from(meterLossMap.entries()).map(([lostUnitsKey, meterNames]) => {
+									const lostUnits = JSON.parse(lostUnitsKey).map(Number);
+									return (
+										<div key={`meters-${lostUnitsKey}`} className="lost-units-group">
+											<div style={{ marginLeft: 16 }}>
+												{meterNames.map(name => (
+													<div key={name}>"{name}"</div>
+												))}
+											</div>
+											<span className="bold">{translate('conversion.delete.lost.units')}: </span>
+											<ul>
+												{lostUnits.map((id: number, i: number) => (
+													<li key={id}>
+														"{unitDataById[id]?.name || id}"
+														{suffixTypeUnitsToDeleteIds.has(id) ? '(created by OED)' : ''}
+													</li>
+												))}
+											</ul>
+										</div>
+									);
+								})}
 							</div>
 						);
-					});
+					}
 
 					// Group non-orphaned groups by lostUnits
 					// Display all groups losing the same set of units
@@ -419,24 +436,36 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 						}
 						groupLossMap.get(key)!.push(group.groupName);
 					});
-					groupLossMap.forEach((groupNames, lostUnitsKey) => {
-						const lostUnits = JSON.parse(lostUnitsKey).map(Number);
+					if (groupLossMap.size > 0) {
 						msgElements.push(
-							<div key={`groups-${lostUnitsKey}`}>
-								<span className="bold">{translate('conversion.delete.group.affected')}: </span>
-								<div style={{ marginLeft: 16 }}>
-									{groupNames.map(name => (
-										<div key={name}>"{name}"</div>
-									))}
+							<div key={"groups-affected"}>
+								<div className="lost-units-section-heading">
+									<span className="bold">{translate('conversion.delete.group.affected')}: </span>
 								</div>
-								<span className="bold">{translate('conversion.delete.lost.units')}: </span>
-								{lostUnits.map((id: number, i: number) => (
-									<span key={id}>"{unitDataById[id]?.name || id}"{i < lostUnits.length - 1 ? ', ' : ''}</span>
-								))}
-								<br /><br />
+								{Array.from(groupLossMap.entries()).map(([lostUnitsKey, groupNames]) => {
+									const lostUnits = JSON.parse(lostUnitsKey).map(Number);
+									return (
+										<div key={`groups-${lostUnitsKey}`} className="lost-units-group">
+											<div style={{ marginLeft: 16 }}>
+												{groupNames.map(name => (
+													<div key={name}>"{name}"</div>
+												))}
+											</div>
+											<span className="bold">{translate('conversion.delete.lost.units')}: </span>
+											<ul>
+												{lostUnits.map((id: number, i: number) => (
+													<li key={id}>
+														"{unitDataById[id]?.name || id}"
+														{suffixTypeUnitsToDeleteIds.has(id) ? ' (created by OED)' : ''}
+													</li>
+												))}
+											</ul>
+										</div>
+									);
+								})}
 							</div>
 						);
-					});
+					}
 
 					// After you get result from simulateDeleteConversion check default graphic units
 					const metersLostDefault: number[] = [];
@@ -491,25 +520,25 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 		}
 		// Process the appropriate modal based on the cancel conditions set above
 		if (cancel) {
-    		msgElements.push(
-        		<div key="restricted">
-            		<br />
-            		<span className="bold">
-                		{translate('conversion.delete.restricted')}
-            		</span>
-        		</div>
-    		);
+			msgElements.push(
+				<div key="restricted">
+					<br />
+					<span className="bold">
+						{translate('conversion.delete.restricted')}
+					</span>
+				</div>
+			);
 			setDeleteConfirmationMessage(msgElements);
 			handleCancelModalOpen();
 		} else {
 			// Confirm deletion if no blocking issues
 			msgElements.push(
 				<div key="final-confirm">
-        			<br />
-        			<span className="bold">
-            			{translate('conversion.delete.conversion')} [{props.conversionIdentifier}] ?
-        			</span>
-    			</div>
+					<br />
+					<span className="bold">
+						{translate('conversion.delete.conversion')} [{props.conversionIdentifier}] ?
+					</span>
+				</div>
 			);
 			setDeleteConfirmationMessage(msgElements);
 			handleDeleteConfirmationModalOpen();

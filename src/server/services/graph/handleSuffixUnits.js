@@ -143,6 +143,9 @@ async function handleSuffixUnits(graph, conn) {
 			// See if this unit already exists. Would if this was done before where this path existed.
 			if (neededSuffixUnit === null) {
 				// If not then add the new unit and conversion.
+				// Note: This regenerates a derived suffix unit/conversion whenever this function runs and finds one missing for a still valid path
+				// This includes if an admin has deleted it directly. Deleting a derived converion alone
+				// does not persis unless the underlying conversion it was generated from is also removed.
 				await addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, unitIdentifier, graph, conn);
 			} else {
 				// If it already exists then check if the unit and conversion are correct.
@@ -191,7 +194,7 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 			const isSource = conversion.sourceId === suffixUnit.id;
 			const otherUnitId = isSource ? conversion.destinationId : conversion.sourceId;
 			const exists = await Unit.exists(otherUnitId, conn);
-			const otherUnit = exists ? await Unit.getById(otherUnitId, conn) : null;  
+			const otherUnit = exists ? await Unit.getById(otherUnitId, conn) : null;
 			return { conversion, otherUnitId, otherUnit };
 		}));
 
@@ -212,7 +215,7 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 		// Conversions to non-suffix units (e.g. the original conversion the
 		// admin is deleting) are left alone rather than aborting the loop.
 		const target = resolved.find(r => r.otherUnit.typeOfUnit === Unit.unitType.SUFFIX);
-	
+
 		if (!target) {
 			// Nothing left to process for this unit.
 			break;
@@ -220,20 +223,20 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 
 		// The units that OED adds are suffix units (typeOfUnit === SUFFIX)
 		try {
-			const {conversion, otherUnitId, otherUnit } = target;
+			const { conversion, otherUnitId, otherUnit } = target;
 
 			// Check if otherUnitId has connections besides this one.
 			// Deletion of other connections may lead to orphaning a unit.
 			const otherUnitConversions = await Conversion.getConversionsByUnitID(otherUnitId, conn);
 			const hasOtherConnections = otherUnitConversions.some(c =>
 				!((c.source_id === conversion.sourceId && c.destination_id === conversion.destinationId) ||
-          		(c.source_id === conversion.destinationId && c.destination_id === conversion.sourceId))
-    		);
+					(c.source_id === conversion.destinationId && c.destination_id === conversion.sourceId))
+			);
 			// Warn the admin of connected units
 			if (hasOtherConnections) {
 				log.warn(`Unit ${otherUnitId} has other connections beyond conversion ${conversion.sourceId}->${conversion.destinationId}; deleting it will also remove those.`);
-   			}
-		
+			}
+
 			// Always delete the conversion
 			await Conversion.delete(conversion.sourceId, conversion.destinationId, conn);
 
@@ -255,7 +258,7 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 
 			// Delete the auto-created unit (dependency checks + cik cleanup handled inside)
 			await deleteUnitSafely(otherUnitId, conn);
-		
+
 		} catch (err) {
 			log.error(`Error processing conversion ${conversion.sourceId}->${conversion.destinationId} during suffix unit cleanup: ${err}`, err);
 			throw err;
@@ -263,9 +266,13 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 	}
 
 	// Restore the suffix unit's displayable status
+	// Note: This funtion only cleans up derived suffix conversions, never the original conversion the suffix unit was created from
+	// handleSuffixUnits will make the unit visible again and regenerate
+	// dericed units from it during the next graph rebuild.
+	// See note there for the full mechanism.
 	suffixUnit.displayable = Unit.displayableType.ALL;
 	await suffixUnit.update(conn);
-	}
+}
 
 module.exports = {
 	handleSuffixUnits,

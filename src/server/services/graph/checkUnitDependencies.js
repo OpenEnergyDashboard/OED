@@ -98,15 +98,12 @@ async function deleteUnitSafely(unitId, conn) {
 	}
 
 	// Delete any other conversions still referencing this unit.
-
-	/**
-	 * NOTE: This can orphan a downstream auto-created unit if the other side of
-	 * a deleted conversion is itself a suffix-type unit that depended on this
-	 * link. The orphaning of a unit is no longer silent to the admin/user
-	 * and the delete simulation detects and reports this case to the admin.
-	 * TODO: A full path re-walk (to prevent the orphaning) would be needed to detect
-	 * and clean up that case.
-	 */ 
+	// NOTE: This can orphan a downstream auto-created unit if the other side of
+	// a deleted conversion is itself a suffix-type unit that depended on this
+	// link. The orphaning of a unit is no longer silent to the admin/user
+	// and the delete simulation detects and reports this case to the admin.
+	// TODO: A full path re-walk (to prevent the orphaning) would be needed to detect
+	// and clean up that case.
 	for (const conv of deps.conversions) {
 		log.info(`Deleting conversion ${conv.source_id}->${conv.destination_id} to allow deletion of unit ${unitId}.`);
 		await Conversion.delete(conv.source_id, conv.destination_id, conn);
