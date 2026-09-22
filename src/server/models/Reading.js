@@ -165,20 +165,37 @@ class Reading {
 	}
 
 	/**
-	 * Returns the count(number of rows) for a meter
-	 * @param meterID
-	 * @param startDate
-	 * @param endDate
-	 * @param requireDisplayable if true (the default), a meter that is not displayable
-	 * contributes no count, the same as a meter id that does not exist.
-	 * @param conn
+	 * Returns the count (number of rows) of readings for a meter within a date range.
+	 * Includes the meter's readings whether or not it is displayable.
+	 * @param meterID the id of the meter to count readings for
+	 * @param startDate the start of the date range (inclusive), or null/undefined for no lower bound
+	 * @param endDate the end of the date range (inclusive), or null/undefined for no upper bound
+	 * @param conn the database connection to use
+	 * @returns {Promise<number>} the number of readings found
 	 */
-	static async getCountByMeterIDAndDateRange(meterID, startDate, endDate, requireDisplayable = true, conn) {
+	static async getCountByMeterIDAndDateRange(meterID, startDate, endDate, conn) {
 		const row = await conn.any(sqlFile('reading/get_count_by_meter_id_and_date_range.sql'), {
 			meterID: meterID,
 			startDate: startDate,
-			endDate: endDate,
-			requireDisplayable: requireDisplayable
+			endDate: endDate
+		});
+		return parseInt(row[0].count);
+	}
+
+	/**
+	 * Returns the count (number of rows) of readings for a meter within a date range.
+	 * Returns 0 if the meter is not displayable, the same as if the meter id does not exist.
+	 * @param meterID the id of the meter to count readings for
+	 * @param startDate the start of the date range (inclusive), or null/undefined for no lower bound
+	 * @param endDate the end of the date range (inclusive), or null/undefined for no upper bound
+	 * @param conn the database connection to use
+	 * @returns {Promise<number>} the number of readings found
+	 */
+	static async getDisplayableCountByMeterIDAndDateRange(meterID, startDate, endDate, conn) {
+		const row = await conn.any(sqlFile('reading/get_displayable_count_by_meter_id_and_date_range.sql'), {
+			meterID: meterID,
+			startDate: startDate,
+			endDate: endDate
 		});
 		return parseInt(row[0].count);
 	}
@@ -198,20 +215,39 @@ class Reading {
 	 * Returns a promise to get all of the readings (so raw) for this meter within (inclusive) a specified date range from the
 	 * database. If no startDate is specified, all readings from the beginning of time to the endDate are returned.
 	 * If no endDate is specified, all readings after and including the startDate are returned.
-	 * @param meterID
-	 * @param {Date} startDate
-	 * @param {Date} endDate
-	 * @param requireDisplayable if true (the default), a meter that is not displayable
-	 * returns no readings, the same as a meter id that does not exist.
+	 * @param meterID the id of the meter to find readings for
+	 * @param {Date} startDate the start of the date range (inclusive), or null/undefined for no lower bound
+	 * @param {Date} endDate the end of the date range (inclusive), or null/undefined for no upper bound
 	 * @param conn is the connection to use.
 	 * @returns {Promise.<array.<Reading>>}
 	 */
-	static async getReadingsByMeterIDAndDateRange(meterID, startDate, endDate, requireDisplayable = true, conn) {
+	static async getReadingsByMeterIDAndDateRange(meterID, startDate, endDate, conn) {
 		const rows = await conn.any(sqlFile('reading/get_readings_by_meter_id_and_date_range.sql'), {
 			meterID: meterID,
 			startDate: startDate,
-			endDate: endDate,
-			requireDisplayable: requireDisplayable
+			endDate: endDate
+		});
+		// This does not do the usual row mapping because the identifiers are not the usual ones and there
+		// is no meter id. All this is to make the data smaller.
+		return rows;
+	}
+
+	/**
+	 * Returns a promise to get all of the readings (so raw) for this meter within (inclusive) a specified date range from the
+	 * database. If no startDate is specified, all readings from the beginning of time to the endDate are returned.
+	 * If no endDate is specified, all readings after and including the startDate are returned.
+	 * Returns no readings if the meter is not displayable, the same as if the meter id does not exist.
+	 * @param meterID the id of the meter to find readings for
+	 * @param {Date} startDate the start of the date range (inclusive), or null/undefined for no lower bound
+	 * @param {Date} endDate the end of the date range (inclusive), or null/undefined for no upper bound
+	 * @param conn is the connection to use.
+	 * @returns {Promise.<array.<Reading>>}
+	 */
+	static async getDisplayableReadingsByMeterIDAndDateRange(meterID, startDate, endDate, conn) {
+		const rows = await conn.any(sqlFile('reading/get_displayable_readings_by_meter_id_and_date_range.sql'), {
+			meterID: meterID,
+			startDate: startDate,
+			endDate: endDate
 		});
 		// This does not do the usual row mapping because the identifiers are not the usual ones and there
 		// is no meter id. All this is to make the data smaller.

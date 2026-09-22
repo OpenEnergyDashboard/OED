@@ -379,10 +379,17 @@ mocha.describe('Readings Route Parameter Validation', () => {
 	});
 
 	mocha.describe('Non-Displayable Meter Access Control', () => {
+		// These are set by the beforeEach below and read by createTestMeter and the test
+		// bodies/hooks in the nested describes below, so they're declared here rather than
+		// passed as arguments.
 		let conn;
+		// Name (not id) of the unit assigned to both test meters, used by insertMeters below.
 		let unitName;
+		// Id of the meter created with displayable=true.
 		let displayableMeterID;
+		// Id of the meter created with displayable=false.
 		let hiddenMeterID;
+		// Ensures each test run creates uniquely-named meters.
 		let meterNameCounter = 0;
 
 		/**
@@ -469,6 +476,27 @@ mocha.describe('Readings Route Parameter Validation', () => {
 					expect(res.body).to.be.an('array').with.lengthOf(1);
 				});
 			});
+
+			mocha.describe('when authenticated as a non-admin role', () => {
+				let token;
+
+				mocha.beforeEach(async () => {
+					token = await getTokenForRole(User.role.CSV, testDB.getConnection());
+				});
+
+				mocha.afterEach(async () => {
+					await chai.request(app).post('/api/loginLogout/logout').set('token', token);
+				});
+
+				mocha.it('still hides reading data for a non-displayable meter', async () => {
+					const res = await chai.request(app)
+						.get(`${RAW_READINGS_BASE_ENDPOINT}/${hiddenMeterID}`)
+						.set('token', token)
+						.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+					expect(res).to.have.status(HTTP_CODES.OK);
+					expect(res.body).to.be.an('array').with.lengthOf(0);
+				});
+			});
 		});
 
 		mocha.describe(`GET ${LINE_COUNT_BASE_ENDPOINT}/:meter_ids`, () => {
@@ -526,6 +554,27 @@ mocha.describe('Readings Route Parameter Validation', () => {
 						.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
 					expect(res).to.have.status(HTTP_CODES.OK);
 					expect(res.text).to.equal('2');
+				});
+			});
+
+			mocha.describe('when authenticated as a non-admin role', () => {
+				let token;
+
+				mocha.beforeEach(async () => {
+					token = await getTokenForRole(User.role.CSV, testDB.getConnection());
+				});
+
+				mocha.afterEach(async () => {
+					await chai.request(app).post('/api/loginLogout/logout').set('token', token);
+				});
+
+				mocha.it('still excludes a non-displayable meter from the count', async () => {
+					const res = await chai.request(app)
+						.get(`${LINE_COUNT_BASE_ENDPOINT}/${displayableMeterID},${hiddenMeterID}`)
+						.set('token', token)
+						.query({ timeInterval: READINGS_LINE_TIME_INTERVAL });
+					expect(res).to.have.status(HTTP_CODES.OK);
+					expect(res.text).to.equal('1');
 				});
 			});
 		});

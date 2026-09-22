@@ -3,8 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 -- Gets raw meter readings by id and date range. This is then ordered by time ascending.
--- When requireDisplayable is true, readings for a meter that is not displayable are
--- excluded, the same as for a meter id that does not exist.
 SELECT
   -- Short column names are used to make the data smaller.
   -- There is no meter id as usual for readings since special for raw export.
@@ -13,7 +11,4 @@ FROM readings
 WHERE meter_id = ${meterID}
   AND start_timestamp >= COALESCE(${startDate}, '-infinity'::TIMESTAMP)
 	AND end_timestamp <= COALESCE(${endDate}, 'infinity'::TIMESTAMP)
-	AND (${requireDisplayable} = FALSE OR EXISTS (
-		SELECT 1 FROM meters WHERE meters.id = readings.meter_id AND meters.displayable = TRUE
-	))
 ORDER BY start_timestamp ASC;
