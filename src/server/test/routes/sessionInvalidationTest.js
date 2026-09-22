@@ -12,8 +12,6 @@ const { HTTP_CODES } = require('../../util/httpCodes');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../../config').secretToken;
 
-//const { chai, mocha, app, testUser } = common;
-
 mocha.describe('Session Invalidation Security', () => {
 	const LOGIN_ENDPOINT = '/api/loginLogout/login';
 	const LOGOUT_ENDPOINT = '/api/loginLogout/logout';
