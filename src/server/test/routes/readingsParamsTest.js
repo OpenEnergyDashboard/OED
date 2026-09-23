@@ -135,6 +135,8 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				username: user.username,
 				password: user.password
 			});
+		// Note these are not formally part of the tests below but using expect is an easy way
+		// to get the test to fail to indicate an unexpected issue/error that really should not happen.
 		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res.body).to.have.property('token');
 		return res.body.token;
@@ -477,7 +479,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				});
 			});
 
-			mocha.describe('when authenticated as a non-admin role', () => {
+			mocha.describe('when authenticated as a non-admin (CSV) role', () => {
 				let token;
 
 				mocha.beforeEach(async () => {
@@ -557,7 +559,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				});
 			});
 
-			mocha.describe('when authenticated as a non-admin role', () => {
+			mocha.describe('when authenticated as a non-admin (CSV) role', () => {
 				let token;
 
 				mocha.beforeEach(async () => {
