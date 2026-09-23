@@ -67,6 +67,17 @@ class Conversion {
 	}
 
 	/**
+	 * Returns source, destination, and directionality of a conversion
+	 * if the conversion is associated with the given unit
+	 * @param {*} unitId The unit's id.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<Conversion>}
+	 */
+	static async getConversionsByUnitID(unitId, conn) {
+		return await conn.any(sqlFile('conversion/get_id_and_direction_by_unit_id.sql'), { unitId });
+	}
+
+	/**
 	 * Inserts a new conversion to the database.
 	 * @param {*} conn The connection to use.
 	 */

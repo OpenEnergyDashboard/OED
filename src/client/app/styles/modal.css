@@ -26,3 +26,19 @@ select option[value="true"] {
 .bold {
 	font-weight: bold;
 }
+
+.lost-units-section-heading {
+	border-bottom: 1px solid #ddd;
+	padding-bottom: 8px;
+	margin-bottom: 8px;
+}
+
+.lost-units-group {
+	margin-top: 12px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid #ddd;
+}
+
+.lost-units-group:last-child {
+	border-bottom: none;
+}

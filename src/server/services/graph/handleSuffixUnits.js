@@ -6,6 +6,8 @@ const Unit = require('../../models/Unit');
 const { pathConversion } = require('./pathConversion');
 const Conversion = require('../../models/Conversion');
 const { getAllPaths } = require('./createConversionGraph');
+const { log } = require('../../log');
+const { deleteUnitSafely } = require('./checkUnitDependencies');
 
 /**
  * Adds the new unit and conversions to the database and the conversion graph.
@@ -141,6 +143,9 @@ async function handleSuffixUnits(graph, conn) {
 			// See if this unit already exists. Would if this was done before where this path existed.
 			if (neededSuffixUnit === null) {
 				// If not then add the new unit and conversion.
+				// Note: This regenerates a derived suffix unit/conversion whenever this function runs and finds one missing for a still valid path
+				// This includes if an admin has deleted it directly. Deleting a derived converion alone
+				// does not persis unless the underlying conversion it was generated from is also removed.
 				await addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, unitIdentifier, graph, conn);
 			} else {
 				// If it already exists then check if the unit and conversion are correct.
@@ -157,25 +162,114 @@ async function handleSuffixUnits(graph, conn) {
 /**
  * OED handles suffix units by adding conversions and units automatically.
  * When a unit's suffix changes, these additional conversions and units need to be removed.
- * Units are complicated to remove so we just set their displayable to NONE.
- * Since this function makes changes to conversions and units, Cik must be recalculated after calling this function.
+ * Each conversion and OED created unit is cleaned up independently.
+ * Cik must be recalculated after calling this function.
  * @param {*} suffixUnit Additional conversions/units of this suffixUnit will be removed.
- * @param {*} conn The connection to use.
+ * @param {*} conn The connection to use (can be a transaction).
+ * @param {number} depth Current recursion depth to prevent infinite loops (default: 0).
  */
-async function removeAdditionalConversionsAndUnits(suffixUnit, conn) {
-	// Get all conversions from this suffix unit.
-	const conversions = (await Conversion.getAll(conn)).filter((conversion) => conversion.sourceId === suffixUnit.id);
-	conversions.forEach(async (conversion) => {
-		const destinationUnit = await Unit.getById(conversion.destinationId, conn);
-		// The units that OED adds are suffix unit.
-		if (destinationUnit.typeOfUnit === Unit.unitType.SUFFIX) {
-			// Delete the conversion.
-			await Conversion.delete(conversion.sourceId, conversion.destinationId, conn);
-			// Hide the destination unit.
-			destinationUnit.displayable = Unit.displayableType.NONE;
-			await destinationUnit.update(conn);
+
+async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) {
+	const MAX_SUFFIX_CLEANUP_DEPTH = 10;
+
+	if (depth > MAX_SUFFIX_CLEANUP_DEPTH) {
+		log.error(`Max depth (${MAX_SUFFIX_CLEANUP_DEPTH}) reached cleaning up suffix unit ${suffixUnit.id}. Possible circular dependency.`);
+		throw new Error(`Suffix unit cleanup depth limit exceeded for unit ${suffixUnit.id}`);
+	}
+	// Track units being deleted to notify admin of the internal change
+
+	while (true) {
+		// Get all conversions involving this suffix unit (as source, destination, or bidirectional)
+		const allConversions = await Conversion.getAll(conn);
+		const relatedConversions = allConversions.filter((conversion) =>
+			conversion.sourceId === suffixUnit.id ||
+			(conversion.bidirectional && conversion.destinationId === suffixUnit.id)
+		);
+		if (relatedConversions.length === 0) {
+			break;
 		}
-	});
+
+		const resolved = await Promise.all(relatedConversions.map(async (conversion) => {
+			// Determine which unit is the suffix unit and which is the destination
+			const isSource = conversion.sourceId === suffixUnit.id;
+			const otherUnitId = isSource ? conversion.destinationId : conversion.sourceId;
+			const exists = await Unit.exists(otherUnitId, conn);
+			const otherUnit = exists ? await Unit.getById(otherUnitId, conn) : null;
+			return { conversion, otherUnitId, otherUnit };
+		}));
+
+		// Handle a conversion pointing at a unit that's already been deleted.
+		// This occurs when a bidirectional conversion is stored as two rows.
+		// Both rows point to the same otherUnitId. If an earlier processing pass deleted
+		// otherUnitId during the same batch, this lookup will correctly register it as
+		// missing rather than indicating an actual data problem.
+		const missing = resolved.find(r => !r.otherUnit);
+		if (missing) {
+			log.warn(`Unit ${missing.otherUnitId} not found when cleaning up suffix unit ${suffixUnit.id}. Conversion ${missing.conversion.sourceId}->${missing.conversion.destinationId} may be orphaned.`);
+			await Conversion.delete(missing.conversion.sourceId, missing.conversion.destinationId, conn);
+			continue;
+		}
+
+		// Find the first related conversion whose other unit is actually a
+		// suffix-type unit this function is responsible for cleaning up.
+		// Conversions to non-suffix units (e.g. the original conversion the
+		// admin is deleting) are left alone rather than aborting the loop.
+		const target = resolved.find(r => r.otherUnit.typeOfUnit === Unit.unitType.SUFFIX);
+
+		if (!target) {
+			// Nothing left to process for this unit.
+			break;
+		}
+
+		// The units that OED adds are suffix units (typeOfUnit === SUFFIX)
+		try {
+			const { conversion, otherUnitId, otherUnit } = target;
+
+			// Check if otherUnitId has connections besides this one.
+			// Deletion of other connections may lead to orphaning a unit.
+			const otherUnitConversions = await Conversion.getConversionsByUnitID(otherUnitId, conn);
+			const hasOtherConnections = otherUnitConversions.some(c =>
+				!((c.source_id === conversion.sourceId && c.destination_id === conversion.destinationId) ||
+					(c.source_id === conversion.destinationId && c.destination_id === conversion.sourceId))
+			);
+			// Warn the admin of connected units
+			if (hasOtherConnections) {
+				log.warn(`Unit ${otherUnitId} has other connections beyond conversion ${conversion.sourceId}->${conversion.destinationId}; deleting it will also remove those.`);
+			}
+
+			// Always delete the conversion
+			await Conversion.delete(conversion.sourceId, conversion.destinationId, conn);
+
+			// If bidirectional, also delete the reverse conversion if it exists separately
+			if (conversion.bidirectional) {
+				const reverseConversion = await Conversion.getBySourceDestination(
+					conversion.destinationId,
+					conversion.sourceId,
+					conn
+				);
+				if (reverseConversion) {
+					await Conversion.delete(conversion.destinationId, conversion.sourceId, conn);
+				}
+			}
+
+			// Recursively clean up this unit's related conversions/units
+			// This handles nested suffix chains (A -> B -> C)
+			await removeAdditionalConversionsAndUnits(otherUnit, conn, depth + 1);
+
+			// Delete the auto-created unit (dependency checks + cik cleanup handled inside)
+			await deleteUnitSafely(otherUnitId, conn);
+
+		} catch (err) {
+			log.error(`Error processing conversion ${conversion.sourceId}->${conversion.destinationId} during suffix unit cleanup: ${err}`, err);
+			throw err;
+		}
+	}
+
+	// Restore the suffix unit's displayable status
+	// Note: This funtion only cleans up derived suffix conversions, never the original conversion the suffix unit was created from
+	// handleSuffixUnits will make the unit visible again and regenerate
+	// dericed units from it during the next graph rebuild.
+	// See note there for the full mechanism.
 	suffixUnit.displayable = Unit.displayableType.ALL;
 	await suffixUnit.update(conn);
 }

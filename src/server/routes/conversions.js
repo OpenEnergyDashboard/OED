@@ -6,13 +6,20 @@ const express = require('express');
 const { log } = require('../log');
 const { getConnection } = require('../db');
 const Conversion = require('../models/Conversion');
+const Unit = require('../models/Unit');
+const { removeAdditionalConversionsAndUnits } = require('../services/graph/handleSuffixUnits');
 const { success, failure } = require('./response');
 const { HTTP_CODES } = require('../util/httpCodes');
 const validate = require('jsonschema').validate;
 
 const { simulateDeleteConversion } = require('../services/conversionSimulation');
+const { getUnitDependencyDetails } = require('../services/graph/checkUnitDependencies');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const { STRING_GENERAL_MAX_LENGTH } = require('../util/validationConstants');
+const Meter = require('../models/Meter');
+const Group = require('../models/Group');
+const { redoCik } = require('../services/graph/redoCik');
+const { isSuffixRelated } = require('../util/suffixUnitCheck');
 
 
 const router = express.Router();
@@ -180,22 +187,120 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 		const { sourceId, destinationId, meterIds = [], groupIds = [] } = req.body;
 		const conn = getConnection();
 		try {
-			await conn.tx(async t => {
-				// Update meters if any
-				for (const meterId of meterIds) {
-					await t.none(`UPDATE meters SET default_graphic_unit = NULL WHERE id = ${meterId}`);
+			// Get the source and destination units for the conversion (before transaction for validation)
+			const source = await Unit.getById(sourceId, conn);
+			const dest = await Unit.getById(destinationId, conn);
+			
+			if (!source || !dest) {
+				failure(res, 404, 'Source or destination unit not found');
+				return;
+			}
+
+			// Check for dependencies on suffix units that will be affected
+			// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
+			// This provides better error messages before attempting deletion
+			const suffixUnitsToCheck = [];
+			if (isSuffixRelated(source)) {
+				suffixUnitsToCheck.push({ unit: source, role: 'source' });
+			}
+			if (isSuffixRelated(dest)) {
+				suffixUnitsToCheck.push({ unit: dest, role: 'destination' });
+			}
+
+			// Check dependencies for each suffix unit that will be cleaned up
+			for (const { unit, role } of suffixUnitsToCheck) {
+				const deps = await getUnitDependencyDetails(unit.id, conn);
+				
+				// If suffix unit has meter/group dependencies, provide detailed error
+				if (deps.meterCount > 0 || deps.groupCount > 0) {
+					const meterNames = deps.meters.map(m => `"${m.name}"`).join(', ');
+					const groupNames = deps.groups.map(g => `"${g.name}"`).join(', ');
+					
+					let errorMsg = `Cannot delete conversion: ${role} unit "${unit.name}" (ID: ${unit.id}) is used by `;
+					const parts = [];
+					if (deps.meterCount > 0) {
+						parts.push(`${deps.meterCount} meter(s): ${meterNames}`);
+					}
+					if (deps.groupCount > 0) {
+						parts.push(`${deps.groupCount} group(s): ${groupNames}`);
+					}
+					errorMsg += parts.join(' and ');
+					
+					log.warn(`Conversion deletion blocked due to dependencies: ${errorMsg}`);
+					failure(res, 400, errorMsg);
+					return;
 				}
-				// Update groups if any
+			}
+
+			// Perform all operations in a single transaction for atomicity
+			await conn.tx(async t => {
+				// Lock the units to prevent concurrent modifications
+				await Unit.lockById(sourceId, t);
+				await Unit.lockById(destinationId, t);
+				
+				// Check if the source or the destination is a suffix unit and clean up related conversions/units
+				// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
+				if (isSuffixRelated(source)) {
+					log.info(`Suffix-related unit ${sourceId} is used in conversion deletion as source. Cleaning up related conversions and units.`);
+					const sourceInTx = await Unit.getById(sourceId, t);
+					await removeAdditionalConversionsAndUnits(sourceInTx, t);
+				}
+				if (isSuffixRelated(dest)) {
+					const destStillExists = await Unit.exists(destinationId, t);
+					if (destStillExists) {
+						log.info(`Suffix-related unit ${destinationId} is used in conversion deletion as destination. Cleaning up related conversions and units.`);
+						const destInTx = await Unit.getById(destinationId, t);
+						await removeAdditionalConversionsAndUnits(destInTx, t);
+					} else {
+						log.info(`Suffix-related unit ${destinationId} was already cleaned up as part of source unit ${sourceId}'s cascade.`);
+    				}
+				}
+				
+				// Handle bidirectional conversion deletion safely
+				// Check if this conversion is bidirectional and if reverse exists
+				const conversion = await Conversion.getBySourceDestination(sourceId, destinationId, t);
+				if (conversion && conversion.bidirectional) {
+					// Check for reverse conversion (some systems store bidirectional as two entries)
+					const reverseConversion = await Conversion.getBySourceDestination(destinationId, sourceId, t);
+					if (reverseConversion) {
+						log.info(`Deleting bidirectional conversion pair: ${sourceId} <-> ${destinationId}`);
+						await Conversion.delete(destinationId, sourceId, t);
+					}
+				}
+				// Update meters, if any, by setting their default graphic unit to NULL
+				for (const meterId of meterIds) {
+					await Meter.clearDefaultGraphicUnit(meterId, t);
+				}
+				// Update groups, if any, by setting their default graphic unit to NULL
 				for (const groupId of groupIds) {
-					await t.none(`UPDATE groups SET default_graphic_unit = NULL WHERE id = ${groupId}`);
+					await Group.clearDefaultGraphicUnit(groupId, t);
 				}
 				// Delete conversion
 				await Conversion.delete(sourceId, destinationId, t);
 			});
+
+			// Verify if units were orphaned after suffix cleanup (performance: only check if suffix units were involved)
+			// Track the units that may be orphaned
+			let orphanedUnits = [];
+			if (isSuffixRelated(source) || isSuffixRelated(dest)) {
+				try {
+					// Use efficient query with LIMIT to avoid scanning large tables unnecessarily
+					// Only check recently affected units to improve performance on large databases
+					orphanedUnits = await Unit.findOrphanedUnits(conn);
+					if (orphanedUnits.length > 0) {
+						log.warn(`Found ${orphanedUnits.length} potentially orphaned suffix units after cleanup: ${orphanedUnits.map(u => `${u.id} (${u.name})`).join(', ')}`);
+						// Log metrics for monitoring
+						log.info(`Conversion deletion metrics: sourceId=${sourceId}, destId=${destinationId}, orphanedUnits=${orphanedUnits.length}`);
+					}
+				} catch (err) {
+					// Non-critical orphan unit check, log but don't fail
+					log.warn(`Error checking for orphaned units. Could not successfully verify if units were orphaned by this deletion : ${err}`);
+				}
+			}
 			success(res, 'Successfully deleted conversion and updated meters/groups');
 		} catch (err) {
-			log.error(`Error while deleting conversion and updating meters/groups: ${err}`);
-			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while deleting conversion and updating meters/groups: ${err}`);
+			log.error(`Error while deleting conversion and updating meters/groups: ${err}`, err);
+			failure(res, HTTP_CODES.INTERNAL_SERVER_ERROR, `Error while deleting conversion and updating meters/groups: ${err.message || err}`);
 		}
 	}
 });
