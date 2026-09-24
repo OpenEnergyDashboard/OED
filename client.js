@@ -12,21 +12,26 @@ const pgclient = new Client({
 	database: process.env.OED_DB_TEST_DATABASE
 });
 
-pgclient.connect();
+/* New Code for setting up the Test Database! */
+async function setupDatabase() {
+	await pgclient.connect();
 
-const createUser = "CREATE USER " + process.env.OED_DB_USER + " WITH PASSWORD '" + process.env.POSTGRES_PASSWORD + "'"
-const alterUser = "ALTER USER " + process.env.OED_DB_USER + " WITH SUPERUSER;"
-const extension = "CREATE EXTENSION IF NOT EXISTS btree_gist;"
+	await pgclient.query(`CREATE USER ${process.env.OED_DB_USER} WITH PASSWORD '${process.env.OED_DB_PASSWORD}'`);
+	await pgclient.query(`ALTER USER ${process.env.OED_DB_USER} WITH SUPERUSER`);
 
-pgclient.query(createUser, (err, res) => {
-	if (err) throw err
-});
+	await pgclient.query(
+		`CREATE USER ${process.env.OED_DB_TEST_USER} WITH NOSUPERUSER NOCREATEDB NOCREATEROLE ` +
+		`PASSWORD '${process.env.OED_DB_TEST_PASSWORD}'`
+	);
 
-pgclient.query(alterUser, (err, res) => {
-	if (err) throw err
-});
+	await pgclient.query(`ALTER DATABASE ${process.env.OED_DB_TEST_DATABASE} OWNER TO ${process.env.OED_DB_TEST_USER}`);
 
-pgclient.query(extension, (err, res) => {
-	if (err) throw err
-	pgclient.end()
+	await pgclient.query('CREATE EXTENSION IF NOT EXISTS btree_gist');
+
+	await pgclient.end();
+}
+
+setupDatabase().catch(err => {
+	console.error(err);
+	process.exit(1);
 });
