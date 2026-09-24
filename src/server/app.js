@@ -33,6 +33,7 @@ const units = require('./routes/units');
 const conversions = require('./routes/conversions');
 const ciks = require('./routes/ciks');
 const { HTTP_CODES } = require('./util/httpCodes');
+const crypto = require('node:crypto');
 
 // Detect test environment and use higher rate limits during tests.
 // Rate limiting is critical for security in production but interferes with automated testing.
@@ -162,6 +163,13 @@ router.get('*', (req, res) => {
 
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
+
+		//assigns a value to the nonce in order to check for authenticity
+		const nonce = crypto.randomBytes(16).toString('base64url');
+		htmlPlusData = htmlPlusData.replace(/{{nonce}}/g, nonce);
+
+		res.setHeader('Content-Security-Policy', `default-src 'self'; img-src 'self' data: ; font-src 'self' https://maxcdn.bootstrapcdn.com ; media-src 'self'; script-src 'self' 'nonce-${nonce}' ; style-src 'self' 'nonce-${nonce}' 'unsafe-inline';`)
+
 		res.send(htmlPlusData);
 	});
 });
