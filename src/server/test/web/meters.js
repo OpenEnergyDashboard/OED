@@ -160,26 +160,26 @@ mocha.describe('meters API', () => {
 			if (User.role[role] == User.role.ADMIN || User.role[role] == User.role.CSV) {
 				let token;
 				mocha.beforeEach(async () => {
-                    // insert test user
-                    const conn = testDB.getConnection();
-                    const password = 'password';
-                    const hashedPassword = await bcrypt.hash(password, 10);
-                    const authorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-                    await authorizedUser.insert(conn);
-                    authorizedUser.password = password;
+					// insert test user
+					const conn = testDB.getConnection();
+					const password = `password${role}`;
+					const hashedPassword = await bcrypt.hash(password, 10);
+					const authorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+					await authorizedUser.insert(conn);
+					authorizedUser.password = password;
 
-                    // login
-                    let res = await chai.request(app).post('/api/loginLogout/login')
-                        .send({ username: authorizedUser.username, password: authorizedUser.password });
-                    token = res.body.token;
-                });
-                mocha.afterEach(async () => {
-                    // logout
-                    if (token) {
-                        await chai.request(app).post('/api/loginLogout/logout')
-                            .set('token', token);
-                    }
-                });
+					// login
+					const res = await chai.request(app).post('/api/loginLogout/login')
+						.send({ username: authorizedUser.username, password: authorizedUser.password });
+					token = res.body.token;
+				});
+				mocha.afterEach(async () => {
+					// logout
+					if (token) {
+						await chai.request(app).post('/api/loginLogout/logout')
+							.set('token', token);
+						}
+					});
 
 				mocha.it(`should return all meters for ${role}`, async () => {
 					const conn = testDB.getConnection();
@@ -221,14 +221,14 @@ mocha.describe('meters API', () => {
 				mocha.beforeEach(async () => {
 					// insert test user
 					const conn = testDB.getConnection();
-					const password = 'password';
+					const password = `password${role}`;
 					const hashedPassword = await bcrypt.hash(password, 10);
 					const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
 					await unauthorizedUser.insert(conn);
 					unauthorizedUser.password = password;
 
 					// login
-					let res = await chai.request(app).post('/api/loginLogout/login')
+					const res = await chai.request(app).post('/api/loginLogout/login')
 						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});
@@ -271,7 +271,7 @@ mocha.describe('meters API', () => {
 				});
 
 				mocha.it(`should reject requests from ${role} to edit meters`, async () => {
-					let res = await chai.request(app).post('/api/meters/edit').set('token', token);
+					const res = await chai.request(app).post('/api/meters/edit').set('token', token);
 					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 			}

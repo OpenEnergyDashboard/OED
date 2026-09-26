@@ -20,7 +20,7 @@ mocha.describe('Users API', () => {
 			// To fix this, manually call  DB creation. This will also happen right after this
 			// .before finishes.
 			await recreateDB();
-			let res = await chai.request(app).post('/api/loginLogout/login')
+			const res = await chai.request(app).post('/api/loginLogout/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
@@ -114,14 +114,14 @@ mocha.describe('Users API', () => {
 				mocha.beforeEach(async () => {
 					// insert test user
 					const conn = testDB.getConnection();
-					const password = 'password';
+					const password = `password${role}`;
 					const hashedPassword = await bcrypt.hash(password, 10);
 					const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
 					await unauthorizedUser.insert(conn);
 					unauthorizedUser.password = password;
 
 					// login
-					let res = await chai.request(app).post('/api/loginLogout/login')
+					const res = await chai.request(app).post('/api/loginLogout/login')
 						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});
@@ -147,7 +147,7 @@ mocha.describe('Users API', () => {
 
 				mocha.it(`should reject requests from ${role} to edit users`, async () => {
 					// edit
-					let res = await chai.request(app).post('/api/users/edit').set('token', token);
+					const res = await chai.request(app).post('/api/users/edit').set('token', token);
 					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 

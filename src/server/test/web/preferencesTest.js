@@ -28,7 +28,7 @@ mocha.describe('preferences API', () => {
 				let token;
 				mocha.beforeEach(async () => {
 					// login
-					let res = await chai.request(app).post('/api/loginLogout/login')
+					const res = await chai.request(app).post('/api/loginLogout/login')
 						.send({ username: testUser.username, password: testUser.password });
 					token = res.body.token;
 				});
@@ -41,7 +41,7 @@ mocha.describe('preferences API', () => {
 				});
 
 				mocha.it('should accept requests from Admin role', async () => {
-					res = await chai.request(app).post('/api/preferences')
+					const res = await chai.request(app).post('/api/preferences')
 						.set('token', token)
 						.send({ preferences });
 					expect(res).to.have.status(HTTP_CODES.OK);
@@ -55,14 +55,14 @@ mocha.describe('preferences API', () => {
 						mocha.beforeEach(async () => {
 							// insert test user
 							const conn = testDB.getConnection();
-							const password = 'password';
+							const password = `password${role}`;
 							const hashedPassword = await bcrypt.hash(password, 10);
 							const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
 							await unauthorizedUser.insert(conn);
 							unauthorizedUser.password = password;
 
 							// login
-							let res = await chai.request(app).post('/api/loginLogout/login')
+							const res = await chai.request(app).post('/api/loginLogout/login')
 								.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 							token = res.body.token;
 						});
@@ -75,7 +75,7 @@ mocha.describe('preferences API', () => {
 						});
 
 						mocha.it(`should reject requests from ${role}`, async () => {
-							res = await chai.request(app).post('/api/preferences')
+							const res = await chai.request(app).post('/api/preferences')
 								.set('token', token)
 								.send({ preferences });
 							expect(res).to.have.status(HTTP_CODES.FORBIDDEN);

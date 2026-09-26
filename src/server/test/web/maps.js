@@ -78,7 +78,7 @@ mocha.describe('maps API', () => {
 		// documented in usersTest.js.
 		mocha.beforeEach(async () => {
 			// login
-			let res = await chai.request(app).post('/api/loginLogout/login')
+			const res = await chai.request(app).post('/api/loginLogout/login')
 				.send({ username: testUser.username, password: testUser.password });
 			token = res.body.token;
 		});
@@ -114,14 +114,14 @@ mocha.describe('maps API', () => {
 				mocha.beforeEach(async () => {
 					// insert test user
 					const conn = testDB.getConnection();
-					const password = 'password';
+					const password = `password${role}`;
 					const hashedPassword = await bcrypt.hash(password, 10);
 					const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
 					await unauthorizedUser.insert(conn);
 					unauthorizedUser.password = password;
 
 					// login
-					let res = await chai.request(app).post('/api/loginLogout/login')
+					const res = await chai.request(app).post('/api/loginLogout/login')
 						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 					token = res.body.token;
 				});
@@ -135,17 +135,17 @@ mocha.describe('maps API', () => {
 
 				mocha.it(`should reject requests from ${role} to create maps`, async () => {
 					// get maps
-					let res = await chai.request(app).post('/api/maps/create').set('token', token);
+					const res = await chai.request(app).post('/api/maps/create').set('token', token);
 					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 
 				mocha.it(`should reject requests from ${role} to edit maps`, async () => {
-					let res = await chai.request(app).post('/api/maps/edit').set('token', token);
+					const res = await chai.request(app).post('/api/maps/edit').set('token', token);
 					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 
 				mocha.it(`should reject requests from ${role} to delete maps`, async () => {
-					let res = await chai.request(app).post('/api/maps/delete').set('token', token);
+					const res = await chai.request(app).post('/api/maps/delete').set('token', token);
 					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
 				});
 				mocha.it(`should only show visible maps to ${role}`, async () => {
@@ -156,11 +156,11 @@ mocha.describe('maps API', () => {
 					await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
 					await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
 					// Insert user
-					const password = 'password';
+					const password = `password${role}`;
 					const hashedPassword = await bcrypt.hash(password, 10);
 
 					// get maps
-					let res = await chai.request(app).get('/api/maps').set('token', token);
+					const res = await chai.request(app).get('/api/maps').set('token', token);
 					expect(res).to.have.status(HTTP_CODES.OK);
 					expect(res).to.be.json;
 					expect(res.body).to.have.lengthOf(3);
