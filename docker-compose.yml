@@ -65,12 +65,9 @@ services:
         build:
             context: ./containers/database/
             args:
-                # TODO The hope was this would get the environment variable and pass it to
-                # the database build. However, it is not working.
-                # oedPassword: ${OED_DB_PASSWORD}
-                # TODO This is a fix (hopefully temporary) to pass the needed value.
-                # TODO Hope to fix, but for now this MUST match the same key value above.
-                OED_DB_PASSWORD: "opened"
+                # Reuses the common values (including OED_DB_PASSWORD) defined above
+                # so the password only needs to be set in one place.
+                <<: *common-db-web-variables
         volumes:
             # This maps the proper Docker database directory back to the local file
             # system. It is critical that the changes actually be written back to
