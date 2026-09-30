@@ -274,7 +274,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 		// - The rate is set so not the custom input value. This happens if select custom value but don't input with enter.
 		// - The custom rate is a positive integer
 		const validUnit = state.name !== '' &&
-			(state.typeOfUnit !== UnitType.suffix || state.suffix !== '') && state.secInRate !== Number(CUSTOM_INPUT)
+			(state.typeOfUnit !== UnitType.unit || state.suffix !== '') && state.secInRate !== Number(CUSTOM_INPUT)
 			&& state?.minVal >= MIN_VAL && state?.maxVal <= MAX_VAL && state?.minVal <= state?.maxVal
 			&& customRateValid(Number(state.secInRate));
 
@@ -371,7 +371,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				// set displayable to none if unit is meter
 				displayable: (state.typeOfUnit === UnitType.meter && state.displayable !== DisplayableType.none) ? DisplayableType.none : state.displayable,
 				// set unit to suffix if suffix is not empty
-				typeOfUnit: (state.typeOfUnit !== UnitType.suffix && state.suffix !== '') ? UnitType.suffix : state.typeOfUnit
+				typeOfUnit: (state.typeOfUnit !== UnitType.unit && state.suffix !== '') ? UnitType.unit : state.typeOfUnit
 			};
 
 			// Need to redo Cik if the suffix, displayable, or type of unit changes.
@@ -511,7 +511,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										type='select'
 										onChange={e => { handleStringChange(e); }}
 										value={state.typeOfUnit}
-										invalid={state.typeOfUnit !== UnitType.suffix && state.suffix !== ''}
+										invalid={state.typeOfUnit !== UnitType.unit && state.suffix !== ''}
 									>
 										{Object.keys(UnitType).map(key => {
 											const isMeter = key === UnitType.meter;
@@ -520,7 +520,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 												<option
 													value={key}
 													key={key}
-													disabled={(state.suffix !== '' && key !== UnitType.suffix) || disableMeter}
+													disabled={(state.suffix !== '' && key !== UnitType.unit) || disableMeter}
 												>
 													{translate(`UnitType.${key}`)}
 												</option>

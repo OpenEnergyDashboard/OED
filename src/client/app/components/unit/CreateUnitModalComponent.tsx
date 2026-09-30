@@ -212,7 +212,7 @@ export default function CreateUnitModalComponent() {
 			// set displayable to none if unit is meter
 			displayable: (state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) ? DisplayableType.none : state.displayable,
 			// set unit to suffix if suffix is not empty
-			typeOfUnit: (state.typeOfUnit != UnitType.suffix && state.suffix != '') ? UnitType.suffix : state.typeOfUnit
+			typeOfUnit: (state.typeOfUnit != UnitType.unit && state.suffix != '') ? UnitType.unit : state.typeOfUnit
 		};
 
 		// Add the new unit and update the store
@@ -327,14 +327,14 @@ export default function CreateUnitModalComponent() {
 										type="select"
 										onChange={e => {handleStringChange(e);}}
 										value={state.typeOfUnit}
-										invalid={state.typeOfUnit != UnitType.suffix && state.suffix != ''}
+										invalid={state.typeOfUnit != UnitType.unit && state.suffix != ''}
 									>
 										{Object.keys(UnitType).map(key => {
 											return (
 												<option
 													value={key}
 													key={key}
-													disabled={state.suffix != '' && key != UnitType.suffix}
+													disabled={state.suffix != '' && key != UnitType.unit}
 												>
 													{translate(`UnitType.${key}`)}
 												</option>
