@@ -46,6 +46,7 @@ const config = {
 			] },
 			// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
 			// @plotly/mapbox-gl references a source map file it does not ship so it is excluded to avoid a warning.
+			// TODO: this may be okay to remove after upgrading to plotly.js v4
 			{ enforce: 'pre', test: /\.js$/, exclude: /node_modules[\\/]@plotly[\\/]mapbox-gl/, use:[{loader: 'source-map-loader'}] }
 		]
 	},
