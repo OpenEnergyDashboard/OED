@@ -9,16 +9,17 @@ on:
 jobs:
   run-checks-tests:
     env:
-      OED_DB_USER: test
-      OED_DB_PASSWORD: travisTest
-      OED_DB_DATABASE: travis_ci_dummy
-      OED_DB_TEST_DATABASE: travis_ci_test
-      OED_DB_HOST: postgres
-      OED_DB_PORT: 5432
-      OED_TOKEN_SECRET: travis
-      OED_SERVER_PORT: 3000
-      OED_TEST_SITE_READING_RATE: 00:15:00
-      POSTGRES_PASSWORD: travisTest
+      # ${{ secrets }} is saved in Repository secrets (Repo -> Settings -> Secrets and variables -> Actions)
+      OED_DB_USER: ${{ secrets.OED_DB_USER }}
+      OED_DB_PASSWORD: ${{ secrets.OED_DB_PASSWORD }}
+      OED_DB_DATABASE: ${{ secrets.OED_DB_DATABASE }}
+      OED_DB_TEST_DATABASE: ${{ secrets.OED_DB_TEST_DATABASE }}
+      OED_DB_HOST: ${{ secrets.OED_DB_HOST }}
+      OED_DB_PORT: ${{ secrets.OED_DB_PORT }}
+      OED_TOKEN_SECRET: ${{ secrets.OED_TOKEN_SECRET }}
+      OED_SERVER_PORT: ${{ secrets.OED_SERVER_PORT }}
+      OED_TEST_SITE_READING_RATE: ${{ secrets.OED_TEST_SITE_READING_RATE }}
+      POSTGRES_PASSWORD: ${{ secrets.OED_DB_PASSWORD }}
 
     runs-on: ubuntu-latest
     # Make sure the node version here matches containers/web/Dockerfile for the standard OED build.
@@ -28,8 +29,9 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_PASSWORD: travisTest
-          POSTGRES_DB: travis_ci_test
+          # ${{ secrets }} is saved in Repository secrets (Repo -> Settings -> Secrets and variables -> Actions)
+          POSTGRES_PASSWORD: ${{ secrets.OED_DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.OED_DB_TEST_DATABASE }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -72,8 +74,9 @@ jobs:
       - name: Connect to PostgreSQL
         run: node client.js
         env:
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: 5432
+          # ${{ secrets }} is saved in Repository secrets (Repo -> Settings -> Secrets and variables -> Actions)
+          POSTGRES_HOST: ${{ secrets.OED_DB_HOST }}
+          POSTGRES_PORT: ${{ secrets.OED_DB_PORT }}
 
       - name: node tests
         run: |
