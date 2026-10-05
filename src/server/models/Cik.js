@@ -53,6 +53,15 @@ class Cik {
 	}
 
 	/**
+	 * Deletes every row in the cik table. Cik is empty until redoCik is run,
+	 * so the caller must call redoCik before the overall process finishes.
+	 * @param {*} conn The connection to use.
+	 */
+	static async deleteAll(conn) {
+		await conn.none(sqlFile('cik/delete_all_conversions.sql'));
+	}
+
+	/**
 	 * Inserts each element of the array with an actual conversion into the cik table.
 	 * The current values in the table are removed first.
 	 * @param {*} cik is the OED conversion array from the graph.

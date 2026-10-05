@@ -186,6 +186,40 @@ class Unit {
 		return Unit.mapRow(row);
 	}
 
+	/**
+	 * Checks whether a unit with the given id currently exists.
+	 * @param {number} id The unit's id.
+	 * @param {*} conn The connection to use.
+	 * @returns {Promise.<boolean>}
+	 */
+	static async exists(id, conn) {
+		const row = await conn.oneOrNone(sqlFile('unit/get_by_id.sql'), { id: id });
+		return row !== null;
+	}
+
+	/**
+	 * Locks a unit's row for the duration of the current transaction, preventing
+	 * concurrent modification by other sessions. Must be called within a transaction.
+	 * @param {number} id The unit's id.
+	 * @param {*} conn The connection to use (should be a transaction).
+	 * @returns {Promise.<Unit>}
+	 */
+	static async lockById(id, conn) {
+		const row = await conn.one(sqlFile('unit/lock_unit_by_id.sql'), { id: id });
+		return Unit.mapRow(row);
+	}
+
+	/**
+	 * Finds units that may have been orphaned (still displayable but with no
+	 * remaining conversions). Used as a post-delete sanity check, not a guarantee.
+	 * @param {*} conn The connection to use.
+	 * @param {number} [limit=100] The maximum number of units to return.
+	 * @returns {Promise.<Array.<{id: number, name: string}>>}
+	 */
+	static async findOrphanedUnits(conn, limit = 100) {
+		return await conn.any(sqlFile('unit/find_orphaned_units.sql'), { limit });
+	}
+
 	// TODO: Returns a special value if it doesn't exist
 	/**
 	 * Returns the associated unit for the given name.
