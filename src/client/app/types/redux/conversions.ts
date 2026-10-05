@@ -39,7 +39,7 @@ export interface SimulateDeleteAffectedGroup {
 	orphaned: boolean;
 }
 
-export interface SimulateDeletePotentiallyOrphanedUnit {
+interface SimulateDeletePotentiallyOrphanedUnit {
 	id: number;
 	name: string;
 }

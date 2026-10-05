@@ -176,8 +176,9 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 		log.error(`Max depth (${MAX_SUFFIX_CLEANUP_DEPTH}) reached cleaning up suffix unit ${suffixUnit.id}. Possible circular dependency.`);
 		throw new Error(`Suffix unit cleanup depth limit exceeded for unit ${suffixUnit.id}`);
 	}
-	// Track units being deleted to notify admin of the internal change
 
+	// Repeat until no related conversions remain. The conversions are re-read on each
+	// pass because earlier passes delete units and conversions.
 	while (true) {
 		// Get all conversions involving this suffix unit (as source, destination, or bidirectional)
 		const allConversions = await Conversion.getAll(conn);
@@ -256,19 +257,20 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 			// This handles nested suffix chains (A -> B -> C)
 			await removeAdditionalConversionsAndUnits(otherUnit, conn, depth + 1);
 
-			// Delete the auto-created unit (dependency checks + cik cleanup handled inside)
+			// Delete the auto-created unit (dependency checks handled inside, Cik is emptied
+			// there and must be rebuilt with redoCik by the caller)
 			await deleteUnitSafely(otherUnitId, conn);
 
 		} catch (err) {
-			log.error(`Error processing conversion ${conversion.sourceId}->${conversion.destinationId} during suffix unit cleanup: ${err}`, err);
+			log.error(`Error processing conversion ${target.conversion.sourceId}->${target.conversion.destinationId} during suffix unit cleanup: ${err}`, err);
 			throw err;
 		}
 	}
 
 	// Restore the suffix unit's displayable status
-	// Note: This funtion only cleans up derived suffix conversions, never the original conversion the suffix unit was created from
+	// Note: This function only cleans up derived suffix conversions, never the original conversion the suffix unit was created from
 	// handleSuffixUnits will make the unit visible again and regenerate
-	// dericed units from it during the next graph rebuild.
+	// derived units from it during the next graph rebuild.
 	// See note there for the full mechanism.
 	suffixUnit.displayable = Unit.displayableType.ALL;
 	await suffixUnit.update(conn);

@@ -22,7 +22,7 @@ async function setupParentChild(conn) {
 	await insertUnits([
 		{
 			name: 'Parent', identifier: 'Parent', unitRepresent: Unit.unitRepresentType.QUANTITY,
-			secInRate: 1000, typeOfUnit: Unit.unitType.SUFFIX, suffix: 'test-suffix',
+			secInRate: 1000, typeOfUnit: Unit.unitType.UNIT, suffix: 'test-suffix',
 			displayable: Unit.displayableType.ALL, preferredDisplay: true, note: ''
 		},
 		{

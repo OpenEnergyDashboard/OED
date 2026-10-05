@@ -42,13 +42,13 @@ async function checkUnitDependencies(unitId, conn) {
  * @param {number} unitId The unit ID to check
  * @param {*} conn Database connection
  * @returns {Promise<Object>} Object containing:
- *   hasDependencies: boolean,
- *   meterCount: number,
- *   groupCount: number,
- *   conversionCount: number,
- *   meters: Array,
- *   groups: Array,
- *   conversions: Array
+ *   - hasDependencies: boolean,
+ *   - meterCount: number,
+ *   - groupCount: number,
+ *   - conversionCount: number,
+ *   - meters: Array,
+ *   - groups: Array,
+ *   - conversions: Array
  */
 async function getUnitDependencyDetails(unitId, conn) {
 	const deps = await checkUnitDependencies(unitId, conn);

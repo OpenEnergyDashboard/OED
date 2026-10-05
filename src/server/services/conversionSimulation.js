@@ -104,11 +104,11 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 	const newConversions = allConversions.filter(c => {
 		// Remove conversions explicitly identified for removal
 		// (e.g The deleted conversion, it's parent -> link)
-		const isExplicitlyRemoved = uniqueConversionsToRemove.some( toRemove =>
+		const isExplicitlyRemoved = uniqueConversionsToRemove.some(toRemove =>
 			c.sourceId === toRemove.sourceId && c.destinationId === toRemove.destinationId
 		);
 		// Remove conversions touching the units being deleted.
-		// `uniqueConversionsToRemove doesn't catch unit conversions
+		// `uniqueConversionsToRemove` doesn't catch unit conversions
 		// beyond a units direct parent link. This resolves the missed detection.
 		const touchesDeletedUnit = allUnitsToDelete.includes(c.sourceId) || allUnitsToDelete.includes(c.destinationId);
 		return !isExplicitlyRemoved && !touchesDeletedUnit;
@@ -116,7 +116,7 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 
 	// Check which units would have zero remaining conversions after the simulated delete.
 	// Mirrors `Unit.findOrphanedUnits` logic but against the simulation.
-	// Filter units that are created by OED, currently visable, and have zero conversions post delete.
+	// Filter units that are created by OED, currently visible, and have zero conversions post delete.
 	const potentiallyOrphanedUnits = allUnits.filter(u =>
 		u.displayable !== Unit.displayableType.NONE &&
 		!allUnitsToDelete.includes(u.id) &&

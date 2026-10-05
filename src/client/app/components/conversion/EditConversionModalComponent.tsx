@@ -264,7 +264,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					return unitDataById[otherId];
 				});
 			// Populate computed units
-			suffixTypeUnitsToDeleteIds = new Set(suffixTypeUnitsToDelete.map(u => u.id))
+			suffixTypeUnitsToDeleteIds = new Set(suffixTypeUnitsToDelete.map(u => u.id));
 			// Check for meters/groups using affected suffix units
 			const affectedSuffixUnitIds = new Set(suffixTypeUnitsToDeleteIds);
 			// Also check the main suffix unit
@@ -361,7 +361,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 						<div key="potentially-orphaned-units">
 							<span className="bold">{translate('conversion.delete.unit.orphan')}:</span>
 							<ul>
-								{result.potentiallyOrphanedUnits.map((u) => (
+								{result.potentiallyOrphanedUnits.map(u => (
 									<li key={u.id}>"{u.name}"</li>
 								))}
 							</ul>
@@ -396,7 +396,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					});
 					if (meterLossMap.size > 0) {
 						msgElements.push(
-							<div key={"meters-affected"}>
+							<div key="meters-affected">
 								<div className="lost-units-section-heading">
 									<span className="bold">{translate('conversion.delete.meter.affected')}: </span>
 								</div>
@@ -411,7 +411,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 											</div>
 											<span className="bold">{translate('conversion.delete.lost.units')}: </span>
 											<ul>
-												{lostUnits.map((id: number, i: number) => (
+												{lostUnits.map((id: number) => (
 													<li key={id}>
 														"{unitDataById[id]?.name || id}"
 														{suffixTypeUnitsToDeleteIds.has(id) ? '(created by OED)' : ''}
@@ -438,7 +438,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 					});
 					if (groupLossMap.size > 0) {
 						msgElements.push(
-							<div key={"groups-affected"}>
+							<div key="groups-affected">
 								<div className="lost-units-section-heading">
 									<span className="bold">{translate('conversion.delete.group.affected')}: </span>
 								</div>
@@ -453,7 +453,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 											</div>
 											<span className="bold">{translate('conversion.delete.lost.units')}: </span>
 											<ul>
-												{lostUnits.map((id: number, i: number) => (
+												{lostUnits.map((id: number) => (
 													<li key={id}>
 														"{unitDataById[id]?.name || id}"
 														{suffixTypeUnitsToDeleteIds.has(id) ? ' (created by OED)' : ''}
