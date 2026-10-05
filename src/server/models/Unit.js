@@ -205,21 +205,19 @@ class Unit {
 	 * @returns {Promise.<Unit>}
 	 */
 	static async lockById(id, conn) {
-		const row = await conn.one(sqlFile('unit/lock_by_id.sql'), { id: id });
+		const row = await conn.one(sqlFile('unit/lock_unit_by_id.sql'), { id: id });
 		return Unit.mapRow(row);
 	}
 
 	/**
-	 * Finds suffix-type units that may have been orphaned (left visible with
-	 * no remaining conversions) after cleaning up around the given source/destination
-	 * units. Used as a post-delete sanity check, not a guarantee.
-	 * @param {number} sourceId The conversion's source unit id.
-	 * @param {number} destinationId The conversion's destination unit id.
+	 * Finds units that may have been orphaned (still displayable but with no
+	 * remaining conversions). Used as a post-delete sanity check, not a guarantee.
 	 * @param {*} conn The connection to use.
+	 * @param {number} [limit=100] The maximum number of units to return.
 	 * @returns {Promise.<Array.<{id: number, name: string}>>}
 	 */
-	static async findOrphanedUnits(conn) {
-		return await conn.any(sqlFile('unit/find_orphaned_units.sql'));
+	static async findOrphanedUnits(conn, limit = 100) {
+		return await conn.any(sqlFile('unit/find_orphaned_units.sql'), { limit });
 	}
 
 	// TODO: Returns a special value if it doesn't exist

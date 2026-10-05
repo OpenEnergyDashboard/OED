@@ -73,8 +73,8 @@ class Conversion {
 	 * @param {*} conn The connection to use.
 	 * @returns {Promise.<Conversion>}
 	 */
-	static async getConversionsByUnitID(unitId, conn) {
-		return await conn.any(sqlFile('conversion/get_id_and_direction_by_unit_id.sql'), { unitId });
+	static async getByUnitID(unitId, conn) {
+		return await conn.any(sqlFile('conversion/get_conversions_by_unit_id.sql'), { unitId });
 	}
 
 	/**

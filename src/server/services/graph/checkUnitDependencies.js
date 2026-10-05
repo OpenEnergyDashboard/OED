@@ -26,7 +26,7 @@ async function checkUnitDependencies(unitId, conn) {
 		// Check if any groups use this unit as default_graphic_unit
 		Group.getByDefaultGraphicUnit(unitId, conn),
 		// Check if unit is used in any conversions (as source or destination)
-		Conversion.getConversionsByUnitID(unitId,conn)
+		Conversion.getByUnitID(unitId,conn)
 	]);
 	
 	return {

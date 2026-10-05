@@ -1,4 +1,4 @@
-/* This Source Code Form is subject to the terms of the Mozilla Punblic
+/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
@@ -9,4 +9,4 @@ AND NOT EXISTS (
 	SELECT 1 FROM conversions conv
 	WHERE (conv.source_id = unit.id OR conv.destination_id = unit.id)
 )
-LIMIT 100;
+LIMIT ${limit};

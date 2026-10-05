@@ -320,7 +320,7 @@ class Meter {
 	 * @param {*} conn The connection to use.
 	 */
 	static async clearDefaultGraphicUnit(id, conn) {
-		await conn.none(sqlFile('meter/clear_default_graphic_unit.sql'), { id: id });
+		await conn.none(sqlFile('meter/clear_meter_default_graphic_unit.sql'), { id: id });
 	}
 
 	/**
@@ -329,7 +329,7 @@ class Meter {
 	 * @param {*} conn The connection to use.
 	 */
 	static async clearUnitId(id, conn) {
-		await conn.none(sqlFile('meter/clear_unit_id.sql'), { id: id });
+		await conn.none(sqlFile('meter/clear_meter_unit_id.sql'), { id: id });
 	}
 
 	/**

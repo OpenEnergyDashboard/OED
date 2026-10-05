@@ -228,7 +228,7 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 
 			// Check if otherUnitId has connections besides this one.
 			// Deletion of other connections may lead to orphaning a unit.
-			const otherUnitConversions = await Conversion.getConversionsByUnitID(otherUnitId, conn);
+			const otherUnitConversions = await Conversion.getByUnitID(otherUnitId, conn);
 			const hasOtherConnections = otherUnitConversions.some(c =>
 				!((c.source_id === conversion.sourceId && c.destination_id === conversion.destinationId) ||
 					(c.source_id === conversion.destinationId && c.destination_id === conversion.sourceId))

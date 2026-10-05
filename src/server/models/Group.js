@@ -259,7 +259,7 @@ class Group {
 	 * @param {*} conn The connection to use.
 	 */
 	static async clearDefaultGraphicUnit(id, conn) {
-		await conn.none(sqlFile('group/clear_default_graphic_unit.sql'), { id: id });
+		await conn.none(sqlFile('group/clear_group_default_graphic_unit.sql'), { id: id });
 	}
 
 	/**
