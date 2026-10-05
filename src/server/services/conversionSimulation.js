@@ -120,6 +120,8 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 	const potentiallyOrphanedUnits = allUnits.filter(u =>
 		u.displayable !== Unit.displayableType.NONE &&
 		!allUnitsToDelete.includes(u.id) &&
+		// Only report units this delete would leave without conversions, not ones that already had none.
+		allConversions.some(c => c.sourceId === u.id || c.destinationId === u.id) &&
 		!newConversions.some(c => c.sourceId === u.id || c.destinationId === u.id)
 	).map(u => ({ id: u.id, name: u.name }));
 	
