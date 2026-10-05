@@ -74,11 +74,17 @@ async function getUnitDependencyDetails(unitId, conn) {
  * cleared first (cosmetic, safe to drop). If it's used as a meter's actual base
  * unit (unit_id), that reference is also cleared (the meter is left without a
  * defined unit) so the deletion can proceed. Any other conversions still
- * referencing this unit are deleted as well. Also clears any stale cik rows
+ * referencing this unit are deleted as well. Cik is emptied first, so the
+ * caller must run redoCik before the overall process finishes.
  * @param {number} unitId The unit to delete.
  * @param {*} conn The connection to use (should be a transaction).
  */
 async function deleteUnitSafely(unitId, conn) {
+	// Empty Cik first so it cannot be left partly correct and the foreign key on
+	// cik cannot block Unit.delete. The caller must run redoCik before the overall
+	// process finishes. Later calls find nothing to delete so they are fast.
+	await Cik.deleteAll(conn);
+
 	const deps = await checkUnitDependencies(unitId, conn);
 
 	// Clear any meter using this as its base unit or default graphic unit.
@@ -109,7 +115,6 @@ async function deleteUnitSafely(unitId, conn) {
 		await Conversion.delete(conv.source_id, conv.destination_id, conn);
 	}
 
-	await Cik.deleteByUnitId(unitId, conn);
 	await Unit.delete(unitId, conn);
 }
 

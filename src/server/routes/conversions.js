@@ -297,6 +297,11 @@ router.post('/delete', adminAuthMiddleware('delete conversions'), async (req, re
 					log.warn(`Error checking for orphaned units. Could not successfully verify if units were orphaned by this deletion : ${err}`);
 				}
 			}
+			// Full Cik recalculation after all cascading deletes complete, to
+			// correctly handle any unit pairs whose path routed through a deleted
+			// unit, not just the units/conversions directly touched above.
+			await redoCik(conn);
+			
 			success(res, 'Successfully deleted conversion and updated meters/groups');
 		} catch (err) {
 			log.error(`Error while deleting conversion and updating meters/groups: ${err}`, err);
