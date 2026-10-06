@@ -5,7 +5,8 @@
  */
 
 const moment = require('moment');
-const { mocha, expect, testDB } = require('../common');
+const { mocha, expect } = require('../common');
+const { testDB } = require('../commonTestDB');
 const Meter = require('../../models/Meter');
 const Reading = require('../../models/Reading');
 const Group = require('../../models/Group');

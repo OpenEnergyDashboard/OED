@@ -4,8 +4,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { expect } = require('chai');
-const { mocha } = require('../common');
+const { mocha, expect } = require('../common');
 const { success, failure } = require('../../routes/response');
 const { HTTP_CODES } = require('../../util/httpCodes');
 

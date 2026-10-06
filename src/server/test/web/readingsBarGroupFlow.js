@@ -7,7 +7,8 @@
 	See: https://github.com/OpenEnergyDashboard/DesignDocs/blob/main/testing/testing.md for information.
 */
 
-const { chai, mocha, app } = require('../common');
+const { chai, mocha } = require('../common');
+const { app } = require('../commonTestDB');
 const Unit = require('../../models/Unit');
 const { prepareTest,
 	parseExpectedCsv,
