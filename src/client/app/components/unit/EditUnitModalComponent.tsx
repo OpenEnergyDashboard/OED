@@ -266,18 +266,25 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			.catch(error => { showErrorNotification(translate('unit.delete.failure') + error.data); });
 	};
 
+	// - If suffix then must be type of unit is unit
+	const isValidSuffix = () => {
+		return state.typeOfUnit === UnitType.unit || state.suffix === '';
+	};
+
+	// This checks:
+	// - Name cannot be blank.
+	// - The rate is set so not the custom input value. This happens if select custom value but don't input with enter.
+	// - The min/maxVal is within range.
+	// - The custom rate is a positive integer.
+	const isValidUnit = () => {
+		return state.name !== '' &&
+			state.secInRate !== Number(CUSTOM_INPUT) &&
+			state?.minVal >= MIN_VAL && state?.maxVal <= MAX_VAL && state?.minVal <= state?.maxVal &&
+			customRateValid(Number(state.secInRate));
+	};
+
 	// Keeps canSave state up to date. Checks if valid and if edit made.
 	useEffect(() => {
-		// This checks:
-		// - Name cannot be blank
-		// - If type of unit is suffix there must be a suffix
-		// - The rate is set so not the custom input value. This happens if select custom value but don't input with enter.
-		// - The custom rate is a positive integer
-		const validUnit = state.name !== '' &&
-			(state.typeOfUnit !== UnitType.suffix || state.suffix !== '') && state.secInRate !== Number(CUSTOM_INPUT)
-			&& state?.minVal >= MIN_VAL && state?.maxVal <= MAX_VAL && state?.minVal <= state?.maxVal
-			&& customRateValid(Number(state.secInRate));
-
 		// Compare original props to state to see if edit made. Check above avoids thinking edit happened if
 		// custom edit started without enter hit.
 		const editMade =
@@ -293,7 +300,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 			|| props.unit.minVal != state.minVal
 			|| props.unit.maxVal != state.maxVal
 			|| props.unit.disableChecks != state.disableChecks;
-		setCanSave(validUnit && editMade);
+		setCanSave(isValidSuffix() && isValidUnit() && editMade);
 
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
@@ -369,9 +376,7 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 				// automatically set if it was empty. Mimic that here.
 				identifier: (state.identifier === '') ? state.name : state.identifier,
 				// set displayable to none if unit is meter
-				displayable: (state.typeOfUnit === UnitType.meter && state.displayable !== DisplayableType.none) ? DisplayableType.none : state.displayable,
-				// set unit to suffix if suffix is not empty
-				typeOfUnit: (state.typeOfUnit !== UnitType.suffix && state.suffix !== '') ? UnitType.suffix : state.typeOfUnit
+				displayable: (state.typeOfUnit === UnitType.meter && state.displayable !== DisplayableType.none) ? DisplayableType.none : state.displayable
 			};
 
 			// Need to redo Cik if the suffix, displayable, or type of unit changes.
@@ -511,7 +516,8 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										type='select'
 										onChange={e => { handleStringChange(e); }}
 										value={state.typeOfUnit}
-										invalid={state.typeOfUnit !== UnitType.suffix && state.suffix !== ''}
+										// Only want red box without message in this case since error shown on suffix.
+										invalid={!isValidSuffix()}
 									>
 										{Object.keys(UnitType).map(key => {
 											const isMeter = key === UnitType.meter;
@@ -520,16 +526,13 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 												<option
 													value={key}
 													key={key}
-													disabled={(state.suffix !== '' && key !== UnitType.suffix) || disableMeter}
+													disabled={(state.suffix !== '' && key !== UnitType.unit) || disableMeter}
 												>
 													{translate(`UnitType.${key}`)}
 												</option>
 											);
 										})}
 									</Input>
-									<FormFeedback>
-										<FormattedMessage id="unit.type.of.unit.suffix" />
-									</FormFeedback>
 								</FormGroup>
 							</Col>
 							{/* Unit represent input */}
@@ -670,9 +673,9 @@ export default function EditUnitModalComponent(props: EditUnitModalComponentProp
 										type='text'
 										value={state.suffix}
 										onChange={e => { handleStringChange(e); }}
-										invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''} />
+										invalid={!isValidSuffix()} />
 									<FormFeedback>
-										<FormattedMessage id="error.required" />
+										<FormattedMessage id="unit.suffix.incorrect" />
 									</FormFeedback>
 								</FormGroup>
 							</Col>
