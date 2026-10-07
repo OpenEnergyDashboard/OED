@@ -115,11 +115,23 @@ export default function CreateConversionModalComponent() {
 		return source?.typeOfUnit === UnitType.meter;
 	};
 
-	// Determine whether the selected source or destination is a suffix unit
+	// Determine whether the selected source or destination is a suffix unit.
+	// It is a suffix unit if it is of type suffix or it has a suffix.
 	const isSuffixUsed = () => {
 		const source = defaultValues.sourceOptions.find(u => u.id === conversionState.sourceId);
 		const dest = defaultValues.sourceOptions.find(u => u.id === conversionState.destinationId);
-		return source?.typeOfUnit === UnitType.suffix || dest?.typeOfUnit === UnitType.suffix;
+		// If neither source or dest is defined/set then not yet using a suffix unit.
+		let result = false;
+		// If the source or dest is not defined then it should not return true (not suffix) so skip test in that case.
+		if (source != undefined) {
+			// First part not needed now but do to be safe into future.
+			result = result || source.typeOfUnit === UnitType.suffix || source.suffix !== '';
+		}
+		if (dest != undefined) {
+			// If either result is true then the result is true.
+			result = result || dest.typeOfUnit === UnitType.suffix || dest.suffix !== '';
+		}
+		return result;
 	};
 
 	/* Warning Modal */
@@ -167,7 +179,7 @@ export default function CreateConversionModalComponent() {
 	// This helper function is introduced to allow the CreateConversion to be similar to the Create requests on other client files.
 	const buildConversionSubmitState = (state: typeof conversionState) => ({
 		...omit(state, 'sourceOptions', 'destinationOptions'),
-		bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
+		bidirectional: isMeterSource() ? false : state.bidirectional
 	});
 
 	// Submit
@@ -324,7 +336,7 @@ export default function CreateConversionModalComponent() {
 										name='sourceId'
 										type='select'
 										value={conversionState.sourceId}
-										onChange={e => {handleNumberChange(e);}}
+										onChange={e => { handleNumberChange(e); }}
 										invalid={conversionState.sourceId === -999}>
 										{<option
 											value={-999}
@@ -351,7 +363,7 @@ export default function CreateConversionModalComponent() {
 										name='destinationId'
 										type='select'
 										value={conversionState.destinationId}
-										onChange={e => {handleNumberChange(e);}}
+										onChange={e => { handleNumberChange(e); }}
 										invalid={conversionState.destinationId === -999}>
 										{<option
 											value={-999}
@@ -377,7 +389,7 @@ export default function CreateConversionModalComponent() {
 								id='bidirectional'
 								name='bidirectional'
 								type='select'
-								onChange={e => {handleBooleanChange(e);}}
+								onChange={e => { handleBooleanChange(e); }}
 								value={String(conversionState.bidirectional)}
 								invalid={(isMeterSource() || isSuffixUsed()) && conversionState.bidirectional === true}>
 								{Object.keys(TrueFalseType).map(key => {
@@ -386,12 +398,12 @@ export default function CreateConversionModalComponent() {
 							</Input>
 							{isMeterSource() && conversionState.bidirectional === true && (
 								<FormFeedback className='d-block'>
-									<FormattedMessage id="conversion.bidirectional.disabled.meter"/>
+									<FormattedMessage id="conversion.bidirectional.disabled.meter" />
 								</FormFeedback>
 							)}
-							{isSuffixUsed() && conversionState.bidirectional === true &&  (
+							{isSuffixUsed() && conversionState.bidirectional === true && (
 								<FormFeedback className='d=block'>
-									<FormattedMessage id="conversion.bidirectional.disabled.suffix"/>
+									<FormattedMessage id="conversion.bidirectional.suffix" />
 								</FormFeedback>
 							)}
 						</FormGroup>
@@ -405,7 +417,7 @@ export default function CreateConversionModalComponent() {
 										name='slope'
 										type='number'
 										value={conversionState.slope}
-										onChange={e => {handleNumberChange(e);}}
+										onChange={e => { handleNumberChange(e); }}
 									/>
 								</FormGroup>
 							</Col>
@@ -418,7 +430,7 @@ export default function CreateConversionModalComponent() {
 										name='intercept'
 										type='number'
 										value={conversionState.intercept}
-										onChange={e => {handleNumberChange(e);}}
+										onChange={e => { handleNumberChange(e); }}
 									/>
 								</FormGroup>
 							</Col>
@@ -430,7 +442,7 @@ export default function CreateConversionModalComponent() {
 								id='note'
 								name='note'
 								type='textarea'
-								onChange={e => {handleStringChange(e);}}
+								onChange={e => { handleStringChange(e); }}
 								value={conversionState.note}
 							/>
 						</FormGroup>
@@ -438,7 +450,7 @@ export default function CreateConversionModalComponent() {
 				</ModalBody>
 				<ModalFooter>
 					{
-						// Todo looks kind of bad make a better visible notification
+						// TODO looks kind of bad make a better visible notification
 						!validConversion && <p>{reason}</p>
 					}
 
