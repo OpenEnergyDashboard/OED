@@ -124,6 +124,11 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	};
 
 	/* State */
+	const [pendingAreaCalculation, setPendingAreaCalculation] = useState<{ message: string; area: number } | null>(null);
+	const [pendingChildAssignment, setPendingChildAssignment] = useState<{
+		message: string;
+		resolve: (shouldUpdate: boolean) => void;
+	} | null>(null);
 	// Handlers for each type of input change where update the local edit state.
 
 	const handleStringChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,26 +238,51 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 						notifyMsg += '\n"' + meter.identifier + '"' + translate('group.area.calculate.error.zero');
 					}
 				});
-				let msg = translate('group.area.calculate.header') + areaSum + ' ' + translate(`AreaUnitType.${groupState.areaUnit}`);
+				// The + here converts back into a number and removes trailing zeroes.
+				const roundedArea = +areaSum.toPrecision(6);
+				let msg = translate('group.area.calculate.confirm')
+					+ roundedArea + ' '
+					+ translate(`AreaUnitType.${groupState.areaUnit}`) + '?';
 				if (notifyMsg != '') {
 					msg += '\n' + translate('group.area.calculate.error.header') + notifyMsg;
 				}
-				if (window.confirm(msg)) {
-					setEditGroupsState({
-						...editGroupsState,
-						[groupState.id]: {
-							...editGroupsState[groupState.id],
-							// the + here converts back into a number. this method also removes trailing zeroes.
-							['area']: +areaSum.toPrecision(6)
-						}
-					});
-				}
+				setPendingAreaCalculation({
+					message: msg,
+					area: roundedArea
+				});
 			} else {
 				showErrorNotification(translate('group.area.calculate.error.group.unit'));
 			}
 		} else {
 			showErrorNotification(translate('group.area.calculate.error.no.meters'));
 		}
+	};
+
+	const handleAreaCalculationConfirm = () => {
+		if (pendingAreaCalculation !== null) {
+			setEditGroupsState(currentState => ({
+				...currentState,
+				[groupState.id]: {
+					...currentState[groupState.id],
+					area: pendingAreaCalculation.area
+				}
+			}));
+		}
+		setPendingAreaCalculation(null);
+	};
+
+	const handleAreaCalculationCancel = () => {
+		setPendingAreaCalculation(null);
+	};
+
+	const handleChildAssignmentConfirm = () => {
+		pendingChildAssignment?.resolve(true);
+		setPendingChildAssignment(null);
+	};
+
+	const handleChildAssignmentCancel = () => {
+		pendingChildAssignment?.resolve(false);
+		setPendingChildAssignment(null);
 	};
 
 	// Reset the state to default values.
@@ -501,6 +531,24 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 					disabled={!canSave || !validGroup}
 				/>
 			)}
+			<ConfirmActionModalComponent
+				show={pendingAreaCalculation !== null}
+				actionTitle={translate('group.area.calculate')}
+				actionConfirmMessage={pendingAreaCalculation?.message}
+				handleClose={handleAreaCalculationCancel}
+				actionFunction={handleAreaCalculationConfirm}
+				actionRejectText={translate('cancel')}
+				actionConfirmText={translate('group.area.calculate.update')}
+			/>
+			<ConfirmActionModalComponent
+				show={pendingChildAssignment !== null}
+				actionTitle={translate('confirm.action')}
+				actionConfirmMessage={pendingChildAssignment?.message}
+				handleClose={handleChildAssignmentCancel}
+				actionFunction={handleChildAssignmentConfirm}
+				actionRejectText={translate('cancel')}
+				actionConfirmText={translate('continue')}
+			/>
 			{/* This is for the modal for delete. */}
 			<ConfirmActionModalComponent
 				show={showDeleteConfirmationModal}
@@ -872,7 +920,7 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 	 * @param groupsState The local group state to use.
 	 * @returns true if change fine or if admin agreed. false if admin does not or the change is an issue.
 	 */
-	function validateGroupPostAddChild(gid: number, parentGroupIds: number[], groupsState: any): boolean {
+	async function validateGroupPostAddChild(gid: number, parentGroupIds: number[], groupsState: any): Promise<boolean> {
 		// This will hold the overall message for the admin alert.
 		let msg = '';
 		// Tells if the change should be cancelled.
@@ -917,7 +965,16 @@ export default function EditGroupModalComponent(props: EditGroupModalComponentPr
 			} else {
 				// If msg is not empty, warns the admin and asks if they want to apply changes.
 				msg += `\n${translate('group.edit.verify')}`;
-				cancel = !window.confirm(msg);
+				return new Promise<boolean>(resolve => {
+					let resolved = false;
+					const resolveOnce = (shouldUpdate: boolean) => {
+						if (!resolved) {
+							resolved = true;
+							resolve(shouldUpdate);
+						}
+					};
+					setPendingChildAssignment({ message: msg, resolve: resolveOnce });
+				});
 			}
 		}
 		return !cancel;

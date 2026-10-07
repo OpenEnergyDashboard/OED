@@ -25,6 +25,7 @@ import { AreaUnitType } from '../../utils/getAreaUnitConversion';
 import { getGPSString, nullToEmptyString, NoUnit, MIN_VAL, MAX_VAL } from '../../utils/input';
 import { showSuccessNotification, showErrorNotification } from '../../utils/notifications';
 import { useTranslate } from '../../redux/componentHooks';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 import TimeZoneSelect from '../TimeZoneSelect';
 import TooltipHelpComponent from '../TooltipHelpComponent';
 import TooltipMarkerComponent from '../TooltipMarkerComponent';
@@ -47,6 +48,10 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 	// boolean that updates if any change is made to any meter modal
 	const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 	const [showUnsavedWarning, setShowUnsavedWarning] = useState(false);
+	const [pendingDisplayableChange, setPendingDisplayableChange] = useState<{
+		message: string;
+		displayable: boolean;
+	} | null>(null);
 	// If there are no changes, then save is disabled
 	const [canSave, setCanSave] = useState(false);
 
@@ -282,9 +287,8 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 
 	// Function handles the selection of a new displayable.
 	const handleDisplayableChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		// If there is a potential issue then the admin will decide if save happens. Otherwise, the value is put into state.
-		let save = true;
-		if (!JSON.parse(e.target.value)) {
+		const displayable = JSON.parse(e.target.value);
+		if (!displayable) {
 			// This will hold the overall message for the admin alert.
 			let msg = '';
 			// This will hold the names of groups that are affected.
@@ -300,12 +304,25 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				// There is a message to display to the user.
 				msg += `${translate('meter')} "${meterState.name}" ${translate('meter.edit.displayable.warning')}\n`;
 				msg += `${groups + '\n' + translate('meter.edit.displayable.verify')}\n`;
-				save = window.confirm(msg);
+				setPendingDisplayableChange({ message: msg, displayable });
+				return;
 			}
 		}
-		if (save) {
-			handleBooleanChange(e);
+		setLocalMeterEdits({ ...localMeterEdits, displayable });
+	};
+
+	const handleDisplayableChangeConfirm = () => {
+		if (pendingDisplayableChange !== null) {
+			setLocalMeterEdits(currentState => ({
+				...currentState,
+				displayable: pendingDisplayableChange.displayable
+			}));
 		}
+		setPendingDisplayableChange(null);
+	};
+
+	const handleDisplayableChangeCancel = () => {
+		setPendingDisplayableChange(null);
 	};
 
 	const handleNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -353,6 +370,15 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 					disabled={!canSave || !validMeter}
 				/>
 			)}
+			<ConfirmActionModalComponent
+				show={pendingDisplayableChange !== null}
+				actionTitle={translate('confirm.action')}
+				actionConfirmMessage={pendingDisplayableChange?.message}
+				handleClose={handleDisplayableChangeCancel}
+				actionFunction={handleDisplayableChangeConfirm}
+				actionRejectText={translate('cancel')}
+				actionConfirmText={translate('continue')}
+			/>
 			<Modal isOpen={props.show} toggle={handleToggle} size='lg'>
 				<ModalHeader>
 					<FormattedMessage id="edit.meter" />
