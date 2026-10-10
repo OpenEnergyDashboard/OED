@@ -5,7 +5,8 @@
 /* This file tests the trivial version API.
  * It may be used as a template for future tests. */
 
-const { chai, mocha, expect, app } = require('../common');
+const { chai, mocha, expect } = require('../common');
+const { app } = require('../commonTestDB');
 const { HTTP_CODES } = require('../../util/httpCodes');
 
 const VERSION = require('../../version');
