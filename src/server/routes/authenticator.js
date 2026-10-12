@@ -45,7 +45,8 @@ const authMiddleware = (req, res, next) => {
 };
 
 /**
- * Middleware that checks the request body for the username and password parameters. If the body contains the username and password parameters, then next
+ * Middleware that checks the request body for the username and password parameters. If the body contains the username and password parameters, 
+ * then next
  * is executed. Otherwise, the server responds with a 400 error.
  */
 function credentialsRequestValidationMiddleware(req, res, next) {
@@ -213,7 +214,8 @@ function obviusUsernameAndPasswordAuthMiddleware(action) {
 				}
 			} catch (error) {
 				if (error.message === 'No data returned from the query.') {
-					res.status(HTTP_CODES.BAD_REQUEST).send(`No user corresponding to the username: ${escapeHtml(req.body.username)} was found. Please make a request with a valid username.`);
+					res.status(HTTP_CODES.BAD_REQUEST).send(`No user corresponding to the username: ${escapeHtml(req.body.username)} was found. 
+					Please make a request with a valid username.`);
 				} else {
 					log.error('Internal Server Error for Obvius request.', error);
 					res.status(HTTP_CODES.INTERNAL_SERVER_ERROR).send('Internal OED Server Error for Obvius request.');
@@ -231,6 +233,8 @@ function obviusUsernameAndPasswordAuthMiddleware(action) {
 const optionalAuthMiddleware = (req, res, next) => {
 	// Set auth token to false initially.
 	req.hasValidAuthToken = false;
+	req.user = null;
+
 
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
@@ -241,19 +245,32 @@ const optionalAuthMiddleware = (req, res, next) => {
 	// If there is no token, there can be no valid token.
 	if (!validate(token, validParams).valid) {
 		next();
-	} else if (token) {
-		verifyActiveTokenAndGetUser(token)
-			.then(({ decoded }) => {
-				req.decoded = decoded;
-				req.hasValidAuthToken = true;
-				next();
-			})
-			.catch(() => {
-				next();
-			});
-	} else {
-		next();
 	}
+
+	verifyActiveTokenAndGetUser(token) //why verify token twice and how do we get user out of it?
+		.then(({ decoded, user }) => {
+			if (user) {
+				req.decoded = decoded;
+				req.user = user;
+				req.hasValidAuthToken = true;
+				if (user.role == User.role.ADMIN) {
+					adminAuthMiddleware;
+				}
+				else if (user.role == User.role.CSV) {
+					csvAuthMiddleware;
+				}
+				else if (user.role == User.role.EXPORT) {
+					exportAuthMiddleware;
+				}
+				else if (user.role == User.role.OBVIUS) {
+					obviusUsernameAndPasswordAuthMiddleware;
+				}
+			}
+			next();
+		})
+		.catch(() => {
+			next();
+		});
 };
 
 module.exports = {
