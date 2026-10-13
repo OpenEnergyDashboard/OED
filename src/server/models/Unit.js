@@ -213,7 +213,7 @@ class Unit {
 	 * Finds units that may have been orphaned (still displayable but with no
 	 * remaining conversions). Used as a post-delete sanity check, not a guarantee.
 	 * @param {*} conn The connection to use.
-	 * @param {number} [limit=100] The maximum number of units to return.
+	 * @param {number} [limit=100] The maximum number of units to return. Defaults to 100.
 	 * @returns {Promise.<Array.<{id: number, name: string}>>}
 	 */
 	static async findOrphanedUnits(conn, limit = 100) {
