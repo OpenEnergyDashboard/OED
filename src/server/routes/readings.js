@@ -55,9 +55,15 @@ router.get('/line/count/meters/:meter_ids', optionalAuthMiddleware, async (req, 
 			const conn = getConnection();
 			meterIDs = req.params.meter_ids.split(',').map(s => parseInt(s));
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const token = req.headers.token || req.body.token || req.query.token;
+			// 'displayable' means visible to non-admin users, so only admins see a non-displayable
+			// meter's reading count; everyone else gets the same (zero) result as for a meter id
+			// that does not exist.
+			const isAdmin = req.hasValidAuthToken && await isTokenAuthorized(token, User.role.ADMIN);
+			const getCount = isAdmin ? Reading.getCountByMeterIDAndDateRange : Reading.getDisplayableCountByMeterIDAndDateRange;
 			let count = 0;
 			for (var i = 0; i < meterIDs.length; i++) {
-				const curr = await Reading.getCountByMeterIDAndDateRange(meterIDs[i], timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+				const curr = await getCount(meterIDs[i], timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 				count += curr
 			}
 			// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
@@ -110,10 +116,17 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			// Get the routed meter id and time for the desired readings.
 			meterID = req.params.meter_id;
 			timeInterval = TimeInterval.fromString(req.query.timeInterval);
+			const token = req.headers.token || req.body.token || req.query.token;
+			// 'displayable' means visible to non-admin users, so only admins see a non-displayable
+			// meter's data; everyone else gets the same (no data) result as for a meter id that
+			// does not exist.
+			const isAdmin = req.hasValidAuthToken && await isTokenAuthorized(token, User.role.ADMIN);
+			const getCount = isAdmin ? Reading.getCountByMeterIDAndDateRange : Reading.getDisplayableCountByMeterIDAndDateRange;
+			const getReadings = isAdmin ? Reading.getReadingsByMeterIDAndDateRange : Reading.getDisplayableReadingsByMeterIDAndDateRange;
 			// Check if user is allowed to export.
 			let shouldDownload = false;
 			// This count only checks a single meterID, while client testing checks multiple meterIDs, so the estimate is slightly different.
-			const count = await Reading.getCountByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+			const count = await getCount(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 			const fileSize = estimateRawExportSizeMB(count);
 			const preferences = await Preferences.get(conn);
 			if (fileSize <= preferences.defaultFileSizeLimit) {
@@ -121,7 +134,6 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 				shouldDownload = true;
 			} else if (req.hasValidAuthToken) {
 				// File size above limit, only users with the role EXPORT or ADMIN can download.
-				const token = req.headers.token || req.body.token || req.query.token;
 				if (await isTokenAuthorized(token, User.role.EXPORT)) {
 					shouldDownload = true;
 				}
@@ -131,7 +143,7 @@ router.get('/line/raw/meter/:meter_id', optionalAuthMiddleware, async (req, res)
 			} else {
 				// Get the raw readings for this meter over time range desired.
 				// Note this returns unusual identifiers to save space and does not return the meter id.
-				const rawReadings = await Reading.getReadingsByMeterIDAndDateRange(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
+				const rawReadings = await getReadings(meterID, timeInterval.startTimestamp, timeInterval.endTimestamp, conn);
 				// They are ready to go back.
 				// nosemgrep: javascript.express.security.audit.xss.direct-response-write.direct-response-write
 				success(res, rawReadings);

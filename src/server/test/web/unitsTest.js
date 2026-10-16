@@ -5,7 +5,8 @@
 /* This file tests the API for retrieving units, by artificially
  * inserting units prior to executing the test code. */
 
-const { chai, mocha, expect, app, testDB, testUser } = require('../common');
+const { chai, mocha, expect } = require('../common');
+const { app, testUser, testDB } = require('../commonTestDB');
 const Unit = require('../../models/Unit');
 const { expectUnitToBeEquivalent, expectArrayOfUnitsToBeEquivalent } = require('../../util/compareUnits');
 const { HTTP_CODES } = require('../../util/httpCodes');
