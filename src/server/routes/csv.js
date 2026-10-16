@@ -104,11 +104,9 @@ router.use(function (req, res, next) {
 // We need this extra middleware because multer does not provide an option to guard against the case where no file is uploaded.
 router.use(function (req, res, next) {
 	if (!req.file) {
-		//failure(req, res, new CSVPipelineError('No csv file was uploaded. A csv file must be submitted via the csvfile parameter.'));
-const language = getLanguageFromRequest(req);
-const errorMessage = translate('csv.upload.error.no.file', language);
-failure(req, res, new CSVPipelineError(errorMessage));
-
+		const language = getLanguageFromRequest(req);
+		const errorMessage = translate('csv.upload.error.no.file', language);
+		failure(req, res, new CSVPipelineError(errorMessage));
 	} else {
 		next();
 	}
@@ -129,7 +127,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 			fileBuffer = zlib.gunzipSync(fileBuffer);
 			// We expect this directory to have been created by this stage of the pipeline.
 			const dir = `${__dirname}/../tmp/uploads/csvPipeline`;
-			csvFilepath = await saveCsv(fileBuffer, 'meters', dir,language); // pass lagnauge for translated error messages
+			csvFilepath = await saveCsv(fileBuffer, 'meters', dir, language);
 			log.info(`The unzipped file ${csvFilepath} was created to upload meters csv data`);
 		} else {
 			csvFilepath = uploadedFilepath;
@@ -137,7 +135,6 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 
 		const conn = getConnection();
 		await uploadMeters(req, res, csvFilepath, conn, language);
-		//success(req, res, 'Successfully inserted the meters.');
 		success(req, res, t('csv.upload.meters.success'));
 	} catch (error) {
 		failure(req, res, error);
@@ -163,12 +160,8 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 }); 
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
-	
-    
     const language = getLanguageFromRequest(req);
     const t = (key) => translate(key, language);
-	
-	
 	const isGzip = normalizeBoolean(req.body.gzip);
 	const isRefreshReadings = normalizeBoolean(req.body.refreshReadings);
 	const uploadedFilepath = req.file.path;
@@ -218,19 +211,13 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	}
 	let message;
 	if (isAllReadingsOk) {
-		//message = '<h2>It looks like the insert of the readings was a success.</h2>'
-		//if (msgTotal !== '') {
-		//	message += '<h3>However, note that the processing of the readings returned these warning(s):</h3>' + msgTotal;
 		message = `<h2>${t('csv.upload.readings.success.complete')}</h2>`;
 		if (msgTotal !== '') {
 			message += `<h3>${t('csv.upload.readings.success.with.warnings')}</h3>` + msgTotal;
-}
+		}
 		success(req, res, message);
 	} else {
-		//message = '<h2>It looks like the insert of the readings had issues with some or all of the readings where' +
-			//' the processing of the readings returned these warning(s)/error(s):</h2>' + msgTotal;
-			message = `<h2>${t('csv.upload.readings.error.has.issues')}</h2>` + msgTotal;
-
+		message = `<h2>${t('csv.upload.readings.error.has.issues')}</h2>` + msgTotal;
 		failure(req, res, message);
 	}
 });

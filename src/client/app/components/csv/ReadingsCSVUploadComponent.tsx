@@ -1,7 +1,7 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
 * License, v. 2.0. If a copy of the MPL was not distributed with this
 * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';//import for internationalization
+import { selectSelectedLanguage } from '../../redux/slices/appStateSlice';
 import { range } from 'lodash';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -49,7 +49,7 @@ export default function ReadingsCSVUploadComponent() {
 	// to the attempted destination URL.
 	const navigate = useNavigate();
 
-	const language = useAppSelector(selectSelectedLanguage);//get user's selected language i18n
+	const language = useAppSelector(selectSelectedLanguage);
 	const dispatch = useAppDispatch();
 	// Check for admin status
 	const isAdmin = useAppSelector(selectIsAdmin);
@@ -194,7 +194,7 @@ export default function ReadingsCSVUploadComponent() {
 		if (selectedFile) {
 			// show spinner before calling api, then stop it immediately after
 			setShowSpinner(true);
-			const { success, message } = await submitReadings(readingsData, selectedFile, dispatch, language); // passed language
+			const { success, message } = await submitReadings(readingsData, selectedFile, dispatch, language);
 			setShowSpinner(false);
 			if (success) {
 				showSuccessNotification(message);
