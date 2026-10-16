@@ -114,7 +114,6 @@ router.use(function (req, res, next) {
 
 router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 	const language = getLanguageFromRequest(req);
-	const t = (key) => translate(key, language);
 	const isGzip = normalizeBoolean(req.body.gzip);
 	const uploadedFilepath = req.file.path;
 	let csvFilepath;
@@ -135,7 +134,7 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 
 		const conn = getConnection();
 		await uploadMeters(req, res, csvFilepath, conn, language);
-		success(req, res, t('csv.upload.meters.success'));
+		success(req, res, translate('csv.upload.meters.success', language));
 	} catch (error) {
 		failure(req, res, error);
 
@@ -161,7 +160,6 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 
 router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
     const language = getLanguageFromRequest(req);
-    const t = (key) => translate(key, language);
 	const isGzip = normalizeBoolean(req.body.gzip);
 	const isRefreshReadings = normalizeBoolean(req.body.refreshReadings);
 	const uploadedFilepath = req.file.path;
@@ -211,13 +209,13 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	}
 	let message;
 	if (isAllReadingsOk) {
-		message = `<h2>${t('csv.upload.readings.success.complete')}</h2>`;
+		message = `<h2>${translate('csv.upload.readings.success.complete', language)}</h2>`;
 		if (msgTotal !== '') {
-			message += `<h3>${t('csv.upload.readings.success.with.warnings')}</h3>` + msgTotal;
+			message += `<h3>${translate('csv.upload.readings.success.with.warnings', language)}</h3>` + msgTotal;
 		}
 		success(req, res, message);
 	} else {
-		message = `<h2>${t('csv.upload.readings.error.has.issues')}</h2>` + msgTotal;
+		message = `<h2>${translate('csv.upload.readings.error.has.issues', language)}</h2>` + msgTotal;
 		failure(req, res, message);
 	}
 });
