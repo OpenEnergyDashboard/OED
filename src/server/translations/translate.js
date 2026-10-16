@@ -12,6 +12,16 @@
  * Created to fix internationalization bug where CSV upload messages always appeared in English
  */
 
+/**
+ * Enum of supported languages.
+ * This enum needs to be kept in sync with the enum in src/client/app/types/redux/i18n.ts
+ * @enum {string}
+ */
+const LANGUAGES = Object.freeze({
+	en: 'en',
+	fr: 'fr',
+	es: 'es'
+})
 const ServerTranslationData = require('./data');
 const { log } = require('../log');
 
@@ -22,29 +32,21 @@ const { log } = require('../log');
  * @returns {string} Language code ('en', 'fr', or 'es')
  */
 function getLanguageFromRequest(req) {
+	let lang = LANGUAGES.en;
 	const acceptLanguage = req.headers['accept-language'];
-	
 	if (!acceptLanguage) {
-		return 'en';
+		return lang;
 	}
-	
-	// Parse Accept-Language header (e.g., "fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7")
-	const languages = acceptLanguage.split(',').map(lang => {
+
+	const parsedLanguages = acceptLanguage.split(',').map(lang => {
 		const parts = lang.split(';');
 		// Get just 'fr' from 'fr-FR'
 		const code = parts[0].trim().split('-')[0];
 		return code;
 	});
-	
-	// Find first supported language
-	for (const lang of languages) {
-		if (ServerTranslationData[lang]) {
-			return lang;
-		}
-	}
-	
-	// Default to English
-	return 'en';
+
+	const code = parsedLanguages.find(code => code in LANGUAGES);
+	return code ?? lang;
 }
 
 /**
@@ -62,4 +64,4 @@ function translate(key, lang = 'en') {
 	return translation;
 }
 
-module.exports = { translate, getLanguageFromRequest };
+module.exports = { translate, getLanguageFromRequest, LANGUAGES };
