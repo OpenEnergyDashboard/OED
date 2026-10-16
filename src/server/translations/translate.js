@@ -55,8 +55,13 @@ function getLanguageFromRequest(req) {
  * @param {string} lang - Language code (default: 'en')
  * @returns {string} Translated string or key if not found
  */
-function translate(key, lang = 'en') {
-	const translation = ServerTranslationData[lang]?.[key];
+function translate(key, lang = LANGUAGES.en) {
+	if (!(lang in ServerTranslationData)) {
+		log.warn(`Language ${lang} not supported.`);
+		return key;
+	}
+	
+	const translation = ServerTranslationData[lang][key];
 	if (!translation) {
 		log.warn(`Translation key not found: ${key} for language: ${lang}`);
 		return key;
