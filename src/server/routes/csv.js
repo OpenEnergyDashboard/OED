@@ -93,7 +93,7 @@ router.use(function (req, res, next) {
 
 	upload(req, res, function (err) {
 		if (err) {
-			failure(req, res, err);
+			failure(req, res, err, getLanguageFromRequest(req));
 			return;
 		}
 		next();
@@ -105,8 +105,8 @@ router.use(function (req, res, next) {
 router.use(function (req, res, next) {
 	if (!req.file) {
 		const language = getLanguageFromRequest(req);
-		const errorMessage = translate('csv.upload.error.no.file', language);
-		failure(req, res, new CSVPipelineError(errorMessage));
+		const errorMessage = translate('csv.upload.error.no.file', {}, language);
+		failure(req, res, new CSVPipelineError(errorMessage), language);
 	} else {
 		next();
 	}
@@ -134,9 +134,9 @@ router.post('/meters', validateMetersCsvUploadParams, async (req, res) => {
 
 		const conn = getConnection();
 		await uploadMeters(req, res, csvFilepath, conn, language);
-		success(req, res, translate('csv.upload.meters.success', language));
+		success(req, res, translate('csv.upload.meters.success', {}, language), language);
 	} catch (error) {
-		failure(req, res, error);
+		failure(req, res, error, language);
 
 	} finally {
 		// Clean up files
@@ -187,7 +187,7 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 			await refreshAllReadingViews();
 		}
 	} catch (error) {
-		failure(req, res, error);
+		failure(req, res, error, language);
 		return;
 	} finally {
 		// Clean up files
@@ -209,14 +209,14 @@ router.post('/readings', validateReadingsCsvUploadParams, async (req, res) => {
 	}
 	let message;
 	if (isAllReadingsOk) {
-		message = `<h2>${translate('csv.upload.readings.success.complete', language)}</h2>`;
+		message = `<h2>${translate('csv.upload.readings.success.complete', {}, language)}</h2>`;
 		if (msgTotal !== '') {
-			message += `<h3>${translate('csv.upload.readings.success.with.warnings', language)}</h3>` + msgTotal;
+			message += `<h3>${translate('csv.upload.readings.success.with.warnings', {}, language)}</h3>` + msgTotal;
 		}
-		success(req, res, message);
+		success(req, res, message, language);
 	} else {
-		message = `<h2>${translate('csv.upload.readings.error.has.issues', language)}</h2>` + msgTotal;
-		failure(req, res, message);
+		message = `<h2>${translate('csv.upload.readings.error.has.issues', {}, language)}</h2>` + msgTotal;
+		failure(req, res, message, language);
 	}
 });
 

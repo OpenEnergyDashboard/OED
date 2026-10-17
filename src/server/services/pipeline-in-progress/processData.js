@@ -13,6 +13,7 @@ const { validateReadings, validateSingleReading } = require('./validateReadings'
 const { MeterTimeSortTypesJS } = require('../csvPipeline/validateCsvUploadParams');
 const { meterTimezone } = require('../meterTimezone');
 const { disableChecksType } = require('../../models/Unit');
+const { translate, LANGUAGES } = require('../../translations/translate');
 
 // The default start/end timestamps that are set to the first
 // day of time in moment. As always, we want to use UTC.
@@ -65,7 +66,7 @@ const E0 = moment(0).utc()
  */
 async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increasing, readingRepetition, isCumulative, cumulativeReset,
 	resetStart = '00:00:00.000', resetEnd = '23:59:99.999', readingGap = 0, readingLengthVariation = 0, isEndTime = false,
-	conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false, warnOnCumulativeReset = false, useMeterFrequency = false, useMeterFrequencyVariation = 0) {
+	conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false, warnOnCumulativeReset = false, useMeterFrequency = false, useMeterFrequencyVariation = 0, lang = LANGUAGES.en) {
 	// Holds all the warning message to pass back to inform user.
 	// Note they use basic HTML because the messages can be long/complex and it was felt it would be easy to put it into a web browser
 	// to make them easier to read.
@@ -141,16 +142,14 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 	// might be true with regular time sort.
 	if (cumulativeReset && !isCumulative) {
 		isAllReadingsOk = false;
-		msgTotal = '<h2>On meter ' + meterName + ' in pipeline: cumulative was false but cumulative reset was true.' +
-			' To avoid mistakes all reading are rejected.</h2>';
+		msgTotal = `<h2>${translate('csv.upload.readings.error.cumulative.mismatch', { meterName }, lang)}</h2>`;
 		// No readings yet so can return result
 		return { result, isAllReadingsOk, msgTotal };
 	}
 	// To avoid mistakes, processing does not happen if useMeterFrequency is true but isEndOny is false.
 	if (useMeterFrequency && !isEndTime) {
 		isAllReadingsOk = false;
-		msgTotal = '<h2>On meter ' + meterName + ' in pipeline: isEndTime was false but useMeterFrequency was true.' +
-			' To avoid mistakes all reading are rejected.</h2>';
+		msgTotal = `<h2>${translate('csv.upload.readings.error.use.meter.frequency', { meterName }, lang)}</h2>`;
 		// No readings yet so can return result
 		return { result, isAllReadingsOk, msgTotal };
 	}
@@ -218,8 +217,7 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				endTimestampTz = moment.parseZone(rows[index][1], undefined, true);
 			}
 			if (!endTimestampTz.isValid() && relaxedParsing) {
-				errMsg += 'The end date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
-					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
+				errMsg += translate('csv.upload.readings.error.end.date.parse', { datetime: rows[index][1] }, lang) + '<br>';
 				// If this fails it is caught below.
 				if (useMeterZone) {
 					// Treat the reading as if it came in the meter time zone.
@@ -252,8 +250,7 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			if (!startTimestampTz.isValid() && relaxedParsing) {
 				// A known example where this will lead to the wrong date is if hyphens are used and it is not yyyy-mm-dd, e.g.,
 				//07-06-2021. This is why the user must ask for doing relaxed parsing.
-				errMsg += 'The start date/time of ' + rows[index][1] + ' did not parse to a date/time using the normal format so'
-					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
+				errMsg += translate('csv.upload.readings.error.start.date.parse', { datetime: rows[index][1] }, lang) + '<br>';
 				// If this fails it is caught below.
 				if (useMeterZone) {
 					// Treat the reading as if it came in the meter time zone.
@@ -272,8 +269,7 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				endTimestampTz = moment.parseZone(rows[index][2], undefined, true);
 			}
 			if (!endTimestampTz.isValid() && relaxedParsing) {
-				errMsg += 'The end date/time of ' + rows[index][2] + ' did not parse to a date/time using the normal format so'
-					+ ' a less restrictive method is being tried. This is a warning since it can lead to wrong results but often okay.<br>'
+				errMsg += translate('csv.upload.readings.error.end.date.parse', { datetime: rows[index][2] }, lang) + '<br>';
 				// If this fails it is caught below.
 				if (useMeterZone) {
 					// Treat the reading as if it came in the meter time zone.
@@ -289,9 +285,12 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			endTimestamp = moment.parseZone(endTimestampTz.clone()).tz('UTC', true);;
 		}
 		if (startTimestamp.format() === 'Invalid date' || endTimestamp.format() === 'Invalid date') {
-			errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
-				' The start (' + rows[index][1] + ') and/or end time (' + rows[index][2] +
-				') provided did not parse into a valid date/time so all reading are rejected.<br>';
+			errMsg += translate('csv.upload.readings.error.parsing.reading.invalid.datetime', {
+				meterName,
+				readingNum: row(index, isAscending, rows.length),
+				start: rows[index][1],
+				end: rows[index][2]
+			}, lang) + '<br>';
 			log.error(errMsg);
 			// We use the current reading where provide 'unknown' for reading value since not yet set.
 			// Since only output this is okay.
@@ -299,7 +298,7 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				new Reading(meterID, 'unknown', startTimestamp, endTimestamp), timeSort, readingRepetition,
 				isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime,
 				honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) + '<br>';
-			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning, lang));
 			// This empties the result array. Should be fast and okay with const.
 			result.splice(0, result.length);
 			isAllReadingsOk = false;
@@ -313,9 +312,11 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			meterReading2 = rows[index][0];
 			// Check the current reading is a number. The previous one should already be checked.
 			if (isNaN(meterReading2)) {
-				errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
-					' with cumulative data. The reading value provided of ' + meterReading2 +
-					' is not considered a number so all reading are rejected.<br>';
+				errMsg += translate('csv.upload.readings.error.parsing.reading.not.number', {
+					meterName,
+					readingNum: row(index, isAscending, rows.length),
+					value: meterReading2
+				}, lang) + '<br>';
 				log.error(errMsg);
 				msgTotal += errMsg;
 				// This empties the result array. Should be fast and okay with const.
@@ -334,9 +335,11 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			// The data is not cumulative use the raw reading value
 			meterReading = rows[index][0];
 			if (isNaN(meterReading)) {
-				errMsg += 'For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
-					' The reading value provided of ' + meterReading +
-					' is not considered a number so all reading are rejected.<br>';
+				errMsg += translate('csv.upload.readings.error.parsing.reading.not.number', {
+					meterName,
+					readingNum: row(index, isAscending, rows.length),
+					value: meterReading
+				}, lang) + '<br>';
 				log.error(errMsg);
 				msgTotal += errMsg;
 				// This empties the result array. Should be fast and okay with const.
@@ -350,12 +353,12 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 		const logReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 		if (isCumulative && isFirst(prevReading.endTimestamp)) {
 			readingOK = false;
-			errMsg += 'The first ever reading must be dropped when dealing with cumulative data.<br>';
+			errMsg += translate('csv.upload.readings.info.first.reading.dropped.cumulative', {}, lang) + '<br>';
 		}
 		if (isEndTime && isFirst(prevReading.endTimestamp)) {
 			readingOK = false;
 			// You may get this message with the cumulative one above but that desired.
-			errMsg += 'The first ever reading must be dropped when dealing only with endTimestamps.<br>';
+			errMsg += translate('csv.upload.readings.info.first.reading.dropped.end.only', {}, lang) + '<br>';
 		}
 
 		// This next block deals with meters that use daylight savings time.
@@ -423,16 +426,20 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 					// Start the reading at the maximum of the previous end time and the start time.
 					// We do this because there might be a gap before this reading so it does not align
 					// with the end of the previous reading.
-					startTimestampUse = moment.max(prevEndTimestamp, startTimestamp);
-					errMsg += 'This or a previous reading crossed from daylight savings time and is the first one that does not entirely overlap a previous reading';
-					errMsg += ' so its reading will be prorated where the original values were:';
-					errMsg += ' startTimestamp of ' + startTimestampTz.format() + ' endTimestamp of ' + endTimestampTz.format() + ' reading value of ' + meterReading;
-					// Prorate the reading value for the fraction of the time of the reading used.
-					// If this is the reading that crossed DST then the original reading is actually one hour longer so need to add the shift.
-					// If not, the shift is zero and all is okay. Use clone to avoid mutating the original.
-					meterReading = prorated(startTimestamp, endTimestamp.clone().add(shift, 'minutes'), startTimestampUse, endTimestamp, meterReading);
-					errMsg += '. The used part has startTimestamp of ' + startTimestampUse.format() + ' and endTimestamp of ' + endTimestamp.format() + ' and value of ' + meterReading;
-					errMsg += '. This is only a notification and should not be an issue.<br>';
+			startTimestampUse = moment.max(prevEndTimestamp, startTimestamp);
+				// Prorate the reading value for the fraction of the time of the reading used.
+				// If this is the reading that crossed DST then the original reading is actually one hour longer so need to add the shift.
+				// If not, the shift is zero and all is okay. Use clone to avoid mutating the original.
+				const origMeterReadingDst = meterReading;
+				meterReading = prorated(startTimestamp, endTimestamp.clone().add(shift, 'minutes'), startTimestampUse, endTimestamp, meterReading);
+				errMsg += translate('csv.upload.readings.info.dst.prorate', {
+					origStart: startTimestampTz.format(),
+					origEnd: endTimestampTz.format(),
+					value: origMeterReadingDst,
+					usedStart: startTimestampUse.format(),
+					usedEnd: endTimestamp.format(),
+					usedValue: meterReading
+				}, lang) + '<br>';
 					// We are done processing readings in this way.
 					inDst = false;
 					// We need to know later that we just stopped inDst so mark.
@@ -440,10 +447,12 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				} else {
 					// This is R1 in 1B, R1 & R2 & R3 & R4 in 3B, R1 & R2 & R3 in 4B in the developer docs examples.
 					// This reading entirely overlaps a previous reading so it is dropped.
-					readingOK = false;
-					errMsg += 'This reading is entirely within the shift time from daylight savings to standard time so it is dropped.';
-					errMsg += ' The dropped reading  had startTimestamp of ' + startTimestampTz.format() + ' and endTimestamp of ' + endTimestampTz.format() + ' and value of ' + meterReading;
-					errMsg += '. This should not be an issue but the reading is lost.<br>';
+				readingOK = false;
+				errMsg += translate('csv.upload.readings.info.dst.dropped', {
+					start: startTimestampTz.format(),
+					end: endTimestampTz.format(),
+					value: meterReading
+				}, lang) + '<br>';
 					// Even though this reading is not okay, the next one might be the case above and if it went backward in time (the first one)
 					// then the time length is off. This happens in 1B in the examples in the developer docs.
 					// If we shift the end time then there will be a gap. We shift the start in this case even though the time is now off but will be dropped.
@@ -454,9 +463,9 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 		}
 		if (readingOK && startTimestamp.isSameOrAfter(endTimestamp)) {
 			readingOK = false;
-			errMsg += 'The reading end time is not after the start time so we must drop the reading.';
+			errMsg += translate('csv.upload.readings.error.end.before.start', {}, lang);
 			if (isEndTime) {
-				errMsg += ' The start time came from the previous readings end time.';
+				errMsg += translate('csv.upload.readings.error.end.from.previous', {}, lang);
 			}
 			errMsg += '<br>';
 		}
@@ -466,13 +475,13 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			// Check that startTimestamp is not before the previous endTimestamp
 			if (isEndTime && endTimestamp.isSameOrBefore(prevReading.endTimestamp)) {
 				readingOK = false;
-				errMsg += 'The reading is not after the previous reading with only end time given so we must drop the reading.<br>';
+				errMsg += translate('csv.upload.readings.error.not.after.previous', {}, lang) + '<br>';
 			} else if (startTimestamp.isBefore(prevReading.endTimestamp)) {
 				if (isCumulative) {
 					// If start time of the current reading by canonical order is before the previous readings end time then reject
 					// Because OED must subtract the previous reading value which should not be done if they are not in time order.
 					readingOK = false;
-					errMsg += 'The reading start time is before the previous end time and the data is cumulative so OED cannot use this reading.<br>';
+					errMsg += translate('csv.upload.readings.error.start.before.previous.cumulative', {}, lang) + '<br>';
 				} else if (!isFirst(prevReading.endTimestamp)) {
 					// Only a potential issue if not the first ever seen reading where previous end time is arbitrary.
 					if (honorDst) {
@@ -483,11 +492,11 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 						// which is the most common case.
 						if (inZone(meterZone, startTimestampMeterZone)) {
 							// Reading starts within DST shift so it might be an issue. Warn the user.
-							errMsg += 'The reading start time is shifted and within the DST shift so it is possible that the crossing to standard time was missed and readings overlap. ';
+							errMsg += translate('csv.upload.readings.warning.dst.shift.overlap', {}, lang) + ' ';
 						}
 					}
 					//Only treat this as a warning since the readings may be sent in a different order.
-					errMsg += 'The current reading startTime is not after the previous reading\'s end time. Note this is treated only as a warning since readings may be sent out of order.<br>';
+					errMsg += translate('csv.upload.readings.warning.start.not.after.previous', {}, lang) + '<br>';
 				}
 			}
 		}
@@ -497,11 +506,10 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				*  immediately after the previous reading by canonical order then there is a gap. If the gap is greater than the expected
 				*  variation then OED should drop this reading. */
 				readingOK = false;
-				errMsg += 'The end of the previous reading is too far from the start of the next readings in cumulative data so drop this reading.<br>';
+				errMsg += translate('csv.upload.readings.error.gap.too.large.cumulative', {}, lang) + '<br>';
 			} else if (!isFirst(prevReading.endTimestamp)) {
 				// Only treat this as a warning. We don't warn on the first ever reading since we expect a gap in that case.
-				errMsg += 'There is a gap in time between this reading and the previous reading that exceeds the allowed amount of ' +
-					msReadingGap / 1000 + ' seconds.<br>';
+				errMsg += translate('csv.upload.readings.error.gap.too.large', { gap: msReadingGap / 1000 }, lang) + '<br>';
 			}
 		}
 		if (readingOK && isCumulative) {
@@ -517,18 +525,15 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				let negRow = row(index, isAscending, rows.length) - readingRepetition + 1;
 				if (negRow < 1) {
 					// The previous reading came from meter not this CSV file.
-					errMsg += 'The last meter reading (logical previous reading) was negative with value ' + meterReading1 +
-						'. With cumulative readings the previous reading cannot be negative so all reading are rejected.<br>';
+					errMsg += translate('csv.upload.readings.error.negative.reading.meter', { value: meterReading1 }, lang) + '<br>';
 				} else {
-					errMsg += '<br>Error parsing Reading #' + negRow +
-						'. Detected a negative value while handling cumulative readings so all reading are rejected.<br>';
+					errMsg += '<br>' + translate('csv.upload.readings.error.negative.reading.detected', { readingNum: negRow }, lang) + '<br>';
 				}
-				errMsg = 'For meter ' + meterName + ': ' + errMsg;
 				log.error(errMsg);
 				errMsg += logStatus(meterName, negRow, prevReading, logReading, timeSort, readingRepetition, isCumulative, cumulativeReset,
 					resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime, honorDst, relaxedParsing, useMeterZone,
 					warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) + '<br>';
-				({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+				({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning, lang));
 				// This empties the result array. Should be fast and okay with const.
 				result.splice(0, result.length);
 				isAllReadingsOk = false;
@@ -546,20 +551,21 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 					meterReading = meterReading2;
 					if (warnOnCumulativeReset) {
 						// Log that did this for information.
-						errMsg += 'While handling cumulative data, the current value is less than the previous value within the allowed reset times so' +
-							' the current reading is treated as the correct absolute value. This is normally fine so not considered an error.' + '<br>'
+						errMsg += translate('csv.upload.readings.info.cumulative.reset', {}, lang) + '<br>';
 					}
 				} else {
 					//cumulativeReset is not expected but there is a negative net meter reading so reject all readings.
-					errMsg += ('<br>For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
-						'. Reading value of ' + meterReading2 + ' gives ' +
-						meterReading + ' with error message:<br>A negative meterReading has been detected but either cumulativeReset' +
-						' is not enabled, or the start time and end time of this reading is out of the reset range. Reject all readings.<br>');
+					errMsg += '<br>' + translate('csv.upload.readings.error.negative.reading.reset', {
+						meterName,
+						readingNum: row(index, isAscending, rows.length),
+						rawValue: meterReading2,
+						netValue: meterReading
+					}, lang) + '<br>';
 					log.error(errMsg);
 					errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading, logReading, timeSort, readingRepetition,
 						isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime, honorDst,
 						relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) + '<br>';
-					({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+					({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning, lang));
 					// This empties the result array. Should be fast and okay with const.
 					result.splice(0, result.length);
 					isAllReadingsOk = false;
@@ -580,9 +586,8 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 				// ever with end only and this does that. Note if it is not end only then the first reading had a valid end
 				// time that will be saved so this check is not passed and you get and the desired warning.
 				if (!isFirst(prevReading.startTimestamp)) {
-					errMsg += 'The previous reading has a different time length than the current reading and exceeds the tolerance of ' +
-						msReadingLengthVariation / 1000 +
-						' seconds. Note this is treated only as a warning since this may be expected for certain meters.<br>';
+					errMsg += translate('csv.upload.readings.error.length.variation',
+						{ variation: msReadingLengthVariation / 1000 }, lang) + '<br>';
 					if (isEndTime && useMeterFrequency && endTimestamp.diff(startTimestamp) >
 						(moment.duration(meter.readingFrequency).add(useMeterFrequencyVariation, 'seconds'))) {
 						// Force the reading to have the expected length since assuming the gap is due to missing reading(s).
@@ -594,11 +599,12 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 						// This is modifying the timestamp which is desired.
 						const origStartTimestamp = startTimestamp.clone();
 						startTimestamp = endTimestamp.clone().subtract(meter.readingFrequency);
-						errMsg +=
-							'The reading with the different time length has end only and useMeterFrequency is true where the length of the reading' +
-							' exceeds the meter reading frequency of ' + moment.duration(meter.readingFrequency).asSeconds() +
-							' plus the allowed variation of ' + useMeterFrequencyVariation + ' so the start time is being changed from '
-							+ origStartTimestamp.format() + ' to ' + startTimestamp.format() + '<br>';
+						errMsg += translate('csv.upload.readings.info.use.meter.frequency.start.change', {
+							frequency: moment.duration(meter.readingFrequency).asSeconds(),
+							variation: useMeterFrequencyVariation,
+							origStart: origStartTimestamp.format(),
+							newStart: startTimestamp.format()
+						}, lang) + '<br>';
 					}
 					// If this is true we still add the reading to the results
 				}
@@ -625,12 +631,15 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 					// If we changed the endTimestamp to avoid length issues earlier, we now put it back because we need the actual end time
 					// so the next reading does not see a gap. subtract mutates endTimestamp as desired. This also gets the right value in the messages.
 					// We do this after the proration so it is the correct length.
-					errMsg += 'Reading #' + row(index, isAscending, rows.length) + ' crossed into daylight savings so it needs to be split where the first part is now being used.';
-					errMsg += ' The original reading had ';
-					errMsg += 'startTimestamp of ' + startTimestampTz.format() + ' endTimestamp of ' + endTimestampTz.format() + ' reading value of ' + meterReading;
-					errMsg += ' and the first part has a startTimestamp of ' + startTimestamp.format() + ' endTimestamp of ' + readingOneEndTimestamp.format();
-					errMsg += ' reading value of ' + readingOneValue;
-					errMsg += '. This is only a notification and should not be an issue.<br>';
+					errMsg += translate('csv.upload.readings.info.dst.split.first', {
+						readingNum: row(index, isAscending, rows.length),
+						origStart: startTimestampTz.format(),
+						origEnd: endTimestampTz.format(),
+						origValue: meterReading,
+						newStart: startTimestamp.format(),
+						newEnd: readingOneEndTimestamp.format(),
+						newValue: readingOneValue
+					}, lang) + '<br>';
 					// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
 					result.push(readingOne.clone());
 				}
@@ -643,13 +652,15 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 					// We need to prorate the value for the fraction of time it uses compared to the full time. This uses the shifted end time.
 					let readingTwoValue = prorated(startTimestamp, shiftedEndTimestamp, readingTwoStartTimestamp, origEndTimestamp, meterReading);
 					let readingTwo = new Reading(meterID, readingTwoValue, readingTwoStartTimestamp, origEndTimestamp);
-					errMsg += 'Reading #' + row(index, isAscending, rows.length) + ' crossed into daylight savings so it needs to be split where the second part is now being used.';
-					errMsg += ' The original reading had';
-					// Since we added the shift to the end time we now subtract to put back the original value.
-					errMsg += ' startTimestamp of ' + startTimestampTz.format() + ' endTimestamp of ' + endTimestampTz.format() + ' reading value of ' + meterReading;
-					errMsg += ' and the second part has a startTimestamp of ' + readingTwoStartTimestamp.format() + ' endTimestamp of ' + origEndTimestamp.format();
-					errMsg += ' reading value of ' + readingTwoValue;
-					errMsg += '. This is only a notification and should not be an issue.<br>';
+					errMsg += translate('csv.upload.readings.info.dst.split.second', {
+						readingNum: row(index, isAscending, rows.length),
+						origStart: startTimestampTz.format(),
+						origEnd: endTimestampTz.format(),
+						origValue: meterReading,
+						newStart: readingTwoStartTimestamp.format(),
+						newEnd: origEndTimestamp.format(),
+						newValue: readingTwoValue
+					}, lang) + '<br>';
 					// May not always be needed but clone so any changes in the timestamps do not change ones put in result.
 					result.push(readingTwo.clone());
 				}
@@ -682,13 +693,16 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			}
 			if (!(errMsg === '')) {
 				// There may be warnings to output even if OED accepts the readings so output all warnings which may exist
-				errMsg = '<br>For meter ' + meterName + ': Warning parsing Reading #' + row(index, isAscending, rows.length) + '. Reading value gives ' +
-					meterReading + ' with warning message:<br>' + errMsg;
+				errMsg = '<br>' + translate('csv.upload.readings.warning.parsing', {
+					meterName,
+					readingNum: row(index, isAscending, rows.length),
+					value: meterReading
+				}, lang) + ':<br>' + errMsg;
 				log.warn(errMsg);
 				errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition,
 					isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime, honorDst,
 					relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) + '<br>';
-				({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+				({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning, lang));
 			}
 		} else {
 			// An error occurred so add it to the readings dropped array and let the client know why before continuing.
@@ -709,13 +723,16 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 			// These cases did not set currentReading so do that now.
 			currentReading = new Reading(meterID, meterReading, startTimestamp, endTimestamp);
 			// }
-			errMsg = '<br>For meter ' + meterName + ': Error parsing Reading #' + row(index, isAscending, rows.length) +
-				'. Reading value gives ' + meterReading + ' with error message:<br>' + errMsg;
+			errMsg = '<br>' + translate('csv.upload.readings.error.parsing.value', {
+				meterName,
+				readingNum: row(index, isAscending, rows.length),
+				value: meterReading
+			}, lang) + ':<br>' + errMsg;
 			log.error(errMsg);
 			errMsg += logStatus(meterName, row(index, isAscending, rows.length), prevReading, currentReading, timeSort, readingRepetition,
 				isCumulative, cumulativeReset, resetStart, resetEnd, readingGap, readingLengthVariation, isEndTime, honorDst,
 				relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation) + '<br>';
-			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning, lang));
 			// This will let the calling functions know that some reading(s) were not used.
 			isAllReadingsOk = false;
 			readingsDropped.push(row(index, isAscending, rows.length));
@@ -730,25 +747,24 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 	// Validate data if conditions are given and disableChecks is not set to 'reject_disabled'
 	if (conditionSet !== undefined && conditionSet['disableChecks'] !== disableChecksType.REJECT_DISABLED) {
 		const { validReadings, errMsg: newErrMsg } = validateReadings(result, conditionSet, meterName);
-		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, newErrMsg, msgTotalWarning));
+		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, newErrMsg, msgTotalWarning, lang));
 
 		if (!validReadings) {
-			errMsg = `<h2>For meter ${meterName}: Error when validating data where `;
-			// Handle 'reject_bad' specifically
 			if (conditionSet['disableChecks'] === disableChecksType.REJECT_BAD) {
-				errMsg += `only bad readings are rejected</h2>`;
+				errMsg = `<h2>${translate('csv.upload.readings.error.validation.reject.bad', { meterName }, lang)}</h2>`;
 				// This removes invalid readings but keeps the valid ones.
 				result = result.filter(reading => validateSingleReading(reading, conditionSet));
 			} else if (conditionSet['disableChecks'] === disableChecksType.REJECT_NONE) {
-				errMsg += `all readings are accepted even though there were check errors</h2>`;
+				// No translation key for this case; keep English
+				errMsg = `<h2>For meter ${meterName}: Error when validating data where all readings are accepted even though there were check errors</h2>`;
 			} else {
 				// Make this the default to be careful in accepting readings.
-				errMsg += `all readings are rejected</h2>`;
+				errMsg = `<h2>${translate('csv.upload.readings.error.validation.reject.all', { meterName }, lang)}</h2>`;
 				// Empties the result array
 				result.splice(0, result.length);
 			}
 			log.error(errMsg);
-			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning));
+			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, errMsg, msgTotalWarning, lang));
 
 			// Mark readings as not okay since some were dropped
 			isAllReadingsOk = false;
@@ -775,10 +791,10 @@ async function processData(rows, meterID, timeSort = MeterTimeSortTypesJS.increa
 	await meter.update(conn);
 	// Let the user know exactly which readings were dropped if any before continuing and add to the total messages.
 	if (readingsDropped.length !== 0) {
-		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, '<h2>Readings Dropped and should have previous messages</h2><ol>', msgTotalWarning));
+		({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, `<h2>${translate('csv.upload.readings.info.dropped.header', {}, lang)}</h2><ol>`, msgTotalWarning, lang));
 		readingsDropped.forEach(readingNum => {
-			let messageNew = '<li>Dropped Reading #' + readingNum + ' for meter ' + meterName + '</li>'; log.info(messageNew);
-			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, messageNew, msgTotalWarning));
+			let messageNew = `<li>${translate('csv.upload.readings.info.dropped.item', { readingNum, meterName }, lang)}</li>`; log.info(messageNew);
+			({ msgTotal, msgTotalWarning } = appendMsgTotal(msgTotal, messageNew, msgTotalWarning, lang));
 		});
 		// Assume the <ol> was put in. If not, get minor HTML syntax issue.
 		msgTotal += '</ol>';
@@ -865,7 +881,7 @@ function logStatus(meterName, rowNum, prevReading, currentReading, timeSort, rea
  * @param {boolean} msgTotalWarning false if have not yet exceeded the allowed message size and true otherwise.
  * @returns {object[]} {the updated message, update message warning}
  */
-function appendMsgTotal(msgTotal, newMsg, msgTotalWarning) {
+function appendMsgTotal(msgTotal, newMsg, msgTotalWarning, lang = LANGUAGES.en) {
 	// The limit to number of characters in the msgTotal.
 	// Each message with the reading info is in the 1k byte range. If limit to 75K
 	// then get around 75+ messages and that seems good without being too large a
@@ -876,8 +892,8 @@ function appendMsgTotal(msgTotal, newMsg, msgTotalWarning) {
 	if (msgTotal.length < MAX_SIZE) {
 		msgTotal += newMsg;
 	} else if (!msgTotalWarning) {
-		msgTotal += '<h1>WARNING - The total number of messages was stopped due to size.' +
-			' The log file has all the messages.</h1>' + newMsg + '<h1>Messages lost starting now.</h1>';
+		msgTotal += '<h1>' + translate('csv.upload.readings.warning.size.limit', {}, lang) + '</h1>'
+			+ newMsg + '<h1>' + translate('csv.upload.readings.warning.size.limit.stopped', {}, lang) + '</h1>';
 		// Note that warned so goes from false to true.
 		msgTotalWarning = !msgTotalWarning;
 	}

@@ -94,8 +94,13 @@ const ServerTranslationData = {
 		'csv.upload.readings.error.parsing.value': 'For meter {meterName}: Error parsing Reading #{readingNum}. Reading value gives {value} with error message',
 		'csv.upload.readings.error.validation.reject.bad': 'For meter {meterName}: Error when validating data where only bad readings are rejected',
 		'csv.upload.readings.error.validation.reject.all': 'For meter {meterName}: Error when validating data where all readings are rejected',
+		'csv.upload.readings.error.use.meter.frequency': 'On meter {meterName} in pipeline: isEndTime was false but useMeterFrequency was true. To avoid mistakes all reading are rejected.',
+		'csv.upload.readings.info.use.meter.frequency.start.change': 'The reading with the different time length has end only and useMeterFrequency is true where the length of the reading exceeds the meter reading frequency of {frequency} plus the allowed variation of {variation} so the start time is being changed from {origStart} to {newStart}',
+		'csv.upload.readings.info.cumulative.reset': 'While handling cumulative data, the current value is less than the previous value within the allowed reset times so the current reading is treated as the correct absolute value. This is normally fine so not considered an error.',
 		'csv.upload.readings.info.dropped.header': 'Readings Dropped and should have previous messages',
+		'csv.upload.readings.info.dropped.item': 'Dropped Reading #{readingNum} for meter {meterName}',
 		'csv.upload.readings.warning.size.limit': 'WARNING - The total number of messages was stopped due to size. The log file has all the messages.',
+		'csv.upload.readings.warning.size.limit.stopped': 'Messages lost starting now.',
 	},
 
 	// ============================================
@@ -165,8 +170,13 @@ const ServerTranslationData = {
 		'csv.upload.readings.error.parsing.value': 'Pour le compteur {meterName} : Erreur lors de l\'analyse du relevé #{readingNum}. La valeur du relevé donne {value} avec message d\'erreur',
 		'csv.upload.readings.error.validation.reject.bad': 'Pour le compteur {meterName} : Erreur lors de la validation des données où seuls les mauvais relevés sont rejetés',
 		'csv.upload.readings.error.validation.reject.all': 'Pour le compteur {meterName} : Erreur lors de la validation des données où tous les relevés sont rejetés',
+		'csv.upload.readings.error.use.meter.frequency': 'Sur le compteur {meterName} dans le pipeline : isEndTime était faux mais useMeterFrequency était vrai. Pour éviter les erreurs, tous les relevés sont rejetés.',
+		'csv.upload.readings.info.use.meter.frequency.start.change': 'La lecture avec une durée différente n\'a que la fin et useMeterFrequency est vrai où la longueur de la lecture dépasse la fréquence de lecture du compteur de {frequency} plus la variation autorisée de {variation} donc l\'heure de début est modifiée de {origStart} à {newStart}',
+		'csv.upload.readings.info.cumulative.reset': 'Lors du traitement des données cumulatives, la valeur actuelle est inférieure à la valeur précédente dans les délais de réinitialisation autorisés, donc la lecture actuelle est traitée comme la valeur absolue correcte. C\'est normalement correct donc non considéré comme une erreur.',
 		'csv.upload.readings.info.dropped.header': 'Relevés supprimés et devrait avoir des messages précédents',
+		'csv.upload.readings.info.dropped.item': 'Relevé #{readingNum} supprimé pour le compteur {meterName}',
 		'csv.upload.readings.warning.size.limit': 'AVERTISSEMENT - Le nombre total de messages a été arrêté en raison de la taille. Le fichier journal contient tous les messages.',
+		'csv.upload.readings.warning.size.limit.stopped': 'Messages perdus à partir de maintenant.',
 	},
 
 	// ============================================
@@ -236,8 +246,13 @@ const ServerTranslationData = {
 		'csv.upload.readings.error.parsing.value': 'Para el medidor {meterName}: Error al analizar la lectura #{readingNum}. El valor de lectura da {value} con mensaje de error',
 		'csv.upload.readings.error.validation.reject.bad': 'Para el medidor {meterName}: Error al validar datos donde solo se rechazan las lecturas incorrectas',
 		'csv.upload.readings.error.validation.reject.all': 'Para el medidor {meterName}: Error al validar datos donde se rechazan todas las lecturas',
+		'csv.upload.readings.error.use.meter.frequency': 'En el medidor {meterName} en el pipeline: isEndTime era falso pero useMeterFrequency era verdadero. Para evitar errores, se rechazan todas las lecturas.',
+		'csv.upload.readings.info.use.meter.frequency.start.change': 'La lectura con la duración diferente solo tiene fin y useMeterFrequency es verdadero donde la duración de la lectura excede la frecuencia de lectura del medidor de {frequency} más la variación permitida de {variation} por lo que la hora de inicio se está cambiando de {origStart} a {newStart}',
+		'csv.upload.readings.info.cumulative.reset': 'Al manejar datos acumulativos, el valor actual es menor que el valor anterior dentro de los tiempos de reinicio permitidos, por lo que la lectura actual se trata como el valor absoluto correcto. Esto es normalmente correcto por lo que no se considera un error.',
 		'csv.upload.readings.info.dropped.header': 'Lecturas eliminadas y deben tener mensajes anteriores',
+		'csv.upload.readings.info.dropped.item': 'Lectura #{readingNum} eliminada para el medidor {meterName}',
 		'csv.upload.readings.warning.size.limit': 'ADVERTENCIA - El número total de mensajes se detuvo debido al tamaño. El archivo de registro tiene todos los mensajes.',
+		'csv.upload.readings.warning.size.limit.stopped': 'Mensajes perdidos a partir de ahora.',
 	}
 };
 module.exports = ServerTranslationData;

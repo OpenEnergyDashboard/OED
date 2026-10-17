@@ -9,6 +9,7 @@ const readCsv = require('../pipeline-in-progress/readCsv');
 const Unit = require('../../models/Unit');
 const { normalizeBoolean } = require('./validateCsvUploadParams');
 const { HTTP_CODES } = require('../../util/httpCodes');
+const { LANGUAGES, translate } = require('../../translations/translate');
 
 /**
  * Middleware that uploads meters via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -17,7 +18,7 @@ const { HTTP_CODES } = require('../../util/httpCodes');
  * @param {filepath} filepath Path to meters csv file.
  * @param conn Connection to the database.
  */
-async function uploadMeters(req, res, filepath, conn) {
+async function uploadMeters(req, res, filepath, conn, lang = LANGUAGES.en) {
 	const temp = (await readCsv(filepath)).map(row => {
 		// The Canonical structure of each row in the Meters CSV file is the order of the fields 
 		// declared in the Meter constructor. If no headerRow is provided (i.e. headerRow === false),
@@ -48,10 +49,10 @@ async function uploadMeters(req, res, filepath, conn) {
 			// Skip if undefined.
 			if (gpsInput) {
 				// Verify GPS is okay values
-				const { validGps, message } = isValidGPSInput(gpsInput);
+				const { validGps, message } = isValidGPSInput(gpsInput, lang);
 				if (!validGps) {
-					let msg = `For meter ${meter[0]} the gps coordinates of ${gpsInput} are invalid with error of "${message}"`;
-					throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+					const errorMessage = translate('csv.upload.meters.error.gps.invalid', { meterName: meter[0], gps: gpsInput, error: message }, lang);
+					throw new CSVPipelineError(errorMessage, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
 				}
 				// Need to reverse latitude & longitude because standard GPS gives in that order but a GPSPoint for the
 				// DB is longitude, latitude.
@@ -62,8 +63,8 @@ async function uploadMeters(req, res, filepath, conn) {
 			const unitName = meter[23];
 			const unitId = await getUnitId(unitName, Unit.unitType.METER, conn);
 			if (!unitId) {
-				const msg = `For meter ${meter[0]} the unit of ${unitName} is invalid`;
-				throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+				const errorMessage = translate('csv.upload.meters.error.unit.invalid', { meterName: meter[0], unit: unitName }, lang);
+				throw new CSVPipelineError(errorMessage, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
 			}
 			// Replace the unit's name by its id.
 			meter[23] = unitId;
@@ -72,8 +73,8 @@ async function uploadMeters(req, res, filepath, conn) {
 			const defaultGraphicUnitName = meter[24];
 			const defaultGraphicUnitId = await getUnitId(defaultGraphicUnitName, Unit.unitType.UNIT, conn);
 			if (!defaultGraphicUnitId) {
-				const msg = `For meter ${meter[0]} the default graphic unit of ${defaultGraphicUnitName} is invalid`;
-				throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+				const errorMessage = translate('csv.upload.meters.error.default.graphic.unit.invalid', { meterName: meter[0], unit: defaultGraphicUnitName }, lang);
+				throw new CSVPipelineError(errorMessage, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
 			}
 			// Replace the default graphic unit's name by its id.
 			meter[24] = defaultGraphicUnitId;
@@ -92,14 +93,15 @@ async function uploadMeters(req, res, filepath, conn) {
 					}
 				} else if (meters.length !== 1) {
 					// This error could be thrown a number of times, one per meter in CSV, but should only see one of them.
-					throw new CSVPipelineError(`Meter identifier provided (\"${identifierOfMeter}\") in request with update for meters but more than one meter in CSV so not processing`, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+					const errorMessage = translate('csv.upload.meters.error.identifier.multiple.meters', { identifier: identifierOfMeter }, lang);
+					throw new CSVPipelineError(errorMessage, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
 				}
 				let currentMeter;
 				currentMeter = await Meter.getByIdentifier(identifierOfMeter, conn)
 					.catch(error => {
 						// Did not find the meter.
-						let msg = `Meter identifier of \"${identifierOfMeter}\" does not seem to exist with update for meters and got DB error of: ${error.message}`;
-						throw new CSVPipelineError(msg, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+						const errorMessage = translate('csv.upload.meters.error.identifier.not.exist', { identifier: identifierOfMeter, error: error.message }, lang)
+						throw new CSVPipelineError(errorMessage, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
 					});
 				currentMeter.merge(...meter);
 				await currentMeter.update(conn);
@@ -108,14 +110,15 @@ async function uploadMeters(req, res, filepath, conn) {
 				await new Meter(undefined, ...meter).insert(conn)
 					.catch(error => {
 						// Probably duplicate meter.
-						throw new CSVPipelineError(
-							`Meter name of \"${meter[0]}\" got database error of: ${error.message}`, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+						const errorMessage = translate('csv.upload.meters.error.meter.name.db', { meterName: meter[0], error: error.message }, lang)
+						throw new CSVPipelineError(errorMessage, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
 					}
 					);
 			}
 		}
 	} catch (error) {
-		throw new CSVPipelineError(`Failed to upload meters due to internal OED Error: ${error.message}`, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
+		const errorMessage = translate('csv.upload.meters.error.internal', { error: error.message }, lang)
+		throw new CSVPipelineError(errorMessage, undefined, HTTP_CODES.INTERNAL_SERVER_ERROR);
 	}
 }
 
@@ -128,14 +131,14 @@ async function uploadMeters(req, res, filepath, conn) {
  * @param input The string to check for GPS values
  * @returns true if string is GPS and false otherwise.
  */
-function isValidGPSInput(input) {
+function isValidGPSInput(input, lang = LANGUAGES.en) {
 	let message = '';
 	let validGps = true;
 	if (input.indexOf(',') === -1) { // if there is no comma
-		message = 'GPS Input is missing a comma';
+		message = translate('csv.upload.meters.error.gps.missing.comma', {}, lang)
 		validGps = false;
 	} else if (input.indexOf(',') !== input.lastIndexOf(',')) { // if there are multiple commas
-		message = 'GPS Input has too many commas';
+		message = translate('csv.upload.meters.error.gps.too.many.commas', {}, lang)
 		validGps = false;
 	}
 	if (validGps) {
@@ -148,7 +151,7 @@ function isValidGPSInput(input) {
 		const result = latitudeConstraint && longitudeConstraint;
 		if (!result) {
 			validGps = false;
-			message = 'Invalid GPS coordinate, latitude must be an integer between -90 and 90, longitude must be an integer between -180 and 180. You input: ' + input;
+			message = translate('csv.upload.meters.error.gps.invalid.coordinates', { input }, lang)
 		}
 	}
 	return { validGps, message };
