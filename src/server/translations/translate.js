@@ -55,7 +55,7 @@ function getLanguageFromRequest(req) {
  * @param {string} lang - Language code (default: 'en')
  * @returns {string} Translated string or key if not found
  */
-function translate(key, lang = LANGUAGES.en) {
+function translate(key, values = {}, lang = LANGUAGES.en) {
 	if (!(lang in ServerTranslationData)) {
 		log.warn(`Language ${lang} not supported.`);
 		return key;
@@ -66,7 +66,12 @@ function translate(key, lang = LANGUAGES.en) {
 		log.warn(`Translation key not found: ${key} for language: ${lang}`);
 		return key;
 	}
-	return translation;
+
+	// Replace variable placeholders in the ServerTranslationData
+    return translation.replace(/\{(\w+)\}/g, (match, varName) => {
+		// Check if values has the property varName
+        return Object.hasOwn(values, varName) ? values[varName] : match;
+    });
 }
 
 module.exports = { translate, getLanguageFromRequest, LANGUAGES };
