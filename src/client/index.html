@@ -11,15 +11,25 @@
 	<script nonce="{{nonce}}">
 		window.__webpack_nonce__ = "{{nonce}}";
 		window.__plotly_nonce__ = "{{nonce}}";
-		// console.log("This script runs because it has the correct nonce.");
 	</script>
+
+	<!-- Add a nonce to the style tag to allow inline styles to be used with CSP rules. This is needed for the noscript warning message. -->
+    <style nonce="{{nonce}}">
+        .noscript-warning {
+            padding: 15px 15px;
+            font-family: Helvetica;
+            font-size: 24px;
+            background: lightcoral;
+            border: 6px solid red;
+        }
+    </style>
+
 	<base id="base" href="SUBDIR" target="_blank">
 	<link rel="icon" type="image/png" href="favicon.ico">
 	<title>Open Energy Dashboard</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
-		nonce="{{nonce}}">
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" nonce="{{nonce}}">
 
 	<!--
 	The meta tag with "Content-Security-Policy" below is the Content Security Policy, by having default-src as self all CSP rules that are
@@ -44,7 +54,7 @@
 	<script src="app/bundle.js" nonce="{{nonce}}"></script>
 
 	<noscript>
-		<div style="padding:15px 15px;font-family:Helvetica;font-size:24px;background:lightcoral;border:6px solid red">
+		<div class="noscript-warning">
 			OED requires JavaScript to run correctly. Please enable JavaScript.
 		</div>
 	</noscript>

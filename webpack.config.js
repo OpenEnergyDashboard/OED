@@ -46,7 +46,7 @@ const config = {
 						loader: 'style-loader',
 						options: {
 							attributes: {
-								//this line allows the webpack nonce to be applied to styles
+								// This line allows the webpack nonce to be applied to styles.
 								nonce: '__webpack_nonce__'
 							}
 						}
