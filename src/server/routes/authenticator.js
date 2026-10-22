@@ -233,8 +233,6 @@ function obviusUsernameAndPasswordAuthMiddleware(action) {
 const optionalAuthMiddleware = (req, res, next) => {
 	// Set auth token to false initially.
 	req.hasValidAuthToken = false;
-	req.user = null;
-
 
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
@@ -246,27 +244,18 @@ const optionalAuthMiddleware = (req, res, next) => {
 	if (!validate(token, validParams).valid) {
 		next();
 	}
-
-	verifyActiveTokenAndGetUser(token) //why verify token twice and how do we get user out of it?
-		.then(({ decoded, user }) => {
-			if (user) {
-				req.decoded = decoded;
-				req.user = user;
-				req.hasValidAuthToken = true;
-				if (user.role == User.role.ADMIN) {
-					adminAuthMiddleware;
-				}
-				else if (user.role == User.role.CSV) {
-					csvAuthMiddleware;
-				}
-				else if (user.role == User.role.EXPORT) {
-					exportAuthMiddleware;
-				}
-				else if (user.role == User.role.OBVIUS) {
-					obviusUsernameAndPasswordAuthMiddleware;
-				}
+	verifyActiveTokenAndGetUser(token)
+		.then(async ({ decoded, user }) => {
+			req.hasValidAuthToken = true;
+			console.log(user.role);
+			//I'm not sure how to tell what role the user is requesting
+			if ((await isTokenAuthorized(token, user.role))) {
+				next();
 			}
-			next();
+			// If user is not who they requested, give basic privileges
+			else {
+				next();
+			}
 		})
 		.catch(() => {
 			next();
