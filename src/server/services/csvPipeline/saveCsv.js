@@ -7,16 +7,18 @@ const { CSVPipelineError } = require('./CustomErrors');
 const fs = require('fs').promises;
 const moment = require('moment');
 const HTTP_CODES = require('../../util/httpCodes');
+const { translate, LANGUAGES } = require('../../translations/translate');
 
-async function saveCsv(buffer, filename, dir = __dirname) {
+async function saveCsv(buffer, filename, dir = __dirname, lang = LANGUAGES.en) {
 	// save this buffer into a file
 	const randomFilename = `${filename}-${moment().format('YYYY-MM-DDTHH:mm:ss.SSSZ')}-${crypto.randomBytes(2).toString('hex')}`;
 	const filepath = `${dir}/${randomFilename}.csv`;
 	await fs.writeFile(filepath, buffer)
 		.catch(err => {
-			const message = `Failed to write the file: ${filepath}`;
-			throw new CSVPipelineError(`Internal OED error: ${message}`, err.message, HTTP_CODES.INTERNAL_SERVER_ERROR);
-		}); // separate logs function that logs for error message, 1. log it, 2. passback error codes to user, 3. stop process; 
+			// separate logs function that logs for error message, 1. log it, 2. passback error codes to user, 3. stop process; 
+			const message = translate('csv.upload.error.file.write.failed', { filepath }, lang);
+			throw new CSVPipelineError(translate('csv.upload.error.internal.oed', { message }, lang), err.message, HTTP_CODES.INTERNAL_SERVER_ERROR);
+		});
 	return filepath;
 }
 

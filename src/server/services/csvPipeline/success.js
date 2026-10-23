@@ -4,6 +4,7 @@
 
 const express = require('express') /* needed to resolve types in JSDoc comments */
 const { HTTP_CODES } = require('../../util/httpCodes');
+const { translate, LANGUAGES } = require('../../translations/translate');
 
 /**
  * Inform the client of a success (200 OK).
@@ -11,11 +12,11 @@ const { HTTP_CODES } = require('../../util/httpCodes');
  * @param {express.Request} req The Express request object
  * @param {express.Response} res The Express response object
  * @param {string} comment Any additional data to be returned to the client.
- *
+ * @param {string} lang Language code for translated header, defaults to English.
  */
-function success(req, res, comment = '') {
+function success(req, res, comment = '', lang = LANGUAGES.en) {
 	res.status(HTTP_CODES.OK) // 200 OK
-	.send(`<h1>SUCCESS</h1>${comment}`);
+		.send(`${translate('csv.upload.success.header', {}, lang)}${comment}`);
 }
 
 /**
@@ -24,14 +25,13 @@ function success(req, res, comment = '') {
  * @param {express.Request} req The Express request object
  * @param {express.Response} res The Express response object
  * @param {string} comment Any additional data to be returned to the client.
- *
+ * @param {string} lang Language code for translated header, defaults to English.
  */
-function failure(req, res, comment = '') {
+function failure(req, res, comment = '', lang = LANGUAGES.en) {
 	// 400 is client error. There is a small chance the insert into the DB failed
 	// but overlooking that.
 	res.status(HTTP_CODES.BAD_REQUEST)
-	.send(`<h1>FAILURE</h1>${comment}`);
-
+		.send(`${translate('csv.upload.failure.header', {}, lang)}${comment}`);
 }
 
 module.exports = { success, failure };

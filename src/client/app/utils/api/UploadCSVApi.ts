@@ -19,7 +19,7 @@ interface ApiResponse {
 }
 
 export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferences, readingsFile: File,
-	dispatch: Dispatch): Promise<ApiResponse> => {
+	dispatch: Dispatch, language: string): Promise<ApiResponse> => { //added language parameter for i18n
 	const backend = new ApiBackend();
 	const formData = new FormData();
 	// The Boolean values in state must be converted to the submitted values of yes and no.
@@ -37,11 +37,12 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 	for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
 		formData.append(preference, value.toString());
 	}
-	formData.append('csvfile', readingsFile); // It is important for the server that the file is attached last.
+	// It is important for the server that the file is attached last.
+	formData.append('csvfile', readingsFile);
 
 	let message = '';
 	try {
-		message = await backend.doPostRequest<string>('/api/csv/readings', formData);
+		message = await backend.doPostRequest<string>('/api/csv/readings', formData, {}, { 'Accept-Language': language });
 		dispatch(baseApi.util.invalidateTags(['Readings']));
 		return { success: true, message: message };
 	} catch (error) {
@@ -50,10 +51,9 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 };
 
 export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferences, metersFile: File,
-	dispatch: Dispatch): Promise<ApiResponse> => {
+	dispatch: Dispatch, language: string): Promise<ApiResponse> => {
 	const backend = new ApiBackend();
 	const formData = new FormData();
-	// The Boolean values in state must be converted to the submitted values of yes and no.
 	const uploadPreferencesForm: CSVUploadPreferences = {
 		...uploadPreferences,
 		gzip: uploadPreferences.gzip,
@@ -63,13 +63,12 @@ export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferences
 	for (const [preference, value] of Object.entries(uploadPreferencesForm)) {
 		formData.append(preference, value.toString());
 	}
-	formData.append('csvfile', metersFile); // It is important for the server that the file is attached last.
+	// It is important for the server that the file is attached last.
+	formData.append('csvfile', metersFile);
 
 	try {
-		const response = await backend.doPostRequest<string>('/api/csv/meters', formData);
-		// Meter Data was sent to the DB, invalidate meters for now
+		const response = await backend.doPostRequest<string>('/api/csv/meters', formData, {}, { 'Accept-Language': language });
 		dispatch(baseApi.util.invalidateTags(['MeterData']));
-		// meters were invalidated so all meter changes will now reflect in Redux state, now return
 		return { success: true, message: response };
 	} catch (error) {
 		return { success: false, message: error.response.data };
