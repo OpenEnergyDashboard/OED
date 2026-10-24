@@ -33,6 +33,8 @@ const units = require('./routes/units');
 const conversions = require('./routes/conversions');
 const ciks = require('./routes/ciks');
 const { HTTP_CODES } = require('./util/httpCodes');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./swagger');
 
 // Detect test environment and use higher rate limits during tests.
 // Rate limiting is critical for security in production but interferes with automated testing.
@@ -147,6 +149,9 @@ app.use('/api/conversion-array', conversionArray);
 app.use('/api/units', units);
 app.use('/api/conversions', conversions);
 app.use('/api/ciks', ciks);
+// Serve API docs before the client static files so `/api-docs` isn't intercepted
+// by the client-side static router.
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express.static(path.join(__dirname, '..', 'client', 'public')));
 
 const router = express.Router();

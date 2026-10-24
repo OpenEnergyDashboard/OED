@@ -71,7 +71,71 @@ function validateConversionsParams(params) {
 }
 
 /**
- * Route for getting all conversions.
+ * @openapi
+ * /api/conversions:
+ *   get:
+ *     summary: List conversions
+ *     tags:
+ *       - Conversions
+ *     responses:
+ *       '200':
+ *         description: List of conversions
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   sourceId:
+ *                     type: integer
+ *                     example: 1
+ *                   destinationId:
+ *                     type: integer
+ *                     example: 2
+ *                   bidirectional:
+ *                     type: boolean
+ *                     example: false
+ *                   slope:
+ *                     type: number
+ *                     example: 1.0
+ *                   intercept:
+ *                     type: number
+ *                     example: 0.0
+ *                   note:
+ *                     type: string
+ *                     nullable: true
+ *                     example: example
+ *             examples:
+ *               sample:
+ *                 value:
+ *                   - sourceId: 1
+ *                     destinationId: 2
+ *                     bidirectional: false
+ *                     slope: 1.0
+ *                     intercept: 0.0
+ *                     note: example
+ *                 description: |
+ *                   cURL example:
+ *
+ *                   ```bash
+ *                   curl -s http://localhost:3000/api/conversions
+ *                   ```
+ *       '500':
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *             example:
+ *               error: Internal server error
+ *     x-codeSamples:
+ *       - lang: curl
+ *         source: |
+ *           curl -s http://localhost:3000/api/conversions
  */
 router.get('/', optionalAuthMiddleware, async (req, res) => {
 	const conn = getConnection();
