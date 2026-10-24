@@ -65,9 +65,22 @@ export const unitsApi = baseApi.injectEndpoints({
 				method: 'POST',
 				body: { id: unitId }
 			}),
-			// You should not be able to delete a unit that is used in a meter or conversion
-			// so no invalidation for those.
-			invalidatesTags: ['Units']
+			onQueryStarted: (_arg, api) => {
+				api.queryFulfilled
+					.then(() => {
+						api.dispatch(
+							conversionsApi.endpoints.refresh.initiate({
+								// The server already redid Cik in /api/units/delete so only refresh the client data.
+								redoCik: false,
+								refreshReadingViews: false
+							})
+						);
+					});
+			},
+			// Refresh invalidates ConversionDetails, Cik, Readings and Units.
+			// The delete can also clear a meter's unit or a meter/group's default graphic unit,
+			// so those need to be refetched here.
+			invalidatesTags: ['MeterData', 'GroupData']
 		})
 	})
 });
