@@ -164,10 +164,12 @@ router.get('*', (req, res) => {
 		const subdir = config.subdir || '/';
 		let htmlPlusData = html.toString().replace('SUBDIR', subdir);
 
-		//assigns a value to the nonce in order to check for authenticity
+		// Assigns a value to the nonce in order to check for authenticity
 		const nonce = crypto.randomBytes(16).toString('base64url');
 		htmlPlusData = htmlPlusData.replace(/{{nonce}}/g, nonce);
-
+		
+		// The directive 'https://maxcdn.bootstrapcdn.com' is listed in both font-src and style-src because the font-awesome CSS file is loaded from that domain and it also needs to load the fonts from that CSS file.
+		// The 'unsafe-inline' directive is needed for the font-awesome CSS file to load properly. These are necessary for src/client/index.html to load the font-awesome CSS file and the fonts it uses.
 		res.setHeader('Content-Security-Policy', `default-src 'self'; img-src 'self' data: ; font-src 'self' https://maxcdn.bootstrapcdn.com ; media-src 'self'; script-src 'self' 'nonce-${nonce}' ; style-src 'self' https://maxcdn.bootstrapcdn.com 'unsafe-inline' ;`)
 
 		res.send(htmlPlusData);
