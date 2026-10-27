@@ -26,9 +26,12 @@ export default function ExportComponent() {
 	const dispatch = useAppDispatch();
 	const chartToRender = useAppSelector(selectChartToRender);
 	const translate = useTranslate();
+	// Holds the message and resolve function for the confirm modal. The modal shows when this is not null.
 	const [pendingExportConfirmation, setPendingExportConfirmation] = React.useState<PendingExportConfirmation | null>(null);
+	// Same value in a ref so the callbacks below always see the latest one.
 	const pendingExportConfirmationRef = React.useRef<PendingExportConfirmation | null>(null);
 
+	// Used in place of window.confirm. Opens the modal and returns a promise that is true on Continue and false on Cancel.
 	const requestExportConfirmation = React.useCallback((message: string) => new Promise<boolean>(resolve => {
 		// Do not replace an unresolved confirmation if the export button is activated more than once.
 		if (pendingExportConfirmationRef.current !== null) {
@@ -40,6 +43,7 @@ export default function ExportComponent() {
 		setPendingExportConfirmation(pendingConfirmation);
 	}), []);
 
+	// Called by the modal buttons. Closes the modal and sends the answer back to the export.
 	const settleExportConfirmation = React.useCallback((confirmed: boolean) => {
 		const pendingConfirmation = pendingExportConfirmationRef.current;
 		pendingExportConfirmationRef.current = null;
@@ -47,6 +51,7 @@ export default function ExportComponent() {
 		pendingConfirmation?.resolve(confirmed);
 	}, []);
 
+	// Cleanup that only runs on unmount. If the modal is still open, treat it as Cancel so the export doesn't wait forever.
 	React.useEffect(() => () => {
 		const pendingConfirmation = pendingExportConfirmationRef.current;
 		pendingExportConfirmationRef.current = null;

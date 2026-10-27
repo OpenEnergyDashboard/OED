@@ -33,6 +33,7 @@ const selectCanExport = (state: RootState) => {
 };
 
 interface ExportRawReadingsArgs {
+	// Asks the user to confirm a large download in a modal. Resolves to true if they click Continue.
 	requestConfirmation: (message: string) => Promise<boolean>;
 }
 

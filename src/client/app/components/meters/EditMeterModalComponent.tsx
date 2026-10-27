@@ -308,9 +308,12 @@ export default function EditMeterModalComponent(props: EditMeterModalComponentPr
 				return;
 			}
 		}
-		setLocalMeterEdits({ ...localMeterEdits, displayable });
+		// No warning is needed so save the change now.
+		handleBooleanChange(e);
 	};
 
+	// Runs when the admin clicks Continue in the modal. There is no change event here,
+	// so set the value directly instead of using handleBooleanChange.
 	const handleDisplayableChangeConfirm = () => {
 		if (pendingDisplayableChange !== null) {
 			setLocalMeterEdits(currentState => ({
