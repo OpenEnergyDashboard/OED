@@ -10,6 +10,7 @@ import { Button } from 'reactstrap';
 import { CalibrationModeTypes, MapMetadata } from '../../types/redux/map';
 import { showErrorNotification } from '../../utils/notifications';
 import { hasToken } from '../../utils/token';
+import ConfirmActionModalComponent from '../ConfirmActionModalComponent';
 
 interface MapViewProps {
 	// The ID of the map to be displayed
@@ -32,6 +33,7 @@ interface MapViewState {
 	circleInput: string;
 	noteFocus: boolean;
 	noteInput: string;
+	showDeleteConfirmationModal: boolean;
 }
 
 type MapViewPropsWithIntl = MapViewProps & WrappedComponentProps;
@@ -46,7 +48,8 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			noteInput: (this.props.map.note) ? this.props.map.note : '',
 			circleFocus: false,
 			// circleSize should always be a valid string due to how stored and mapRow.
-			circleInput: this.props.map.circleSize.toString()
+			circleInput: this.props.map.circleSize.toString(),
+			showDeleteConfirmationModal: false
 		};
 		this.handleCalibrationSetting = this.handleCalibrationSetting.bind(this);
 		this.toggleMapDisplayable = this.toggleMapDisplayable.bind(this);
@@ -55,6 +58,8 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 		this.toggleNoteInput = this.toggleNoteInput.bind(this);
 		this.handleNoteChange = this.handleNoteChange.bind(this);
 		this.toggleDelete = this.toggleDelete.bind(this);
+		this.handleDeleteConfirmationClose = this.handleDeleteConfirmationClose.bind(this);
+		this.handleDeleteMap = this.handleDeleteMap.bind(this);
 		this.notifyCalibrationNeeded = this.notifyCalibrationNeeded.bind(this);
 		this.handleSizeChange = this.handleSizeChange.bind(this);
 		this.toggleCircleInput = this.toggleCircleInput.bind(this);
@@ -197,8 +202,16 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 	}
 
 	private toggleDelete() {
-		const consent = window.confirm(`${this.props.intl.formatMessage({ id: 'map.confirm.remove' })} "${this.props.map.name}"?`);
-		if (consent) { this.props.removeMap(this.props.id); }
+		this.setState({ showDeleteConfirmationModal: true });
+	}
+
+	private handleDeleteConfirmationClose() {
+		this.setState({ showDeleteConfirmationModal: false });
+	}
+
+	private handleDeleteMap() {
+		this.setState({ showDeleteConfirmationModal: false });
+		this.props.removeMap(this.props.id);
 	}
 
 	private formatDeleteButton() {
@@ -206,9 +219,24 @@ class MapViewComponent extends React.Component<MapViewPropsWithIntl, MapViewStat
 			display: 'inline', // or 'none'
 			paddingLeft: '5px'
 		};
-		return <Button style={editButtonStyle} color='primary' onClick={this.toggleDelete}>
-			<FormattedMessage id={'delete.map'} />
-		</Button>;
+		const deleteConfirmationMessage = this.props.intl.formatMessage(
+			{ id: 'map.confirm.remove' },
+			{ name: this.props.map.name }
+		);
+		return <>
+			<Button style={editButtonStyle} color='primary' onClick={this.toggleDelete}>
+				<FormattedMessage id={'delete.map'} />
+			</Button>
+			<ConfirmActionModalComponent
+				show={this.state.showDeleteConfirmationModal}
+				actionTitle={this.props.intl.formatMessage({ id: 'delete.map' })}
+				actionConfirmMessage={deleteConfirmationMessage}
+				handleClose={this.handleDeleteConfirmationClose}
+				actionFunction={this.handleDeleteMap}
+				actionRejectText={this.props.intl.formatMessage({ id: 'cancel' })}
+				actionConfirmText={this.props.intl.formatMessage({ id: 'delete.map' })}
+			/>
+		</>;
 	}
 
 	private styleEnabled(): React.CSSProperties {
