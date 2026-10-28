@@ -8,6 +8,7 @@ const fs = require('fs');
 const readCsv = require('./readCsv');
 const loadArrayInput = require('./loadArrayInput');
 const { log } = require('../../log');
+const { LANGUAGES } = require('../../translations/translate');
 
 /**
  * Read a CSV file and select needed column to return an array of reading value and reading time
@@ -53,14 +54,17 @@ async function loadCsvInput(
 	honorDst = false,
 	relaxedParsing = false,
 	useMeterZone = false,
-	warnOnCumulativeReset = false
+	warnOnCumulativeReset = false,
+	useMeterFrequency = false,
+	useMeterFrequencyVariation = 0,
+	lang = LANGUAGES.en
 ) {
 	try {
 		const dataRows = await readCsv(filePath, headerRow);
 		return loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition,
 			isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
 			readingGap, readingLengthVariation, isEndOnly, shouldUpdate, conditionSet, conn,
-			honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset);
+			honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation, lang);
 	} catch (err) {
 		log.error(`Error updating meter ${meterID} with data from ${filePath}: ${err}`, err);
 	}

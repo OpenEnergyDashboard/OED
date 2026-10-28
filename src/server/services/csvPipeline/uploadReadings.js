@@ -7,6 +7,7 @@ const { CSVPipelineError } = require('./CustomErrors');
 const { loadCsvInput } = require('../pipeline-in-progress/loadCsvInput');
 const { normalizeBoolean, MeterTimeSortTypesJS } = require('./validateCsvUploadParams');
 const Meter = require('../../models/Meter');
+const { translate, LANGUAGES } = require('../../translations/translate');
 
 /**
  * Middleware that uploads readings via the pipeline. This should be the final stage of the CSV Pipeline.
@@ -16,7 +17,7 @@ const Meter = require('../../models/Meter');
  * @param conn 
  * @returns 
  */
-async function uploadReadings(req, res, filepath, conn) {
+async function uploadReadings(req, res, filepath, conn, lang = LANGUAGES.en) {
 	// extract query parameters
 	const { meterIdentifier, meterName, headerRow, update, honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset } = req.body;
 	// The next few have no value in the DB for a meter so always use the value passed.
@@ -39,14 +40,10 @@ async function uploadReadings(req, res, filepath, conn) {
 		}
 	} catch (error) {
 		// If Meter does not exist, we do not know what to do with the readings so we error out.
-		let errorMessage = meterIdentifier
-			? `User Error: Meter with identifier '${meterIdentifier}' not found.`
-			: `User Error: Meter with name '${meterName}' not found.`;
-
-		throw new CSVPipelineError(
-			errorMessage,
-			error.message
-		);
+		const errorMessage = meterIdentifier
+			? translate('csv.upload.readings.error.meter.identifier.not.found', { identifier: meterIdentifier }, lang)
+			: translate('csv.upload.readings.error.meter.name.not.found', { name: meterName }, lang);
+		throw new CSVPipelineError(errorMessage, error.message);
 	}
 	// Handle other parameter defaults
 	let { timeSort, duplications, cumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd,
@@ -220,8 +217,11 @@ async function uploadReadings(req, res, filepath, conn) {
 		shouldHonorDst,
 		shouldRelaxedParsing,
 		shouldUseMeterZone,
-		shouldWarnOnCumulativeReset
-	); // load csv data
+		shouldWarnOnCumulativeReset,
+		false,
+		0,
+		lang
+	); 
 }
 
 module.exports = uploadReadings;
