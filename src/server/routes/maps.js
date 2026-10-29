@@ -148,10 +148,8 @@ router.get('/', optionalAuthMiddleware, async (req, res) => {
 		// req.role = User.role... // DEBUG
 		const conn = getConnection();
 		let query;
-		// const token = req.headers.token || req.body.token || req.query.token;
 		// returns false if req.role is undefined/no role
 		if (isReqAuthorized(req, User.role.ADMIN)) {
-		// if (req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN))) {
 			query = Map.getAll; // only admins can see disabled maps;
 		} else {
 			query = Map.getDisplayable;

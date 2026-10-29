@@ -231,12 +231,13 @@ function obviusUsernameAndPasswordAuthMiddleware(action) {
  * Sets the req field hasValidAuthToken to true or false.
  * Sets the role field as either the role held by user or undefined depending on token validity.
  */
+// TO-DO: Find out what to initialize req.role to
+
 const optionalAuthMiddleware = (req, res, next) => {
 	// Set auth token to false initially.
 	req.hasValidAuthToken = false;
-	// TO-DO: Find out what to initialize req.role to
-	// req.role is undefined unless token is validated
-	req.role = undefined; // undefined is equivalent to having no role
+	// req.role is undefined unless token is validated.
+	req.role = undefined; // undefined is equivalent to having no role.
 
 	const token = req.headers.token || req.body.token || req.query.token;
 	const validParams = {
@@ -252,15 +253,8 @@ const optionalAuthMiddleware = (req, res, next) => {
 		.then(async ({ decoded, user }) => {
 			req.hasValidAuthToken = true;
 			// console.log(user.role);
-			//I'm not sure how to tell what role the user is requesting
-			// if ((await isTokenAuthorized(token, user.role))) {
 			req.role = user.role;
 			next();
-			// }
-			// // If user is not who they requested, give basic privileges
-			// else {
-			// 	next();
-			// }
 		})
 		.catch(() => {
 			next();

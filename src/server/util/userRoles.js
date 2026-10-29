@@ -26,7 +26,7 @@ function isRoleAuthorized(role, requestedRole) {
 /**
  * Checks if a client's role has the authorization capabilities as the requested role.
  * This code currently returns false for undefined/no role.
- * @param req is an incoming request sent by a client ?
+ * @param req is an incoming request sent by a client
  * @param {User.role} requestedRole is a role listed in User.role
  * @returns {boolean} true if role has the permissions of the requestedRole. Returns false otherwise.
  */
