@@ -4,7 +4,8 @@
 
 /* This file tests the login form API. */
 
-const { chai, mocha, expect, app, testUser } = require('../common');
+const { chai, mocha, expect } = require('../common');
+const { app, testUser } = require('../commonTestDB');
 const { HTTP_CODES } = require('../../util/httpCodes');
 
 const VERSION = require('../../version');
@@ -16,6 +17,12 @@ mocha.describe('login API', () => {
 		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res).to.be.json;
 		expect(res.body).to.have.property('token');
+		let token = res.body.token;
+
+		if (token) {
+			await chai.request(app).post('/api/loginLogout/logout')
+				.set('token', token);
+		}
 	});
 	mocha.it('returns 401 for a wrong password', async () => {
 		const res = await chai.request(app).post('/api/loginLogout/login')
@@ -37,10 +44,15 @@ mocha.describe('verification API', () => {
 			.send({ username: testUser.username, password: testUser.password });
 		expect(res).to.have.status(HTTP_CODES.OK);
 		expect(res).to.be.json;
-		token = res.body.token;
+		let token = res.body.token;
 
 		const res2 = await chai.request(app).post('/api/verification')
-			.send({token: token});
+			.send({ token: token });
 		expect(res2).to.have.status(HTTP_CODES.OK);
+
+		if (token) {
+			await chai.request(app).post('/api/loginLogout/logout')
+				.set('token', token);
+		}
 	});
 });

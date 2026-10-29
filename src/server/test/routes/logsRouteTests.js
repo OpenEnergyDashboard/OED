@@ -4,15 +4,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-const { chai, mocha, expect, app, testUser } = require('../common');
+const { chai, mocha, expect } = require('../common');
+const { app, testUser } = require('../commonTestDB');
 const moment = require('moment');
 const { log } = require('../../log');
 const { HTTP_CODES } = require('../../util/httpCodes');
 
 mocha.describe('Log Routes', () => {
 	let token, currentLogToDb;
-
-	mocha.before(async () => {
+	mocha.beforeEach(async () => {
 		// Login to get authentication token
 		const res = await chai.request(app).post('/api/loginLogout/login')
 			.send({ username: testUser.username, password: testUser.password });
@@ -24,8 +24,12 @@ mocha.describe('Log Routes', () => {
 		currentLogToDb = log.logToDb;
 		log.logToDb = true;
 	});
-
-	mocha.after(async () => {
+	mocha.afterEach(async () => {
+		// Logout after all tests are done
+		if (token) {
+			await chai.request(app).post('/api/loginLogout/logout')
+				.set('token', token);
+		}
 		// Reset after tests done.
 		log.logToDb = currentLogToDb;
 	});

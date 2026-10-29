@@ -4,7 +4,7 @@
 
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const webpack = require('webpack');
 const path = require('path');
 
@@ -40,12 +40,24 @@ const config = {
 			// All TypeScript ('.ts' or '.tsx') will be handled by 'awesome-typescript-loader'.
 			{ test: /\.[jt]sx?$/, exclude: /node_modules/, use: 'ts-loader' },
 			// CSS stylesheet loader.
-			{ test: /\.css$/, use: [
-				{loader: 'style-loader'},
-				{loader: 'css-loader'}
-			] },
+			{
+				test: /\.css$/, use: [
+					{
+						loader: 'style-loader',
+						options: {
+							attributes: {
+								// This line allows the webpack nonce to be applied to styles.
+								nonce: '__webpack_nonce__'
+							}
+						}
+					},
+					{ loader: 'css-loader' }
+				]
+			},
 			// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-			{ enforce: 'pre', test: /\.js$/, use:[{loader: 'source-map-loader'}] }
+			// @plotly/mapbox-gl references a source map file it does not ship so it is excluded to avoid a warning.
+			// TODO: this may be okay to remove after upgrading to plotly.js v4
+			{ enforce: 'pre', test: /\.js$/, exclude: /node_modules[\\/]@plotly[\\/]mapbox-gl/, use:[{loader: 'source-map-loader'}] }
 		]
 	},
 	output: {
