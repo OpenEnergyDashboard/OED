@@ -9,7 +9,7 @@ const validate = require('jsonschema').validate;
 const { getConnection } = require('../db');
 const { adminAuthMiddleware, optionalAuthMiddleware } = require('./authenticator');
 const Point = require('../models/Point');
-const { isTokenAuthorized } = require('../util/userRoles');
+const { isTokenAuthorized, isReqAuthorized } = require('../util/userRoles');
 const User = require('../models/User');
 const { DEFAULT_CIRCLE_SIZE } = require('../models/Map');
 const { STRING_GENERAL_MAX_LENGTH, STRING_SHORT_MAX_LENGTH: SHORT_STRING_MAX_LENGTH, NUMERIC_ID_MAX_LENGTH } = require('../util/validationConstants');
@@ -145,10 +145,13 @@ function validateMapsParams(params, isEdit = true) {
 
 router.get('/', optionalAuthMiddleware, async (req, res) => {
 	try {
+		// req.role = User.role... // DEBUG
 		const conn = getConnection();
 		let query;
-		const token = req.headers.token || req.body.token || req.query.token;
-		if (req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN))) {
+		// const token = req.headers.token || req.body.token || req.query.token;
+		// returns false if req.role is undefined/no role
+		if (isReqAuthorized(req, User.role.ADMIN)) {
+		// if (req.hasValidAuthToken && (await isTokenAuthorized(token, User.role.ADMIN))) {
 			query = Map.getAll; // only admins can see disabled maps;
 		} else {
 			query = Map.getDisplayable;
@@ -173,7 +176,7 @@ router.get('/:map_id', optionalAuthMiddleware, async (req, res) => {
 			}
 		}
 	};
-	if (!validate(req.params, validParams).valid) {
+	if (!validate(req.params, validParams).valid) { // my next stop?
 		res.sendStatus(HTTP_CODES.BAD_REQUEST);
 	} else {
 		const conn = getConnection();
