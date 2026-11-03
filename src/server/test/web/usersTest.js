@@ -129,14 +129,12 @@ mocha.describe('Users API', () => {
 						const res = await chai.request(app).post('/api/loginLogout/login')
 							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 						token = res.body.token;
-						console.log(`Logged in ${role}`);
 					});
 					mocha.afterEach(async () => {
 						// logout
 						if (token) {
 							await chai.request(app).post('/api/loginLogout/logout')
 								.set('token', token);
-							console.log(`Logged out ${role}`);
 						}
 					});
 

@@ -159,11 +159,11 @@ mocha.describe('meters API', () => {
 	mocha.describe('Admin & CSV roles:', () => {
 		for (const role in User.role) {
 			if (User.role[role] == User.role.ADMIN || User.role[role] == User.role.CSV) {
+				let token;
 				// The describe block is used to group related tests to a specific role's scope.
 				// This is important since the beforeEach/afterEach blocks should login/logout only
 				// for the current test's role instead of every role.
 				mocha.describe(`${role} role`, () => {
-					let token;
 					mocha.beforeEach(async () => {
 						// insert test user
 						const conn = testDB.getConnection();
@@ -177,14 +177,12 @@ mocha.describe('meters API', () => {
 						const res = await chai.request(app).post('/api/loginLogout/login')
 							.send({ username: authorizedUser.username, password: authorizedUser.password });
 						token = res.body.token;
-						console.log(`Logged in as ${role}`);
 					});
 					mocha.afterEach(async () => {
 						// logout
 						if (token) {
 							await chai.request(app).post('/api/loginLogout/logout')
 								.set('token', token);
-							console.log(`Logged out ${role}`);
 						}
 					});
 
@@ -216,7 +214,6 @@ mocha.describe('meters API', () => {
 						expect(res).to.be.json;
 						expect(res.body).to.have.lengthOf(4);
 						expectMetersToBeEquivalent(res.body, 4, true, unitId);
-						console.log(`Checked all meters for ${role}`);
 					});
 				});
 			}

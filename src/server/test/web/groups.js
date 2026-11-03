@@ -169,12 +169,10 @@ mocha.describe('groups API', () => {
 								const res = await chai.request(app).post('/api/loginLogout/login')
 									.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 								token = res.body.token;
-								console.log(`Logged in ${role}`);
 							});
 							mocha.afterEach(async () => {
 								// logout
 								if (token) {
-									console.log(`Logged out ${role}`);
 									await chai.request(app).post('/api/loginLogout/logout')
 										.set('token', token);
 								}
@@ -184,7 +182,6 @@ mocha.describe('groups API', () => {
 								// create
 								const res = await chai.request(app).post('/api/groups/create').set('token', token);
 								expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
-								console.log(`Rejected request from ${role}`);
 							});
 						});
 					}
