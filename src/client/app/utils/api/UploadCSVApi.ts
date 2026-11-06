@@ -12,6 +12,7 @@ import {
 	ReadingsCSVUploadPreferences
 } from '../../types/csvUploadForm';
 import ApiBackend from './ApiBackend';
+import { LanguageTypes } from 'types/redux/i18n';
 
 interface ApiResponse {
 	success: boolean,
@@ -19,7 +20,7 @@ interface ApiResponse {
 }
 
 export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPreferences, readingsFile: File,
-	dispatch: Dispatch, language: string): Promise<ApiResponse> => { //added language parameter for i18n
+	dispatch: Dispatch, language: LanguageTypes): Promise<ApiResponse> => {
 	const backend = new ApiBackend();
 	const formData = new FormData();
 	// The Boolean values in state must be converted to the submitted values of yes and no.
@@ -51,7 +52,7 @@ export const submitReadings = async (uploadPreferences: ReadingsCSVUploadPrefere
 };
 
 export const submitMeters = async (uploadPreferences: MetersCSVUploadPreferences, metersFile: File,
-	dispatch: Dispatch, language: string): Promise<ApiResponse> => {
+	dispatch: Dispatch, language: LanguageTypes): Promise<ApiResponse> => {
 	const backend = new ApiBackend();
 	const formData = new FormData();
 	// The Boolean values in state must be converted to the submitted values of yes and no.
