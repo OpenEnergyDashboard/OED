@@ -144,8 +144,8 @@ async function handleSuffixUnits(graph, conn) {
 			if (neededSuffixUnit === null) {
 				// If not then add the new unit and conversion.
 				// Note: This regenerates a derived suffix unit/conversion whenever this function runs and finds one missing for a still valid path
-				// This includes if an admin has deleted it directly. Deleting a derived converion alone
-				// does not persis unless the underlying conversion it was generated from is also removed.
+				// This includes if an admin has deleted it directly. Deleting a derived conversion alone
+				// does not persist unless the underlying conversion it was generated from is also removed.
 				await addNewUnitAndConversion(sourceId, destinationId, slope, intercept, unitName, unitIdentifier, graph, conn);
 			} else {
 				// If it already exists then check if the unit and conversion are correct.
@@ -172,7 +172,7 @@ async function handleSuffixUnits(graph, conn) {
 async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) {
 	const MAX_SUFFIX_CLEANUP_DEPTH = 10;
 
-	if (depth > MAX_SUFFIX_CLEANUP_DEPTH) {
+	if (depth >= MAX_SUFFIX_CLEANUP_DEPTH) {
 		log.error(`Max depth (${MAX_SUFFIX_CLEANUP_DEPTH}) reached cleaning up suffix unit ${suffixUnit.id}. Possible circular dependency.`);
 		throw new Error(`Suffix unit cleanup depth limit exceeded for unit ${suffixUnit.id}`);
 	}
@@ -199,11 +199,9 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 			return { conversion, otherUnitId, otherUnit };
 		}));
 
-		// Handle a conversion pointing at a unit that's already been deleted.
-		// This occurs when a bidirectional conversion is stored as two rows.
-		// Both rows point to the same otherUnitId. If an earlier processing pass deleted
-		// otherUnitId during the same batch, this lookup will correctly register it as
-		// missing rather than indicating an actual data problem.
+		// Defensive check for a conversion whose other unit no longer exists. The foreign keys on
+		// conversions should prevent this, but it could happen if another session deleted the unit
+		// after the conversions were read. Remove the orphaned conversion and read again.
 		const missing = resolved.find(r => !r.otherUnit);
 		if (missing) {
 			log.warn(`Unit ${missing.otherUnitId} not found when cleaning up suffix unit ${suffixUnit.id}. Conversion ${missing.conversion.sourceId}->${missing.conversion.destinationId} may be orphaned.`);
@@ -226,16 +224,17 @@ async function removeAdditionalConversionsAndUnits(suffixUnit, conn, depth = 0) 
 		try {
 			const { conversion, otherUnitId, otherUnit } = target;
 
-			// Check if otherUnitId has connections besides this one.
+			// Find any conversions of otherUnitId other than this one (or its reverse).
 			// Deletion of other connections may lead to orphaning a unit.
 			const otherUnitConversions = await Conversion.getByUnitID(otherUnitId, conn);
-			const hasOtherConnections = otherUnitConversions.some(c =>
-				!((c.source_id === conversion.sourceId && c.destination_id === conversion.destinationId) ||
-					(c.source_id === conversion.destinationId && c.destination_id === conversion.sourceId))
-			);
+			const isTargetConversion = c =>
+				(c.source_id === conversion.sourceId && c.destination_id === conversion.destinationId) ||
+				(c.source_id === conversion.destinationId && c.destination_id === conversion.sourceId);
+			const otherConnections = otherUnitConversions.filter(c => !isTargetConversion(c));
 			// Warn the admin of connected units
-			if (hasOtherConnections) {
-				log.warn(`Unit ${otherUnitId} has other connections beyond conversion ${conversion.sourceId}->${conversion.destinationId}; deleting it will also remove those.`);
+			if (otherConnections.length > 0) {
+				const connectionList = otherConnections.map(c => `${c.source_id}->${c.destination_id}`).join(', ');
+				log.warn(`Unit ${otherUnitId} has other connections beyond conversion ${conversion.sourceId}->${conversion.destinationId}: ${connectionList}. Deleting it will also remove those.`);
 			}
 
 			// Always delete the conversion

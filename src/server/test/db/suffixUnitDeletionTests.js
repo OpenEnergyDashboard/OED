@@ -9,6 +9,7 @@ const Meter = require('../../models/Meter');
 const Group = require('../../models/Group');
 const Point = require('../../models/Point');
 const Conversion = require('../../models/Conversion');
+const Cik = require('../../models/Cik');
 const gps = new Point(90, 45);
 const { removeAdditionalConversionsAndUnits } = require('../../services/graph/handleSuffixUnits');
 const { insertUnits, insertConversions, insertGroups } = require('../../util/insertData');
@@ -145,7 +146,7 @@ mocha.describe('Suffix unit cascade deletion', () => {
 		await insertUnits([
 			{
 				name: 'A', identifier: 'A', unitRepresent: Unit.unitRepresentType.QUANTITY,
-				secInRate: 1000, typeOfUnit: Unit.unitType.SUFFIX, suffix: 'chain-suffix',
+				secInRate: 1000, typeOfUnit: Unit.unitType.UNIT, suffix: 'chain-suffix',
 				displayable: Unit.displayableType.ALL, preferredDisplay: true, note: ''
 			},
 			{
@@ -189,13 +190,13 @@ mocha.describe('Suffix unit cascade deletion', () => {
 		expect(conversionAfter).to.not.equal(null);
 	});
 
-	mocha.it('deletes the reverse conversion when bidirectional', async () => {
+	mocha.it('deletes a bidirectional conversion and the auto-created unit', async () => {
 		const conn = testDB.getConnection();
 
 		await insertUnits([
 			{
 				name: 'Parent', identifier: 'Parent', unitRepresent: Unit.unitRepresentType.QUANTITY,
-				secInRate: 1000, typeOfUnit: Unit.unitType.SUFFIX, suffix: 'test-suffix',
+				secInRate: 1000, typeOfUnit: Unit.unitType.UNIT, suffix: 'test-suffix',
 				displayable: Unit.displayableType.ALL, preferredDisplay: true, note: ''
 			},
 			{
@@ -205,8 +206,7 @@ mocha.describe('Suffix unit cascade deletion', () => {
 			}
 		], false, conn);
 		await insertConversions([
-			{ sourceName: 'Parent', destinationName: 'Child', bidirectional: true, slope: 1, intercept: 0, note: 'forward' },
-			{ sourceName: 'Child', destinationName: 'Parent', bidirectional: true, slope: 1, intercept: 0, note: 'reverse' }
+			{ sourceName: 'Parent', destinationName: 'Child', bidirectional: true, slope: 1, intercept: 0, note: 'bidirectional' }
 		], conn);
 
 		const parent = await Unit.getByName('Parent', conn);
@@ -214,10 +214,9 @@ mocha.describe('Suffix unit cascade deletion', () => {
 
 		await removeAdditionalConversionsAndUnits(parent, conn);
 
-		const forwardAfter = await Conversion.getBySourceDestination(parent.id, child.id, conn);
-		const reverseAfter = await Conversion.getBySourceDestination(child.id, parent.id, conn);
-		expect(forwardAfter).to.equal(null);
-		expect(reverseAfter).to.equal(null);
+		await expectUnitDeleted(child.id, conn);
+		const conversionAfter = await Conversion.getBySourceDestination(parent.id, child.id, conn);
+		expect(conversionAfter).to.equal(null);
 	});
 
 	mocha.it('clears stale cik rows before deleting the unit', async () => {
@@ -226,15 +225,16 @@ mocha.describe('Suffix unit cascade deletion', () => {
 
 		// Simulate a stale cik row referencing the child unit, as would exist
 		// before Cik regeneration
-		await conn.none(
-			'INSERT INTO cik (source_id, destination_id, slope, intercept) VALUES ($1, $2, 1, 0)',
-			[child.id, parent.id]
-		);
+		await Cik.insert([{ source: child.id, destination: parent.id, slope: 1, intercept: 0 }], conn);
 
-		// Should not throw.
 		await removeAdditionalConversionsAndUnits(parent, conn);
 
 		await expectUnitDeleted(child.id, conn);
+
+		// The stale cik row should be gone too
+		const cikAfter = await Cik.getAll(conn);
+		const staleRows = cikAfter.filter(c => c.meterUnitId === child.id || c.nonMeterUnitId === child.id);
+		expect(staleRows).to.have.lengthOf(0);
 	});
 
 	mocha.it('does not touch a regular (non-suffix) unit in the same conversion set', async () => {
@@ -243,7 +243,7 @@ mocha.describe('Suffix unit cascade deletion', () => {
 		await insertUnits([
 			{
 				name: 'Parent', identifier: 'Parent', unitRepresent: Unit.unitRepresentType.QUANTITY,
-				secInRate: 1000, typeOfUnit: Unit.unitType.SUFFIX, suffix: 'test-suffix',
+				secInRate: 1000, typeOfUnit: Unit.unitType.UNIT, suffix: 'test-suffix',
 				displayable: Unit.displayableType.ALL, preferredDisplay: true, note: ''
 			},
 			{

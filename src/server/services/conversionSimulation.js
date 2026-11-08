@@ -24,9 +24,9 @@ function simulateSuffixUnitCleanup(suffixUnit, allConversions, allUnits) {
 	const unitsToDelete = [];
 	
 	// Find all conversions involving this suffix unit
-	const relatedConversions = allConversions.filter((conversion) => 
+	const relatedConversions = allConversions.filter((conversion) =>
 		conversion.sourceId === suffixUnit.id ||
-		(conversion.bidirectional && (conversion.sourceId === suffixUnit.id || conversion.destinationId === suffixUnit.id))
+		(conversion.bidirectional && conversion.destinationId === suffixUnit.id)
 	);
 	
 	// Process each related conversion
@@ -35,8 +35,8 @@ function simulateSuffixUnitCleanup(suffixUnit, allConversions, allUnits) {
 		const otherUnitId = isSource ? conversion.destinationId : conversion.sourceId;
 		const otherUnit = allUnits.find(u => u.id === otherUnitId);
 		
-		// If the other unit is also a suffix unit (created by OED), it would be hidden
-		if (otherUnit && otherUnit.typeOfUnit === Unit.unitType.SUFFIX) {
+		// If the other unit is of type suffix (created by OED), it and its conversions will be removed
+		if (otherUnit.typeOfUnit === Unit.unitType.SUFFIX) {
 			conversionsToRemove.push({
 				sourceId: conversion.sourceId,
 				destinationId: conversion.destinationId
@@ -73,22 +73,22 @@ async function simulateDeleteConversion({ sourceId, destinationId }, conn) {
 	const destUnit = allUnits.find(u => u.id === destinationId);
 	
 	// 3. Simulate suffix unit cleanup if applicable
-	let conversionsToRemove = [
+	const conversionsToRemove = [
 		// The conversion being deleted
 		{ sourceId, destinationId } 
 	];
 	// Track units that will be deleted
-	let allUnitsToDelete = [];
+	const allUnitsToDelete = [];
 
 	// Validate if the source unit is a suffix related unit
-	// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
+	// Accounts for Suffix Inputs where unit type = unit & and Suffix contains a string
 	if (isSuffixRelated(sourceUnit)) {
 		const cleanup = simulateSuffixUnitCleanup(sourceUnit, allConversions, allUnits);
 		conversionsToRemove.push(...cleanup.conversionsToRemove);
 		allUnitsToDelete.push(...cleanup.unitsToDelete);
 	}
 	// Validate if the destination unit is a suffix related unit
-	// Accounts for Suffix Inputs where unit = unit & and Suffix contains a string
+	// Accounts for Suffix Inputs where unit type = unit & and Suffix contains a string
 	if (isSuffixRelated(destUnit)) {
 		const cleanup = simulateSuffixUnitCleanup(destUnit, allConversions, allUnits);
 		conversionsToRemove.push(...cleanup.conversionsToRemove);

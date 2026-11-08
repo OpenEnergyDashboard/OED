@@ -227,7 +227,7 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 		const conn = getConnection();
 		const unitId = req.body.id;
 		try {
-			const unit = await Unit.getById(req.body.id, conn);
+			const unit = await Unit.getById(unitId, conn);
 			if (!unit) {
 				failure(res, HTTP_CODES.NOT_FOUND, 'Unit not found');
 				return;
@@ -264,14 +264,14 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 				const unitInTx = await Unit.getById(unitId, t);
 				
 				// Handle suffix-type units (created by OED)
-				if (unitInTx.typeOfUnit === 'suffix') {
+				if (unitInTx.typeOfUnit === Unit.unitType.SUFFIX) {
 					log.info(`Deleting suffix-type unit ${unitId}. Cleaning up associated units and conversions.`);
 					await removeAdditionalConversionsAndUnits(unitInTx, t);
 				}
 				
 				// Handle units with suffix string (not suffix-type)
 				// These units may have conversions involving suffix units that need cleanup
-				if (unitInTx.suffix && unitInTx.suffix !== '') {
+				if (unitInTx.suffix) {
 					log.info(`Unit ${unitId} has suffix "${unitInTx.suffix}". Checking for suffix-involved conversions.`);
 					
 					// Get all conversions involving this unit
@@ -286,6 +286,7 @@ router.post('/delete', adminAuthMiddleware('delete units'), async (req, res) => 
 						await Conversion.delete(conversion.sourceId, conversion.destinationId, t);
 						
 						// If bidirectional, also delete reverse if it exists separately
+						// Safety check: if a reverse conversion was stored as its own row, delete it too
 						if (conversion.bidirectional) {
 							const reverseConversion = await Conversion.getBySourceDestination(
 								conversion.destinationId,
