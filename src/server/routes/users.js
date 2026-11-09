@@ -172,6 +172,8 @@ router.post('/create', adminAuthMiddleware('create a user.'), async (req, res) =
 			} else {
 				const hashedPassword = await bcrypt.hash(password, 10);
 				const user = new User(undefined, username, hashedPassword, role, note);
+				// TODO DEBUG
+				throw new Error('test create-user failure');
 				await user.insert(conn);
 				success(res);
 			}
@@ -261,6 +263,8 @@ router.post('/delete', adminAuthMiddleware('delete a user'), async (req, res) =>
 				failure(res, HTTP_CODES.BAD_REQUEST, new Error(message), message);
 				return;
 			} else {
+				// TODO DEBUG
+				throw new Error('test delete-user failure');
 				await User.deleteUser(username, conn);
 				success(res);
 			}
