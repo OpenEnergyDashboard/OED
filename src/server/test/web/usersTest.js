@@ -112,50 +112,55 @@ mocha.describe('Users API', () => {
 		for (const role in User.role) {
 			if (User.role[role] !== User.role.ADMIN) {
 				let token;
-				mocha.beforeEach(async () => {
-					// insert test user
-					const conn = testDB.getConnection();
-					const password = `password${role}`;
-					const hashedPassword = await bcrypt.hash(password, 10);
-					const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-					await unauthorizedUser.insert(conn);
-					unauthorizedUser.password = password;
+				// The describe block is used to group related tests to a specific role's scope.
+				// This is important since the beforeEach/afterEach blocks should login/logout only
+				// for the current test's role instead of every role.
+				mocha.describe(`${role} role`, () => {
+					mocha.beforeEach(async () => {
+						// insert test user
+						const conn = testDB.getConnection();
+						const password = `password${role}`;
+						const hashedPassword = await bcrypt.hash(password, 10);
+						const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+						await unauthorizedUser.insert(conn);
+						unauthorizedUser.password = password;
 
-					// login
-					const res = await chai.request(app).post('/api/loginLogout/login')
-						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
-					token = res.body.token;
-				});
-				mocha.afterEach(async () => {
-					// logout
-					if (token) {
-						await chai.request(app).post('/api/loginLogout/logout')
-							.set('token', token);
-					}
-				});
+						// login
+						const res = await chai.request(app).post('/api/loginLogout/login')
+							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
+						token = res.body.token;
+					});
+					mocha.afterEach(async () => {
+						// logout
+						if (token) {
+							await chai.request(app).post('/api/loginLogout/logout')
+								.set('token', token);
+						}
+					});
 
-				mocha.it(`should reject requests from ${role} to retrieve users`, async () => {
-					// get
-					const res = await chai.request(app).get('/api/users').set('token', token);
-					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
-				});
+					mocha.it(`should reject requests from ${role} to retrieve users`, async () => {
+						// get
+						const res = await chai.request(app).get('/api/users').set('token', token);
+						expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+					});
 
-				mocha.it(`should reject requests from ${role} to create users`, async () => {
-					// create
-					const res = await chai.request(app).post('/api/users/create').set('token', token);
-					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
-				});
+					mocha.it(`should reject requests from ${role} to create users`, async () => {
+						// create
+						const res = await chai.request(app).post('/api/users/create').set('token', token);
+						expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+					});
 
-				mocha.it(`should reject requests from ${role} to edit users`, async () => {
-					// edit
-					const res = await chai.request(app).post('/api/users/edit').set('token', token);
-					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
-				});
+					mocha.it(`should reject requests from ${role} to edit users`, async () => {
+						// edit
+						const res = await chai.request(app).post('/api/users/edit').set('token', token);
+						expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+					});
 
-				mocha.it(`should reject requests from ${role} to delete users`, async () => {
-					// delete
-					const res = await chai.request(app).post('/api/users/delete').set('token', token);
-					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+					mocha.it(`should reject requests from ${role} to delete users`, async () => {
+						// delete
+						const res = await chai.request(app).post('/api/users/delete').set('token', token);
+						expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+					});
 				});
 			}
 		}

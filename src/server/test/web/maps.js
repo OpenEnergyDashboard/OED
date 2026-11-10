@@ -112,61 +112,63 @@ mocha.describe('maps API', () => {
 		for (const role in User.role) {
 			if (User.role[role] !== User.role.ADMIN) {
 				let token;
-				mocha.beforeEach(async () => {
-					// insert test user
-					const conn = testDB.getConnection();
-					const password = `password${role}`;
-					const hashedPassword = await bcrypt.hash(password, 10);
-					const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-					await unauthorizedUser.insert(conn);
-					unauthorizedUser.password = password;
+				// The describe block is used to group related tests to a specific role's scope.
+				// This is important since the beforeEach/afterEach blocks should login/logout only
+				// for the current test's role instead of every role.
+				mocha.describe(`${role} role`, () => {
+					mocha.beforeEach(async () => {
+						// insert test user
+						const conn = testDB.getConnection();
+						const password = `password${role}`;
+						const hashedPassword = await bcrypt.hash(password, 10);
+						const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
+						await unauthorizedUser.insert(conn);
+						unauthorizedUser.password = password;
 
-					// login
-					const res = await chai.request(app).post('/api/loginLogout/login')
-						.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
-					token = res.body.token;
-				});
-				mocha.afterEach(async () => {
-					// logout
-					if (token) {
-						await chai.request(app).post('/api/loginLogout/logout')
-							.set('token', token);
-					}
-				});
+						// login
+						const res = await chai.request(app).post('/api/loginLogout/login')
+							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
+						token = res.body.token;
+					});
+					mocha.afterEach(async () => {
+						// logout
+						if (token) {
+							await chai.request(app).post('/api/loginLogout/logout')
+								.set('token', token);
+						}
+					});
 
-				mocha.it(`should reject requests from ${role} to create maps`, async () => {
-					// get maps
-					const res = await chai.request(app).post('/api/maps/create').set('token', token);
-					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
-				});
+					mocha.it(`should reject requests from ${role} to create maps`, async () => {
+						// get maps
+						const res = await chai.request(app).post('/api/maps/create').set('token', token);
+						expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+					});
 
-				mocha.it(`should reject requests from ${role} to edit maps`, async () => {
-					const res = await chai.request(app).post('/api/maps/edit').set('token', token);
-					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
-				});
+					mocha.it(`should reject requests from ${role} to edit maps`, async () => {
+						const res = await chai.request(app).post('/api/maps/edit').set('token', token);
+						expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+					});
 
-				mocha.it(`should reject requests from ${role} to delete maps`, async () => {
-					const res = await chai.request(app).post('/api/maps/delete').set('token', token);
-					expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
-				});
-				mocha.it(`should only show visible maps to ${role}`, async () => {
-					const conn = testDB.getConnection();
-					// Insert maps
-					await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-					await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-					await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-					await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
-					// Insert user
-					const password = `password${role}`;
-					const hashedPassword = await bcrypt.hash(password, 10);
+					mocha.it(`should reject requests from ${role} to delete maps`, async () => {
+						const res = await chai.request(app).post('/api/maps/delete').set('token', token);
+						expect(res).to.have.status(HTTP_CODES.FORBIDDEN);
+					});
+					mocha.it(`should only show visible maps to ${role}`, async () => {
+						const conn = testDB.getConnection();
+						// Insert maps
+						await new Map(undefined, 'Map 1', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+						await new Map(undefined, 'Map 2', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+						await new Map(undefined, 'Map 3', true, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
+						await new Map(undefined, 'Not Visible', false, null, 'default', moment('2000-10-10'), origin, opposite, 'placeholder').insert(conn);
 
-					// get maps
-					const res = await chai.request(app).get('/api/maps').set('token', token);
-					expect(res).to.have.status(HTTP_CODES.OK);
-					expect(res).to.be.json;
-					expect(res.body).to.have.lengthOf(3);
-					const allMapsAreDisplayable = res.body.reduce((acc, map) => acc && map.displayable, true);
-					expect(allMapsAreDisplayable).to.be.true;
+						// get maps
+						const res = await chai.request(app).get('/api/maps').set('token', token);
+						expect(res).to.have.status(HTTP_CODES.OK);
+						expect(res).to.be.json;
+						expect(res.body).to.have.lengthOf(3);
+						const allMapsAreDisplayable = res.body.reduce((acc, map) => acc && map.displayable, true);
+						expect(allMapsAreDisplayable).to.be.true;
+					});
 				});
 			}
 		}
