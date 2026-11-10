@@ -6,6 +6,7 @@
 
 const Reading = require('../../models/Reading');
 const { log } = require('../../log');
+const { translate, LANGUAGES } = require('../../translations/translate');
 const processData = require('./processData');
 
 /**
@@ -34,12 +35,12 @@ const processData = require('./processData');
  */
 async function loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readingRepetition, isCumulative,
 	cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly,
-	shouldUpdate, conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false, warnOnCumulativeReset = false) {
+	shouldUpdate, conditionSet, conn, honorDst = false, relaxedParsing = false, useMeterZone = false, warnOnCumulativeReset = false, useMeterFrequency = false, useMeterFrequencyVariation = 0, lang = LANGUAGES.en) {
 	// Get the reading, then process them for acceptance and finally insert into the DB.
 	readingsArray = dataRows.map(mapRowToModel);
 	let { result: readingsToInsert, isAllReadingsOk, msgTotal } = await processData(readingsArray, meterID, timeSort, readingRepetition,
 		isCumulative, cumulativeReset, cumulativeResetStart, cumulativeResetEnd, readingGap, readingLengthVariation, isEndOnly,
-		conditionSet, conn, honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset);
+		conditionSet, conn, honorDst, relaxedParsing, useMeterZone, warnOnCumulativeReset, useMeterFrequency, useMeterFrequencyVariation, lang);
 	if (shouldUpdate) {
 		// New readings should replace old ones.
 		await Reading.insertOrUpdateAll(readingsToInsert, conn)
@@ -47,18 +48,16 @@ async function loadArrayInput(dataRows, meterID, mapRowToModel, timeSort, readin
 				// DB insert failed. log it, note that processing is not okay & add to message user will get.
 				log.error('loadArrayInput failed during DB inserts with updates with: ' + error.stack);
 				isAllReadingsOk = false;
-				msgTotal += 'Attempting to insert the readings into the database with updates failed with error: \"' + error.stack +
-					'\n and the pipeline returned these messages: ' + msgTotal;
-			})
+				msgTotal += translate('csv.upload.readings.error.db.insert.with.updates', { error: error.stack, messages: msgTotal }, lang);
+			});
 	} else {
 		await Reading.insertOrIgnoreAll(readingsToInsert, conn)
 			.catch(error => {
 				// DB insert failed. log it, note that processing is not okay & add to message user will get.
 				log.error('loadArrayInput failed during DB inserts with: ' + error.stack);
 				isAllReadingsOk = false;
-				msgTotal += 'Attempting to insert the readings into the database failed with error: \"' + error.stack +
-					'\n and the pipeline returned these messages: ' + msgTotal;
-			})
+				msgTotal += translate('csv.upload.readings.error.db.insert', { error: error.stack, messages: msgTotal }, lang);
+			});
 	}
 	return { isAllReadingsOk, msgTotal };
 }
