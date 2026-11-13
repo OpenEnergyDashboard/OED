@@ -215,6 +215,7 @@ export const selectIsValidConversion = createAppSelector(
 		/* Create Conversion Validation:
 					Source equals destination: invalid conversion
 					Conversion exists: invalid conversion
+					Suffix unit and bidirectional: invalid conversion
 					Conversion does not exist:
 						Inverse exists:
 							Conversion is bidirectional: invalid conversion
@@ -225,6 +226,20 @@ export const selectIsValidConversion = createAppSelector(
 		// The destination cannot be a meter unit.
 		if (destinationId !== -999 && unitDataById[destinationId].typeOfUnit === UnitType.meter) {
 			return [false, translate('conversion.create.destination.meter')];
+		}
+
+		// A suffix unit cannot be bidirectional. It is a suffix unit if it is of type suffix or
+		// it has a suffix. It is invalid whether the source or destination. First make sure the
+		// source or destination is set.
+		// This should mirror the test in CreateConversionModalComponent.tsx for isValidSuffix and the bidirectional feedback in the form.
+		if (bidirectional) {
+			if ((sourceId !== -999 &&
+				(unitDataById[sourceId].typeOfUnit === UnitType.suffix || unitDataById[sourceId].suffix !== '')) ||
+				(destinationId !== -999 &&
+					(unitDataById[destinationId].typeOfUnit === UnitType.suffix || unitDataById[destinationId].suffix !== ''))
+			) {
+				return [false, translate('conversion.bidirectional.suffix')];
+			}
 		}
 
 		// Source or destination not set

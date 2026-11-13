@@ -149,17 +149,25 @@ export default function CreateUnitModalComponent() {
 		}
 	};
 
+	// - If suffix then must be type of unit is unit
+	const isValidSuffix = () => {
+		return state.typeOfUnit === UnitType.unit || state.suffix === '';
+	};
+
+	// This checks:
+	// - Name cannot be blank.
+	// - The rate is set so not the custom input value. This happens if select custom value but don't input with enter.
+	// - The min/maxVal is within range.
+	// - The custom rate is a positive integer.
+	const isValidUnit = () => {
+		return state.name !== '' &&
+			state.secInRate !== Number(CUSTOM_INPUT) &&
+			state?.minVal >= MIN_VAL && state?.maxVal <= MAX_VAL && state?.minVal <= state?.maxVal &&
+			customRateValid(Number(state.secInRate));
+	};
+
 	// Keeps canSave state up to date. Checks if valid and if edit made.
 	useEffect(() => {
-		// This checks:
-		// - Name cannot be blank
-		// - If type of unit is suffix there must be a suffix
-		// - The rate is set so not the custom input value. This happens if select custom value but don't input with enter.
-		// - The custom rate is a positive integer
-		const validUnit = state.name !== '' &&
-			(state.typeOfUnit !== UnitType.suffix || state.suffix !== '') && state.secInRate !== Number(CUSTOM_INPUT)
-			&& state?.minVal >= MIN_VAL && state?.maxVal <= MAX_VAL && state?.minVal <= state?.maxVal
-			&& customRateValid(Number(state.secInRate));
 
 		// Compare the local changes to the default values
 		const editMade =
@@ -175,7 +183,7 @@ export default function CreateUnitModalComponent() {
 			|| state.minVal !== defaultValues.minVal
 			|| state.maxVal !== defaultValues.maxVal
 			|| state.disableChecks !== defaultValues.disableChecks;
-		setCanSave(validUnit && editMade);
+		setCanSave(isValidSuffix() && isValidUnit() && editMade);
 
 		// Automatically checks for unsaved changes and addresses the issue
 		// of having to manually set the setHasUnsavedChanges
@@ -210,9 +218,7 @@ export default function CreateUnitModalComponent() {
 			// Set default identifier as name if left blank
 			identifier: !state.identifier || state.identifier.length === 0 ? state.name : state.identifier,
 			// set displayable to none if unit is meter
-			displayable: (state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) ? DisplayableType.none : state.displayable,
-			// set unit to suffix if suffix is not empty
-			typeOfUnit: (state.typeOfUnit != UnitType.suffix && state.suffix != '') ? UnitType.suffix : state.typeOfUnit
+			displayable: (state.typeOfUnit == UnitType.meter && state.displayable != DisplayableType.none) ? DisplayableType.none : state.displayable
 		};
 
 		// Add the new unit and update the store
@@ -290,7 +296,7 @@ export default function CreateUnitModalComponent() {
 										name="identifier"
 										type="text"
 										autoComplete="on"
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 										value={state.identifier}
 									/>
 								</FormGroup>
@@ -304,7 +310,7 @@ export default function CreateUnitModalComponent() {
 										name="name"
 										type="text"
 										autoComplete="on"
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 										value={state.name}
 										invalid={state.name === ''}
 									/>
@@ -325,25 +331,23 @@ export default function CreateUnitModalComponent() {
 										id="typeOfUnit"
 										name="typeOfUnit"
 										type="select"
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 										value={state.typeOfUnit}
-										invalid={state.typeOfUnit != UnitType.suffix && state.suffix != ''}
+										// Only want red box without message in this case since error shown on suffix.
+										invalid={!isValidSuffix()}
 									>
 										{Object.keys(UnitType).map(key => {
 											return (
 												<option
 													value={key}
 													key={key}
-													disabled={state.suffix != '' && key != UnitType.suffix}
+													disabled={state.suffix != '' && key != UnitType.unit}
 												>
 													{translate(`UnitType.${key}`)}
 												</option>
 											);
 										})}
 									</Input>
-									<FormFeedback>
-										<FormattedMessage id="unit.type.of.unit.suffix" />
-									</FormFeedback>
 								</FormGroup>
 							</Col>
 							{/* Unit represent input */}
@@ -356,7 +360,7 @@ export default function CreateUnitModalComponent() {
 										id="unitRepresent"
 										name="unitRepresent"
 										type="select"
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 										value={state.unitRepresent}
 									>
 										{Object.keys(UnitRepresentType).map(key => {
@@ -379,7 +383,7 @@ export default function CreateUnitModalComponent() {
 										id="displayable"
 										name="displayable"
 										type="select"
-										onChange={e => {handleStringChange(e);}}
+										onChange={e => { handleStringChange(e); }}
 										value={state.displayable}
 										invalid={
 											state.displayable != DisplayableType.none &&
@@ -420,7 +424,7 @@ export default function CreateUnitModalComponent() {
 										id="preferredDisplay"
 										name="preferredDisplay"
 										type="select"
-										onChange={e => {handleBooleanChange(e);}}
+										onChange={e => { handleBooleanChange(e); }}
 									>
 										{Object.keys(TrueFalseType).map(key => {
 											return (
@@ -443,7 +447,7 @@ export default function CreateUnitModalComponent() {
 										name="secInRate"
 										type="select"
 										value={rate}
-										onChange={e => {handleRateChange(e);}}
+										onChange={e => { handleRateChange(e); }}
 									>
 										{Object.entries(LineGraphRates).map(
 											([rateKey, rateValue]) => (
@@ -468,7 +472,7 @@ export default function CreateUnitModalComponent() {
 												value={customRate}
 												min={1}
 												invalid={!customRateValid(customRate)}
-												onChange={e => {handleCustomRateChange(e);}}
+												onChange={e => { handleCustomRateChange(e); }}
 												// This grabs each key hit and then finishes input when hit enter.
 												onKeyDown={e => { handleEnter(e.key); }}
 											/>
@@ -489,12 +493,11 @@ export default function CreateUnitModalComponent() {
 										name="suffix"
 										type="text"
 										value={state.suffix}
-										onChange={e => {handleStringChange(e);}}
-										invalid={state.typeOfUnit === UnitType.suffix && state.suffix === ''
-										}
+										onChange={e => { handleStringChange(e); }}
+										invalid={!isValidSuffix()}
 									/>
 									<FormFeedback>
-										<FormattedMessage id="error.required" />
+										<FormattedMessage id="unit.suffix.incorrect" />
 									</FormFeedback>
 								</FormGroup>
 							</Col>
@@ -504,7 +507,7 @@ export default function CreateUnitModalComponent() {
 							<Col><FormGroup>
 								<Label for='minVal'>{translate('min.value')}</Label>
 								<Input id='minVal' name='minVal' type='number'
-									onChange={e => {handleNumberChange(e);}}
+									onChange={e => { handleNumberChange(e); }}
 									min={MIN_VAL}
 									max={state.maxVal}
 									value={state.minVal}
@@ -517,7 +520,7 @@ export default function CreateUnitModalComponent() {
 							<Col><FormGroup>
 								<Label for='maxVal'>{translate('max.value')}</Label>
 								<Input id='maxVal' name='maxVal' type='number'
-									onChange={e => {handleNumberChange(e);}}
+									onChange={e => { handleNumberChange(e); }}
 									min={state.minVal}
 									max={MAX_VAL}
 									value={state.maxVal}
@@ -532,7 +535,7 @@ export default function CreateUnitModalComponent() {
 							<Col><FormGroup>
 								<Label for='disableChecks'>{translate('disable.checks')}</Label>
 								<Input id='disableChecks' name='disableChecks' type='select'
-									onChange={e => {handleStringChange(e);}}
+									onChange={e => { handleStringChange(e); }}
 									value={state.disableChecks}>
 									{Object.keys(DisableChecksType).map(key => {
 										return (<option value={key} key={key} >
@@ -549,7 +552,7 @@ export default function CreateUnitModalComponent() {
 								name='note'
 								type='textarea'
 								value={state.note}
-								onChange={e => {handleStringChange(e);}} />
+								onChange={e => { handleStringChange(e); }} />
 						</FormGroup>
 					</Container>
 				</ModalBody>

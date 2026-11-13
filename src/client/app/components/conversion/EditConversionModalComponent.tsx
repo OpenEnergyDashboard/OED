@@ -99,7 +99,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const isSuffixUsed = () => {
 		const source = unitDataById[state.sourceId];
 		const dest = unitDataById[state.destinationId];
-		return source?.typeOfUnit === UnitType.suffix || dest?.typeOfUnit === UnitType.suffix;
+		return source?.typeOfUnit === UnitType.suffix || source.suffix !== '' ||
+			dest?.typeOfUnit === UnitType.suffix || dest.suffix !== '';
 	};
 
 	/**
@@ -485,8 +486,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 			// Save our changes
 			editConversion({
 				conversionData: {
-					...state,
-					bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
+					...state
 				}, shouldRedoCik
 			})
 				.unwrap()
@@ -540,8 +540,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 				// Save our changes
 				editConversion({
 					conversionData: {
-						...state,
-						bidirectional: (isMeterSource() || isSuffixUsed()) ? false : state.bidirectional
+						...state
 					}, shouldRedoCik
 				})
 					.unwrap()
@@ -684,7 +683,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 								type='select'
 								defaultValue={state.bidirectional.toString()}
 								onChange={e => { handleBooleanChange(e); }}
-								invalid={(isMeterSource() || isSuffixUsed()) && state.bidirectional === true}>
+								disabled={(isMeterSource() || isSuffixUsed())}>
 								{Object.keys(TrueFalseType).map(key => {
 									return (<option value={key} key={key}>{translate(`TrueFalseType.${key}`)}</option>);
 								})}
@@ -696,7 +695,7 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 							)}
 							{isSuffixUsed() && state.bidirectional === true && (
 								<FormFeedback className='d-block'>
-									<FormattedMessage id="conversion.bidirectional.disabled.suffix" />
+									<FormattedMessage id="conversion.bidirectional.suffix" />
 								</FormFeedback>
 							)}
 						</FormGroup>
