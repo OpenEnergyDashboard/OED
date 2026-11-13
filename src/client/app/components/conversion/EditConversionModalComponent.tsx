@@ -99,7 +99,8 @@ export default function EditConversionModalComponent(props: EditConversionModalC
 	const isSuffixUsed = () => {
 		const source = unitDataById[state.sourceId];
 		const dest = unitDataById[state.destinationId];
-		return source?.typeOfUnit === UnitType.suffix || dest?.typeOfUnit === UnitType.suffix;
+		return source?.typeOfUnit === UnitType.suffix || source.suffix !== '' ||
+			dest?.typeOfUnit === UnitType.suffix || dest.suffix !== '';
 	};
 
 	/**
