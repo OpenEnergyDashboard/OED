@@ -14,6 +14,7 @@ const User = require('../../models/User');
 const Unit = require('../../models/Unit');
 const gpsPoint = new Point(90, 45);
 const { HTTP_CODES } = require('../../util/httpCodes');
+const { insertTestUserWithRole, getTokenForUser, logoutUser } = require('../../util/loginFunctions');
 
 mocha.describe('groups API', () => {
 	let groupA;
@@ -101,15 +102,12 @@ mocha.describe('groups API', () => {
 				let token;
 				mocha.beforeEach(async () => {
 					// login
-					const res = await chai.request(app).post('/api/loginLogout/login')
-						.send({ username: testUser.username, password: testUser.password });
-					token = res.body.token;
+					token = await getTokenForUser(testUser);
 				});
 				mocha.afterEach(async () => {
 					// logout
 					if (token) {
-						await chai.request(app).post('/api/loginLogout/logout')
-							.set('token', token);
+						await logoutUser(token);
 					}
 				});
 
@@ -159,22 +157,15 @@ mocha.describe('groups API', () => {
 							mocha.beforeEach(async () => {
 								// insert test user
 								const conn = testDB.getConnection();
-								const password = `password${role}`;
-								const hashedPassword = await bcrypt.hash(password, 10);
-								const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-								await unauthorizedUser.insert(conn);
-								unauthorizedUser.password = password;
+								const unauthorizedUser = await insertTestUserWithRole(role, conn);
 
 								// login
-								const res = await chai.request(app).post('/api/loginLogout/login')
-									.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
-								token = res.body.token;
+								token = await getTokenForUser(unauthorizedUser);
 							});
 							mocha.afterEach(async () => {
 								// logout
 								if (token) {
-									await chai.request(app).post('/api/loginLogout/logout')
-										.set('token', token);
+									await logoutUser(token);
 								}
 							});
 
@@ -193,15 +184,12 @@ mocha.describe('groups API', () => {
 				let token;
 				mocha.beforeEach(async () => {
 					// login
-					const res = await chai.request(app).post('/api/loginLogout/login')
-						.send({ username: testUser.username, password: testUser.password });
-					token = res.body.token;
+					token = await getTokenForUser(testUser);
 				});
 				mocha.afterEach(async () => {
 					// logout
 					if (token) {
-						await chai.request(app).post('/api/loginLogout/logout')
-							.set('token', token);
+						await logoutUser(token);
 					}
 				});
 
@@ -269,22 +257,15 @@ mocha.describe('groups API', () => {
 							mocha.beforeEach(async () => {
 								// insert test user
 								const conn = testDB.getConnection();
-								const password = `password${role}`;
-								const hashedPassword = await bcrypt.hash(password, 10);
-								const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-								await unauthorizedUser.insert(conn);
-								unauthorizedUser.password = password;
+								const unauthorizedUser = await insertTestUserWithRole(role, conn);
 
 								// login
-								const res = await chai.request(app).post('/api/loginLogout/login')
-									.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
-								token = res.body.token;
+								token = await getTokenForUser(unauthorizedUser);
 							});
 							mocha.afterEach(async () => {
 								// logout
 								if (token) {
-									await chai.request(app).post('/api/loginLogout/logout')
-										.set('token', token);
+									await logoutUser(token);
 								}
 							});
 
