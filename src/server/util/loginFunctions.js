@@ -77,7 +77,7 @@ async function insertTestUserWithRole(role, conn) {
 async function logoutUser(token) {
     const res = await chai.request(app)
         .post('/api/loginLogout/logout')
-        .send({ token })
+        .send({ token });
     expect(res).to.have.status(HTTP_CODES.OK);
 }
 
