@@ -6,15 +6,15 @@
  * inserting meters prior to executing the test code. */
 
 const { chai, mocha, expect } = require('../common');
-const { app, testUser, testDB } = require('../commonTestDB');
+const { app, testDB } = require('../commonTestDB');
 const Meter = require('../../models/Meter');
 const User = require('../../models/User');
-const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
 const moment = require('moment-timezone');
 const gps = new Point(90, 45);
 const Unit = require('../../models/Unit');
 const { HTTP_CODES } = require('../../util/httpCodes');
+const { getTokenForRole, logoutWithToken } = require('../util/accessHelpers');
 
 /**
  * Verifies the values in the meter are the ones expected.
@@ -165,24 +165,14 @@ mocha.describe('meters API', () => {
 				// for the current test's role instead of every role.
 				mocha.describe(`${role} role`, () => {
 					mocha.beforeEach(async () => {
-						// insert test user
-						const conn = testDB.getConnection();
-						const password = `password${role}`;
-						const hashedPassword = await bcrypt.hash(password, 10);
-						const authorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-						await authorizedUser.insert(conn);
-						authorizedUser.password = password;
-
 						// login
-						const res = await chai.request(app).post('/api/loginLogout/login')
-							.send({ username: authorizedUser.username, password: authorizedUser.password });
-						token = res.body.token;
+						const conn = testDB.getConnection();
+						token = await getTokenForRole(role, conn);
 					});
 					mocha.afterEach(async () => {
 						// logout
 						if (token) {
-							await chai.request(app).post('/api/loginLogout/logout')
-								.set('token', token);
+							await logoutWithToken(token);
 						}
 					});
 
@@ -226,24 +216,14 @@ mocha.describe('meters API', () => {
 				let token;
 				mocha.describe(`${role} role`, () => {
 					mocha.beforeEach(async () => {
-						// insert test user
-						const conn = testDB.getConnection();
-						const password = `password${role}`;
-						const hashedPassword = await bcrypt.hash(password, 10);
-						const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-						await unauthorizedUser.insert(conn);
-						unauthorizedUser.password = password;
-
 						// login
-						const res = await chai.request(app).post('/api/loginLogout/login')
-							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
-						token = res.body.token;
+						const conn = testDB.getConnection();
+						token = await getTokenForRole(role, conn);
 					});
 					mocha.afterEach(async () => {
 						// logout
 						if (token) {
-							await chai.request(app).post('/api/loginLogout/logout')
-								.set('token', token);
+							await logoutWithToken(token);
 						}
 					});
 

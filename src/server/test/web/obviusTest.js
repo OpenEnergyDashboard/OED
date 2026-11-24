@@ -9,11 +9,11 @@ const { chai, mocha, expect } = require('../common');
 const { app, testUser, testDB } = require('../commonTestDB');
 const User = require('../../models/User');
 const Configfile = require('../../models/obvius/Configfile');
-const bcrypt = require('bcryptjs');
 const { insertUnits } = require('../../util/insertData');
 const Unit = require('../../models/Unit');
 const Meter = require('../../models/Meter.js');
 const { HTTP_CODES } = require('../../util/httpCodes');
+const { createUserWithRole } = require('../util/accessHelpers');
 
 //expected names and ids for obvius meters.
 const expMeterNames = [
@@ -39,11 +39,7 @@ mocha.describe('Obvius API', () => {
 			});
 			mocha.it('should accept requests from Obvius users', async () => {
 				const conn = testDB.getConnection();
-				const password = 'password';
-				const hashedPassword = await bcrypt.hash(password, 10);
-				const obviusUser = new User(undefined, 'obivus@example.com', hashedPassword, User.role.OBVIUS);
-				await obviusUser.insert(conn);
-				obviusUser.password = password;
+				const obviusUser = await createUserWithRole('OBVIUS', conn);
 				const res = await chai.request(app).post('/api/obvius').send({ username: obviusUser.username, password: obviusUser.password });
 				expect(res).to.have.status(HTTP_CODES.NOT_ACCEPTABLE); // this passes role verification but fails due to improper input
 				// test here for backwards compatibility using email parameter
@@ -56,11 +52,7 @@ mocha.describe('Obvius API', () => {
 				if (User.role[role] !== User.role.ADMIN && User.role[role] !== User.role.OBVIUS) {
 					mocha.it(`should reject requests from ${role}`, async () => {
 						const conn = testDB.getConnection();
-						const password = 'password';
-						const hashedPassword = await bcrypt.hash(password, 10);
-						const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-						await unauthorizedUser.insert(conn);
-						unauthorizedUser.password = password;
+						const unauthorizedUser = await createUserWithRole(role, conn);
 						const res = await chai.request(app).post('/api/obvius').send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
 						// request should respond with http code of 401 for failed user
 						expect(res).to.have.status(HTTP_CODES.UNAUTHORIZED);
@@ -96,11 +88,8 @@ mocha.describe('Obvius API', () => {
 				await insertUnits(unitData, false, conn);
 			});
 			mocha.it('should reject requests without a mode', async () => {
-				const password = 'password';
-				const hashedPassword = await bcrypt.hash(password, 10);
-				const obviusUser = new User(undefined, 'obivus@example.com', hashedPassword, User.role.OBVIUS);
-				await obviusUser.insert(conn);
-				obviusUser.password = password;
+				const conn = testDB.getConnection();
+				const obviusUser = await createUserWithRole('OBVIUS', conn);
 				const res = await chai.request(app).post('/api/obvius').send({ username: obviusUser.username, password: obviusUser.password });
 				//should respond with 406, not acceptable
 				expect(res).to.have.status(HTTP_CODES.NOT_ACCEPTABLE);
@@ -108,11 +97,8 @@ mocha.describe('Obvius API', () => {
 				expect(res.text).equals(`<pre>\nRequest must include mode parameter.\n</pre>\n`);
 			});
 			mocha.it('should accept status requests', async () => {
-				const password = 'password';
-				const hashedPassword = await bcrypt.hash(password, 10);
-				const obviusUser = new User(undefined, 'obivus@example.com', hashedPassword, User.role.OBVIUS);
-				await obviusUser.insert(conn);
-				obviusUser.password = password;
+				const conn = testDB.getConnection();
+				const obviusUser = await createUserWithRole('OBVIUS', conn);
 				const requestMode = 'STATUS';
 				const res = await chai.request(app).post('/api/obvius').send({ username: obviusUser.username, password: obviusUser.password, mode: requestMode });
 				//should respond with 200, success
@@ -121,11 +107,8 @@ mocha.describe('Obvius API', () => {
 				expect(res.text).equals("<pre>\nSUCCESS\n</pre>\n");
 			});
 			mocha.it('should accept valid logfile uploads', async () => {
-				const password = 'password';
-				const hashedPassword = await bcrypt.hash(password, 10);
-				const obviusUser = new User(undefined, 'obvius@example.com', hashedPassword, User.role.OBVIUS);
-				await obviusUser.insert(conn);
-				obviusUser.password = password;
+				const conn = testDB.getConnection();
+				const obviusUser = await createUserWithRole('OBVIUS', conn);
 				const logfileRequestMode = 'LOGFILEUPLOAD';
 
 				// Adapted from ../obvius/README.md
@@ -146,11 +129,8 @@ mocha.describe('Obvius API', () => {
 
 			});
 			mocha.it('should accept valid config file uploads', async () => {
-				const password = 'password';
-				const hashedPassword = await bcrypt.hash(password, 10);
-				const obviusUser = new User(undefined, 'obvius@example.com', hashedPassword, User.role.OBVIUS);
-				await obviusUser.insert(conn);
-				obviusUser.password = password;
+				const conn = testDB.getConnection();
+				const obviusUser = await createUserWithRole('OBVIUS', conn);
 				const requestMode = 'CONFIGFILEUPLOAD';
 
 				// Adapted from ../obvius/README.md
@@ -171,11 +151,8 @@ mocha.describe('Obvius API', () => {
 				expect(res.text).equals("<pre>\nSUCCESS\nAcquired config log with (pseudo)filename mb-001-mb-1234.ini.</pre>\n");
 			});
 			mocha.it('should return accurate config file manifests', async () => {
-				const password = 'password';
-				const hashedPassword = await bcrypt.hash(password, 10);
-				const obviusUser = new User(undefined, 'obvius@example.com', hashedPassword, User.role.OBVIUS);
-				await obviusUser.insert(conn);
-				obviusUser.password = password;
+				const conn = testDB.getConnection();
+				const obviusUser = await createUserWithRole('OBVIUS', conn);
 				const uploadRequestMode = 'CONFIGFILEUPLOAD';
 				const manifestRequestMode = 'CONFIGFILEMANIFEST';
 				const serialStart = 'mb-';
