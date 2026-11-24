@@ -23,9 +23,8 @@ const Point = require('../../models/Point');
 const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
 const Unit = require('../../models/Unit');
-const User = require('../../models/User');
 const { insertMeters } = require('../../util/insertData');
-const { getTokenForRole } = require('../../util/loginFunctions');
+const { getTokenForRole } = require('../util/accessHelpers');
 
 /** Shared valid timeInterval for line reading routes (used in multiple tests in this file). */
 const READINGS_LINE_TIME_INTERVAL = '2020-01-01T00:00:00.000Z_2020-01-02T00:00:00.000Z';

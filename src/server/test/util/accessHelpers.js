@@ -2,12 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const { chai, expect } = require('../test/common');
-const { app } = require('../test/commonTestDB');
-const { HTTP_CODES } = require('./httpCodes');
-const User = require('../models/User');
+const { chai, expect } = require('../common');
+const { app } = require('../commonTestDB');
+const { HTTP_CODES } = require('../../util/httpCodes');
+const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
-
 
 /**
  * Logs in as given user and returns the generated auth token.
@@ -40,7 +39,7 @@ async function getTokenForUser(user) {
 async function createUserWithRole(role, conn) {
     const password = `${role}password`;
     const user = new User(
-        undefined, `${role}@example.com`, bcrypt.hashSync(password, 10), User.role[role]
+        undefined, `${role}user`, bcrypt.hashSync(password, 10), User.role[role]
     );
     await user.insert(conn);
     user.password = password;
@@ -60,17 +59,6 @@ async function getTokenForRole(role, conn) {
 }
 
 /**
- * Creates a test user with the given role and inserts them into the database.
- * @param role The role to assign to the created user.
- * @param conn The database connection to use.
- * @returns The inserted user.
- */
-async function insertTestUserWithRole(role, conn) {
-    const user = await createUserWithRole(role, conn);
-    return user;
-}
-
-/**
  * Logs out the user with the given token.
  * @param {string} token The auth token of the user to log out.
  */
@@ -81,4 +69,4 @@ async function logoutUser(token) {
     expect(res).to.have.status(HTTP_CODES.OK);
 }
 
-module.exports = { getTokenForUser, createUserWithRole, getTokenForRole, insertTestUserWithRole, logoutUser };
+module.exports = { getTokenForUser, createUserWithRole, getTokenForRole, logoutUser };

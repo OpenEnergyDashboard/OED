@@ -6,7 +6,6 @@
 
 const { chai, mocha, expect } = require('../common');
 const { app, testUser, testDB } = require('../commonTestDB');
-const bcrypt = require('bcryptjs');
 const Group = require('../../models/Group');
 const Meter = require('../../models/Meter');
 const Point = require('../../models/Point');
@@ -14,7 +13,7 @@ const User = require('../../models/User');
 const Unit = require('../../models/Unit');
 const gpsPoint = new Point(90, 45);
 const { HTTP_CODES } = require('../../util/httpCodes');
-const { insertTestUserWithRole, getTokenForUser, logoutUser } = require('../../util/loginFunctions');
+const { getTokenForRole, getTokenForUser, logoutUser } = require('../util/accessHelpers');
 
 mocha.describe('groups API', () => {
 	let groupA;
@@ -155,12 +154,8 @@ mocha.describe('groups API', () => {
 						mocha.describe(`${role} role`, () => {
 							let token;
 							mocha.beforeEach(async () => {
-								// insert test user
-								const conn = testDB.getConnection();
-								const unauthorizedUser = await insertTestUserWithRole(role, conn);
-
 								// login
-								token = await getTokenForUser(unauthorizedUser);
+								token = await getTokenForRole(role, testDB.getConnection());
 							});
 							mocha.afterEach(async () => {
 								// logout
@@ -255,12 +250,8 @@ mocha.describe('groups API', () => {
 						let token;
 						mocha.describe(`${role} role`, () => {
 							mocha.beforeEach(async () => {
-								// insert test user
-								const conn = testDB.getConnection();
-								const unauthorizedUser = await insertTestUserWithRole(role, conn);
-
 								// login
-								token = await getTokenForUser(unauthorizedUser);
+								token = await getTokenForRole(role, testDB.getConnection());
 							});
 							mocha.afterEach(async () => {
 								// logout
