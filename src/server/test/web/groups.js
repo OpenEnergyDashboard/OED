@@ -13,7 +13,7 @@ const User = require('../../models/User');
 const Unit = require('../../models/Unit');
 const gpsPoint = new Point(90, 45);
 const { HTTP_CODES } = require('../../util/httpCodes');
-const { getTokenForRole, getTokenForUser, logoutWithToken } = require('../util/accessHelpers');
+const { getTokenForUser, getTokenForRole, logoutWithToken } = require('../util/accessHelpers');
 
 mocha.describe('groups API', () => {
 	let groupA;

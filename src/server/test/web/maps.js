@@ -12,7 +12,7 @@ const User = require('../../models/User');
 const Point = require('../../models/Point');
 const moment = require('moment');
 const { HTTP_CODES } = require('../../util/httpCodes');
-const { getTokenForRole, getTokenForUser, logoutWithToken } = require('../util/accessHelpers');
+const { getTokenForUser, getTokenForRole, logoutWithToken } = require('../util/accessHelpers');
 
 const origin = new Point(0.000001, 0.000001);
 const opposite = new Point(179.999999, 89.999999);

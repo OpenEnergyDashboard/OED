@@ -24,7 +24,7 @@ const Reading = require('../../models/Reading');
 const Meter = require('../../models/Meter');
 const Unit = require('../../models/Unit');
 const { insertMeters } = require('../../util/insertData');
-const { getTokenForRole } = require('../util/accessHelpers');
+const { getTokenForRole, logoutWithToken } = require('../util/accessHelpers');
 
 /** Shared valid timeInterval for line reading routes (used in multiple tests in this file). */
 const READINGS_LINE_TIME_INTERVAL = '2020-01-01T00:00:00.000Z_2020-01-02T00:00:00.000Z';
@@ -276,9 +276,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				expect(res).to.have.status(expectedStatus);
 			} finally {
 				if (token) {
-					await chai.request(app)
-						.post('/api/loginLogout/logout')
-						.set('token', token);
+					await logoutWithToken(token);
 				}
 			}
 		}
@@ -413,7 +411,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				});
 
 				mocha.afterEach(async () => {
-					await chai.request(app).post('/api/loginLogout/logout').set('token', token);
+					await logoutWithToken(token);
 				});
 
 				mocha.it('allows access to a non-displayable meter', async () => {
@@ -434,7 +432,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				});
 
 				mocha.afterEach(async () => {
-					await chai.request(app).post('/api/loginLogout/logout').set('token', token);
+					await logoutWithToken(token);
 				});
 
 				mocha.it('still hides reading data for a non-displayable meter', async () => {
@@ -493,7 +491,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				});
 
 				mocha.afterEach(async () => {
-					await chai.request(app).post('/api/loginLogout/logout').set('token', token);
+					await logoutWithToken(token);
 				});
 
 				mocha.it('includes a non-displayable meter in an authenticated count', async () => {
@@ -514,7 +512,7 @@ mocha.describe('Readings Route Parameter Validation', () => {
 				});
 
 				mocha.afterEach(async () => {
-					await chai.request(app).post('/api/loginLogout/logout').set('token', token);
+					await logoutWithToken(token);
 				});
 
 				mocha.it('still excludes a non-displayable meter from the count', async () => {

@@ -8,8 +8,8 @@
 const { chai, mocha, expect } = require('../common');
 const { app, testUser, testDB } = require('../commonTestDB');
 const User = require('../../models/User');
-const bcrypt = require('bcryptjs');
 const { HTTP_CODES } = require('../../util/httpCodes');
+const { getTokenForUser, getTokenForRole, logoutWithToken } = require('../util/accessHelpers');
 
 mocha.describe('preferences API', () => {
 	mocha.describe('modification api', () => {
@@ -29,15 +29,12 @@ mocha.describe('preferences API', () => {
 				let token;
 				mocha.beforeEach(async () => {
 					// login
-					const res = await chai.request(app).post('/api/loginLogout/login')
-						.send({ username: testUser.username, password: testUser.password });
-					token = res.body.token;
+					token = await getTokenForUser(testUser);
 				});
 				mocha.afterEach(async () => {
 					// logout
 					if (token) {
-						await chai.request(app).post('/api/loginLogout/logout')
-							.set('token', token);
+						await logoutWithToken(token);
 					}
 				});
 
@@ -58,24 +55,14 @@ mocha.describe('preferences API', () => {
 						// for the current test's role instead of every role.							
 						mocha.describe(`${role} role`, async () => {
 							mocha.beforeEach(async () => {
-								// insert test user
-								const conn = testDB.getConnection();
-								const password = `password${role}`;
-								const hashedPassword = await bcrypt.hash(password, 10);
-								const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-								await unauthorizedUser.insert(conn);
-								unauthorizedUser.password = password;
-
 								// login
-								const res = await chai.request(app).post('/api/loginLogout/login')
-									.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
-								token = res.body.token;
+								const conn = testDB.getConnection();
+								token = await getTokenForRole(role, conn);
 							});
 							mocha.afterEach(async () => {
 								// logout
 								if (token) {
-									await chai.request(app).post('/api/loginLogout/logout')
-										.set('token', token);
+									await logoutWithToken(token);
 								}
 							});
 

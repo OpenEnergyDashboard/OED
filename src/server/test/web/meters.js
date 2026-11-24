@@ -14,7 +14,7 @@ const moment = require('moment-timezone');
 const gps = new Point(90, 45);
 const Unit = require('../../models/Unit');
 const { HTTP_CODES } = require('../../util/httpCodes');
-const { getTokenForRole, logoutWithToken } = require('../util/accessHelpers');
+const { getTokenForUser, logoutWithRole } = require('../util/accessHelpers');
 
 /**
  * Verifies the values in the meter are the ones expected.
