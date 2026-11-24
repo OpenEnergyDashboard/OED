@@ -15,7 +15,7 @@ mocha.describe('Log Routes', () => {
 	let token, currentLogToDb;
 	mocha.beforeEach(async () => {
 		// Login to get authentication token
-		token = getTokenForUser(testUser);
+		token = await getTokenForUser(testUser);
 
 		// These tests insert and check for items in the DB. Normally the test setup in common.js
 		// stops all messages  to the DB but this allows them to happen.

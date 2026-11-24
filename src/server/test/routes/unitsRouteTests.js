@@ -12,7 +12,7 @@ mocha.describe('Units Route', () => {
 	let token;
 	mocha.beforeEach(async () => {
 		// login
-		token = getTokenForUser(testUser);
+		token = await getTokenForUser(testUser);
 	});
 	mocha.afterEach(async () => {
 		// logout
