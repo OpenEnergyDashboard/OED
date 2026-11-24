@@ -13,6 +13,7 @@ const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
 const moment = require('moment');
 const { HTTP_CODES } = require('../../util/httpCodes');
+const { getTokenForRole, getTokenForUser, logoutUser } = require('../util/accessHelpers');
 
 const origin = new Point(0.000001, 0.000001);
 const opposite = new Point(179.999999, 89.999999);
@@ -79,15 +80,12 @@ mocha.describe('maps API', () => {
 		// documented in usersTest.js.
 		mocha.beforeEach(async () => {
 			// login
-			const res = await chai.request(app).post('/api/loginLogout/login')
-				.send({ username: testUser.username, password: testUser.password });
-			token = res.body.token;
+			token = await getTokenForUser(testUser);
 		});
 		mocha.afterEach(async () => {
 			// logout
 			if (token) {
-				await chai.request(app).post('/api/loginLogout/logout')
-					.set('token', token);
+				await logoutUser(token);
 			}
 		});
 
@@ -117,24 +115,13 @@ mocha.describe('maps API', () => {
 				// for the current test's role instead of every role.
 				mocha.describe(`${role} role`, () => {
 					mocha.beforeEach(async () => {
-						// insert test user
-						const conn = testDB.getConnection();
-						const password = `password${role}`;
-						const hashedPassword = await bcrypt.hash(password, 10);
-						const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-						await unauthorizedUser.insert(conn);
-						unauthorizedUser.password = password;
-
 						// login
-						const res = await chai.request(app).post('/api/loginLogout/login')
-							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
-						token = res.body.token;
+						token = await getTokenForRole(role, testDB.getConnection());
 					});
 					mocha.afterEach(async () => {
 						// logout
 						if (token) {
-							await chai.request(app).post('/api/loginLogout/logout')
-								.set('token', token);
+							await logoutUser(token);
 						}
 					});
 
