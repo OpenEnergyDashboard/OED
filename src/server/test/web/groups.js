@@ -13,7 +13,7 @@ const User = require('../../models/User');
 const Unit = require('../../models/Unit');
 const gpsPoint = new Point(90, 45);
 const { HTTP_CODES } = require('../../util/httpCodes');
-const { getTokenForRole, getTokenForUser, logoutUser } = require('../util/accessHelpers');
+const { getTokenForRole, getTokenForUser, logoutWithToken } = require('../util/accessHelpers');
 
 mocha.describe('groups API', () => {
 	let groupA;
@@ -106,7 +106,7 @@ mocha.describe('groups API', () => {
 				mocha.afterEach(async () => {
 					// logout
 					if (token) {
-						await logoutUser(token);
+						await logoutWithToken(token);
 					}
 				});
 
@@ -155,12 +155,13 @@ mocha.describe('groups API', () => {
 							let token;
 							mocha.beforeEach(async () => {
 								// login
-								token = await getTokenForRole(role, testDB.getConnection());
+								const conn = testDB.getConnection();
+								token = await getTokenForRole(role, conn);
 							});
 							mocha.afterEach(async () => {
 								// logout
 								if (token) {
-									await logoutUser(token);
+									await logoutWithToken(token);
 								}
 							});
 
@@ -184,7 +185,7 @@ mocha.describe('groups API', () => {
 				mocha.afterEach(async () => {
 					// logout
 					if (token) {
-						await logoutUser(token);
+						await logoutWithToken(token);
 					}
 				});
 
@@ -251,12 +252,13 @@ mocha.describe('groups API', () => {
 						mocha.describe(`${role} role`, () => {
 							mocha.beforeEach(async () => {
 								// login
-								token = await getTokenForRole(role, testDB.getConnection());
+								const conn = testDB.getConnection();
+								token = await getTokenForRole(role, conn);
 							});
 							mocha.afterEach(async () => {
 								// logout
 								if (token) {
-									await logoutUser(token);
+									await logoutWithToken(token);
 								}
 							});
 

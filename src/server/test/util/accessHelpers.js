@@ -62,11 +62,12 @@ async function getTokenForRole(role, conn) {
  * Logs out the user with the given token.
  * @param {string} token The auth token of the user to log out.
  */
-async function logoutUser(token) {
+async function logoutWithToken(token) {
     const res = await chai.request(app)
         .post('/api/loginLogout/logout')
         .send({ token });
     expect(res).to.have.status(HTTP_CODES.OK);
+    expect(res.body).to.have.property('success', true);
 }
 
-module.exports = { getTokenForUser, createUserWithRole, getTokenForRole, logoutUser };
+module.exports = { getTokenForUser, createUserWithRole, getTokenForRole, logoutWithToken };

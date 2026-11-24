@@ -9,11 +9,10 @@ const { chai, mocha, expect } = require('../common');
 const { app, testUser, testDB } = require('../commonTestDB');
 const { Map } = require('../../models/Map');
 const User = require('../../models/User');
-const bcrypt = require('bcryptjs');
 const Point = require('../../models/Point');
 const moment = require('moment');
 const { HTTP_CODES } = require('../../util/httpCodes');
-const { getTokenForRole, getTokenForUser, logoutUser } = require('../util/accessHelpers');
+const { getTokenForRole, getTokenForUser, logoutWithToken } = require('../util/accessHelpers');
 
 const origin = new Point(0.000001, 0.000001);
 const opposite = new Point(179.999999, 89.999999);
@@ -85,7 +84,7 @@ mocha.describe('maps API', () => {
 		mocha.afterEach(async () => {
 			// logout
 			if (token) {
-				await logoutUser(token);
+				await logoutWithToken(token);
 			}
 		});
 
@@ -116,12 +115,13 @@ mocha.describe('maps API', () => {
 				mocha.describe(`${role} role`, () => {
 					mocha.beforeEach(async () => {
 						// login
-						token = await getTokenForRole(role, testDB.getConnection());
+						const conn = testDB.getConnection();
+						token = await getTokenForRole(role, conn);
 					});
 					mocha.afterEach(async () => {
 						// logout
 						if (token) {
-							await logoutUser(token);
+							await logoutWithToken(token);
 						}
 					});
 
