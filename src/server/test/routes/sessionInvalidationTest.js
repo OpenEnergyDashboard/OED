@@ -6,40 +6,21 @@
 
 const { chai, mocha, expect } = require('../common');
 const { app, testUser, testDB } = require('../commonTestDB');
-const bcrypt = require('bcryptjs');
-const User = require('../../models/User');
 const { HTTP_CODES } = require('../../util/httpCodes');
 const jwt = require('jsonwebtoken');
 const secretToken = require('../../config').secretToken;
+const { getTokenForUser, createUserWithRole, logoutWithToken } = require('../util/accessHelpers');
 
 mocha.describe('Session Invalidation Security', () => {
-	const LOGIN_ENDPOINT = '/api/loginLogout/login';
 	const LOGOUT_ENDPOINT = '/api/loginLogout/logout';
 	const VERIFY_ENDPOINT = '/api/verification';
 	const PROTECTED_ENDPOINT = '/api/users';
-	const CSV_USER_PASSWORD = 'csv-password-2';
-
-	/*
-	 * Logs in with the provided username and password, then returns the issued token.
-	 */
-	async function loginAndGetToken(username, password) {
-		const res = await chai.request(app)
-			.post(LOGIN_ENDPOINT)
-			.send({
-				username,
-				password
-			});
-
-		expect(res).to.have.status(HTTP_CODES.OK);
-		expect(res.body).to.have.property('token');
-		return res.body.token;
-	}
 
 	mocha.describe('Admin user session invalidation', () => {
 		let token;
 
 		mocha.beforeEach(async () => {
-			token = await loginAndGetToken(testUser.username, testUser.password);
+			token = await getTokenForUser(testUser);
 		});
 
 		mocha.it('should verify a valid token before logout', async () => {
@@ -61,12 +42,7 @@ mocha.describe('Session Invalidation Security', () => {
 			expect(beforeVerify.body).to.have.property('success', true);
 			expect(beforeVerify.body).to.not.have.property('message');
 
-			const logoutRes = await chai.request(app)
-				.post(LOGOUT_ENDPOINT)
-				.send({ token });
-
-			expect(logoutRes).to.have.status(HTTP_CODES.OK);
-			expect(logoutRes.body).to.have.property('success', true);
+			await logoutWithToken(token);
 
 			const verifyRes = await chai.request(app)
 				.post(VERIFY_ENDPOINT)
@@ -158,19 +134,11 @@ mocha.describe('Session Invalidation Security', () => {
 
 		mocha.beforeEach(async () => {
 			const conn = testDB.getConnection();
-
-			csvUser = new User(
-				undefined,
-				'test-csv@example.invalid',
-				bcrypt.hashSync(CSV_USER_PASSWORD, 10),
-				User.role.CSV
-			);
-
-			await csvUser.insert(conn);
+			csvUser = await createUserWithRole('CSV', conn);
 		});
 
 		mocha.it('should invalidate token for a CSV user', async () => {
-			const csvToken = await loginAndGetToken(csvUser.username, CSV_USER_PASSWORD);
+			const csvToken = await getTokenForUser(csvUser);
 
 			const beforeVerify = await chai.request(app)
 				.post(VERIFY_ENDPOINT)
@@ -179,12 +147,7 @@ mocha.describe('Session Invalidation Security', () => {
 			expect(beforeVerify).to.have.status(HTTP_CODES.OK);
 			expect(beforeVerify.body).to.have.property('success', true);
 
-			const logoutRes = await chai.request(app)
-				.post(LOGOUT_ENDPOINT)
-				.send({ token: csvToken });
-
-			expect(logoutRes).to.have.status(HTTP_CODES.OK);
-			expect(logoutRes.body).to.have.property('success', true);
+			await logoutWithToken(csvToken);
 
 			const verifyRes = await chai.request(app)
 				.post(VERIFY_ENDPOINT)

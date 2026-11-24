@@ -10,6 +10,7 @@ const { app, testUser, testDB, recreateDB } = require('../commonTestDB');
 const User = require('../../models/User');
 const bcrypt = require('bcryptjs');
 const { HTTP_CODES } = require('../../util/httpCodes');
+const { getTokenForUser, createUserWithRole, getTokenForRole, logoutWithToken } = require('../util/accessHelpers');
 
 mocha.describe('Users API', () => {
 	mocha.describe('Admin role', () => {
@@ -21,25 +22,20 @@ mocha.describe('Users API', () => {
 			// To fix this, manually call  DB creation. This will also happen right after this
 			// .before finishes.
 			await recreateDB();
-			const res = await chai.request(app).post('/api/loginLogout/login')
-				.send({ username: testUser.username, password: testUser.password });
-			token = res.body.token;
+			token = await getTokenForUser(testUser);
 		});
 		mocha.afterEach(async () => {
 			if (token) {
-				await chai.request(app).post('/api/loginLogout/logout')
-					.set('token', token);
+				await logoutWithToken(token);
 			}
 		});
 
 		mocha.it('retrieves users', async () => {
 			const conn = testDB.getConnection();
-			const password = await bcrypt.hash('password', 10);
-			const csv = new User(undefined, 'csv@example.com', password, User.role.CSV);
-			await csv.insert(conn);
+			const csv = await createUserWithRole('CSV', conn); // add csv user to DB
 			const res = await chai.request(app).get('/api/users').set('token', token);
 			expect(res).to.have.status(HTTP_CODES.OK);
-			expect(res.body).to.have.lengthOf(2);
+			expect(res.body).to.have.lengthOf(2); // Check if csv user was successfully added to the DB and retrieved
 		});
 		mocha.it('successfully creates a user', async () => {
 			// I cannot show the issue and it may be related to something else that was fixed
@@ -66,12 +62,9 @@ mocha.describe('Users API', () => {
 		});
 		mocha.it('update role', async () => {
 			const conn = testDB.getConnection();
-			const password = await bcrypt.hash('password', 10);
-			const csv = new User(undefined, 'csv@example.com', password, User.role.CSV, 'test note');
-			await csv.insert(conn);
+			const csv = await createUserWithRole('CSV', conn);
 			const csvUser = await User.getByUsername(csv.username, conn);
-			const obvius = new User(undefined, 'obvius@example.com', password, User.role.OBVIUS, 'test note');
-			await obvius.insert(conn);
+			const obvius = await createUserWithRole('OBVIUS', conn);
 			const obviusUser = await User.getByUsername(obvius.username, conn);
 			const retrievedTestUser = await User.getByUsername(testUser.username, conn);
 
@@ -97,9 +90,7 @@ mocha.describe('Users API', () => {
 		});
 		mocha.it('deletes a user', async () => {
 			const conn = testDB.getConnection();
-			const password = await bcrypt.hash('password', 10);
-			const csv = new User(undefined, 'csv@example.com', password, User.role.CSV);
-			await csv.insert(conn);
+			const csv = await createUserWithRole('CSV', conn);
 			const dbUser = await User.getByUsername(csv.username, conn);
 			expect(dbUser.username).to.equal(csv.username);
 			const res = await chai.request(app).post('/api/users/delete').set('token', token).send({ username: csv.username });
@@ -117,24 +108,14 @@ mocha.describe('Users API', () => {
 				// for the current test's role instead of every role.
 				mocha.describe(`${role} role`, () => {
 					mocha.beforeEach(async () => {
-						// insert test user
-						const conn = testDB.getConnection();
-						const password = `password${role}`;
-						const hashedPassword = await bcrypt.hash(password, 10);
-						const unauthorizedUser = new User(undefined, `${role}@example.com`, hashedPassword, User.role[role]);
-						await unauthorizedUser.insert(conn);
-						unauthorizedUser.password = password;
-
 						// login
-						const res = await chai.request(app).post('/api/loginLogout/login')
-							.send({ username: unauthorizedUser.username, password: unauthorizedUser.password });
-						token = res.body.token;
+						const conn = testDB.getConnection();
+						token = await getTokenForRole(role, conn);
 					});
 					mocha.afterEach(async () => {
 						// logout
 						if (token) {
-							await chai.request(app).post('/api/loginLogout/logout')
-								.set('token', token);
+							await logoutWithToken(token);
 						}
 					});
 

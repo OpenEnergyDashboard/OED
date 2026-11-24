@@ -9,14 +9,13 @@ const { app, testUser } = require('../commonTestDB');
 const moment = require('moment');
 const { log } = require('../../log');
 const { HTTP_CODES } = require('../../util/httpCodes');
+const { getTokenForUser, logoutWithToken } = require('../util/accessHelpers');
 
 mocha.describe('Log Routes', () => {
 	let token, currentLogToDb;
 	mocha.beforeEach(async () => {
 		// Login to get authentication token
-		const res = await chai.request(app).post('/api/loginLogout/login')
-			.send({ username: testUser.username, password: testUser.password });
-		token = res.body.token;
+		token = await getTokenForUser(testUser);
 
 		// These tests insert and check for items in the DB. Normally the test setup in common.js
 		// stops all messages  to the DB but this allows them to happen.
@@ -27,8 +26,7 @@ mocha.describe('Log Routes', () => {
 	mocha.afterEach(async () => {
 		// Logout after all tests are done
 		if (token) {
-			await chai.request(app).post('/api/loginLogout/logout')
-				.set('token', token);
+			await logoutWithToken(token);
 		}
 		// Reset after tests done.
 		log.logToDb = currentLogToDb;

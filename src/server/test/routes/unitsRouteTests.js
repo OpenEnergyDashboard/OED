@@ -6,20 +6,18 @@ const { chai, mocha, expect } = require('../common');
 const { app, testUser, testDB } = require('../commonTestDB');
 const Unit = require('../../models/Unit');
 const { HTTP_CODES } = require('../../util/httpCodes');
+const { getTokenForUser, logoutWithToken } = require('../util/accessHelpers');
 
 mocha.describe('Units Route', () => {
 	let token;
 	mocha.beforeEach(async () => {
 		// login
-		const res = await chai.request(app).post('/api/loginLogout/login')
-			.send({ username: testUser.username, password: testUser.password });
-		token = res.body.token;
+		token = await getTokenForUser(testUser);
 	});
 	mocha.afterEach(async () => {
 		// logout
 		if (token) {
-			await chai.request(app).post('/api/loginLogout/logout')
-				.set('token', token);
+			await logoutWithToken(token);
 		}
 	});
 
